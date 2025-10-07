@@ -3,6 +3,7 @@ import { AuthController, RequestWithUser } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../database/entities/user.entity';
+import { Response } from 'express';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -10,6 +11,14 @@ describe('AuthController', () => {
   const mockAuthService = {
     register: jest.fn(),
     login: jest.fn(),
+  };
+
+  const mockResponse = () => {
+    const res = {} as Response;
+    res.cookie = jest.fn().mockReturnValue(res);
+    res.clearCookie = jest.fn().mockReturnValue(res);
+    res.json = jest.fn().mockReturnValue(res);
+    return res;
   };
 
   beforeEach(async () => {
@@ -33,7 +42,7 @@ describe('AuthController', () => {
   });
 
   describe('register', () => {
-    it('should register a new user', async () => {
+    it('should register a new user and set cookie', async () => {
       const registerDto: RegisterDto = {
         email: 'test@example.com',
         username: 'testuser',
@@ -54,15 +63,28 @@ describe('AuthController', () => {
 
       mockAuthService.register.mockResolvedValue(expectedResponse);
 
-      const result = await controller.register(registerDto);
+      const res = mockResponse();
+      await controller.register(registerDto, res);
 
-      expect(result).toEqual(expectedResponse);
       expect(mockAuthService.register).toHaveBeenCalledWith(registerDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'jwt-token',
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+        }),
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        user: expectedResponse.user,
+      });
     });
   });
 
   describe('login', () => {
-    it('should login a user', () => {
+    it('should login a user and set cookie', () => {
       const mockUser = {
         id: 'uuid-123',
         email: 'test@example.com',
@@ -85,10 +107,23 @@ describe('AuthController', () => {
       mockAuthService.login.mockReturnValue(expectedResponse);
 
       const req = { user: mockUser };
-      const result = controller.login(req as unknown as RequestWithUser);
+      const res = mockResponse();
+      controller.login(req as unknown as RequestWithUser, res);
 
-      expect(result).toEqual(expectedResponse);
       expect(mockAuthService.login).toHaveBeenCalledWith(mockUser);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.cookie).toHaveBeenCalledWith(
+        'access_token',
+        'jwt-token',
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+        }),
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        user: expectedResponse.user,
+      });
     });
   });
 
@@ -113,6 +148,20 @@ describe('AuthController', () => {
         displayName: mockUser.displayName,
         avatarUrl: mockUser.avatarUrl,
         isGuest: mockUser.isGuest,
+      });
+    });
+  });
+
+  describe('logout', () => {
+    it('should clear the access_token cookie', () => {
+      const res = mockResponse();
+      controller.logout(res);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.clearCookie).toHaveBeenCalledWith('access_token');
+
+      expect(res.json).toHaveBeenCalledWith({
+        message: 'Logged out successfully',
       });
     });
   });

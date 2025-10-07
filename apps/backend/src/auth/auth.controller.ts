@@ -4,11 +4,12 @@ import {
   Get,
   Post,
   Request,
+  Response,
   UseGuards,
 } from '@nestjs/common';
+import type { Response as ExpressResponse } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../database/entities/user.entity';
@@ -22,14 +23,46 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Response({ passthrough: false }) res: ExpressResponse,
+  ) {
+    const result = await this.authService.register(registerDto);
+
+    // Set JWT token as HTTP-only cookie
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Return user data without the token in the response body
+    return res.json({
+      user: result.user,
+    });
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Request() req: RequestWithUser): AuthResponseDto {
-    return this.authService.login(req.user);
+  login(
+    @Request() req: RequestWithUser,
+    @Response({ passthrough: false }) res: ExpressResponse,
+  ) {
+    const result = this.authService.login(req.user);
+
+    // Set JWT token as HTTP-only cookie
+    res.cookie('access_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Return user data without the token in the response body
+    return res.json({
+      user: result.user,
+    });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -43,5 +76,13 @@ export class AuthController {
       avatarUrl: req.user.avatarUrl,
       isGuest: req.user.isGuest,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Response({ passthrough: false }) res: ExpressResponse) {
+    // Clear the access_token cookie
+    res.clearCookie('access_token');
+    return res.json({ message: 'Logged out successfully' });
   }
 }
