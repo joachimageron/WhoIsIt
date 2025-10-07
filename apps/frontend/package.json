@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint --fix"
+    "lint": "eslint --fix && echo 'Lint completed successfully!'"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",
@@ -33,7 +33,7 @@
     "@heroui/pagination": "2.2.24",
     "@heroui/popover": "2.3.27",
     "@heroui/progress": "2.2.22",
-    "@heroui/radio": "2.3.27",
+  "@heroui/radio": "2.3.27",
     "@heroui/react-utils": "2.1.14",
     "@heroui/scroll-shadow": "2.3.18",
     "@heroui/select": "2.4.28",
