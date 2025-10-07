@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
@@ -54,7 +59,7 @@ export class GameService {
       characterSet,
       host: hostUser ?? undefined,
       status: GameStatus.LOBBY,
-  visibility: this.resolveVisibility(request.visibility),
+      visibility: this.resolveVisibility(request.visibility),
       maxPlayers: this.normalizeOptionalNumber(request.maxPlayers),
       turnTimerSeconds: this.normalizeOptionalNumber(request.turnTimerSeconds),
       ruleConfig: request.ruleConfig ?? {},
@@ -62,7 +67,8 @@ export class GameService {
 
     const savedGame = await this.gameRepository.save(game);
 
-    const hostDisplayName = request.hostDisplayName?.trim() || hostUser?.displayName;
+    const hostDisplayName =
+      request.hostDisplayName?.trim() || hostUser?.displayName;
     if (!hostDisplayName) {
       throw new BadRequestException('A host display name is required');
     }
@@ -82,7 +88,10 @@ export class GameService {
     return this.mapToLobbyResponse(hydratedGame);
   }
 
-  async joinGame(roomCode: string, request: JoinGameRequest): Promise<GameLobbyResponse> {
+  async joinGame(
+    roomCode: string,
+    request: JoinGameRequest,
+  ): Promise<GameLobbyResponse> {
     const normalizedRoomCode = roomCode.trim().toUpperCase();
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
@@ -101,18 +110,26 @@ export class GameService {
       throw new BadRequestException('Game is not joinable');
     }
 
-    if (typeof game.maxPlayers === 'number' && game.players && game.players.length >= game.maxPlayers) {
+    if (
+      typeof game.maxPlayers === 'number' &&
+      game.players &&
+      game.players.length >= game.maxPlayers
+    ) {
       throw new BadRequestException('Game is full');
     }
 
     let joiningUser: User | null = null;
     if (request.userId) {
-      joiningUser = await this.userRepository.findOne({ where: { id: request.userId } });
+      joiningUser = await this.userRepository.findOne({
+        where: { id: request.userId },
+      });
       if (!joiningUser) {
         throw new NotFoundException('Joining user not found');
       }
 
-      const alreadyJoined = game.players?.some((player) => player.user?.id === joiningUser?.id);
+      const alreadyJoined = game.players?.some(
+        (player) => player.user?.id === joiningUser?.id,
+      );
       if (alreadyJoined) {
         return this.mapToLobbyResponse(game);
       }
@@ -132,7 +149,7 @@ export class GameService {
       avatarUrl:
         preferredAvatar && preferredAvatar.length > 0
           ? preferredAvatar
-          : joiningUser?.avatarUrl ?? undefined,
+          : (joiningUser?.avatarUrl ?? undefined),
       role: GamePlayerRole.PLAYER,
       isReady: false,
     });
@@ -177,7 +194,9 @@ export class GameService {
     });
 
     if (!game) {
-      throw new InternalServerErrorException('Game disappeared during processing');
+      throw new InternalServerErrorException(
+        'Game disappeared during processing',
+      );
     }
 
     return game;
@@ -208,9 +227,12 @@ export class GameService {
       visibility: game.visibility,
       hostUserId: game.host?.id,
       characterSetId: game.characterSet.id,
-      maxPlayers: typeof game.maxPlayers === 'number' ? game.maxPlayers : undefined,
+      maxPlayers:
+        typeof game.maxPlayers === 'number' ? game.maxPlayers : undefined,
       turnTimerSeconds:
-        typeof game.turnTimerSeconds === 'number' ? game.turnTimerSeconds : undefined,
+        typeof game.turnTimerSeconds === 'number'
+          ? game.turnTimerSeconds
+          : undefined,
       ruleConfig: game.ruleConfig ?? {},
       createdAt: game.createdAt?.toISOString?.() ?? new Date().toISOString(),
       startedAt: game.startedAt?.toISOString?.(),
@@ -219,7 +241,9 @@ export class GameService {
     };
   }
 
-  private resolveVisibility(visibility?: ContractGameVisibility): GameVisibility {
+  private resolveVisibility(
+    visibility?: ContractGameVisibility,
+  ): GameVisibility {
     if (visibility === 'public') {
       return GameVisibility.PUBLIC;
     }
@@ -232,9 +256,15 @@ export class GameService {
   }
 
   private async generateRoomCode(): Promise<string> {
-    for (let attempt = 0; attempt < GameService.MAX_ROOM_CODE_ATTEMPTS; attempt += 1) {
+    for (
+      let attempt = 0;
+      attempt < GameService.MAX_ROOM_CODE_ATTEMPTS;
+      attempt += 1
+    ) {
       const candidate = this.createRoomCodeCandidate();
-      const exists = await this.gameRepository.exists({ where: { roomCode: candidate } });
+      const exists = await this.gameRepository.exists({
+        where: { roomCode: candidate },
+      });
       if (!exists) {
         return candidate;
       }
@@ -253,7 +283,9 @@ export class GameService {
     return code;
   }
 
-  private normalizeOptionalNumber(value: number | null | undefined): number | null | undefined {
+  private normalizeOptionalNumber(
+    value: number | null | undefined,
+  ): number | null | undefined {
     if (typeof value !== 'number') {
       return undefined;
     }

@@ -1,4 +1,11 @@
-import { BadRequestException, Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+} from '@nestjs/common';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
@@ -17,7 +24,9 @@ export class GameController {
     }
 
     if (!body.hostDisplayName && !body.hostUserId) {
-      throw new BadRequestException('hostDisplayName is required when hostUserId is missing');
+      throw new BadRequestException(
+        'hostDisplayName is required when hostUserId is missing',
+      );
     }
 
     return this.gameService.createGame({
@@ -37,7 +46,9 @@ export class GameController {
     }
 
     if (!body?.displayName && !body?.userId) {
-      throw new BadRequestException('displayName is required when userId is missing');
+      throw new BadRequestException(
+        'displayName is required when userId is missing',
+      );
     }
 
     return this.gameService.joinGame(roomCode, {
@@ -48,7 +59,9 @@ export class GameController {
   }
 
   @Get(':roomCode')
-  async getLobby(@Param('roomCode') roomCode: string): Promise<GameLobbyResponse> {
+  async getLobby(
+    @Param('roomCode') roomCode: string,
+  ): Promise<GameLobbyResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
     }
