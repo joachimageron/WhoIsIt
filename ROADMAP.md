@@ -15,6 +15,8 @@
 - Stocker les grilles dans des modules JSON/TS versionnés ; prévoir un registre exportant la liste disponible et facilitant l’ajout d’une nouvelle grille.
 - Concevoir le modèle Postgres correspondant (tables `grids`, `characters`, `attributes`, `grid_attributes`) et un script de seed synchronisant fichiers et base.
 - Ajouter une validation automatique (tests unitaires ou script `pnpm data:check`) pour garantir l’unicité des IDs et la cohérence des attributs.
+- Introduire des scripts `pnpm data:seed` et `pnpm data:list` (optionnel) exposés depuis la racine pour synchroniser et auditer les données.
+- Documenter dans `docs/phase-2-vision.md` le flux d’ajout d’une grille et référencer les prérequis (Postgres, Prisma, Zod).
 
 ## Phase 3 – Backend fondations (NestJS + Postgres)
 
