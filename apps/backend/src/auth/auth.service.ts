@@ -53,10 +53,10 @@ export class AuthService {
       accessToken,
       user: {
         id: user.id,
-        email: user.email,
-        username: user.username,
+        email: user.email ?? null,
+        username: user.username ?? null,
         displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
+        avatarUrl: user.avatarUrl ?? null,
       },
     };
   }
@@ -93,10 +93,10 @@ export class AuthService {
       accessToken,
       user: {
         id: user.id,
-        email: user.email,
-        username: user.username,
+        email: user.email ?? null,
+        username: user.username ?? null,
         displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
+        avatarUrl: user.avatarUrl ?? null,
       },
     };
   }
