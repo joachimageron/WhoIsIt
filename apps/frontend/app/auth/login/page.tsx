@@ -3,22 +3,19 @@
 import React from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Checkbox } from "@heroui/checkbox";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const [isVisible, setIsVisible] = React.useState(false);
-  const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
-  const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
 
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
         <p className="pb-4 text-left text-3xl font-semibold">
-          Sign Up
+          Log In
           <span aria-label="emoji" className="ml-2" role="img">
             👋
           </span>
@@ -27,15 +24,6 @@ export default function RegisterPage() {
           className="flex flex-col gap-4"
           onSubmit={(e) => e.preventDefault()}
         >
-          <Input
-            isRequired
-            label="Username"
-            labelPlacement="outside"
-            name="username"
-            placeholder="Enter your username"
-            type="text"
-            variant="bordered"
-          />
           <Input
             isRequired
             label="Email"
@@ -69,47 +57,18 @@ export default function RegisterPage() {
             type={isVisible ? "text" : "password"}
             variant="bordered"
           />
-          <Input
-            isRequired
-            endContent={
-              <button type="button" onClick={toggleConfirmVisibility}>
-                {isConfirmVisible ? (
-                  <Icon
-                    className="text-default-400 pointer-events-none text-2xl"
-                    icon="solar:eye-closed-linear"
-                  />
-                ) : (
-                  <Icon
-                    className="text-default-400 pointer-events-none text-2xl"
-                    icon="solar:eye-bold"
-                  />
-                )}
-              </button>
-            }
-            label="Confirm Password"
-            labelPlacement="outside"
-            name="confirmPassword"
-            placeholder="Confirm your password"
-            type={isConfirmVisible ? "text" : "password"}
-            variant="bordered"
-          />
-          <Checkbox isRequired className="py-4" size="sm">
-            I agree with the&nbsp;
-            <Link className="relative z-1" href="#" size="sm">
-              Terms
+          <div className="flex items-center justify-between py-2">
+            <Link href="/auth/forgot-password" size="sm">
+              Forgot password?
             </Link>
-            &nbsp; and&nbsp;
-            <Link className="relative z-1" href="#" size="sm">
-              Privacy Policy
-            </Link>
-          </Checkbox>
+          </div>
           <Button color="primary" type="submit">
-            Sign Up
+            Log In
           </Button>
         </form>
         <p className="text-small text-center">
-          <Link href="/login" size="sm">
-            Already have an account? Log In
+          <Link href="/auth/register" size="sm">
+            Don&apos;t have an account? Sign Up
           </Link>
         </p>
       </div>
