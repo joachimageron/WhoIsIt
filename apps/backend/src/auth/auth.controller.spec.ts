@@ -1,12 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthController } from './auth.controller';
+import { AuthController, RequestWithUser } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { User } from '../database/entities/user.entity';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let authService: AuthService;
 
   const mockAuthService = {
     register: jest.fn(),
@@ -25,7 +24,6 @@ describe('AuthController', () => {
     }).compile();
 
     controller = module.get<AuthController>(AuthController);
-    authService = module.get<AuthService>(AuthService);
 
     jest.clearAllMocks();
   });
@@ -59,7 +57,7 @@ describe('AuthController', () => {
       const result = await controller.register(registerDto);
 
       expect(result).toEqual(expectedResponse);
-      expect(authService.register).toHaveBeenCalledWith(registerDto);
+      expect(mockAuthService.register).toHaveBeenCalledWith(registerDto);
     });
   });
 
@@ -87,10 +85,10 @@ describe('AuthController', () => {
       mockAuthService.login.mockReturnValue(expectedResponse);
 
       const req = { user: mockUser };
-      const result = controller.login(req as any);
+      const result = controller.login(req as unknown as RequestWithUser);
 
       expect(result).toEqual(expectedResponse);
-      expect(authService.login).toHaveBeenCalledWith(mockUser);
+      expect(mockAuthService.login).toHaveBeenCalledWith(mockUser);
     });
   });
 
@@ -106,7 +104,7 @@ describe('AuthController', () => {
       } as User;
 
       const req = { user: mockUser };
-      const result = controller.getProfile(req as any);
+      const result = controller.getProfile(req as unknown as RequestWithUser);
 
       expect(result).toEqual({
         id: mockUser.id,
