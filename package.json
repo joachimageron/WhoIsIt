@@ -10,5 +10,9 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test"
+  },
+  "dependencies": {
+    "@heroui/checkbox": "^2.3.27",
+    "@iconify/react": "^6.0.2"
   }
 }
