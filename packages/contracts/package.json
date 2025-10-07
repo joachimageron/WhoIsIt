@@ -1,0 +1,8 @@
+{
+  "name": "@whois-it/contracts",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared API contracts for the WhoIsIt game.",
+  "types": "./index.d.ts",
+  "license": "UNLICENSED"
+}
