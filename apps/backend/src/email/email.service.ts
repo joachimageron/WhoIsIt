@@ -133,7 +133,7 @@ export class EmailService {
   ): Promise<void> {
     const frontendUrl =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    const resetLink = `${frontendUrl}/auth/reset-password/${resetToken}`;
+    const resetLink = `${frontendUrl}/auth/forgot-password/${resetToken}`;
 
     const html = this.compileTemplate('reset-password', {
       username,
