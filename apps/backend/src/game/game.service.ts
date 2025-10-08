@@ -178,6 +178,27 @@ export class GameService {
     return this.mapToLobbyResponse(game);
   }
 
+  async updatePlayerReady(
+    playerId: string,
+    isReady: boolean,
+  ): Promise<GamePlayer> {
+    const player = await this.playerRepository.findOne({
+      where: { id: playerId },
+      relations: { game: true },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    if (player.game.status !== GameStatus.LOBBY) {
+      throw new BadRequestException('Game is not in lobby state');
+    }
+
+    player.isReady = isReady;
+    return this.playerRepository.save(player);
+  }
+
   private async loadLobbyById(id: string): Promise<Game> {
     const game = await this.gameRepository.findOne({
       where: { id },
