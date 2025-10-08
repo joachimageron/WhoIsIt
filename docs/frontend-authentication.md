@@ -68,6 +68,9 @@ await authApi.getProfile();
 
 // Logout
 await authApi.logout();
+
+// Resend verification email
+await authApi.resendVerificationEmail("user@example.com");
 ```
 
 All API calls use `credentials: 'include'` to ensure cookies are sent with requests.
@@ -205,6 +208,55 @@ export default function RegisterPage() {
   };
 
   // Form implementation...
+}
+```
+
+### Email Verification
+
+After registration, users need to verify their email address. Here's how to implement the resend verification functionality:
+
+```typescript
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@heroui/button";
+import * as authApi from "@/lib/auth-api";
+
+export default function VerificationPage({ email }: { email: string }) {
+  const router = useRouter();
+  const [isResending, setIsResending] = React.useState(false);
+  const [resendSuccess, setResendSuccess] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const handleResendEmail = async () => {
+    setError(null);
+    setResendSuccess(false);
+    setIsResending(true);
+
+    try {
+      await authApi.resendVerificationEmail(email);
+      setResendSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend verification email");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  return (
+    <div>
+      <h2>Check your email</h2>
+      <p>We've sent a verification email to {email}</p>
+      
+      {error && <div className="error">{error}</div>}
+      {resendSuccess && <div className="success">Verification email sent!</div>}
+      
+      <Button onClick={handleResendEmail} disabled={isResending}>
+        {isResending ? "Sending..." : "Resend Email"}
+      </Button>
+    </div>
+  );
 }
 ```
 
