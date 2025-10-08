@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
-import * as mjml2html from 'mjml';
+import mjml2html from 'mjml';
 import * as fs from 'fs';
 import * as path from 'path';
 
