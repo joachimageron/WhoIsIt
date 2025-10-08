@@ -1,6 +1,19 @@
 const { heroui } = require("@heroui/theme");
 
-/** @type {import('tailwindcss').Config} */
+/**
+ * Tailwind CSS configuration with Hero UI semantic colors customization.
+ * 
+ * Semantic colors configured:
+ * - Primary (Brand): #F07507 (Orange) with shades 100-900
+ * - Success: #08D877 (Green) with shades 100-900
+ * - Warning: #FFE207 (Yellow) with shades 100-900
+ * - Danger: #FF5959 (Red) with shades 100-900
+ * - Secondary (Info): #06BBE8 (Cyan) with shades 100-900
+ * 
+ * Colors are identical for both light and dark themes.
+ * 
+ * @type {import('tailwindcss').Config}
+ */
 const config = {
   content: [
     './components/**/*.{js,ts,jsx,tsx,mdx}',
