@@ -20,7 +20,7 @@ export type AuthState = {
   clearError: () => void;
   logout: () => void;
   reset: () => void;
-}
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
