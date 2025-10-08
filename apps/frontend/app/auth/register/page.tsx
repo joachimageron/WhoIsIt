@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -11,6 +11,7 @@ import { Icon } from "@iconify/react";
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
+import { addToast } from "@heroui/toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function RegisterPage() {
     useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = React.useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = React.useState(true);
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
@@ -91,6 +92,17 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (error){
+      addToast({
+      title: "Error",
+      description: error,
+      color: "danger",
+    });
+    }
+    
+  }, [error]);
 
   const handleResendEmail = async () => {
     clearError();

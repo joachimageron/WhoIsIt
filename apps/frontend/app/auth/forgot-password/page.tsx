@@ -11,9 +11,6 @@ export default function ForgotPasswordPage() {
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
         <p className="pb-4 text-left text-3xl font-semibold">
           Forgot Password
-          <span aria-label="emoji" className="ml-2" role="img">
-            🔐
-          </span>
         </p>
         <p className="text-small text-default-500 pb-2">
           Enter your email address and we&apos;ll send you a link to reset your
