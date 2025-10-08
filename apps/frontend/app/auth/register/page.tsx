@@ -101,7 +101,11 @@ export default function RegisterPage() {
       await authApi.resendVerificationEmail(formData.email);
       setResendSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to resend verification email");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to resend verification email",
+      );
     } finally {
       setIsResending(false);
     }
@@ -144,8 +148,8 @@ export default function RegisterPage() {
             <div className="mt-4 flex gap-2">
               <Button
                 color="primary"
-                variant="bordered"
                 isLoading={isResending}
+                variant="bordered"
                 onPress={handleResendEmail}
               >
                 Resend Email
