@@ -11,6 +11,7 @@ describe('AuthController', () => {
   const mockAuthService = {
     register: jest.fn(),
     login: jest.fn(),
+    updateLastSeen: jest.fn(),
   };
 
   const mockResponse = () => {
@@ -84,7 +85,7 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should login a user and set cookie', () => {
+    it('should login a user and set cookie', async () => {
       const mockUser = {
         id: 'uuid-123',
         email: 'test@example.com',
@@ -108,7 +109,7 @@ describe('AuthController', () => {
 
       const req = { user: mockUser };
       const res = mockResponse();
-      controller.login(req as unknown as RequestWithUser, res);
+      await controller.login(req as unknown as RequestWithUser, res);
 
       expect(mockAuthService.login).toHaveBeenCalledWith(mockUser);
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -128,7 +129,7 @@ describe('AuthController', () => {
   });
 
   describe('getProfile', () => {
-    it('should return user profile', () => {
+    it('should return user profile', async () => {
       const mockUser = {
         id: 'uuid-123',
         email: 'test@example.com',
@@ -139,8 +140,11 @@ describe('AuthController', () => {
       } as User;
 
       const req = { user: mockUser };
-      const result = controller.getProfile(req as unknown as RequestWithUser);
+      const result = await controller.getProfile(
+        req as unknown as RequestWithUser,
+      );
 
+      expect(mockAuthService.updateLastSeen).toHaveBeenCalledWith(mockUser.id);
       expect(result).toEqual({
         id: mockUser.id,
         email: mockUser.email,

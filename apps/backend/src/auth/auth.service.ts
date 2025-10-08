@@ -44,6 +44,7 @@ export class AuthService {
     verificationTokenExpiresAt.setHours(
       verificationTokenExpiresAt.getHours() + 24,
     ); // 24 hours from now
+    const lastSeenAt = new Date();
 
     // Create user
     const user = this.userRepository.create({
@@ -55,6 +56,7 @@ export class AuthService {
       emailVerified: false,
       verificationToken,
       verificationTokenExpiresAt,
+      lastSeenAt,
     });
 
     await this.userRepository.save(user);
@@ -111,12 +113,16 @@ export class AuthService {
     return user;
   }
 
-  login(user: User): AuthResponseDto {
+  async login(user: User): Promise<AuthResponseDto> {
+    user.lastSeenAt = new Date();
+    await this.userRepository.save(user);
+
     const payload = {
       sub: user.id,
       email: user.email,
       username: user.username,
     };
+
     const accessToken = this.jwtService.sign(payload);
 
     return {
@@ -129,6 +135,10 @@ export class AuthService {
         avatarUrl: user.avatarUrl ?? null,
       },
     };
+  }
+
+  async updateLastSeen(userId: string): Promise<void> {
+    await this.userRepository.update(userId, { lastSeenAt: new Date() });
   }
 
   async findById(userId: string): Promise<User | null> {

@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+const API_URL = process.env.API_URL ?? "http://localhost:4000";
 
 export type RegisterData = {
   email: string;
@@ -23,6 +23,14 @@ export type User = {
 
 export type AuthResponse = {
   user: User;
+};
+
+export type VerifyEmailData = {
+  token: string;
+};
+
+export type VerifyEmailResponse = {
+  message: string;
 };
 
 /**
@@ -128,6 +136,34 @@ export const resendVerificationEmail = async (email: string): Promise<void> => {
 
     throw new Error(error.message || "Failed to resend verification email");
   }
+};
+
+/**
+ * Verify user's email with the provided token
+ */
+export const verifyEmail = async (
+  data: VerifyEmailData,
+): Promise<VerifyEmailResponse> => {
+  const response = await fetch(`${API_URL}/auth/verify-email`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Email verification failed" }));
+
+    throw new Error(error.message || "Email verification failed");
+  }
+
+  const result: VerifyEmailResponse = await response.json();
+
+  return result;
 };
 
 /**

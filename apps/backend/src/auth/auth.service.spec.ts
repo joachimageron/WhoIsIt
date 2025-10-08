@@ -175,7 +175,7 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should return access token and user info', () => {
+    it('should return access token and user info', async () => {
       const mockUser = {
         id: 'uuid-123',
         email: 'test@example.com',
@@ -186,7 +186,7 @@ describe('AuthService', () => {
 
       mockJwtService.sign.mockReturnValue('jwt-token');
 
-      const result = service.login(mockUser);
+      const result = await service.login(mockUser);
 
       expect(result).toEqual({
         accessToken: 'jwt-token',

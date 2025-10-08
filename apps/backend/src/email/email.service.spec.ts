@@ -162,7 +162,7 @@ describe('EmailService', () => {
       expect(callArgs.subject).toBe('Verify your email address');
       expect(callArgs.text).toContain('testuser');
       expect(callArgs.text).toContain(
-        'http://localhost:3000/auth/verify-email?token=verification-token-123',
+        'http://localhost:3000/auth/verify-email/verification-token-123',
       );
     });
 
@@ -285,7 +285,7 @@ describe('EmailService', () => {
       expect(callArgs.subject).toBe('Reset your password');
       expect(callArgs.text).toContain('testuser');
       expect(callArgs.text).toContain(
-        'http://localhost:3000/auth/reset-password?token=reset-token-456',
+        'http://localhost:3000/auth/reset-password/reset-token-456',
       );
     });
 

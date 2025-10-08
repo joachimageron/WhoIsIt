@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -11,6 +11,7 @@ import { Icon } from "@iconify/react";
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
+import { addToast } from "@heroui/toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function RegisterPage() {
     useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = React.useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = React.useState(true);
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
@@ -28,7 +29,6 @@ export default function RegisterPage() {
   });
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
-  const [resendSuccess, setResendSuccess] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
@@ -94,12 +94,15 @@ export default function RegisterPage() {
 
   const handleResendEmail = async () => {
     clearError();
-    setResendSuccess(false);
     setIsResending(true);
 
     try {
-      await authApi.resendVerificationEmail(formData.email);
-      setResendSuccess(true);
+      await authApi.resendVerificationEmail("ageron.joachim@gmail.com");
+      addToast({
+        title: "Success",
+        description: "Verification email sent successfully! Please check your inbox.",
+        color: "success",
+      });
     } catch (err) {
       setError(
         err instanceof Error
@@ -110,6 +113,18 @@ export default function RegisterPage() {
       setIsResending(false);
     }
   };
+
+  
+  useEffect(() => {
+    if (error){
+      addToast({
+      title: "Error",
+      description: error,
+      color: "danger",
+    });
+    }
+    
+  }, [error]);
 
   if (registrationSuccess) {
     return (
@@ -128,16 +143,6 @@ export default function RegisterPage() {
               <strong>{formData.email}</strong>. Please check your inbox and
               click the verification link to activate your account.
             </p>
-            {error && (
-              <div className="rounded-medium bg-danger-50 px-4 py-3 text-danger w-full">
-                {error}
-              </div>
-            )}
-            {resendSuccess && (
-              <div className="rounded-medium bg-success-50 px-4 py-3 text-success w-full">
-                Verification email sent successfully! Please check your inbox.
-              </div>
-            )}
             <div className="rounded-medium mt-2 p-4">
               <p className="text-primary-600 text-sm">
                 <Icon className="inline mr-1" icon="solar:info-circle-bold" />
@@ -173,11 +178,6 @@ export default function RegisterPage() {
             👋
           </span>
         </p>
-        {error && (
-          <div className="rounded-medium bg-danger-50 px-4 py-3 text-danger">
-            {error}
-          </div>
-        )}
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired
