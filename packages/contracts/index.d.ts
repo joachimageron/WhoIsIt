@@ -44,3 +44,63 @@ export type GameLobbyResponse = {
   endedAt?: string;
   players: GamePlayerResponse[];
 };
+
+// Socket.IO Event Types
+export type SocketJoinRoomRequest = {
+  roomCode: string;
+  playerId?: string;
+};
+
+export type SocketJoinRoomResponse = {
+  success: boolean;
+  lobby?: GameLobbyResponse;
+  error?: string;
+};
+
+export type SocketLeaveRoomRequest = {
+  roomCode: string;
+};
+
+export type SocketLeaveRoomResponse = {
+  success: boolean;
+  error?: string;
+};
+
+export type SocketUpdatePlayerReadyRequest = {
+  roomCode: string;
+  playerId: string;
+  isReady: boolean;
+};
+
+export type SocketUpdatePlayerReadyResponse = {
+  success: boolean;
+  lobby?: GameLobbyResponse;
+  error?: string;
+};
+
+export type SocketPlayerJoinedEvent = {
+  roomCode: string;
+  lobby: GameLobbyResponse;
+};
+
+// Socket.IO Events
+export interface ServerToClientEvents {
+  lobbyUpdate: (lobby: GameLobbyResponse) => void;
+  playerJoined: (event: SocketPlayerJoinedEvent) => void;
+}
+
+export interface ClientToServerEvents {
+  joinRoom: (
+    data: SocketJoinRoomRequest,
+    callback: (response: SocketJoinRoomResponse) => void,
+  ) => void;
+  leaveRoom: (
+    data: SocketLeaveRoomRequest,
+    callback: (response: SocketLeaveRoomResponse) => void,
+  ) => void;
+  updatePlayerReady: (
+    data: SocketUpdatePlayerReadyRequest,
+    callback: (response: SocketUpdatePlayerReadyResponse) => void,
+  ) => void;
+}
+

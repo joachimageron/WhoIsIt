@@ -1,9 +1,14 @@
+import type {
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from "@whois-it/contracts";
+
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:3000";
+  process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:4000";
 
-let socket: Socket | null = null;
+let socket: Socket<ServerToClientEvents, ClientToServerEvents> | null = null;
 
 export const getSocket = () => {
   if (!socket) {
