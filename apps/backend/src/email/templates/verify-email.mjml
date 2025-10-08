@@ -1,0 +1,76 @@
+<mjml>
+  <mj-head>
+    <mj-title>Verify your email address</mj-title>
+    <mj-font name="Arial" href="https://fonts.googleapis.com/css?family=Arial" />
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#666666" line-height="24px" />
+      <mj-section padding="20px 0" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <!-- Header -->
+    <mj-section background-color="#ffffff" padding="40px 25px 20px">
+      <mj-column>
+        <mj-text align="center" font-size="28px" color="#333333" font-weight="bold">
+          WhoIsIt
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Content -->
+    <mj-section background-color="#ffffff" padding="20px 25px">
+      <mj-column>
+        <mj-text font-size="24px" color="#333333" font-weight="bold" padding-bottom="20px">
+          Welcome, {{username}}!
+        </mj-text>
+        <mj-text color="#666666" line-height="24px">
+          Thank you for registering with WhoIsIt. To complete your registration and activate your account, please verify your email address by clicking the button below.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Button -->
+    <mj-section background-color="#ffffff" padding="20px 25px">
+      <mj-column>
+        <mj-button background-color="#007bff" color="#ffffff" font-size="16px" font-weight="bold" border-radius="5px" href="{{verificationLink}}" padding="15px 40px">
+          Verify Email Address
+        </mj-button>
+      </mj-column>
+    </mj-section>
+
+    <!-- Alternative link -->
+    <mj-section background-color="#ffffff" padding="20px 25px">
+      <mj-column>
+        <mj-text color="#999999" font-size="12px" line-height="20px">
+          If the button doesn't work, copy and paste this link into your browser:
+        </mj-text>
+        <mj-text color="#007bff" font-size="12px" line-height="20px">
+          <a href="{{verificationLink}}" style="color: #007bff; word-break: break-all;">{{verificationLink}}</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#ffffff" padding="20px 25px 40px">
+      <mj-column>
+        <mj-divider border-color="#e0e0e0" padding="20px 0" />
+        <mj-text color="#999999" font-size="12px" line-height="18px">
+          This verification link will expire in 24 hours.
+        </mj-text>
+        <mj-text color="#999999" font-size="12px" line-height="18px">
+          If you didn't create an account with WhoIsIt, please ignore this email.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer branding -->
+    <mj-section background-color="#f4f4f4" padding="20px 25px">
+      <mj-column>
+        <mj-text align="center" color="#999999" font-size="11px">
+          © 2024 WhoIsIt. All rights reserved.
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
