@@ -5,6 +5,7 @@ This guide explains how to use the authentication system in the WhoIsIt frontend
 ## Overview
 
 The frontend authentication system is built using:
+
 - **Zustand** for state management
 - **HTTP-only cookies** for secure token storage
 - **React hooks** for authentication state access
@@ -26,12 +27,14 @@ const { setUser, setLoading, setError, clearError, logout } = useAuthStore();
 ```
 
 **State:**
+
 - `user`: Current user object or null
 - `isAuthenticated`: Boolean indicating authentication status
 - `isLoading`: Boolean for loading state during auth operations
 - `error`: Error message string or null
 
 **Actions:**
+
 - `setUser(user)`: Set the current user and mark as authenticated
 - `setLoading(loading)`: Set loading state
 - `setError(error)`: Set error message
@@ -95,6 +98,7 @@ function MyComponent() {
 ```
 
 **Features:**
+
 - Automatically checks authentication status on first render
 - Provides logout function that clears both server and client state
 - Handles loading states during authentication checks
@@ -287,6 +291,7 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:3000
 ```
 
 These variables configure:
+
 - `NEXT_PUBLIC_API_URL`: Backend API server URL (default: `http://localhost:4000`)
 - `NEXT_PUBLIC_SOCKET_URL`: Socket.IO server URL (default: `http://localhost:3000`)
 
@@ -323,6 +328,7 @@ try {
 ```
 
 Common error scenarios:
+
 - Invalid credentials (401)
 - Missing required fields (400)
 - Email/username already exists (409) - during registration
@@ -357,21 +363,25 @@ When testing authentication flows:
 ## Troubleshooting
 
 ### "Failed to fetch" errors
+
 - Ensure backend server is running
 - Check `NEXT_PUBLIC_API_URL` environment variable
 - Verify CORS configuration on backend
 
 ### Cookies not being set
+
 - Check browser console for cookie errors
 - Ensure `credentials: 'include'` is used in all fetch calls
 - Verify backend is setting cookies correctly
 
 ### User session not persisting
+
 - Check if cookies are being stored in browser
 - Verify cookie expiration time (7 days by default)
 - Ensure `useAuth` hook is called in components that need auth state
 
 ### TypeScript errors
+
 - Ensure all type imports are correct
 - Check that Zustand types are properly inferred
 - Verify API response types match the User type
