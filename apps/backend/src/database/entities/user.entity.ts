@@ -49,6 +49,12 @@ export class User {
   @Column({ type: 'timestamptz', nullable: true })
   verificationTokenExpiresAt?: Date | null;
 
+  @Column({ type: 'text', nullable: true })
+  passwordResetToken?: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  passwordResetTokenExpiresAt?: Date | null;
+
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
 
