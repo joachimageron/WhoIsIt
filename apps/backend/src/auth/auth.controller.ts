@@ -85,4 +85,16 @@ export class AuthController {
     res.clearCookie('access_token');
     return res.json({ message: 'Logged out successfully' });
   }
+
+  @Post('verify-email')
+  async verifyEmail(@Body('token') token: string) {
+    await this.authService.verifyEmail(token);
+    return { message: 'Email verified successfully' };
+  }
+
+  @Post('resend-verification')
+  async resendVerification(@Body('email') email: string) {
+    await this.authService.resendVerificationEmail(email);
+    return { message: 'Verification email sent' };
+  }
 }

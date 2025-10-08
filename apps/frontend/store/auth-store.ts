@@ -9,7 +9,7 @@ export type User = {
   isGuest?: boolean;
 };
 
-export interface AuthState {
+export type AuthState = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -20,7 +20,7 @@ export interface AuthState {
   clearError: () => void;
   logout: () => void;
   reset: () => void;
-}
+};
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
