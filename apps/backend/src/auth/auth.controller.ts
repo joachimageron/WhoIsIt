@@ -45,11 +45,11 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(
+  async login(
     @Request() req: RequestWithUser,
     @Response({ passthrough: false }) res: ExpressResponse,
   ) {
-    const result = this.authService.login(req.user);
+    const result = await this.authService.login(req.user);
 
     // Set JWT token as HTTP-only cookie
     res.cookie('access_token', result.accessToken, {
@@ -67,7 +67,8 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req: RequestWithUser) {
+  async getProfile(@Request() req: RequestWithUser) {
+    await this.authService.updateLastSeen(req.user.id);
     return {
       id: req.user.id,
       email: req.user.email,
