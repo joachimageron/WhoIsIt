@@ -2,7 +2,7 @@
   "name": "whois-it",
   "private": true,
   "version": "0.1.0",
-  "packageManager": "pnpm@10.6.4",
+  "packageManager": "pnpm@10.18.1",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "dev:frontend": "pnpm --filter @whois-it/frontend dev",
