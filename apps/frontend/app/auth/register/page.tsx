@@ -95,7 +95,7 @@ export default function RegisterPage() {
       <div className="flex h-full w-full items-center justify-center">
         <div className="rounded-large flex w-full max-w-md flex-col gap-4 px-8 pt-6 pb-10">
           <div className="flex flex-col items-center gap-4">
-            <div className="rounded-full bg-success-100 p-4">
+            <div className="rounded-full p-4">
               <Icon
                 className="text-success text-5xl"
                 icon="solar:check-circle-bold"
@@ -107,8 +107,8 @@ export default function RegisterPage() {
               <strong>{formData.email}</strong>. Please check your inbox and
               click the verification link to activate your account.
             </p>
-            <div className="rounded-medium bg-primary-50 mt-2 p-4">
-              <p className="text-primary-700 text-sm">
+            <div className="rounded-medium mt-2 p-4">
+              <p className="text-primary-600 text-sm">
                 <Icon className="inline mr-1" icon="solar:info-circle-bold" />
                 Didn&apos;t receive the email? Check your spam folder or click
                 below to resend.
