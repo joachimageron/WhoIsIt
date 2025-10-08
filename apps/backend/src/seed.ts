@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { runSeeds } from './database/seeds';
 import { DATABASE_ENTITIES } from './database/database.module';
