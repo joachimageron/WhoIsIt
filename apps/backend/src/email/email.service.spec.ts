@@ -285,7 +285,7 @@ describe('EmailService', () => {
       expect(callArgs.subject).toBe('Reset your password');
       expect(callArgs.text).toContain('testuser');
       expect(callArgs.text).toContain(
-        'http://localhost:3000/auth/reset-password?token=reset-token-456',
+        'http://localhost:3000/auth/reset-password/reset-token-456',
       );
     });
 

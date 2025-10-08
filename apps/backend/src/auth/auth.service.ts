@@ -122,7 +122,6 @@ export class AuthService {
       email: user.email,
       username: user.username,
     };
-    
 
     const accessToken = this.jwtService.sign(payload);
 

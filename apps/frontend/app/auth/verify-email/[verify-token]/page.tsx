@@ -5,8 +5,8 @@ import { useRouter, useParams } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import { Icon } from "@iconify/react";
-import * as authApi from "@/lib/auth-api";
 
+import * as authApi from "@/lib/auth-api";
 
 export default function VerifyEmailPage() {
   const router = useRouter();
@@ -38,6 +38,7 @@ export default function VerifyEmailPage() {
         setStatus("error");
       }
     };
+
     verifyEmail();
   }, [token]);
 

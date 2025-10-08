@@ -141,7 +141,9 @@ export const resendVerificationEmail = async (email: string): Promise<void> => {
 /**
  * Verify user's email with the provided token
  */
-export const verifyEmail = async (data: VerifyEmailData): Promise<VerifyEmailResponse> => {
+export const verifyEmail = async (
+  data: VerifyEmailData,
+): Promise<VerifyEmailResponse> => {
   const response = await fetch(`${API_URL}/auth/verify-email`, {
     method: "POST",
     credentials: "include",
