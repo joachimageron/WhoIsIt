@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
+import { addToast } from "@heroui/toast";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
@@ -51,20 +52,20 @@ export default function LoginPage() {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      addToast({
+        color: "danger",
+        title: error ? "Login Failed" : "",
+        description: error || "",
+      });
+    }
+  }, [error]);
+
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">
-          Log In
-          <span aria-label="emoji" className="ml-2" role="img">
-            👋
-          </span>
-        </p>
-        {error && (
-          <div className="rounded-medium bg-danger-50 px-4 py-3 text-danger">
-            {error}
-          </div>
-        )}
+        <p className="pb-4 text-left text-3xl font-semibold">Log In</p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired

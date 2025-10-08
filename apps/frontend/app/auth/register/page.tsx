@@ -7,11 +7,11 @@ import { Input } from "@heroui/input";
 import { Checkbox } from "@heroui/checkbox";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
+import { addToast } from "@heroui/toast";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
-import { addToast } from "@heroui/toast";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function RegisterPage() {
     useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
-  const [registrationSuccess, setRegistrationSuccess] = React.useState(true);
+  const [registrationSuccess, setRegistrationSuccess] = React.useState(false);
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
@@ -97,10 +97,11 @@ export default function RegisterPage() {
     setIsResending(true);
 
     try {
-      await authApi.resendVerificationEmail("ageron.joachim@gmail.com");
+      await authApi.resendVerificationEmail(formData.email);
       addToast({
         title: "Success",
-        description: "Verification email sent successfully! Please check your inbox.",
+        description:
+          "Verification email sent successfully! Please check your inbox.",
         color: "success",
       });
     } catch (err) {
@@ -114,16 +115,14 @@ export default function RegisterPage() {
     }
   };
 
-  
   useEffect(() => {
-    if (error){
+    if (error) {
       addToast({
-      title: "Error",
-      description: error,
-      color: "danger",
-    });
+        title: "Error",
+        description: error,
+        color: "danger",
+      });
     }
-    
   }, [error]);
 
   if (registrationSuccess) {
