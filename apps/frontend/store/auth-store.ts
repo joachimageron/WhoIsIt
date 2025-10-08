@@ -9,7 +9,7 @@ export type User = {
   isGuest?: boolean;
 };
 
-export interface AuthState {
+export type AuthState = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
