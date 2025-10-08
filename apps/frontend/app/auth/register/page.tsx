@@ -10,6 +10,7 @@ import { Icon } from "@iconify/react";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
+import { isValidEmail } from "@/lib/utils/validation";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -46,6 +47,12 @@ export default function RegisterPage() {
       !formData.confirmPassword
     ) {
       setError("Please fill in all required fields");
+
+      return;
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setError("Please enter a valid email address");
 
       return;
     }

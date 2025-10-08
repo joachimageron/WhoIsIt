@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
+import { isValidEmail, looksLikeEmail } from "@/lib/utils/validation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,6 +27,12 @@ export default function LoginPage() {
 
     if (!emailOrUsername || !password) {
       setError("Please fill in all fields");
+
+      return;
+    }
+
+    if (looksLikeEmail(emailOrUsername) && !isValidEmail(emailOrUsername)) {
+      setError("Please enter a valid email address");
 
       return;
     }
