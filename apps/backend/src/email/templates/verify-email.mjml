@@ -33,7 +33,7 @@
     <!-- Button -->
     <mj-section background-color="#ffffff" padding="20px 25px">
       <mj-column>
-        <mj-button background-color="#007bff" color="#ffffff" font-size="16px" font-weight="bold" border-radius="5px" href="{{verificationLink}}" padding="15px 40px">
+        <mj-button background-color="#F07507" color="#ffffff" font-size="16px" font-weight="bold" border-radius="5px" href="{{verificationLink}}" padding="15px 40px">
           Verify Email Address
         </mj-button>
       </mj-column>
@@ -45,8 +45,8 @@
         <mj-text color="#999999" font-size="12px" line-height="20px">
           If the button doesn't work, copy and paste this link into your browser:
         </mj-text>
-        <mj-text color="#007bff" font-size="12px" line-height="20px">
-          <a href="{{verificationLink}}" style="color: #007bff; word-break: break-all;">{{verificationLink}}</a>
+        <mj-text color="#F07507" font-size="12px" line-height="20px">
+          <a href="{{verificationLink}}" style="color: #F07507; word-break: break-all;">{{verificationLink}}</a>
         </mj-text>
       </mj-column>
     </mj-section>

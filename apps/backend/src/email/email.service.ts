@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
-import * as mjml2html from 'mjml';
+import mjml2html from 'mjml';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -34,19 +34,15 @@ export class EmailService {
       });
 
       // Compile MJML to HTML
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
       const result = mjml2html(mjmlContent);
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (result.errors && result.errors.length > 0) {
         this.logger.warn(
           `MJML compilation warnings for ${templateName}:`,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           result.errors,
         );
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
       return result.html;
     } catch (error) {
       this.logger.error(`Failed to compile template ${templateName}:`, error);
@@ -87,7 +83,7 @@ export class EmailService {
   ): Promise<void> {
     const frontendUrl =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
-    const verificationLink = `${frontendUrl}/auth/verify-email?token=${verificationToken}`;
+    const verificationLink = `${frontendUrl}/auth/verify-email/${verificationToken}`;
 
     const html = this.compileTemplate('verify-email', {
       username,
