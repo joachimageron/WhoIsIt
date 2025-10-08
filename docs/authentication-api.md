@@ -8,11 +8,15 @@ This document describes the RESTful authentication endpoints available in the Wh
 http://localhost:4000/auth
 ```
 
+## Authentication Method
+
+This API uses **HTTP-only cookies** for authentication. After successful registration or login, the JWT token is automatically stored in a secure, HTTP-only cookie named `access_token`. Your browser will automatically include this cookie in subsequent requests to protected endpoints.
+
 ## Endpoints
 
 ### 1. Register
 
-Create a new user account.
+Create a new user account and receive an authentication cookie.
 
 **Endpoint:** `POST /auth/register`
 
@@ -33,9 +37,15 @@ Create a new user account.
 - `displayName`: Required
 
 **Success Response (201):**
+
+*Response Headers:*
+```
+Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax
+```
+
+*Response Body:*
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "uuid",
     "email": "user@example.com",
@@ -54,7 +64,7 @@ Create a new user account.
 
 ### 2. Login
 
-Authenticate an existing user.
+Authenticate an existing user and receive an authentication cookie.
 
 **Endpoint:** `POST /auth/login`
 
@@ -69,10 +79,16 @@ Authenticate an existing user.
 **Notes:**
 - `emailOrUsername` can be either the user's email address or username
 
-**Success Response (200):**
+**Success Response (201):**
+
+*Response Headers:*
+```
+Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax
+```
+
+*Response Body:*
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": "uuid",
     "email": "user@example.com",
@@ -91,14 +107,12 @@ Authenticate an existing user.
 
 ### 3. Get Profile
 
-Get the current user's profile information.
+Get the current user's profile information. Requires authentication via cookie.
 
 **Endpoint:** `GET /auth/profile`
 
-**Headers:**
-```
-Authorization: Bearer <access_token>
-```
+**Authentication:**
+The authentication cookie is automatically included by the browser. No manual headers needed.
 
 **Success Response (200):**
 ```json
@@ -113,24 +127,57 @@ Authorization: Bearer <access_token>
 ```
 
 **Error Responses:**
-- `401 Unauthorized`: Missing or invalid token
+- `401 Unauthorized`: Missing or invalid authentication cookie
 
 ---
 
-## JWT Token
+### 4. Logout
 
-The JWT access token is valid for **7 days** from issuance. Include it in the `Authorization` header for protected endpoints:
+Clear the authentication cookie and log out the user.
 
+**Endpoint:** `POST /auth/logout`
+
+**Authentication:**
+Requires authentication via cookie.
+
+**Success Response (201):**
+
+*Response Headers:*
 ```
-Authorization: Bearer <access_token>
+Set-Cookie: access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
 ```
+
+*Response Body:*
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+**Error Responses:**
+- `401 Unauthorized`: Missing or invalid authentication cookie
+
+---
+
+## Cookie Details
+
+The authentication cookie has the following security features:
+
+- **Name:** `access_token`
+- **Duration:** 7 days (604800 seconds)
+- **HttpOnly:** Yes - prevents JavaScript access (XSS protection)
+- **SameSite:** Lax - prevents CSRF attacks
+- **Secure:** Yes (in production) - HTTPS-only transmission
+- **Path:** / - available for all routes
 
 ## Security Features
 
+- **Cookie-based Authentication**: JWT tokens stored in HTTP-only cookies for XSS protection
 - **Password Hashing**: Passwords are hashed using bcrypt with 10 rounds
 - **JWT Signature**: Tokens are signed with a secret key (configurable via `JWT_SECRET` environment variable)
+- **CSRF Protection**: SameSite=Lax cookie attribute prevents cross-site request forgery
 - **Validation**: All inputs are validated using class-validator
-- **CORS**: Enabled for frontend integration
+- **CORS**: Enabled with credentials support for cookie-based authentication
 
 ## Environment Variables
 
@@ -138,6 +185,7 @@ Set these in your `.env` file:
 
 ```env
 JWT_SECRET=your-secret-key-here
+NODE_ENV=production  # Enables secure flag on cookies for HTTPS-only
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
@@ -153,23 +201,29 @@ PORT=4000
 
 **Register:**
 ```bash
-curl -X POST http://localhost:4000/auth/register \
+curl -c cookies.txt -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","username":"testuser","password":"password123","displayName":"Test User"}'
 ```
 
 **Login:**
 ```bash
-curl -X POST http://localhost:4000/auth/login \
+curl -c cookies.txt -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
   -d '{"emailOrUsername":"testuser","password":"password123"}'
 ```
 
 **Get Profile:**
 ```bash
-curl -X GET http://localhost:4000/auth/profile \
-  -H "Authorization: Bearer <your-token-here>"
+curl -b cookies.txt -X GET http://localhost:4000/auth/profile
 ```
+
+**Logout:**
+```bash
+curl -b cookies.txt -c cookies.txt -X POST http://localhost:4000/auth/logout
+```
+
+**Note:** The `-c cookies.txt` flag saves cookies to a file, and `-b cookies.txt` sends cookies from that file.
 
 ### Using JavaScript/TypeScript
 
@@ -177,6 +231,7 @@ curl -X GET http://localhost:4000/auth/profile \
 // Register
 const registerResponse = await fetch('http://localhost:4000/auth/register', {
   method: 'POST',
+  credentials: 'include', // Important: includes cookies in requests
   headers: {
     'Content-Type': 'application/json',
   },
@@ -187,11 +242,13 @@ const registerResponse = await fetch('http://localhost:4000/auth/register', {
     displayName: 'Test User',
   }),
 });
-const { accessToken, user } = await registerResponse.json();
+const { user } = await registerResponse.json();
+// Authentication cookie is automatically stored by the browser
 
 // Login
 const loginResponse = await fetch('http://localhost:4000/auth/login', {
   method: 'POST',
+  credentials: 'include', // Important: includes cookies in requests
   headers: {
     'Content-Type': 'application/json',
   },
@@ -200,13 +257,32 @@ const loginResponse = await fetch('http://localhost:4000/auth/login', {
     password: 'password123',
   }),
 });
-const { accessToken, user } = await loginResponse.json();
+const { user } = await loginResponse.json();
+// Authentication cookie is automatically stored by the browser
 
 // Get Profile
 const profileResponse = await fetch('http://localhost:4000/auth/profile', {
-  headers: {
-    'Authorization': `Bearer ${accessToken}`,
-  },
+  credentials: 'include', // Important: sends cookies with the request
 });
 const profile = await profileResponse.json();
+
+// Logout
+const logoutResponse = await fetch('http://localhost:4000/auth/logout', {
+  method: 'POST',
+  credentials: 'include', // Important: sends cookies with the request
+});
+const { message } = await logoutResponse.json();
+// Authentication cookie is automatically cleared by the browser
 ```
+
+**Important:** Always use `credentials: 'include'` in fetch requests to ensure cookies are sent and received properly.
+
+## Backward Compatibility
+
+For API clients that cannot use cookies, the JWT token can still be sent via the `Authorization` header:
+
+```
+Authorization: Bearer <access_token>
+```
+
+However, this method is less secure than cookie-based authentication and should only be used when cookies are not available (e.g., mobile apps, server-to-server communication).
