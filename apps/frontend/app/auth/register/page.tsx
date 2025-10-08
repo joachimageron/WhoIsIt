@@ -13,7 +13,8 @@ import * as authApi from "@/lib/auth-api";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setUser, setLoading, setError, clearError, isLoading, error } = useAuthStore();
+  const { setUser, setLoading, setError, clearError, isLoading, error } =
+    useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
   const [formData, setFormData] = React.useState({
@@ -30,6 +31,7 @@ export default function RegisterPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -37,18 +39,26 @@ export default function RegisterPage() {
     e.preventDefault();
     clearError();
 
-    if (!formData.username || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (
+      !formData.username ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
       setError("Please fill in all required fields");
+
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+
       return;
     }
 
     if (!agreedToTerms) {
       setError("Please agree to the terms and privacy policy");
+
       return;
     }
 
@@ -61,6 +71,7 @@ export default function RegisterPage() {
         password: formData.password,
         displayName: formData.displayName || formData.username,
       });
+
       setUser(user);
       router.push("/");
     } catch (err) {
@@ -84,10 +95,7 @@ export default function RegisterPage() {
             {error}
           </div>
         )}
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit}
-        >
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired
             label="Username"
@@ -172,7 +180,13 @@ export default function RegisterPage() {
             variant="bordered"
             onChange={handleInputChange}
           />
-          <Checkbox isRequired className="py-4" size="sm" isSelected={agreedToTerms} onValueChange={setAgreedToTerms}>
+          <Checkbox
+            isRequired
+            className="py-4"
+            isSelected={agreedToTerms}
+            size="sm"
+            onValueChange={setAgreedToTerms}
+          >
             I agree with the&nbsp;
             <Link className="relative z-1" href="#" size="sm">
               Terms
@@ -182,7 +196,7 @@ export default function RegisterPage() {
               Privacy Policy
             </Link>
           </Checkbox>
-          <Button color="primary" type="submit" isLoading={isLoading}>
+          <Button color="primary" isLoading={isLoading} type="submit">
             Sign Up
           </Button>
         </form>

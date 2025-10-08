@@ -12,7 +12,8 @@ import * as authApi from "@/lib/auth-api";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { setUser, setLoading, setError, clearError, isLoading, error } = useAuthStore();
+  const { setUser, setLoading, setError, clearError, isLoading, error } =
+    useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [emailOrUsername, setEmailOrUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -25,6 +26,7 @@ export default function LoginPage() {
 
     if (!emailOrUsername || !password) {
       setError("Please fill in all fields");
+
       return;
     }
 
@@ -32,6 +34,7 @@ export default function LoginPage() {
 
     try {
       const user = await authApi.login({ emailOrUsername, password });
+
       setUser(user);
       router.push("/");
     } catch (err) {
@@ -55,10 +58,7 @@ export default function LoginPage() {
             {error}
           </div>
         )}
-        <form
-          className="flex flex-col gap-4"
-          onSubmit={handleSubmit}
-        >
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired
             label="Email or Username"
@@ -101,7 +101,7 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <Button color="primary" type="submit" isLoading={isLoading}>
+          <Button color="primary" isLoading={isLoading} type="submit">
             Log In
           </Button>
         </form>

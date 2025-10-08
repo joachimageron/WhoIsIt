@@ -39,11 +39,15 @@ export const register = async (data: RegisterData): Promise<User> => {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Registration failed" }));
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Registration failed" }));
+
     throw new Error(error.message || "Registration failed");
   }
 
   const { user }: AuthResponse = await response.json();
+
   return user;
 };
 
@@ -61,11 +65,15 @@ export const login = async (data: LoginData): Promise<User> => {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: "Login failed" }));
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Login failed" }));
+
     throw new Error(error.message || "Login failed");
   }
 
   const { user }: AuthResponse = await response.json();
+
   return user;
 };
 
@@ -82,6 +90,7 @@ export const getProfile = async (): Promise<User> => {
   }
 
   const user: User = await response.json();
+
   return user;
 };
 
