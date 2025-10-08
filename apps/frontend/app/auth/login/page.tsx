@@ -58,7 +58,7 @@ export default function LoginPage() {
             variant="bordered"
           />
           <div className="flex items-center justify-between py-2">
-            <Link href="/forgot-password" size="sm">
+            <Link href="/auth/forgot-password" size="sm">
               Forgot password?
             </Link>
           </div>
@@ -67,7 +67,7 @@ export default function LoginPage() {
           </Button>
         </form>
         <p className="text-small text-center">
-          <Link href="/register" size="sm">
+          <Link href="/auth/register" size="sm">
             Don&apos;t have an account? Sign Up
           </Link>
         </p>

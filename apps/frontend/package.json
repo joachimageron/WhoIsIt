@@ -33,7 +33,7 @@
     "@heroui/pagination": "2.2.24",
     "@heroui/popover": "2.3.27",
     "@heroui/progress": "2.2.22",
-  "@heroui/radio": "2.3.27",
+    "@heroui/radio": "2.3.27",
     "@heroui/react-utils": "2.1.14",
     "@heroui/scroll-shadow": "2.3.18",
     "@heroui/select": "2.4.28",
@@ -59,10 +59,12 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "socket.io-client": "^4.8.1",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.8",
+    "@iconify/react": "^6.0.2"
   },
   "devDependencies": {
     "@eslint/compat": "^1.4.0",
+    "@whois-it/contracts": "workspace:*",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@next/eslint-plugin-next": "15.3.4",
