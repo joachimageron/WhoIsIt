@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -11,8 +13,16 @@ import { Button } from "@heroui/button";
 import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
+import { Avatar } from "@heroui/avatar";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/dropdown";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
@@ -21,12 +31,20 @@ import {
   TwitterIcon,
   GithubIcon,
   DiscordIcon,
-  HeartFilledIcon,
   SearchIcon,
   Logo,
 } from "@/components/icons";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 export const Navbar = () => {
+  const router = useRouter();
+  const { user, isAuthenticated, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/auth/login");
+  };
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -93,16 +111,53 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
-          <Button
-            isExternal
-            as={Link}
-            className="text-sm font-normal text-default-600 bg-default-100"
-            href={siteConfig.links.sponsor}
-            startContent={<HeartFilledIcon className="text-danger" />}
-            variant="flat"
-          >
-            Sponsor
-          </Button>
+          {isAuthenticated && user ? (
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Avatar
+                  as="button"
+                  className="transition-transform"
+                  name={user.displayName}
+                  size="sm"
+                  src={user.avatarUrl || undefined}
+                />
+              </DropdownTrigger>
+              <DropdownMenu aria-label="User Actions" variant="flat">
+                <DropdownItem key="profile" className="h-14 gap-2">
+                  <p className="font-semibold">Signed in as</p>
+                  <p className="font-semibold">{user.email}</p>
+                </DropdownItem>
+                <DropdownItem key="settings">Settings</DropdownItem>
+                <DropdownItem
+                  key="logout"
+                  color="danger"
+                  onPress={handleLogout}
+                >
+                  Log Out
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          ) : (
+            <>
+              <Button
+                as={NextLink}
+                className="text-sm font-normal text-default-600"
+                href="/auth/login"
+                variant="flat"
+              >
+                Login
+              </Button>
+              <Button
+                as={NextLink}
+                className="text-sm font-normal"
+                color="primary"
+                href="/auth/register"
+                variant="flat"
+              >
+                Sign Up
+              </Button>
+            </>
+          )}
         </NavbarItem>
       </NavbarContent>
 
@@ -134,6 +189,35 @@ export const Navbar = () => {
               </Link>
             </NavbarMenuItem>
           ))}
+          {!isAuthenticated && (
+            <>
+              <NavbarMenuItem>
+                <Link color="primary" href="/auth/login" size="lg">
+                  Login
+                </Link>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Link color="primary" href="/auth/register" size="lg">
+                  Sign Up
+                </Link>
+              </NavbarMenuItem>
+            </>
+          )}
+          {isAuthenticated && user && (
+            <>
+              <NavbarMenuItem>
+                <div className="text-small">
+                  <p className="font-semibold">{user.displayName}</p>
+                  <p className="text-default-500">{user.email}</p>
+                </div>
+              </NavbarMenuItem>
+              <NavbarMenuItem>
+                <Link color="danger" size="lg" onPress={handleLogout}>
+                  Log Out
+                </Link>
+              </NavbarMenuItem>
+            </>
+          )}
         </div>
       </NavbarMenu>
     </HeroUINavbar>
