@@ -10,6 +10,8 @@ import {
 import type { Response as ExpressResponse } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../database/entities/user.entity';
@@ -96,5 +98,20 @@ export class AuthController {
   async resendVerification(@Body('email') email: string) {
     await this.authService.resendVerificationEmail(email);
     return { message: 'Verification email sent' };
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.authService.requestPasswordReset(forgotPasswordDto.email);
+    return { message: 'If the email exists, a reset link has been sent' };
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.password,
+    );
+    return { message: 'Password reset successfully' };
   }
 }
