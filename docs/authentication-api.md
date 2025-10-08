@@ -4,7 +4,7 @@ This document describes the RESTful authentication endpoints available in the Wh
 
 ## Base URL
 
-```
+```http
 http://localhost:4000/auth
 ```
 
@@ -21,6 +21,7 @@ Create a new user account and receive an authentication cookie.
 **Endpoint:** `POST /auth/register`
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -31,6 +32,7 @@ Create a new user account and receive an authentication cookie.
 ```
 
 **Validation Rules:**
+
 - `email`: Must be a valid email address
 - `username`: Required, minimum 3 characters
 - `password`: Required, minimum 6 characters
@@ -39,11 +41,13 @@ Create a new user account and receive an authentication cookie.
 **Success Response (201):**
 
 *Response Headers:*
-```
+
+```http
 Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax
 ```
 
 *Response Body:*
+
 ```json
 {
   "user": {
@@ -57,6 +61,7 @@ Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite
 ```
 
 **Error Responses:**
+
 - `400 Bad Request`: Invalid input data (validation failed)
 - `409 Conflict`: Email or username already exists
 
@@ -69,6 +74,7 @@ Authenticate an existing user and receive an authentication cookie.
 **Endpoint:** `POST /auth/login`
 
 **Request Body:**
+
 ```json
 {
   "emailOrUsername": "user@example.com",
@@ -77,16 +83,19 @@ Authenticate an existing user and receive an authentication cookie.
 ```
 
 **Notes:**
+
 - `emailOrUsername` can be either the user's email address or username
 
 **Success Response (201):**
 
 *Response Headers:*
-```
+
+```http
 Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax
 ```
 
 *Response Body:*
+
 ```json
 {
   "user": {
@@ -100,6 +109,7 @@ Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite
 ```
 
 **Error Responses:**
+
 - `400 Bad Request`: Missing required fields
 - `401 Unauthorized`: Invalid credentials
 
@@ -115,6 +125,7 @@ Get the current user's profile information. Requires authentication via cookie.
 The authentication cookie is automatically included by the browser. No manual headers needed.
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid",
@@ -127,6 +138,7 @@ The authentication cookie is automatically included by the browser. No manual he
 ```
 
 **Error Responses:**
+
 - `401 Unauthorized`: Missing or invalid authentication cookie
 
 ---
@@ -143,11 +155,13 @@ Requires authentication via cookie.
 **Success Response (201):**
 
 *Response Headers:*
-```
+
+```http
 Set-Cookie: access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
 ```
 
 *Response Body:*
+
 ```json
 {
   "message": "Logged out successfully"
@@ -155,6 +169,7 @@ Set-Cookie: access_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT
 ```
 
 **Error Responses:**
+
 - `401 Unauthorized`: Missing or invalid authentication cookie
 
 ---
@@ -200,6 +215,7 @@ PORT=4000
 ### Using curl
 
 **Register:**
+
 ```bash
 curl -c cookies.txt -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
@@ -207,6 +223,7 @@ curl -c cookies.txt -X POST http://localhost:4000/auth/register \
 ```
 
 **Login:**
+
 ```bash
 curl -c cookies.txt -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
@@ -214,11 +231,13 @@ curl -c cookies.txt -X POST http://localhost:4000/auth/login \
 ```
 
 **Get Profile:**
+
 ```bash
 curl -b cookies.txt -X GET http://localhost:4000/auth/profile
 ```
 
 **Logout:**
+
 ```bash
 curl -b cookies.txt -c cookies.txt -X POST http://localhost:4000/auth/logout
 ```
@@ -281,7 +300,7 @@ const { message } = await logoutResponse.json();
 
 For API clients that cannot use cookies, the JWT token can still be sent via the `Authorization` header:
 
-```
+```http
 Authorization: Bearer <access_token>
 ```
 
