@@ -18,6 +18,7 @@ export default function RegisterPage() {
     useAuthStore();
   const [isVisible, setIsVisible] = React.useState(false);
   const [isConfirmVisible, setIsConfirmVisible] = React.useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = React.useState(false);
   const [formData, setFormData] = React.useState({
     username: "",
     email: "",
@@ -80,13 +81,59 @@ export default function RegisterPage() {
       });
 
       setUser(user);
-      router.push("/");
+      setRegistrationSuccess(true);
+      // Don't redirect immediately - show verification message
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
   };
+
+  if (registrationSuccess) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="rounded-large flex w-full max-w-md flex-col gap-4 px-8 pt-6 pb-10">
+          <div className="flex flex-col items-center gap-4">
+            <div className="rounded-full bg-success-100 p-4">
+              <Icon
+                className="text-success text-5xl"
+                icon="solar:check-circle-bold"
+              />
+            </div>
+            <h2 className="text-2xl font-semibold">Registration Successful!</h2>
+            <p className="text-default-500 text-center">
+              We&apos;ve sent a verification email to{" "}
+              <strong>{formData.email}</strong>. Please check your inbox and
+              click the verification link to activate your account.
+            </p>
+            <div className="rounded-medium bg-primary-50 mt-2 p-4">
+              <p className="text-primary-700 text-sm">
+                <Icon className="inline mr-1" icon="solar:info-circle-bold" />
+                Didn&apos;t receive the email? Check your spam folder or click
+                below to resend.
+              </p>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <Button
+                color="primary"
+                variant="bordered"
+                onPress={() => {
+                  // TODO: Add resend functionality
+                  setError("Resend feature coming soon");
+                }}
+              >
+                Resend Email
+              </Button>
+              <Button color="primary" onPress={() => router.push("/")}>
+                Go to Home
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center">
