@@ -1,32 +1,23 @@
+import type { GameLobbyResponse } from "@whois-it/contracts";
+
 import { create } from "zustand";
 
-export type Player = {
-  id: string;
-  name: string;
-  avatarUrl?: string;
-};
-
 export interface GameState {
-  players: Player[];
-  roomCode?: string;
+  lobby: GameLobbyResponse | null;
   isConnected: boolean;
-  setPlayers: (players: Player[]) => void;
-  setRoomCode: (code: string | undefined) => void;
+  setLobby: (lobby: GameLobbyResponse | null) => void;
   setConnected: (connected: boolean) => void;
   reset: () => void;
 }
 
 export const useGameStore = create<GameState>((set) => ({
-  players: [],
-  roomCode: undefined,
+  lobby: null,
   isConnected: false,
-  setPlayers: (players) => set({ players }),
-  setRoomCode: (roomCode) => set({ roomCode }),
+  setLobby: (lobby) => set({ lobby }),
   setConnected: (isConnected) => set({ isConnected }),
   reset: () =>
     set({
-      players: [],
-      roomCode: undefined,
+      lobby: null,
       isConnected: false,
     }),
 }));
