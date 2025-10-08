@@ -10,6 +10,19 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 import { GameService } from './game.service';
+import type {
+  SocketJoinRoomRequest,
+  SocketJoinRoomResponse,
+  SocketLeaveRoomRequest,
+  SocketLeaveRoomResponse,
+  SocketUpdatePlayerReadyRequest,
+  SocketUpdatePlayerReadyResponse,
+  ServerToClientEvents,
+  ClientToServerEvents,
+} from '@whois-it/contracts';
+
+type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
 
 @WebSocketGateway({
   cors: {
@@ -19,25 +32,25 @@ import { GameService } from './game.service';
 })
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server!: Server;
+  server!: TypedServer;
 
   private readonly logger = new Logger(GameGateway.name);
 
   constructor(private readonly gameService: GameService) {}
 
-  handleConnection(client: Socket) {
+  handleConnection(client: TypedSocket) {
     this.logger.log(`Client connected: ${client.id}`);
   }
 
-  handleDisconnect(client: Socket) {
+  handleDisconnect(client: TypedSocket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('joinRoom')
   async handleJoinRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomCode: string; playerId?: string },
-  ) {
+    @ConnectedSocket() client: TypedSocket,
+    @MessageBody() data: SocketJoinRoomRequest,
+  ): Promise<SocketJoinRoomResponse> {
     try {
       const { roomCode } = data;
       const normalizedRoomCode = roomCode.trim().toUpperCase();
@@ -69,9 +82,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('leaveRoom')
   async handleLeaveRoom(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { roomCode: string },
-  ) {
+    @ConnectedSocket() client: TypedSocket,
+    @MessageBody() data: SocketLeaveRoomRequest,
+  ): Promise<SocketLeaveRoomResponse> {
     try {
       const { roomCode } = data;
       const normalizedRoomCode = roomCode.trim().toUpperCase();
@@ -89,10 +102,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('updatePlayerReady')
   async handleUpdatePlayerReady(
-    @ConnectedSocket() client: Socket,
-    @MessageBody()
-    data: { roomCode: string; playerId: string; isReady: boolean },
-  ) {
+    @ConnectedSocket() client: TypedSocket,
+    @MessageBody() data: SocketUpdatePlayerReadyRequest,
+  ): Promise<SocketUpdatePlayerReadyResponse> {
     try {
       const { roomCode, playerId, isReady } = data;
       const normalizedRoomCode = roomCode.trim().toUpperCase();
