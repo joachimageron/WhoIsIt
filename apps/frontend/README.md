@@ -48,6 +48,20 @@ public-hoist-pattern[]=*@heroui/*
 
 After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
 
+## Theme Customization
+
+The application uses custom semantic colors configured in `tailwind.config.js`. The color palette is consistent across both light and dark themes:
+
+### Semantic Colors
+
+- **Primary (Brand)**: Orange (#F07507) - Used for primary actions and branding
+- **Success**: Green (#08D877) - Used for success states and positive feedback
+- **Warning**: Yellow (#FFE207) - Used for warnings and cautionary messages
+- **Danger**: Red (#FF5959) - Used for errors and destructive actions
+- **Secondary (Info)**: Cyan (#06BBE8) - Used for informational elements
+
+Each color includes shades from 100 (lightest) to 900 (darkest) for flexible usage throughout the application. These colors are applied to Hero UI components automatically when using color props like `color="primary"`, `color="success"`, etc.
+
 ## License
 
 Licensed under the [MIT license](https://github.com/heroui-inc/next-app-template/blob/main/LICENSE).
