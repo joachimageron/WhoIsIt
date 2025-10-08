@@ -107,3 +107,25 @@ export const logout = async (): Promise<void> => {
     throw new Error("Logout failed");
   }
 };
+
+/**
+ * Resend verification email to the user
+ */
+export const resendVerificationEmail = async (email: string): Promise<void> => {
+  const response = await fetch(`${API_URL}/auth/resend-verification`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to resend verification email" }));
+
+    throw new Error(error.message || "Failed to resend verification email");
+  }
+};

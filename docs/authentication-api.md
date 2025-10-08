@@ -115,7 +115,65 @@ Set-Cookie: access_token=<jwt_token>; Max-Age=604800; Path=/; HttpOnly; SameSite
 
 ---
 
-### 3. Get Profile
+### 4. Verify Email
+
+Verify a user's email address using the verification token sent to their email.
+
+**Endpoint:** `POST /auth/verify-email`
+
+**Request Body:**
+
+```json
+{
+  "token": "verification_token_from_email"
+}
+```
+
+**Success Response (201):**
+
+```json
+{
+  "message": "Email verified successfully"
+}
+```
+
+**Error Responses:**
+
+- `400 Bad Request`: Invalid or expired verification token
+- `400 Bad Request`: Email already verified
+
+---
+
+### 5. Resend Verification Email
+
+Resend the verification email to a user who hasn't verified their email yet.
+
+**Endpoint:** `POST /auth/resend-verification`
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Success Response (201):**
+
+```json
+{
+  "message": "Verification email sent"
+}
+```
+
+**Error Responses:**
+
+- `400 Bad Request`: Email already verified
+- `404 Not Found`: User not found
+
+---
+
+### 6. Get Profile
 
 Get the current user's profile information. Requires authentication via cookie.
 
@@ -143,7 +201,7 @@ The authentication cookie is automatically included by the browser. No manual he
 
 ---
 
-### 4. Logout
+### 7. Logout
 
 Clear the authentication cookie and log out the user.
 
@@ -242,6 +300,22 @@ curl -b cookies.txt -X GET http://localhost:4000/auth/profile
 curl -b cookies.txt -c cookies.txt -X POST http://localhost:4000/auth/logout
 ```
 
+**Verify Email:**
+
+```bash
+curl -X POST http://localhost:4000/auth/verify-email \
+  -H "Content-Type: application/json" \
+  -d '{"token":"verification_token_from_email"}'
+```
+
+**Resend Verification Email:**
+
+```bash
+curl -X POST http://localhost:4000/auth/resend-verification \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com"}'
+```
+
 **Note:** The `-c cookies.txt` flag saves cookies to a file, and `-b cookies.txt` sends cookies from that file.
 
 ### Using JavaScript/TypeScript
@@ -292,6 +366,32 @@ const logoutResponse = await fetch('http://localhost:4000/auth/logout', {
 });
 const { message } = await logoutResponse.json();
 // Authentication cookie is automatically cleared by the browser
+
+// Verify Email
+const verifyEmailResponse = await fetch('http://localhost:4000/auth/verify-email', {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    token: 'verification_token_from_email',
+  }),
+});
+const verifyResult = await verifyEmailResponse.json();
+
+// Resend Verification Email
+const resendResponse = await fetch('http://localhost:4000/auth/resend-verification', {
+  method: 'POST',
+  credentials: 'include',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'test@example.com',
+  }),
+});
+const resendResult = await resendResponse.json();
 ```
 
 **Important:** Always use `credentials: 'include'` in fetch requests to ensure cookies are sent and received properly.

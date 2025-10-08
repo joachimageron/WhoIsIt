@@ -27,6 +27,8 @@ export default function RegisterPage() {
     displayName: "",
   });
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
+  const [isResending, setIsResending] = React.useState(false);
+  const [resendSuccess, setResendSuccess] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   const toggleConfirmVisibility = () => setIsConfirmVisible(!isConfirmVisible);
@@ -90,6 +92,21 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResendEmail = async () => {
+    clearError();
+    setResendSuccess(false);
+    setIsResending(true);
+
+    try {
+      await authApi.resendVerificationEmail(formData.email);
+      setResendSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend verification email");
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   if (registrationSuccess) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -107,6 +124,16 @@ export default function RegisterPage() {
               <strong>{formData.email}</strong>. Please check your inbox and
               click the verification link to activate your account.
             </p>
+            {error && (
+              <div className="rounded-medium bg-danger-50 px-4 py-3 text-danger w-full">
+                {error}
+              </div>
+            )}
+            {resendSuccess && (
+              <div className="rounded-medium bg-success-50 px-4 py-3 text-success w-full">
+                Verification email sent successfully! Please check your inbox.
+              </div>
+            )}
             <div className="rounded-medium mt-2 p-4">
               <p className="text-primary-600 text-sm">
                 <Icon className="inline mr-1" icon="solar:info-circle-bold" />
@@ -118,10 +145,8 @@ export default function RegisterPage() {
               <Button
                 color="primary"
                 variant="bordered"
-                onPress={() => {
-                  // TODO: Add resend functionality
-                  setError("Resend feature coming soon");
-                }}
+                isLoading={isResending}
+                onPress={handleResendEmail}
               >
                 Resend Email
               </Button>
