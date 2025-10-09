@@ -14,12 +14,8 @@ import { Kbd } from "@heroui/kbd";
 import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
 import { Avatar } from "@heroui/avatar";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@heroui/dropdown";
+import { Tooltip } from "@heroui/tooltip";
+import { Listbox, ListboxItem } from "@heroui/listbox";
 import { link as linkStyles } from "@heroui/theme";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
@@ -112,31 +108,38 @@ export const Navbar = () => {
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
           {isAuthenticated && user ? (
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Avatar
-                  as="button"
-                  className="transition-transform"
-                  name={user.displayName}
-                  size="sm"
-                  src={user.avatarUrl || undefined}
-                />
-              </DropdownTrigger>
-              <DropdownMenu aria-label="User Actions" variant="flat">
-                <DropdownItem key="profile" className="h-14 gap-2">
+            <Tooltip
+              content={
+              <div className="px-1 py-2">
+                <Listbox aria-label="User Actions" onAction={(key) => {
+                if (key === "logout") {
+                  handleLogout();
+                }
+                }}>
+                <ListboxItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
                   <p className="font-semibold">{user.email}</p>
-                </DropdownItem>
-                <DropdownItem key="settings">Settings</DropdownItem>
-                <DropdownItem
+                </ListboxItem>
+                <ListboxItem key="settings">Settings</ListboxItem>
+                <ListboxItem
                   key="logout"
+                  className="text-danger"
                   color="danger"
-                  onPress={handleLogout}
                 >
                   Log Out
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
+                </ListboxItem>
+                </Listbox>
+              </div>
+              }
+            >
+              <Avatar
+              as="button"
+              className="transition-transform"
+              name={user.displayName}
+              size="sm"
+              src={user.avatarUrl || undefined}
+              />
+            </Tooltip>
           ) : (
             <>
               <Button
