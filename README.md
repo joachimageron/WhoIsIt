@@ -31,7 +31,17 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
    copy apps\backend\.env.example apps\backend\.env
    ```
 
-3. **Run the apps in development**
+3. **Configure frontend environment**
+
+   Duplicate `apps/frontend/.env.example` to `.env` to configure API and Socket.IO URLs.
+
+   ```bash
+   copy apps\frontend\.env.example apps\frontend\.env
+   ```
+
+   The default values (`http://localhost:4000`) should work for local development.
+
+4. **Run the apps in development**
 
    ```bash
    pnpm dev
