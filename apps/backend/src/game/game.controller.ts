@@ -68,4 +68,15 @@ export class GameController {
 
     return this.gameService.getLobbyByRoomCode(roomCode);
   }
+
+  @Post(':roomCode/start')
+  async startGame(
+    @Param('roomCode') roomCode: string,
+  ): Promise<GameLobbyResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    return this.gameService.startGame(roomCode);
+  }
 }

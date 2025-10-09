@@ -199,6 +199,42 @@ export class GameService {
     return this.playerRepository.save(player);
   }
 
+  async startGame(roomCode: string): Promise<GameLobbyResponse> {
+    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        characterSet: true,
+        host: true,
+        players: { user: true },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.LOBBY) {
+      throw new BadRequestException('Game has already started or ended');
+    }
+
+    if (!game.players || game.players.length < 2) {
+      throw new BadRequestException('Need at least 2 players to start the game');
+    }
+
+    const allPlayersReady = game.players.every((player) => player.isReady);
+    if (!allPlayersReady) {
+      throw new BadRequestException('All players must be ready to start');
+    }
+
+    game.status = GameStatus.IN_PROGRESS;
+    game.startedAt = new Date();
+    await this.gameRepository.save(game);
+
+    const refreshedGame = await this.loadLobbyById(game.id);
+    return this.mapToLobbyResponse(refreshedGame);
+  }
+
   private async loadLobbyById(id: string): Promise<Game> {
     const game = await this.gameRepository.findOne({
       where: { id },
