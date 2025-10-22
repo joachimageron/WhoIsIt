@@ -75,7 +75,6 @@ export class AuthController {
       id: req.user.id,
       email: req.user.email,
       username: req.user.username,
-      displayName: req.user.displayName,
       avatarUrl: req.user.avatarUrl,
       isGuest: req.user.isGuest,
     };

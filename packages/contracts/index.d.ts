@@ -4,7 +4,7 @@ export type GamePlayerRole = "host" | "player" | "spectator";
 
 export type CreateGameRequest = {
   characterSetId: string;
-  hostDisplayName?: string;
+  hostUsername?: string;
   hostUserId?: string;
   visibility?: GameVisibility;
   maxPlayers?: number | null;
@@ -13,14 +13,14 @@ export type CreateGameRequest = {
 };
 
 export type JoinGameRequest = {
-  displayName?: string;
+  username?: string;
   userId?: string;
   avatarUrl?: string;
 };
 
 export type GamePlayerResponse = {
   id: string;
-  displayName: string;
+  username: string;
   avatarUrl?: string;
   role: GamePlayerRole;
   isReady: boolean;
@@ -103,4 +103,35 @@ export interface ClientToServerEvents {
     callback: (response: SocketUpdatePlayerReadyResponse) => void,
   ) => void;
 }
+
+// Character Sets API Types
+export type CharacterSetResponseDto = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  visibility: string;
+  isDefault: boolean;
+  metadata: Record<string, unknown>;
+  characterCount?: number;
+};
+
+export type TraitValueResponseDto = {
+  id: string;
+  traitId: string;
+  traitName: string;
+  traitSlug: string;
+  valueText: string;
+};
+
+export type CharacterResponseDto = {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string | null;
+  summary?: string | null;
+  metadata: Record<string, unknown>;
+  isActive: boolean;
+  traits?: TraitValueResponseDto[];
+};
 

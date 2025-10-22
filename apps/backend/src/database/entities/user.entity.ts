@@ -22,11 +22,8 @@ export class User {
   @Column({ type: 'text', nullable: true, unique: true })
   email?: string | null;
 
-  @Column({ type: 'text', nullable: true, unique: true })
-  username?: string | null;
-
-  @Column({ type: 'text' })
-  displayName!: string;
+  @Column({ type: 'text', nullable: false, unique: true })
+  username!: string;
 
   @Column({ type: 'text', nullable: true })
   avatarUrl?: string | null;

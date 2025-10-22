@@ -171,7 +171,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
               <Avatar
                 as="button"
                 className="transition-transform"
-                name={user.displayName}
+                name={user.username}
                 size="sm"
                 src={user.avatarUrl || undefined}
               />
@@ -247,7 +247,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
             <>
               <NavbarMenuItem>
                 <div className="text-small">
-                  <p className="font-semibold">{user.displayName}</p>
+                  <p className="font-semibold">{user.username}</p>
                   <p className="text-default-500">{user.email}</p>
                 </div>
               </NavbarMenuItem>
