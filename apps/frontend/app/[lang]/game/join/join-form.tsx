@@ -23,8 +23,8 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const validateRoomCode = (code: string): boolean => {
-    // Room codes should be exactly 6 characters (uppercase alphanumeric)
-    return code.trim().length === 6;
+    // Room codes should be exactly 5 characters (uppercase alphanumeric)
+    return code.trim().length === 5;
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

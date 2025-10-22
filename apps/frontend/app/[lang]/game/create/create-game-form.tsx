@@ -146,9 +146,7 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
             onChange={(e) => setSelectedCharacterSet(e.target.value)}
           >
             {characterSets.map((set) => (
-              <SelectItem key={set.id}>
-                {set.name}
-              </SelectItem>
+              <SelectItem key={set.id}>{set.name}</SelectItem>
             ))}
           </Select>
           <Input

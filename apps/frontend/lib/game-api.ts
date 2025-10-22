@@ -1,59 +1,14 @@
 import type {
-  GameLobbyResponse, CharacterSetResponseDto, CreateGameRequest, JoinGameRequest
+  CreateGameRequest,
+  JoinGameRequest,
+  GameLobbyResponse,
+  CharacterSetResponseDto,
 } from "@whois-it/contracts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
 /**
- * Join an existing game using a room code
- */
-export const joinGame = async (
-  roomCode: string,
-  data: JoinGameRequest,
-): Promise<GameLobbyResponse> => {
-  const response = await fetch(`${API_URL}/games/${roomCode}/join`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response
-      .json()
-      .catch(() => ({ message: "Failed to join game" }));
-
-    throw new Error(error.message || "Failed to join game");
-  }
-
-  const lobby: GameLobbyResponse = await response.json();
-
-  return lobby;
-};
-
-/**
- * Get the current lobby state for a room code
- */
-export const getLobby = async (
-  roomCode: string,
-): Promise<GameLobbyResponse> => {
-  const response = await fetch(`${API_URL}/games/${roomCode}`, {
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch lobby");
-  }
-
-  const lobby: GameLobbyResponse = await response.json();
-
-  return lobby;
-};
-
-/**
- * Get all available character sets
+ * Get all character sets
  */
 export const getCharacterSets = async (): Promise<
   CharacterSetResponseDto[]
@@ -65,9 +20,9 @@ export const getCharacterSets = async (): Promise<
   if (!response.ok) {
     const error = await response
       .json()
-      .catch(() => ({ message: "Failed to fetch character sets" }));
+      .catch(() => ({ message: "Failed to get character sets" }));
 
-    throw new Error(error.message || "Failed to fetch character sets");
+    throw new Error(error.message || "Failed to get character sets");
   }
 
   return response.json();
@@ -94,6 +49,76 @@ export const createGame = async (
       .catch(() => ({ message: "Failed to create game" }));
 
     throw new Error(error.message || "Failed to create game");
+  }
+
+  return response.json();
+};
+
+/**
+ * Join an existing game
+ */
+export const joinGame = async (
+  roomCode: string,
+  data: JoinGameRequest,
+): Promise<GameLobbyResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/join`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to join game" }));
+
+    throw new Error(error.message || "Failed to join game");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get lobby details by room code
+ */
+export const getLobby = async (
+  roomCode: string,
+): Promise<GameLobbyResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get lobby" }));
+
+    throw new Error(error.message || "Failed to get lobby");
+  }
+
+  return response.json();
+};
+
+/**
+ * Start a game
+ */
+export const startGame = async (
+  roomCode: string,
+): Promise<GameLobbyResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/start`, {
+    method: "POST",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to start game" }));
+
+    throw new Error(error.message || "Failed to start game");
   }
 
   return response.json();
