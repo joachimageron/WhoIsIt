@@ -71,18 +71,11 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
     setIsLoading(true);
 
     try {
-      const gameData: any = {
+      const gameData: CreateGameRequest = {
         characterSetId: selectedCharacterSet,
+        hostUsername: user?.username ?? "Guest",
+        hostUserId: user?.id,
       };
-
-      // Add user info if authenticated
-      if (user) {
-        gameData.hostUserId = user.id;
-        gameData.hostUsername = user.username;
-      } else {
-        // For guest users, we need a username
-        gameData.hostUsername = "Guest";
-      }
 
       // Add optional fields
       if (maxPlayers && parseInt(maxPlayers) > 0) {

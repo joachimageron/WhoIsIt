@@ -52,6 +52,13 @@ export class GameService {
     private readonly characterRepository: Repository<Character>,
   ) {}
 
+  /**
+   * Normalize room code to uppercase and trimmed
+   */
+  private normalizeRoomCode(roomCode: string): string {
+    return roomCode.trim().toUpperCase();
+  }
+
   async createGame(request: CreateGameRequest): Promise<GameLobbyResponse> {
     const characterSet = await this.characterSetRepository.findOne({
       where: { id: request.characterSetId },
@@ -111,7 +118,7 @@ export class GameService {
     roomCode: string,
     request: JoinGameRequest,
   ): Promise<GameLobbyResponse> {
-    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
@@ -180,7 +187,7 @@ export class GameService {
   }
 
   async getLobbyByRoomCode(roomCode: string): Promise<GameLobbyResponse> {
-    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
@@ -198,7 +205,7 @@ export class GameService {
   }
 
   async getGameByRoomCode(roomCode: string): Promise<Game | null> {
-    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     return this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
@@ -231,7 +238,7 @@ export class GameService {
   }
 
   async startGame(roomCode: string): Promise<GameLobbyResponse> {
-    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
