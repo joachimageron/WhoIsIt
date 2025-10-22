@@ -3,6 +3,7 @@
 ## 📊 État Actuel du Projet
 
 ### Architecture et Technologies
+
 - **Monorepo** : PNPM workspace avec 4 packages (~8,200 lignes de code total)
 - **Backend** : NestJS 11 + TypeORM + PostgreSQL (~4,700 lignes)
 - **Frontend** : Next.js 15 + HeroUI + Zustand (~3,500 lignes)
@@ -12,7 +13,9 @@
 ### ✅ Fonctionnalités Implémentées
 
 #### Backend (NestJS)
+
 **Authentification complète :**
+
 - ✅ Inscription utilisateur avec validation email
 - ✅ Login/Logout avec cookies HTTP-only sécurisés
 - ✅ Système de vérification email (envoi + validation token)
@@ -22,6 +25,7 @@
 - ✅ 64/65 tests unitaires passent (AuthController, AuthService, GameService)
 
 **Gestion de jeu - Phase Lobby :**
+
 - ✅ Création de partie (POST /games) avec room code généré
 - ✅ Rejoindre une partie (POST /games/:roomCode/join)
 - ✅ Récupération état lobby (GET /games/:roomCode)
@@ -30,19 +34,23 @@
 - ✅ Broadcast temps réel des changements lobby (lobbyUpdate, playerJoined)
 
 **Base de données :**
+
 - ✅ 15 entités TypeORM complètes (User, Game, GamePlayer, Round, Question, Answer, Guess, Character, CharacterSet, Trait, etc.)
 - ✅ Scripts de seed fonctionnels (utilisateurs, character set "Classic Characters" avec 24 personnages)
 - ✅ Relations entre entités bien définies
 - ✅ Support des invitations, événements de jeu, statistiques joueurs
 
 **Configuration et tooling :**
+
 - ✅ Variables d'environnement via ConfigModule
 - ✅ CORS configuré pour frontend
 - ✅ Scripts pnpm : dev, build, lint, test, seed
 - ✅ ESLint + Prettier configurés
 
 #### Frontend (Next.js)
+
 **Pages d'authentification :**
+
 - ✅ /auth/login - Connexion
 - ✅ /auth/register - Inscription
 - ✅ /auth/forgot-password - Demande reset password
@@ -50,6 +58,7 @@
 - ✅ /auth/verify-email/[verify-token] - Vérification email
 
 **Infrastructure state management :**
+
 - ✅ Store Zustand pour auth (useAuthStore avec user, isLoading, login, register, logout, etc.)
 - ✅ Hook useAuth pour authentification
 - ✅ Store Zustand pour jeu (useGameStore avec lobby, isConnected)
@@ -57,15 +66,18 @@
 - ✅ Client Socket.IO avec types complets
 
 **Pages marketing/démo :**
+
 - ✅ Page d'accueil (landing)
 - ✅ /about, /blog, /docs, /pricing
 
 **Configuration :**
+
 - ✅ HeroUI intégré avec Tailwind CSS 4
 - ✅ ESLint configuré
 - ✅ Layout avec provider pour auth et thème
 
 #### Contracts & Documentation
+
 - ✅ Types partagés pour API REST (CreateGameRequest, JoinGameRequest, GameLobbyResponse, etc.)
 - ✅ Types Socket.IO complets (ServerToClientEvents, ClientToServerEvents)
 - ✅ Documentation complète : authentication-api.md, frontend-authentication.md, database-schema.md, SOCKETIO_FLOW.md, SOCKETIO_INTEGRATION.md
@@ -74,6 +86,7 @@
 ### ❌ Fonctionnalités Manquantes / Lacunes Identifiées
 
 #### 🎯 Gameplay Core (CRITIQUE)
+
 - ❌ **Aucune API pour démarrer une partie** (POST /games/:roomCode/start)
 - ❌ **Aucune logique de rounds** implémentée côté backend
 - ❌ **Aucun système de questions/réponses** opérationnel
@@ -83,6 +96,7 @@
 - ❌ Événements Socket.IO pour le gameplay manquants (questionAsked, answerSubmitted, guessResult, roundEnded, gameOver)
 
 #### 🎨 Interface Utilisateur de Jeu
+
 - ❌ **Aucune page de création de partie** (sélection character set, config max players, timer)
 - ❌ **Aucune page "Rejoindre"** dédiée (saisie room code)
 - ❌ **Aucune page lobby** consommant useGameSocket (liste joueurs, bouton prêt, début partie)
@@ -91,6 +105,7 @@
 - ❌ Aucune composant pour afficher l'état de jeu temps réel
 
 #### 📚 API Catalogue de Personnages
+
 - ❌ **Aucune route GET /character-sets** pour lister les sets disponibles
 - ❌ **Aucune route GET /character-sets/:id** pour détails d'un set
 - ❌ **Aucune route GET /character-sets/:id/characters** pour récupérer personnages + traits
@@ -98,6 +113,7 @@
 - ❌ Les entités CharacterSet, Character, Trait existent et sont seedées, mais pas exposées via API
 
 #### 🔒 Sécurité et Auth Avancée
+
 - ❌ **Socket.IO non sécurisé** : aucune validation JWT/cookies sur connexions WebSocket
 - ❌ Pas de middleware pour authentifier les événements Socket.IO
 - ❌ Pas de gestion des invités vs utilisateurs authentifiés (tous peuvent rejoindre)
@@ -106,6 +122,7 @@
 - ❌ Aucun nettoyage automatique des lobbies inactifs
 
 #### ⚙️ Configuration et Variables d'Environnement
+
 - ❌ Incohérence dans la documentation : API_URL vs NEXT_PUBLIC_API_URL
 - ❌ Pas de fichier .env.example pour le frontend
 - ❌ Variables d'environnement Socket.IO non documentées (NEXT_PUBLIC_SOCKET_URL)
@@ -113,6 +130,7 @@
 - ❌ Pas de validation des variables d'env au démarrage
 
 #### 🧪 Tests et Qualité
+
 - ❌ 1 test backend qui échoue (email.service.spec.ts - URL reset password incorrecte)
 - ❌ Aucun test frontend
 - ❌ Aucun test e2e
@@ -121,12 +139,14 @@
 - ❌ Pas de tests pour GameGateway
 
 #### 🚀 CI/CD et Automatisation
+
 - ❌ **Aucune pipeline CI/CD** (pas de .github/workflows/)
 - ❌ Pas de validation automatique des PRs (lint, test, build)
 - ❌ Pas de déploiement automatisé
 - ❌ Pas de contrôle de qualité automatique
 
 #### 📖 Documentation et DX
+
 - ❌ Documentation Socket.IO mentionne /lobby page qui n'existe pas
 - ❌ Guides README ne reflètent pas entièrement l'état réel
 - ❌ Pas de diagramme de séquence pour une partie complète
@@ -134,6 +154,7 @@
 - ❌ Pas de documentation API (Swagger/OpenAPI)
 
 #### ��️ Base de Données et Migrations
+
 - ❌ Pas de système de migrations TypeORM (synchronize: true en dev uniquement)
 - ❌ Seeds non testés en mode production
 - ❌ Pas de stratégie de rollback
@@ -142,6 +163,7 @@
 ## 🎯 Plan d'Action Recommandé (par ordre de priorité)
 
 ### Phase 1 : Fondations Solides (1-2 semaines)
+
 **Objectif :** Corriger les bugs, sécuriser, standardiser la configuration
 
 1. **Fixes urgents**
@@ -170,6 +192,7 @@
    - [ ] Cache pnpm pour accélérer CI
 
 ### Phase 2 : Expérience Lobby Complète (2-3 semaines)
+
 **Objectif :** Permettre aux utilisateurs de créer, rejoindre et démarrer une partie
 
 1. **Frontend - Création de Partie**
@@ -208,6 +231,7 @@
    - [ ] Empêcher les accès non autorisés
 
 ### Phase 3 : Mécanique de Jeu Core (3-4 semaines)
+
 **Objectif :** Implémenter le gameplay complet (questions, réponses, guesses, scoring)
 
 1. **Backend - Système de Questions**
@@ -264,6 +288,7 @@
    - [ ] États de jeu complets dans game-store
 
 ### Phase 4 : Qualité et Fiabilité (2 semaines)
+
 **Objectif :** Tester, documenter, optimiser
 
 1. **Tests Backend**
@@ -295,6 +320,7 @@
    - [ ] Documentation déploiement
 
 ### Phase 5 : Fonctionnalités Avancées (2-3 semaines)
+
 **Objectif :** Enrichir l'expérience utilisateur
 
 1. **Gestion Avatar**
@@ -326,17 +352,20 @@
 ## 📈 Métriques de Qualité Actuelles
 
 ### Tests
+
 - Backend : 64/65 tests passent (98.5%)
 - Frontend : 0 tests
 - E2E : 0 tests
 - **Coverage : non mesuré**
 
 ### Build
+
 - Backend : ✅ Build réussit
 - Frontend : ⚠️ Build échoue (problème Google Fonts en environnement restreint - non bloquant en dev)
 - Contracts : ✅ Pas de build nécessaire
 
 ### Lint
+
 - Backend : ✅ ESLint configuré
 - Frontend : ✅ ESLint configuré
 - **Status : non exécuté dans cette analyse**
@@ -344,6 +373,7 @@
 ## 🎓 Conclusions et Recommandations Stratégiques
 
 ### Points Forts
+
 1. **Architecture solide** : monorepo bien structuré, séparation claire des responsabilités
 2. **Authentification complète** : fonctionnalité rare et complexe déjà implémentée à 100%
 3. **Base de données riche** : toutes les entités nécessaires existent
@@ -351,6 +381,7 @@
 5. **Documentation fournie** : effort notable sur les docs techniques
 
 ### Points Faibles Critiques
+
 1. **Aucun gameplay** : impossible de jouer réellement, juste de créer/rejoindre un lobby
 2. **APIs manquantes** : character sets non exposés, pas de démarrage de partie
 3. **UI de jeu inexistante** : aucune page de jeu, lobby non implémenté
@@ -358,9 +389,11 @@
 5. **Pas de CI/CD** : aucune automatisation, risque de régression
 
 ### Recommandation Prioritaire
-**Focus immédiat : Phase 1 (Fondations) + Phase 2 (Lobby)**
+
+#### **Focus immédiat : Phase 1 (Fondations) + Phase 2 (Lobby)**
 
 Le projet a une excellente base mais ne permet pas encore de jouer. La priorité absolue est :
+
 1. Exposer les character sets via API
 2. Créer les pages de création/join/lobby
 3. Implémenter le démarrage de partie
@@ -369,6 +402,7 @@ Le projet a une excellente base mais ne permet pas encore de jouer. La priorité
 Une fois le lobby fonctionnel de bout en bout, l'équipe pourra itérer sur le gameplay (Phase 3) avec une base solide et testée.
 
 ### Prochaine Étape Suggérée
+
 **Sprint 1 (1 semaine) :** Corriger le test failing + créer API character-sets + page /game/create
 
 ---
