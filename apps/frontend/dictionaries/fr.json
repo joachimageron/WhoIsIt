@@ -1,29 +1,21 @@
 {
   "nav": {
     "home": "Accueil",
-    "docs": "Documentation",
-    "pricing": "Tarifs",
-    "blog": "Blog",
-    "about": "À propos",
-    "profile": "Profil",
-    "dashboard": "Tableau de bord",
-    "projects": "Projets",
-    "team": "Équipe",
-    "calendar": "Calendrier",
-    "settings": "Paramètres",
-    "helpFeedback": "Aide & Commentaires",
-    "logout": "Déconnexion",
+    "createGame": "Créer une partie",
+    "joinGame": "Rejoindre",
     "login": "Connexion",
-    "signUp": "S'inscrire"
+    "signUp": "S'inscrire",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
   },
   "home": {
-    "title1": "Créez",
-    "title2": "WhoIsIt",
-    "title3": "des jeux avec des indices collaboratifs en temps réel.",
-    "subtitle": "Lancez des parties instantanément avec HeroUI, Socket.IO et Zustand.",
-    "frontendDocs": "Documentation frontend",
-    "backendDocs": "Documentation backend",
-    "getStarted": "Commencez en modifiant"
+    "title1": "Devinez",
+    "title2": "Qui Est-ce",
+    "title3": "dans une expérience de jeu multijoueur en temps réel !",
+    "subtitle": "Créez ou rejoignez une partie, posez des questions et trouvez le personnage mystère de vos adversaires.",
+    "createGameButton": "Créer une Partie",
+    "joinGameButton": "Rejoindre une Partie",
+    "howToPlay": "Comment jouer"
   },
   "about": {
     "title": "À propos"
