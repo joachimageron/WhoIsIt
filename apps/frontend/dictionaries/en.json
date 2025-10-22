@@ -127,11 +127,11 @@
     "join": {
       "title": "Join a Game",
       "roomCode": "Room Code",
-      "roomCodePlaceholder": "Enter 6-character room code",
+      "roomCodePlaceholder": "Enter 5-character room code",
       "joinButton": "Join Game",
       "backToHome": "Back to Home",
       "enterRoomCode": "Please enter a room code",
-      "invalidRoomCode": "Room code must be 6 characters",
+      "invalidRoomCode": "Room code must be 5 characters",
       "joinFailed": "Failed to join game",
       "joining": "Joining game..."
     }

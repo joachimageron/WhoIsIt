@@ -127,11 +127,11 @@
     "join": {
       "title": "Rejoindre une Partie",
       "roomCode": "Code de Partie",
-      "roomCodePlaceholder": "Entrez le code à 6 caractères",
+      "roomCodePlaceholder": "Entrez le code à 5 caractères",
       "joinButton": "Rejoindre",
       "backToHome": "Retour à l'accueil",
       "enterRoomCode": "Veuillez entrer un code de partie",
-      "invalidRoomCode": "Le code doit contenir 6 caractères",
+      "invalidRoomCode": "Le code doit contenir 5 caractères",
       "joinFailed": "Échec de la connexion à la partie",
       "joining": "Connexion en cours..."
     }
