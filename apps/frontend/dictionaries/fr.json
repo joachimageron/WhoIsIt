@@ -34,5 +34,9 @@
   },
   "footer": {
     "poweredBy": "Propulsé par"
+  },
+  "common": {
+    "search": "Rechercher",
+    "language": "Langue"
   }
 }
