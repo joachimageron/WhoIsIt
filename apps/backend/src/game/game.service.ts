@@ -6,8 +6,22 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
-import { CharacterSet, Game, GamePlayer, User } from '../database/entities';
+import {
+  GamePlayerRole,
+  GameStatus,
+  GameVisibility,
+  RoundState,
+  PlayerSecretStatus,
+} from '../database/enums';
+import {
+  CharacterSet,
+  Game,
+  GamePlayer,
+  User,
+  Round,
+  PlayerSecret,
+  Character,
+} from '../database/entities';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
@@ -30,6 +44,12 @@ export class GameService {
     private readonly characterSetRepository: Repository<CharacterSet>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Round)
+    private readonly roundRepository: Repository<Round>,
+    @InjectRepository(PlayerSecret)
+    private readonly playerSecretRepository: Repository<PlayerSecret>,
+    @InjectRepository(Character)
+    private readonly characterRepository: Repository<Character>,
   ) {}
 
   async createGame(request: CreateGameRequest): Promise<GameLobbyResponse> {
@@ -240,12 +260,105 @@ export class GameService {
       throw new BadRequestException('All players must be ready to start');
     }
 
+    // Update game status and start time
     game.status = GameStatus.IN_PROGRESS;
     game.startedAt = new Date();
     await this.gameRepository.save(game);
 
+    // Initialize the first round
+    await this.initializeFirstRound(game);
+
+    // Assign secret characters to each player
+    await this.assignSecretCharacters(game);
+
     const refreshedGame = await this.loadLobbyById(game.id);
     return this.mapToLobbyResponse(refreshedGame);
+  }
+
+  /**
+   * Initialize the first round of the game
+   */
+  private async initializeFirstRound(game: Game): Promise<Round> {
+    // Get the first player to be the active player
+    const firstPlayer = game.players?.[0];
+
+    if (!firstPlayer) {
+      throw new InternalServerErrorException(
+        'No players found to initialize round',
+      );
+    }
+
+    const round = this.roundRepository.create({
+      game,
+      roundNumber: 1,
+      activePlayer: firstPlayer,
+      state: RoundState.AWAITING_QUESTION,
+      startedAt: new Date(),
+    });
+
+    return this.roundRepository.save(round);
+  }
+
+  /**
+   * Assign secret characters to each player randomly
+   */
+  private async assignSecretCharacters(game: Game): Promise<void> {
+    // Get all active characters from the character set
+    const characters = await this.characterRepository.find({
+      where: {
+        set: { id: game.characterSet.id },
+        isActive: true,
+      },
+    });
+
+    if (!characters || characters.length === 0) {
+      throw new InternalServerErrorException(
+        'No characters found in the character set',
+      );
+    }
+
+    if (!game.players || game.players.length === 0) {
+      throw new InternalServerErrorException('No players found in the game');
+    }
+
+    if (characters.length < game.players.length) {
+      throw new BadRequestException(
+        'Not enough characters in the set for all players',
+      );
+    }
+
+    // Shuffle characters using Fisher-Yates algorithm
+    const shuffledCharacters = this.shuffleArray([...characters]);
+
+    // Assign one character to each player
+    const playerSecrets: PlayerSecret[] = [];
+    for (let i = 0; i < game.players.length; i++) {
+      const player = game.players[i];
+      const character = shuffledCharacters[i];
+
+      const secret = this.playerSecretRepository.create({
+        player,
+        character,
+        status: PlayerSecretStatus.HIDDEN,
+        assignedAt: new Date(),
+      });
+
+      playerSecrets.push(secret);
+    }
+
+    await this.playerSecretRepository.save(playerSecrets);
+  }
+
+  /**
+   * Shuffle an array using Fisher-Yates algorithm
+   */
+  private shuffleArray<T>(array: T[]): T[] {
+    const result = [...array];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
   }
 
   private async loadLobbyById(id: string): Promise<Game> {

@@ -243,6 +243,24 @@ export class GameGateway
   }
 
   /**
+   * Broadcast game started event to all clients in a room
+   */
+  async broadcastGameStarted(roomCode: string) {
+    try {
+      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const lobby =
+        await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
+      this.server.to(normalizedRoomCode).emit('gameStarted', {
+        roomCode: normalizedRoomCode,
+        lobby,
+      });
+      this.logger.log(`Broadcasted game started to room ${normalizedRoomCode}`);
+    } catch (error) {
+      this.logger.error('Error broadcasting game started:', error);
+    }
+  }
+
+  /**
    * Start periodic cleanup of abandoned lobbies
    */
   private startLobbyCleanup() {

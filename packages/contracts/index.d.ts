@@ -83,10 +83,16 @@ export type SocketPlayerJoinedEvent = {
   lobby: GameLobbyResponse;
 };
 
+export type SocketGameStartedEvent = {
+  roomCode: string;
+  lobby: GameLobbyResponse;
+};
+
 // Socket.IO Events
 export interface ServerToClientEvents {
   lobbyUpdate: (lobby: GameLobbyResponse) => void;
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
+  gameStarted: (event: SocketGameStartedEvent) => void;
 }
 
 export interface ClientToServerEvents {
