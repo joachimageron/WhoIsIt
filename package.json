@@ -14,7 +14,10 @@
     "db:reset": "pnpm --filter @whois-it/backend db:reset"
   },
   "dependencies": {
+    "@formatjs/intl-localematcher": "^0.6.2",
     "@heroui/checkbox": "^2.3.27",
-    "@iconify/react": "^6.0.2"
+    "@iconify/react": "^6.0.2",
+    "@types/negotiator": "^0.6.4",
+    "negotiator": "^1.0.0"
   }
 }

@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "Home",
+    "docs": "Docs",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "about": "About",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "projects": "Projects",
+    "team": "Team",
+    "calendar": "Calendar",
+    "settings": "Settings",
+    "helpFeedback": "Help & Feedback",
+    "logout": "Logout",
+    "login": "Login",
+    "signUp": "Sign Up"
+  },
+  "home": {
+    "title1": "Build",
+    "title2": "WhoIsIt",
+    "title3": "games with collaborative, real-time clues.",
+    "subtitle": "Spin up matches instantly with HeroUI, Socket.IO and Zustand.",
+    "frontendDocs": "Frontend docs",
+    "backendDocs": "Backend docs",
+    "getStarted": "Get started by editing"
+  },
+  "about": {
+    "title": "About"
+  },
+  "auth": {
+    "signedInAs": "Signed in as",
+    "logOut": "Log Out"
+  },
+  "footer": {
+    "poweredBy": "Powered by"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "docs": "Documentation",
+    "pricing": "Tarifs",
+    "blog": "Blog",
+    "about": "À propos",
+    "profile": "Profil",
+    "dashboard": "Tableau de bord",
+    "projects": "Projets",
+    "team": "Équipe",
+    "calendar": "Calendrier",
+    "settings": "Paramètres",
+    "helpFeedback": "Aide & Commentaires",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "signUp": "S'inscrire"
+  },
+  "home": {
+    "title1": "Créez",
+    "title2": "WhoIsIt",
+    "title3": "des jeux avec des indices collaboratifs en temps réel.",
+    "subtitle": "Lancez des parties instantanément avec HeroUI, Socket.IO et Zustand.",
+    "frontendDocs": "Documentation frontend",
+    "backendDocs": "Documentation backend",
+    "getStarted": "Commencez en modifiant"
+  },
+  "about": {
+    "title": "À propos"
+  },
+  "auth": {
+    "signedInAs": "Connecté en tant que",
+    "logOut": "Déconnexion"
+  },
+  "footer": {
+    "poweredBy": "Propulsé par"
+  }
+}
