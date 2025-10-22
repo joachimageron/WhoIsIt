@@ -291,32 +291,32 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                     className="flex items-center justify-between rounded-medium bg-default-100 p-3"
                   >
                     <div className="flex gap-4 items-start">
-                        <Badge
+                      <Badge
                         color={player.isReady ? "success" : "danger"}
                         content={
                           player.isReady ? (
-                          <Icon 
-                            icon="iconamoon:check-bold" 
-                            width={14}
-                            className="text-default-100"
-                          />
+                            <Icon
+                              className="text-default-100"
+                              icon="iconamoon:check-bold"
+                              width={14}
+                            />
                           ) : (
-                            <Icon 
-                            icon="iconamoon:close-bold" 
-                            width={14}
-                            className="text-default-100"
-                          />
+                            <Icon
+                              className="text-default-100"
+                              icon="iconamoon:close-bold"
+                              width={14}
+                            />
                           )
                         }
                         placement="bottom-left"
                         shape="circle"
-                        >
+                      >
                         <Avatar
                           name={player.username}
                           size="lg"
                           src={player.avatarUrl}
                         />
-                        </Badge>
+                      </Badge>
                       <div className="flex items-start gap-1 flex-col">
                         <p className="font-medium">{player.username}</p>
 
@@ -346,11 +346,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
           )}
 
           {!allPlayersReady && (
-            <Chip
-              color="default"
-              size="lg"
-              variant="flat"
-            >
+            <Chip color="default" size="lg" variant="flat">
               {dict.lobby.notAllPlayersReady}
             </Chip>
           )}
@@ -364,7 +360,9 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                 isLoading={isTogglingReady}
                 onPress={handleToggleReady}
               >
-                {currentPlayer.isReady ? dict.lobby.toggleNotReady : dict.lobby.toggleReady}
+                {currentPlayer.isReady
+                  ? dict.lobby.toggleNotReady
+                  : dict.lobby.toggleReady}
               </Button>
             )}
 

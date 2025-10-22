@@ -197,7 +197,7 @@ export class GameGateway
         if (player) {
           playerId = player.id;
         }
-      } catch (error) {
+      } catch {
         // If we can't get the lobby, that's okay - player might have already left
         this.logger.warn(`Could not get lobby for room ${normalizedRoomCode}`);
       }
