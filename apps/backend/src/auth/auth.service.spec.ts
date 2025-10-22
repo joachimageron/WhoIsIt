@@ -60,16 +60,14 @@ describe('AuthService', () => {
         email: 'test@example.com',
         username: 'testuser',
         password: 'password123',
-        displayName: 'Test User',
       };
 
       const mockUser = {
         id: 'uuid-123',
         email: registerDto.email,
         username: registerDto.username,
-        displayName: registerDto.displayName,
         passwordHash: 'hashed-password',
-        avatarUrl: null,
+        avatarUrl: '/avatar/avatar_5.jpg',
         isGuest: false,
       };
 
@@ -86,7 +84,6 @@ describe('AuthService', () => {
           id: mockUser.id,
           email: mockUser.email,
           username: mockUser.username,
-          displayName: mockUser.displayName,
           avatarUrl: mockUser.avatarUrl,
         },
       });
@@ -96,6 +93,16 @@ describe('AuthService', () => {
           { username: registerDto.username },
         ],
       });
+      // Verify that avatarUrl is set to a valid avatar path
+      expect(mockUserRepository.create).toHaveBeenCalled();
+      const createCallArgs = mockUserRepository.create.mock
+        .calls[0] as unknown[];
+      const userObject = createCallArgs[0] as { avatarUrl?: string };
+      expect(userObject.avatarUrl).toBeDefined();
+      expect(userObject.avatarUrl).toMatch(/^\/avatar\/avatar_\d+\.jpg$/);
+      expect(userObject.avatarUrl).toMatch(
+        /^\/avatar\/avatar_(0|[1-9]|1[0-7])\.jpg$/,
+      );
     });
 
     it('should throw ConflictException if user already exists', async () => {
@@ -103,7 +110,6 @@ describe('AuthService', () => {
         email: 'existing@example.com',
         username: 'existinguser',
         password: 'password123',
-        displayName: 'Existing User',
       };
 
       const existingUser = {
@@ -180,7 +186,6 @@ describe('AuthService', () => {
         id: 'uuid-123',
         email: 'test@example.com',
         username: 'testuser',
-        displayName: 'Test User',
         avatarUrl: null,
       } as User;
 
@@ -194,7 +199,6 @@ describe('AuthService', () => {
           id: mockUser.id,
           email: mockUser.email,
           username: mockUser.username,
-          displayName: mockUser.displayName,
           avatarUrl: mockUser.avatarUrl,
         },
       });

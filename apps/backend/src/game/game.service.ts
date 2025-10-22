@@ -67,16 +67,15 @@ export class GameService {
 
     const savedGame = await this.gameRepository.save(game);
 
-    const hostDisplayName =
-      request.hostDisplayName?.trim() || hostUser?.displayName;
-    if (!hostDisplayName) {
-      throw new BadRequestException('A host display name is required');
+    const hostUsername = request.hostUsername?.trim() || hostUser?.username;
+    if (!hostUsername) {
+      throw new BadRequestException('A host username is required');
     }
 
     const hostPlayer = this.playerRepository.create({
       game: savedGame,
       user: hostUser ?? undefined,
-      displayName: hostDisplayName,
+      username: hostUsername,
       avatarUrl: hostUser?.avatarUrl ?? undefined,
       role: GamePlayerRole.HOST,
       isReady: true,
@@ -135,9 +134,9 @@ export class GameService {
       }
     }
 
-    const displayName = request.displayName?.trim() || joiningUser?.displayName;
-    if (!displayName) {
-      throw new BadRequestException('A display name is required');
+    const username = request.username?.trim() || joiningUser?.username;
+    if (!username) {
+      throw new BadRequestException('A username is required');
     }
 
     const preferredAvatar = request.avatarUrl?.trim();
@@ -145,7 +144,7 @@ export class GameService {
     const player = this.playerRepository.create({
       game,
       user: joiningUser ?? undefined,
-      displayName,
+      username,
       avatarUrl:
         preferredAvatar && preferredAvatar.length > 0
           ? preferredAvatar
@@ -282,7 +281,7 @@ export class GameService {
 
     const playerResponses: GamePlayerResponse[] = players.map((player) => ({
       id: player.id,
-      displayName: player.displayName,
+      username: player.username,
       avatarUrl: player.avatarUrl ?? undefined,
       role: player.role,
       isReady: player.isReady,

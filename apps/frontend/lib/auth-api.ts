@@ -4,7 +4,6 @@ export type RegisterData = {
   email: string;
   username: string;
   password: string;
-  displayName: string;
 };
 
 export type LoginData = {
@@ -16,7 +15,6 @@ export type User = {
   id: string;
   email: string;
   username: string;
-  displayName: string;
   avatarUrl: string | null;
   isGuest?: boolean;
 };

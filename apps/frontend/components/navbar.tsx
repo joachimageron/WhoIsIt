@@ -110,34 +110,37 @@ export const Navbar = () => {
           {isAuthenticated && user ? (
             <Tooltip
               content={
-              <div className="px-1 py-2">
-                <Listbox aria-label="User Actions" onAction={(key) => {
-                if (key === "logout") {
-                  handleLogout();
-                }
-                }}>
-                <ListboxItem key="profile" className="h-14 gap-2">
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">{user.email}</p>
-                </ListboxItem>
-                <ListboxItem key="settings">Settings</ListboxItem>
-                <ListboxItem
-                  key="logout"
-                  className="text-danger"
-                  color="danger"
-                >
-                  Log Out
-                </ListboxItem>
-                </Listbox>
-              </div>
+                <div className="px-1 py-2">
+                  <Listbox
+                    aria-label="User Actions"
+                    onAction={(key) => {
+                      if (key === "logout") {
+                        handleLogout();
+                      }
+                    }}
+                  >
+                    <ListboxItem key="profile" className="h-14 gap-2">
+                      <p className="font-semibold">Signed in as</p>
+                      <p className="font-semibold">{user.email}</p>
+                    </ListboxItem>
+                    <ListboxItem key="settings">Settings</ListboxItem>
+                    <ListboxItem
+                      key="logout"
+                      className="text-danger"
+                      color="danger"
+                    >
+                      Log Out
+                    </ListboxItem>
+                  </Listbox>
+                </div>
               }
             >
               <Avatar
-              as="button"
-              className="transition-transform"
-              name={user.displayName}
-              size="sm"
-              src={user.avatarUrl || undefined}
+                as="button"
+                className="transition-transform"
+                name={user.username}
+                size="sm"
+                src={user.avatarUrl || undefined}
               />
             </Tooltip>
           ) : (
@@ -210,7 +213,7 @@ export const Navbar = () => {
             <>
               <NavbarMenuItem>
                 <div className="text-small">
-                  <p className="font-semibold">{user.displayName}</p>
+                  <p className="font-semibold">{user.username}</p>
                   <p className="text-default-500">{user.email}</p>
                 </div>
               </NavbarMenuItem>

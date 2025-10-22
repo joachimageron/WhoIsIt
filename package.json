@@ -10,7 +10,8 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "seed": "pnpm --filter @whois-it/backend seed"
+    "seed": "pnpm --filter @whois-it/backend seed",
+    "db:reset": "pnpm --filter @whois-it/backend db:reset"
   },
   "dependencies": {
     "@heroui/checkbox": "^2.3.27",

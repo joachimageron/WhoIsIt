@@ -40,7 +40,7 @@ export class GamePlayer {
   user?: User | null;
 
   @Column({ type: 'text' })
-  displayName!: string;
+  username!: string;
 
   @Column({ type: 'text', nullable: true })
   avatarUrl?: string | null;

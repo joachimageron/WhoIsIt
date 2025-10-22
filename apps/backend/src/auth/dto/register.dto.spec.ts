@@ -7,7 +7,6 @@ describe('RegisterDto', () => {
     dto.email = 'test@example.com';
     dto.username = 'testuser';
     dto.password = 'password123';
-    dto.displayName = 'Test User';
 
     const errors = await validate(dto);
     expect(errors.length).toBe(0);
@@ -18,7 +17,6 @@ describe('RegisterDto', () => {
     dto.email = 'invalid-email';
     dto.username = 'testuser';
     dto.password = 'password123';
-    dto.displayName = 'Test User';
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
@@ -31,7 +29,6 @@ describe('RegisterDto', () => {
     dto.email = '';
     dto.username = 'testuser';
     dto.password = 'password123';
-    dto.displayName = 'Test User';
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
@@ -44,7 +41,6 @@ describe('RegisterDto', () => {
     dto.email = 'test@example.com';
     dto.username = 'ab';
     dto.password = 'password123';
-    dto.displayName = 'Test User';
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
@@ -57,24 +53,10 @@ describe('RegisterDto', () => {
     dto.email = 'test@example.com';
     dto.username = 'testuser';
     dto.password = '12345';
-    dto.displayName = 'Test User';
 
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
     expect(errors[0].property).toBe('password');
     expect(errors[0].constraints?.minLength).toBeDefined();
-  });
-
-  it('should reject empty displayName', async () => {
-    const dto = new RegisterDto();
-    dto.email = 'test@example.com';
-    dto.username = 'testuser';
-    dto.password = 'password123';
-    dto.displayName = '';
-
-    const errors = await validate(dto);
-    expect(errors.length).toBeGreaterThan(0);
-    const displayNameError = errors.find((e) => e.property === 'displayName');
-    expect(displayNameError).toBeDefined();
   });
 });

@@ -25,7 +25,6 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    displayName: "",
   });
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
@@ -79,7 +78,6 @@ export default function RegisterPage() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        displayName: formData.displayName || formData.username,
       });
 
       setUser(user);
@@ -173,9 +171,6 @@ export default function RegisterPage() {
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
         <p className="pb-4 text-left text-3xl font-semibold">
           Sign Up
-          <span aria-label="emoji" className="ml-2" role="img">
-            👋
-          </span>
         </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
@@ -197,16 +192,6 @@ export default function RegisterPage() {
             placeholder="Enter your email"
             type="email"
             value={formData.email}
-            variant="bordered"
-            onChange={handleInputChange}
-          />
-          <Input
-            label="Display Name"
-            labelPlacement="outside"
-            name="displayName"
-            placeholder="Enter your display name (optional)"
-            type="text"
-            value={formData.displayName}
             variant="bordered"
             onChange={handleInputChange}
           />

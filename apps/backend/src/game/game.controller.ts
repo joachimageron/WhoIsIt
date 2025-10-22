@@ -23,16 +23,16 @@ export class GameController {
       throw new BadRequestException('characterSetId is required');
     }
 
-    if (!body.hostDisplayName && !body.hostUserId) {
+    if (!body.hostUsername && !body.hostUserId) {
       throw new BadRequestException(
-        'hostDisplayName is required when hostUserId is missing',
+        'hostUsername is required when hostUserId is missing',
       );
     }
 
     return this.gameService.createGame({
       ...body,
       characterSetId: body.characterSetId.trim(),
-      hostDisplayName: body.hostDisplayName?.trim(),
+      hostUsername: body.hostUsername?.trim(),
     });
   }
 
@@ -45,15 +45,15 @@ export class GameController {
       throw new BadRequestException('roomCode is required');
     }
 
-    if (!body?.displayName && !body?.userId) {
+    if (!body?.username && !body?.userId) {
       throw new BadRequestException(
-        'displayName is required when userId is missing',
+        'username is required when userId is missing',
       );
     }
 
     return this.gameService.joinGame(roomCode, {
       ...body,
-      displayName: body.displayName?.trim(),
+      username: body.username?.trim(),
       avatarUrl: body.avatarUrl?.trim(),
     });
   }
