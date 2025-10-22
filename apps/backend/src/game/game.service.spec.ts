@@ -82,7 +82,7 @@ describe('GameService', () => {
         id: 'user-123',
         email: 'host@example.com',
         username: 'hostuser',
-        displayName: 'Host User',
+        username: 'hostuser',
         avatarUrl: 'https://example.com/avatar.jpg',
         isGuest: false,
         createdAt: new Date(),
@@ -92,7 +92,7 @@ describe('GameService', () => {
       const createRequest: CreateGameRequest = {
         characterSetId: 'char-set-123',
         hostUserId: 'user-123',
-        hostDisplayName: 'Host User',
+        hostUsername: 'Host User',
         visibility: 'private',
         maxPlayers: 4,
         turnTimerSeconds: 60,
@@ -116,7 +116,7 @@ describe('GameService', () => {
         id: 'player-123',
         game: mockGame,
         user: mockUser,
-        displayName: 'Host User',
+        username: 'hostuser',
         avatarUrl: mockUser.avatarUrl,
         role: GamePlayerRole.HOST,
         isReady: true,
@@ -163,7 +163,7 @@ describe('GameService', () => {
 
       const createRequest: CreateGameRequest = {
         characterSetId: 'char-set-123',
-        hostDisplayName: 'Guest Host',
+        hostUsername: 'Guest Host',
         visibility: 'public',
       };
 
@@ -181,7 +181,7 @@ describe('GameService', () => {
       const mockHostPlayer: GamePlayer = {
         id: 'player-123',
         game: mockGame,
-        displayName: 'Guest Host',
+        username: 'guesthost',
         role: GamePlayerRole.HOST,
         isReady: true,
         joinedAt: new Date(),
@@ -203,13 +203,13 @@ describe('GameService', () => {
       expect(result).toBeDefined();
       expect(result.roomCode).toBe('XYZ99');
       expect(result.visibility).toBe(GameVisibility.PUBLIC);
-      expect(result.players[0].displayName).toBe('Guest Host');
+      expect(result.players[0].username).toBe('guesthost');
     });
 
     it('should throw NotFoundException if character set not found', async () => {
       const createRequest: CreateGameRequest = {
         characterSetId: 'non-existent',
-        hostDisplayName: 'Host',
+        hostUsername: 'Host',
       };
 
       mockCharacterSetRepository.findOne.mockResolvedValue(null);
@@ -232,7 +232,7 @@ describe('GameService', () => {
       const createRequest: CreateGameRequest = {
         characterSetId: 'char-set-123',
         hostUserId: 'non-existent-user',
-        hostDisplayName: 'Host',
+        hostUsername: 'Host',
       };
 
       mockCharacterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -274,7 +274,7 @@ describe('GameService', () => {
         BadRequestException,
       );
       await expect(service.createGame(createRequest)).rejects.toThrow(
-        'A host display name is required',
+        'A host username is required',
       );
     });
 
@@ -287,7 +287,7 @@ describe('GameService', () => {
 
       const createRequest: CreateGameRequest = {
         characterSetId: 'char-set-123',
-        hostDisplayName: 'Host',
+        hostUsername: 'Host',
       };
 
       mockCharacterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -311,21 +311,21 @@ describe('GameService', () => {
 
       const mockHostUser: User = {
         id: 'host-123',
-        displayName: 'Host',
+        username: 'host',
       } as User;
 
       const mockJoiningUser: User = {
         id: 'user-456',
         email: 'player@example.com',
         username: 'player',
-        displayName: 'Player One',
+        username: 'playerone',
         avatarUrl: 'https://example.com/player.jpg',
         isGuest: false,
       } as User;
 
       const mockHostPlayer: GamePlayer = {
         id: 'player-host',
-        displayName: 'Host',
+        username: 'host',
         role: GamePlayerRole.HOST,
         user: mockHostUser,
       } as GamePlayer;
@@ -344,7 +344,7 @@ describe('GameService', () => {
         id: 'player-new',
         game: mockGame,
         user: mockJoiningUser,
-        displayName: 'Player One',
+        username: 'playerone',
         avatarUrl: mockJoiningUser.avatarUrl,
         role: GamePlayerRole.PLAYER,
         isReady: false,
@@ -353,7 +353,7 @@ describe('GameService', () => {
 
       const joinRequest: JoinGameRequest = {
         userId: 'user-456',
-        displayName: 'Player One',
+        username: 'playerone',
       };
 
       mockGameRepository.findOne.mockResolvedValueOnce(mockGame);
@@ -369,7 +369,7 @@ describe('GameService', () => {
 
       expect(result).toBeDefined();
       expect(result.players).toHaveLength(2);
-      expect(result.players[1].displayName).toBe('Player One');
+      expect(result.players[1].username).toBe('playerone');
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'user-456' },
       });
@@ -392,14 +392,14 @@ describe('GameService', () => {
       const mockNewPlayer: GamePlayer = {
         id: 'player-guest',
         game: mockGame,
-        displayName: 'Guest Player',
+        username: 'guestplayer',
         role: GamePlayerRole.PLAYER,
         isReady: false,
         joinedAt: new Date(),
       } as GamePlayer;
 
       const joinRequest: JoinGameRequest = {
-        displayName: 'Guest Player',
+        username: 'guestplayer',
       };
 
       mockGameRepository.findOne.mockResolvedValueOnce(mockGame);
@@ -414,12 +414,12 @@ describe('GameService', () => {
 
       expect(result).toBeDefined();
       expect(result.roomCode).toBe('ABC12');
-      expect(result.players[0].displayName).toBe('Guest Player');
+      expect(result.players[0].username).toBe('guestplayer');
     });
 
     it('should throw NotFoundException if game not found', async () => {
       const joinRequest: JoinGameRequest = {
-        displayName: 'Player',
+        username: 'player',
       };
 
       mockGameRepository.findOne.mockResolvedValue(null);
@@ -441,7 +441,7 @@ describe('GameService', () => {
       } as Game;
 
       const joinRequest: JoinGameRequest = {
-        displayName: 'Player',
+        username: 'player',
       };
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
@@ -471,7 +471,7 @@ describe('GameService', () => {
       } as Game;
 
       const joinRequest: JoinGameRequest = {
-        displayName: 'Player',
+        username: 'player',
       };
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
@@ -494,7 +494,7 @@ describe('GameService', () => {
 
       const joinRequest: JoinGameRequest = {
         userId: 'non-existent',
-        displayName: 'Player',
+        username: 'player',
       };
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
@@ -524,14 +524,14 @@ describe('GameService', () => {
         BadRequestException,
       );
       await expect(service.joinGame('ABC12', joinRequest)).rejects.toThrow(
-        'A display name is required',
+        'A username is required',
       );
     });
 
     it('should return existing game if user already joined', async () => {
       const mockUser: User = {
         id: 'user-123',
-        displayName: 'Existing Player',
+        username: 'existingplayer',
       } as User;
 
       const mockCharacterSet: CharacterSet = {
@@ -542,7 +542,7 @@ describe('GameService', () => {
       const mockPlayer: GamePlayer = {
         id: 'player-123',
         user: mockUser,
-        displayName: 'Existing Player',
+        username: 'existingplayer',
       } as GamePlayer;
 
       const mockGame: Game = {
@@ -556,7 +556,7 @@ describe('GameService', () => {
 
       const joinRequest: JoinGameRequest = {
         userId: 'user-123',
-        displayName: 'Existing Player',
+        username: 'existingplayer',
       };
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);

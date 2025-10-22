@@ -48,7 +48,7 @@ describe('AuthController', () => {
         email: 'test@example.com',
         username: 'testuser',
         password: 'password123',
-        displayName: 'Test User',
+        username: 'testuser',
       };
 
       const expectedResponse = {
@@ -57,7 +57,7 @@ describe('AuthController', () => {
           id: 'uuid-123',
           email: registerDto.email,
           username: registerDto.username,
-          displayName: registerDto.displayName,
+          username: registerDto.username,
           avatarUrl: null,
         },
       };
@@ -90,7 +90,7 @@ describe('AuthController', () => {
         id: 'uuid-123',
         email: 'test@example.com',
         username: 'testuser',
-        displayName: 'Test User',
+        username: 'testuser',
         avatarUrl: null,
       } as User;
 
@@ -100,7 +100,7 @@ describe('AuthController', () => {
           id: mockUser.id,
           email: mockUser.email,
           username: mockUser.username,
-          displayName: mockUser.displayName,
+          username: mockUser.username,
           avatarUrl: mockUser.avatarUrl,
         },
       };
@@ -134,7 +134,7 @@ describe('AuthController', () => {
         id: 'uuid-123',
         email: 'test@example.com',
         username: 'testuser',
-        displayName: 'Test User',
+        username: 'testuser',
         avatarUrl: null,
         isGuest: false,
       } as User;
@@ -149,7 +149,7 @@ describe('AuthController', () => {
         id: mockUser.id,
         email: mockUser.email,
         username: mockUser.username,
-        displayName: mockUser.displayName,
+        username: mockUser.username,
         avatarUrl: mockUser.avatarUrl,
         isGuest: mockUser.isGuest,
       });

@@ -24,7 +24,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const { email, username, password, displayName } = registerDto;
+    const { email, username, password } = registerDto;
 
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
@@ -54,7 +54,6 @@ export class AuthService {
     const user = this.userRepository.create({
       email,
       username,
-      displayName,
       passwordHash,
       avatarUrl,
       isGuest: false,
@@ -91,8 +90,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email ?? null,
-        username: user.username ?? null,
-        displayName: user.displayName,
+        username: user.username,
         avatarUrl: user.avatarUrl ?? null,
       },
     };
@@ -135,8 +133,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email ?? null,
-        username: user.username ?? null,
-        displayName: user.displayName,
+        username: user.username,
         avatarUrl: user.avatarUrl ?? null,
       },
     };
@@ -205,7 +202,7 @@ export class AuthService {
     // Send verification email
     await this.emailService.sendVerificationEmail(
       email,
-      user.username ?? user.displayName,
+      user.username,
       verificationToken,
     );
   }
@@ -233,7 +230,7 @@ export class AuthService {
     // Send password reset email
     await this.emailService.sendPasswordResetEmail(
       email,
-      user.username ?? user.displayName,
+      user.username,
       passwordResetToken,
     );
   }

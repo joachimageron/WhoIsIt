@@ -25,7 +25,6 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    displayName: "",
   });
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
@@ -79,7 +78,6 @@ export default function RegisterPage() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        displayName: formData.displayName || formData.username,
       });
 
       setUser(user);
@@ -197,16 +195,6 @@ export default function RegisterPage() {
             placeholder="Enter your email"
             type="email"
             value={formData.email}
-            variant="bordered"
-            onChange={handleInputChange}
-          />
-          <Input
-            label="Display Name"
-            labelPlacement="outside"
-            name="displayName"
-            placeholder="Enter your display name (optional)"
-            type="text"
-            value={formData.displayName}
             variant="bordered"
             onChange={handleInputChange}
           />
