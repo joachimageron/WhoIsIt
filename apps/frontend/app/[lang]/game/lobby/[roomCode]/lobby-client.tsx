@@ -11,6 +11,7 @@ import { Divider } from "@heroui/divider";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 import { Avatar } from "@heroui/avatar";
+import { Badge } from "@heroui/badge";
 
 import { useGameSocket } from "@/hooks/use-game-socket";
 import { useGameStore } from "@/store/game-store";
@@ -262,11 +263,22 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                     className="flex items-center justify-between rounded-medium bg-default-100 p-3"
                   >
                     <div className="flex gap-3 items-start">
-                      <Avatar
-                        name={player.username}
-                        size="lg"
-                        src={player.avatarUrl}
-                      />
+                      <Badge
+                        color={player.isReady ? "success" : "default"}
+                        content={
+                          player.isReady ? (
+                            <Icon icon="solar:check-circle-bold" width={14} />
+                          ) : undefined
+                        }
+                        placement="bottom-right"
+                        shape="circle"
+                      >
+                        <Avatar
+                          name={player.username}
+                          size="lg"
+                          src={player.avatarUrl}
+                        />
+                      </Badge>
                       <div className="flex items-start gap-1 flex-col">
                         <p className="font-medium">{player.username}</p>
 
@@ -277,20 +289,6 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                         )}
                       </div>
                     </div>
-                    <Chip
-                      color={player.isReady ? "success" : "default"}
-                      size="sm"
-                      startContent={
-                        player.isReady ? (
-                          <Icon icon="solar:check-circle-bold" width={16} />
-                        ) : undefined
-                      }
-                      variant="flat"
-                    >
-                      {player.isReady
-                        ? dict.lobby.readyStatus
-                        : dict.lobby.notReadyStatus}
-                    </Chip>
                   </div>
                 ))}
               </div>
@@ -299,11 +297,14 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
           {/* Status Messages */}
           {allPlayersReady && (
-            <div className="rounded-medium bg-success-100 p-3">
-              <p className="text-small text-success-700">
-                {dict.lobby.allPlayersReady}
-              </p>
-            </div>
+            <Chip
+              color="success"
+              size="lg"
+              startContent={<Icon icon="solar:check-circle-bold" width={20} />}
+              variant="flat"
+            >
+              {dict.lobby.allPlayersReady}
+            </Chip>
           )}
 
           {!isHost && !allPlayersReady && (
