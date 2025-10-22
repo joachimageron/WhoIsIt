@@ -283,23 +283,33 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                     key={player.id}
                     className="flex items-center justify-between rounded-medium bg-default-100 p-3"
                   >
-                    <div className="flex gap-3 items-start">
-                      <Badge
-                        color={player.isReady ? "success" : "default"}
+                    <div className="flex gap-4 items-start">
+                        <Badge
+                        color={player.isReady ? "success" : "danger"}
                         content={
                           player.isReady ? (
-                            <Icon icon="solar:check-circle-bold" width={14} />
-                          ) : undefined
+                          <Icon 
+                            icon="iconamoon:check-bold" 
+                            width={14}
+                            className="text-default-100"
+                          />
+                          ) : (
+                            <Icon 
+                            icon="iconamoon:close-bold" 
+                            width={14}
+                            className="text-default-100"
+                          />
+                          )
                         }
-                        placement="bottom-right"
+                        placement="bottom-left"
                         shape="circle"
-                      >
+                        >
                         <Avatar
                           name={player.username}
                           size="lg"
                           src={player.avatarUrl}
                         />
-                      </Badge>
+                        </Badge>
                       <div className="flex items-start gap-1 flex-col">
                         <p className="font-medium">{player.username}</p>
 
@@ -328,12 +338,14 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
             </Chip>
           )}
 
-          {!isHost && !allPlayersReady && (
-            <div className="rounded-medium bg-default-100 p-3">
-              <p className="text-small text-default-600">
-                {dict.lobby.waitingForHost}
-              </p>
-            </div>
+          {!allPlayersReady && (
+            <Chip
+              color="default"
+              size="lg"
+              variant="flat"
+            >
+              {dict.lobby.notAllPlayersReady}
+            </Chip>
           )}
 
           {/* Action Buttons */}
@@ -345,7 +357,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                 isLoading={isTogglingReady}
                 onPress={handleToggleReady}
               >
-                {dict.lobby.toggleReady}
+                {currentPlayer.isReady ? dict.lobby.toggleNotReady : dict.lobby.toggleReady}
               </Button>
             )}
 
