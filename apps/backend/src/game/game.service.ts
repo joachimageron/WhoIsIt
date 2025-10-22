@@ -67,8 +67,7 @@ export class GameService {
 
     const savedGame = await this.gameRepository.save(game);
 
-    const hostUsername =
-      request.hostUsername?.trim() || hostUser?.username;
+    const hostUsername = request.hostUsername?.trim() || hostUser?.username;
     if (!hostUsername) {
       throw new BadRequestException('A host username is required');
     }
