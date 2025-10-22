@@ -11,13 +11,6 @@ interface AuthenticatedSocket extends Socket {
   user?: User | null;
 }
 
-// JWT payload structure
-interface JwtPayload {
-  sub: string;
-  email: string | null;
-  username: string | null;
-}
-
 export class WsAuthAdapter extends IoAdapter {
   private readonly logger = new Logger(WsAuthAdapter.name);
 
