@@ -120,5 +120,22 @@
   "common": {
     "search": "Search",
     "language": "Language"
+  },
+  "game": {
+    "create": {
+      "title": "Create Game",
+      "characterSet": "Character Set",
+      "characterSetPlaceholder": "Select a character set",
+      "maxPlayers": "Maximum Players",
+      "maxPlayersPlaceholder": "Enter max players (optional)",
+      "turnTimer": "Turn Timer (seconds)",
+      "turnTimerPlaceholder": "Enter turn timer in seconds (optional)",
+      "createButton": "Create Game",
+      "creating": "Creating...",
+      "loadingCharacterSets": "Loading character sets...",
+      "fillCharacterSet": "Please select a character set",
+      "creationFailed": "Failed to create game",
+      "noCharacterSets": "No character sets available"
+    }
   }
 }
