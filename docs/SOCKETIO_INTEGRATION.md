@@ -92,13 +92,15 @@ export default function GameLobby() {
 
 ## Testing
 
-A test page is available at `/lobby` to test Socket.IO functionality:
+To test Socket.IO functionality, you can:
 
 1. Start the backend: `cd apps/backend && pnpm run dev`
 2. Start the frontend: `cd apps/frontend && pnpm run dev`
-3. Navigate to `http://localhost:3000/lobby`
-4. Enter a room code from an existing game
-5. Test joining, ready status updates, and real-time synchronization
+3. Use the provided hooks and stores in your own components
+4. Create a game using the REST API (`POST /games`)
+5. Use `useGameSocket` hook to test joining, ready status updates, and real-time synchronization
+
+**Note**: The frontend game lobby pages are planned for Phase 2 of development and are not yet implemented.
 
 ## Environment Variables
 
