@@ -48,7 +48,6 @@ describe('AuthController', () => {
         email: 'test@example.com',
         username: 'testuser',
         password: 'password123',
-        username: 'testuser',
       };
 
       const expectedResponse = {
@@ -56,7 +55,6 @@ describe('AuthController', () => {
         user: {
           id: 'uuid-123',
           email: registerDto.email,
-          username: registerDto.username,
           username: registerDto.username,
           avatarUrl: null,
         },
@@ -90,7 +88,6 @@ describe('AuthController', () => {
         id: 'uuid-123',
         email: 'test@example.com',
         username: 'testuser',
-        username: 'testuser',
         avatarUrl: null,
       } as User;
 
@@ -99,7 +96,6 @@ describe('AuthController', () => {
         user: {
           id: mockUser.id,
           email: mockUser.email,
-          username: mockUser.username,
           username: mockUser.username,
           avatarUrl: mockUser.avatarUrl,
         },
@@ -134,7 +130,6 @@ describe('AuthController', () => {
         id: 'uuid-123',
         email: 'test@example.com',
         username: 'testuser',
-        username: 'testuser',
         avatarUrl: null,
         isGuest: false,
       } as User;
@@ -148,7 +143,6 @@ describe('AuthController', () => {
       expect(result).toEqual({
         id: mockUser.id,
         email: mockUser.email,
-        username: mockUser.username,
         username: mockUser.username,
         avatarUrl: mockUser.avatarUrl,
         isGuest: mockUser.isGuest,

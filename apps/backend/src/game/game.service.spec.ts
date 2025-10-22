@@ -82,7 +82,6 @@ describe('GameService', () => {
         id: 'user-123',
         email: 'host@example.com',
         username: 'hostuser',
-        username: 'hostuser',
         avatarUrl: 'https://example.com/avatar.jpg',
         isGuest: false,
         createdAt: new Date(),
@@ -318,7 +317,6 @@ describe('GameService', () => {
         id: 'user-456',
         email: 'player@example.com',
         username: 'player',
-        username: 'playerone',
         avatarUrl: 'https://example.com/player.jpg',
         isGuest: false,
       } as User;
