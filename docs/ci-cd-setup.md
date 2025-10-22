@@ -20,7 +20,7 @@ The CI workflow includes three parallel jobs:
 ### Features
 
 - **pnpm Caching**: Dependencies are cached to speed up CI runs
-- **Node.js 20 LTS**: Uses the latest LTS version of Node.js
+- **Node.js 22 LTS**: Uses the latest LTS version of Node.js
 - **Parallel Execution**: Jobs run in parallel for faster feedback
 - **Error Handling**: Frontend build failures are allowed due to Google Fonts network restrictions in CI environments
 
@@ -89,20 +89,20 @@ If you encounter issues with cached dependencies, you can clear the GitHub Actio
 
 ### Node.js Version Mismatch
 
-The CI uses Node.js 20 LTS. Ensure your local environment uses the same version:
+The CI uses Node.js 22 LTS. Ensure your local environment uses the same version:
 
 ```bash
-node --version  # Should show v20.x.x
+node --version  # Should show v22.x.x
 ```
 
 You can use `nvm` or `fnm` to manage Node.js versions:
 
 ```bash
 # Using nvm
-nvm install 20
-nvm use 20
+nvm install 22
+nvm use 22
 
 # Using fnm
-fnm install 20
-fnm use 20
+fnm install 22
+fnm use 22
 ```
