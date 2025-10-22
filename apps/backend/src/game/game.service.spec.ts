@@ -6,7 +6,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { GameService } from './game.service';
-import { CharacterSet, Game, GamePlayer, User } from '../database/entities';
+import {
+  CharacterSet,
+  Game,
+  GamePlayer,
+  User,
+  Round,
+  PlayerSecret,
+  Character,
+} from '../database/entities';
 import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
 import type { CreateGameRequest, JoinGameRequest } from '@whois-it/contracts';
 
@@ -34,6 +42,23 @@ describe('GameService', () => {
     findOne: jest.fn(),
   };
 
+  const mockRoundRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
+  const mockPlayerSecretRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
+  const mockCharacterRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -53,6 +78,18 @@ describe('GameService', () => {
         {
           provide: getRepositoryToken(User),
           useValue: mockUserRepository,
+        },
+        {
+          provide: getRepositoryToken(Round),
+          useValue: mockRoundRepository,
+        },
+        {
+          provide: getRepositoryToken(PlayerSecret),
+          useValue: mockPlayerSecretRepository,
+        },
+        {
+          provide: getRepositoryToken(Character),
+          useValue: mockCharacterRepository,
         },
       ],
     }).compile();
@@ -655,6 +692,211 @@ describe('GameService', () => {
       await expect(
         service.updatePlayerReady('player-123', true),
       ).rejects.toThrow('Game is not in lobby state');
+    });
+  });
+
+  describe('startGame', () => {
+    it('should successfully start a game with all players ready', async () => {
+      const mockCharacterSet: CharacterSet = {
+        id: 'char-set-123',
+        name: 'Test Set',
+        slug: 'test-set',
+      } as CharacterSet;
+
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        isReady: true,
+        joinedAt: new Date(),
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+        isReady: true,
+        joinedAt: new Date(),
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        characterSet: mockCharacterSet,
+        players: [mockPlayer1, mockPlayer2],
+        createdAt: new Date(),
+      } as Game;
+
+      const mockCharacters: Character[] = [
+        { id: 'char-1', name: 'Character 1' } as Character,
+        { id: 'char-2', name: 'Character 2' } as Character,
+        { id: 'char-3', name: 'Character 3' } as Character,
+      ];
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+      } as Round;
+
+      mockGameRepository.findOne
+        .mockResolvedValueOnce(mockGame)
+        .mockResolvedValueOnce({ ...mockGame, status: GameStatus.IN_PROGRESS });
+      mockGameRepository.save.mockResolvedValue({
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+      });
+      mockCharacterRepository.find.mockResolvedValue(mockCharacters);
+      mockRoundRepository.create.mockReturnValue(mockRound);
+      mockRoundRepository.save.mockResolvedValue(mockRound);
+      mockPlayerSecretRepository.create.mockImplementation((data) => data);
+      mockPlayerSecretRepository.save.mockResolvedValue([]);
+
+      const result = await service.startGame('ABC12');
+
+      expect(result).toBeDefined();
+      expect(mockGameRepository.save).toHaveBeenCalled();
+      expect(mockRoundRepository.create).toHaveBeenCalled();
+      expect(mockRoundRepository.save).toHaveBeenCalled();
+      expect(mockCharacterRepository.find).toHaveBeenCalled();
+      expect(mockPlayerSecretRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if game not found', async () => {
+      mockGameRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.startGame('NOTFOUND')).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.startGame('NOTFOUND')).rejects.toThrow(
+        'Game not found',
+      );
+    });
+
+    it('should throw BadRequestException if game has already started', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        'Game has already started or ended',
+      );
+    });
+
+    it('should throw BadRequestException if less than 2 players', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        isReady: true,
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        players: [mockPlayer],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        'Need at least 2 players to start the game',
+      );
+    });
+
+    it('should throw BadRequestException if not all players are ready', async () => {
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        isReady: true,
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+        isReady: false,
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        players: [mockPlayer1, mockPlayer2],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.startGame('ABC12')).rejects.toThrow(
+        'All players must be ready to start',
+      );
+    });
+
+    it('should throw BadRequestException if not enough characters for all players', async () => {
+      const mockCharacterSet: CharacterSet = {
+        id: 'char-set-123',
+        name: 'Test Set',
+      } as CharacterSet;
+
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        isReady: true,
+        joinedAt: new Date(),
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+        isReady: true,
+        joinedAt: new Date(),
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        characterSet: mockCharacterSet,
+        players: [mockPlayer1, mockPlayer2],
+        createdAt: new Date(),
+      } as Game;
+
+      const mockCharacters: Character[] = [
+        { id: 'char-1', name: 'Character 1' } as Character,
+      ];
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+      } as Round;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockGameRepository.save.mockResolvedValue({
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+      });
+      mockCharacterRepository.find.mockResolvedValue(mockCharacters);
+      mockRoundRepository.create.mockReturnValue(mockRound);
+      mockRoundRepository.save.mockResolvedValue(mockRound);
+
+      const error = await service
+        .startGame('ABC12')
+        .catch((err) => err as Error);
+
+      expect(error).toBeInstanceOf(BadRequestException);
+      expect(error.message).toContain(
+        'Not enough characters in the set for all players',
+      );
     });
   });
 });

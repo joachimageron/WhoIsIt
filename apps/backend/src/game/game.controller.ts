@@ -12,10 +12,14 @@ import type {
   JoinGameRequest,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
+import { GameGateway } from './game.gateway';
 
 @Controller('games')
 export class GameController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly gameGateway: GameGateway,
+  ) {}
 
   @Post()
   async create(@Body() body: CreateGameRequest): Promise<GameLobbyResponse> {
@@ -77,6 +81,11 @@ export class GameController {
       throw new BadRequestException('roomCode is required');
     }
 
-    return this.gameService.startGame(roomCode);
+    const result = await this.gameService.startGame(roomCode);
+
+    // Broadcast gameStarted event to all players in the room
+    await this.gameGateway.broadcastGameStarted(roomCode);
+
+    return result;
   }
 }
