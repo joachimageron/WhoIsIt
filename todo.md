@@ -6,6 +6,7 @@
 ## 📊 Quick Summary
 
 The WhoIsIt project is a multiplayer guessing game with a **solid foundation** in place:
+
 - ✅ **Backend API complete**: Authentication, character sets, game lobby, and start game functionality
 - ✅ **Socket.IO real-time system**: Secure WebSocket gateway with authentication and reconnection
 - ✅ **CI/CD pipeline**: Automated testing and building with GitHub Actions
