@@ -5,14 +5,10 @@ import { GameService } from './game.service';
 import { User } from '../database/entities/user.entity';
 import { Game } from '../database/entities/game.entity';
 import { GameStatus } from '../database/enums';
-import type {
-  GameLobbyResponse,
-  GamePlayerResponse,
-} from '@whois-it/contracts';
+import type { GameLobbyResponse } from '@whois-it/contracts';
 
 describe('GameGateway', () => {
   let gateway: GameGateway;
-  let gameService: GameService;
 
   const mockGameService = {
     getLobbyByRoomCode: jest.fn(),
@@ -83,6 +79,8 @@ describe('GameGateway', () => {
         auth: {},
       },
     };
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return socket as any;
   };
 
@@ -98,9 +96,9 @@ describe('GameGateway', () => {
     }).compile();
 
     gateway = module.get<GameGateway>(GameGateway);
-    gameService = module.get<GameService>(GameService);
 
     // Mock the server
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     gateway.server = {
       to: jest.fn().mockReturnThis(),
       emit: jest.fn(),
@@ -141,9 +139,11 @@ describe('GameGateway', () => {
 
   describe('handleConnection', () => {
     it('should track authenticated user connection', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const socket = createMockSocket(mockUser);
       const loggerSpy = jest.spyOn(Logger.prototype, 'log');
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       gateway.handleConnection(socket);
 
       expect(loggerSpy).toHaveBeenCalledWith(
@@ -159,6 +159,7 @@ describe('GameGateway', () => {
     });
 
     it('should track guest connection', () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const socket = createMockSocket(null);
       const loggerSpy = jest.spyOn(Logger.prototype, 'log');
 
@@ -399,6 +400,7 @@ describe('GameGateway', () => {
       gateway.handleConnection(socket2);
       expect(gateway.getConnectedUsersCount()).toBe(2);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       gateway.handleDisconnect(socket1);
       expect(gateway.getConnectedUsersCount()).toBe(1);
     });
@@ -416,6 +418,7 @@ describe('GameGateway', () => {
       mockRooms.set('socket-2', new Set(['socket-2'])); // Default room (socket ID)
       mockRooms.set('XYZ34', new Set(['socket-3'])); // Actual game room
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       gateway.server.sockets.adapter.rooms = mockRooms;
 
       // Should count only non-default rooms (ABC12 and XYZ34)
@@ -450,10 +453,12 @@ describe('GameGateway', () => {
       // Mock rooms without active connections
       const mockRooms = new Map();
       mockRooms.set('ABC12', new Set()); // Empty room
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       gateway.server.sockets.adapter.rooms = mockRooms;
 
       // Manually trigger cleanup
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await (gateway as any).cleanupAbandonedLobbies();
 
       // Should log that it's cleaning up the abandoned lobby
@@ -475,8 +480,10 @@ describe('GameGateway', () => {
 
       const mockRooms = new Map();
       mockRooms.set('ABC12', new Set());
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       gateway.server.sockets.adapter.rooms = mockRooms;
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       await (gateway as any).cleanupAbandonedLobbies();
 
       // Should not log cleanup for in-progress games
