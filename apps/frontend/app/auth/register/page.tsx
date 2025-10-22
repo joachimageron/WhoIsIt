@@ -171,9 +171,6 @@ export default function RegisterPage() {
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
         <p className="pb-4 text-left text-3xl font-semibold">
           Sign Up
-          <span aria-label="emoji" className="ml-2" role="img">
-            👋
-          </span>
         </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input

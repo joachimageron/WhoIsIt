@@ -3,11 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CharacterSet } from '../database/entities/character-set.entity';
 import { Character } from '../database/entities/character.entity';
-import {
-  CharacterSetResponseDto,
-  CharacterResponseDto,
-  TraitValueResponseDto,
-} from './dto';
+import { CharacterSetResponseDto, CharacterResponseDto } from './dto';
 
 @Injectable()
 export class CharacterSetsService {
