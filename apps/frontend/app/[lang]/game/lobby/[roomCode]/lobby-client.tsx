@@ -15,6 +15,7 @@ import { useGameSocket } from "@/hooks/use-game-socket";
 import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
+import { Avatar } from "@heroui/avatar";
 
 interface LobbyClientProps {
   dict: any;
@@ -260,26 +261,26 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                     key={player.id}
                     className="flex items-center justify-between rounded-medium bg-default-100 p-3"
                   >
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        className="text-default-400"
-                        icon="solar:user-circle-bold"
-                        width={32}
+                    <div className="flex gap-3 items-start">
+                      <Avatar
+                      size="lg"
+                        src={player.avatarUrl}
+                        name={player.username}
                       />
-                      <div>
+                      <div className="flex items-start gap-1 flex-col">
                         <p className="font-medium">
                           {player.username}
-                          {player.role === "host" && (
-                            <Chip
-                              className="ml-2"
-                              color="primary"
-                              size="sm"
-                              variant="flat"
-                            >
-                              {dict.lobby.host}
-                            </Chip>
-                          )}
                         </p>
+
+                        {player.role === "host" && (
+                          <Chip
+                            color="primary"
+                            size="sm"
+                            variant="flat"
+                          >
+                            {dict.lobby.host}
+                          </Chip>
+                        )}
                       </div>
                     </div>
                     <Chip
@@ -304,7 +305,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
           {/* Status Messages */}
           {allPlayersReady && (
-            <div className="rounded-medium bg-success-50 p-3">
+            <div className="rounded-medium bg-success-100 p-3">
               <p className="text-small text-success-700">
                 {dict.lobby.allPlayersReady}
               </p>
