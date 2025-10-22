@@ -3,12 +3,16 @@
  * This file demonstrates how to protect pages in the WhoIsIt application
  */
 
+import { useState } from "react";
+
 import { RouteGuard } from "./route-guard";
+
+import { useGameAccess } from "@/lib/hooks/use-game-access";
 
 // Example 1: Game route - allows both authenticated and guest users
 export function GameLobbyPageExample() {
   return (
-    <RouteGuard requireAuth={false} allowGuest={true}>
+    <RouteGuard allowGuest={true} requireAuth={false}>
       <div>
         {/* Game lobby content */}
         <h1>Game Lobby</h1>
@@ -21,7 +25,7 @@ export function GameLobbyPageExample() {
 // Example 2: User profile - requires full authentication
 export function UserProfilePageExample() {
   return (
-    <RouteGuard requireAuth={true} allowGuest={false}>
+    <RouteGuard allowGuest={false} requireAuth={true}>
       <div>
         {/* User profile content */}
         <h1>User Profile</h1>
@@ -34,11 +38,7 @@ export function UserProfilePageExample() {
 // Example 3: Game with custom redirect
 export function PrivateGamePageExample() {
   return (
-    <RouteGuard
-      requireAuth={false}
-      allowGuest={true}
-      redirectTo="/game/join"
-    >
+    <RouteGuard allowGuest={true} redirectTo="/game/join" requireAuth={false}>
       <div>
         {/* Private game content */}
         <h1>Private Game</h1>
@@ -49,9 +49,6 @@ export function PrivateGamePageExample() {
 }
 
 // Example 4: Using with useGameAccess hook
-import { useGameAccess } from "@/lib/hooks/use-game-access";
-import { useState } from "react";
-
 export function CreateGameFormExample() {
   const {
     canAccessGame,
@@ -78,8 +75,8 @@ export function CreateGameFormExample() {
     const username = getGameUsername();
     const userId = getGameUserId();
 
-    console.log("Creating game with:", { username, userId });
-    // Call API to create game...
+    // Example: Call API to create game
+    void Promise.resolve({ username, userId });
   };
 
   return (
@@ -89,14 +86,14 @@ export function CreateGameFormExample() {
           <label htmlFor="guestUsername">Enter your username:</label>
           <input
             id="guestUsername"
+            placeholder="Your username"
             type="text"
             value={guestUsername}
             onChange={(e) => setGuestUsername(e.target.value)}
-            placeholder="Your username"
           />
         </div>
       )}
-      <button onClick={handleCreateGame} disabled={!canAccessGame}>
+      <button disabled={!canAccessGame} onClick={handleCreateGame}>
         Create Game
       </button>
     </div>

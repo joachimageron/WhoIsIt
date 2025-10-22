@@ -14,10 +14,25 @@ const GUEST_SESSION_KEY = "whoisit_guest_session";
 const GUEST_SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
- * Generate a simple unique ID for guest sessions
+ * Generate a secure unique ID for guest sessions
  */
 const generateGuestId = (): string => {
-  return `guest_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+  // Use crypto.randomUUID() if available (modern browsers)
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return `guest_${crypto.randomUUID()}`;
+  }
+
+  // Fallback for older environments: use timestamp + crypto random values
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    const array = new Uint32Array(2);
+
+    crypto.getRandomValues(array);
+
+    return `guest_${Date.now()}_${array[0].toString(36)}_${array[1].toString(36)}`;
+  }
+
+  // Final fallback (should rarely be needed)
+  return `guest_${Date.now()}_${Date.now().toString(36)}`;
 };
 
 /**
