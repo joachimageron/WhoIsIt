@@ -14,6 +14,7 @@ describe('GameGateway', () => {
     getLobbyByRoomCode: jest.fn(),
     getGameByRoomCode: jest.fn(),
     updatePlayerReady: jest.fn(),
+    markPlayerAsLeft: jest.fn(),
   };
 
   const mockUser: User = {
@@ -273,6 +274,10 @@ describe('GameGateway', () => {
     it('should successfully leave a room', async () => {
       const socket = createMockSocket(mockUser);
       mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
+      mockGameService.markPlayerAsLeft.mockResolvedValue({
+        id: 'player-1',
+        leftAt: new Date(),
+      });
 
       gateway.handleConnection(socket);
       await gateway.handleJoinRoom(socket, { roomCode: 'ABC12' });
@@ -283,6 +288,66 @@ describe('GameGateway', () => {
 
       expect(result.success).toBe(true);
       expect(socket.leave).toHaveBeenCalledWith('ABC12');
+    });
+
+    it('should notify other players when someone leaves', async () => {
+      const socket = createMockSocket(mockUser);
+      const updatedLobby = {
+        ...mockLobbyResponse,
+        players: [], // Player has left, so empty
+      };
+
+      // First call for joining
+      mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(
+        mockLobbyResponse,
+      );
+      // Second call for finding player when leaving
+      mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(
+        mockLobbyResponse,
+      );
+      // Third call for broadcasting updated state
+      mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(updatedLobby);
+
+      mockGameService.markPlayerAsLeft.mockResolvedValue({
+        id: 'player-1',
+        leftAt: new Date(),
+      });
+
+      gateway.handleConnection(socket);
+      await gateway.handleJoinRoom(socket, { roomCode: 'ABC12' });
+
+      await gateway.handleLeaveRoom(socket, { roomCode: 'ABC12' });
+
+      // Verify that playerLeft event was emitted
+      expect(socket.to).toHaveBeenCalledWith('ABC12');
+      expect(socket.to('ABC12').emit).toHaveBeenCalledWith(
+        'playerLeft',
+        expect.objectContaining({
+          roomCode: 'ABC12',
+          lobby: updatedLobby,
+        }),
+      );
+      // Verify that lobbyUpdate was also broadcast
+      expect(socket.to('ABC12').emit).toHaveBeenCalledWith(
+        'lobbyUpdate',
+        updatedLobby,
+      );
+    });
+
+    it('should mark player as left in database', async () => {
+      const socket = createMockSocket(mockUser);
+      mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
+      mockGameService.markPlayerAsLeft.mockResolvedValue({
+        id: 'player-1',
+        leftAt: new Date(),
+      });
+
+      gateway.handleConnection(socket);
+      await gateway.handleJoinRoom(socket, { roomCode: 'ABC12' });
+
+      await gateway.handleLeaveRoom(socket, { roomCode: 'ABC12' });
+
+      expect(mockGameService.markPlayerAsLeft).toHaveBeenCalledWith('player-1');
     });
 
     it('should handle errors gracefully', async () => {
@@ -301,6 +366,23 @@ describe('GameGateway', () => {
         'Error in handleLeaveRoom:',
         error,
       );
+    });
+
+    it('should handle case when player is not found in lobby', async () => {
+      const socket = createMockSocket(null); // Guest user
+      mockGameService.getLobbyByRoomCode.mockResolvedValue({
+        ...mockLobbyResponse,
+        players: [], // No players
+      });
+
+      const result = await gateway.handleLeaveRoom(socket, {
+        roomCode: 'ABC12',
+      });
+
+      expect(result.success).toBe(true);
+      expect(socket.leave).toHaveBeenCalledWith('ABC12');
+      // markPlayerAsLeft should not be called if player not found
+      expect(mockGameService.markPlayerAsLeft).not.toHaveBeenCalled();
     });
   });
 

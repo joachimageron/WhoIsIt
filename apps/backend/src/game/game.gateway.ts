@@ -176,10 +176,36 @@ export class GameGateway
       const { roomCode } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
+      // Get the current player ID from connection tracking
+      const connection = this.connectedUsers.get(client.id);
+      let playerId: string | null = null;
+
+      // Try to find the player in the lobby
+      try {
+        const lobby =
+          await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
+        const userId = client.user?.id;
+        const username = client.user?.username;
+
+        // Find the player by userId or username
+        const player = lobby.players.find(
+          (p) =>
+            (userId && p.userId === userId) ||
+            (username && p.username === username),
+        );
+
+        if (player) {
+          playerId = player.id;
+        }
+      } catch (error) {
+        // If we can't get the lobby, that's okay - player might have already left
+        this.logger.warn(`Could not get lobby for room ${normalizedRoomCode}`);
+      }
+
+      // Leave the Socket.IO room first
       await client.leave(normalizedRoomCode);
 
       // Update connection tracking
-      const connection = this.connectedUsers.get(client.id);
       if (connection && connection.roomCode === normalizedRoomCode) {
         connection.roomCode = null;
         connection.lastSeenAt = new Date();
@@ -189,6 +215,36 @@ export class GameGateway
       this.logger.log(
         `Client ${client.id} (${username}) left room ${normalizedRoomCode}`,
       );
+
+      // Mark player as left in database if we found them
+      if (playerId) {
+        try {
+          await this.gameService.markPlayerAsLeft(playerId);
+        } catch (error) {
+          this.logger.warn(
+            `Could not mark player ${playerId} as left: ${(error as Error).message}`,
+          );
+        }
+      }
+
+      // Get updated lobby state and notify other players
+      try {
+        const updatedLobby =
+          await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
+
+        // Notify other players in the room about the player leaving
+        client.to(normalizedRoomCode).emit('playerLeft', {
+          roomCode: normalizedRoomCode,
+          lobby: updatedLobby,
+        });
+
+        // Also broadcast a lobby update to ensure all clients are in sync
+        client.to(normalizedRoomCode).emit('lobbyUpdate', updatedLobby);
+      } catch (error) {
+        this.logger.warn(
+          `Could not broadcast player left event: ${(error as Error).message}`,
+        );
+      }
 
       return { success: true };
     } catch (error) {

@@ -33,6 +33,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     updatePlayerReady,
     onLobbyUpdate,
     onPlayerJoined,
+    onPlayerLeft,
     onGameStarted,
   } = useGameSocket();
   const { lobby, setLobby, isConnected, setConnected } = useGameStore();
@@ -115,6 +116,10 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       setLobby(event.lobby);
     });
 
+    const unsubscribePlayerLeft = onPlayerLeft((event) => {
+      setLobby(event.lobby);
+    });
+
     const unsubscribeGameStarted = onGameStarted((event) => {
       setLobby(event.lobby);
       addToast({
@@ -129,11 +134,13 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     return () => {
       unsubscribeLobbyUpdate();
       unsubscribePlayerJoined();
+      unsubscribePlayerLeft();
       unsubscribeGameStarted();
     };
   }, [
     onLobbyUpdate,
     onPlayerJoined,
+    onPlayerLeft,
     onGameStarted,
     setLobby,
     dict,

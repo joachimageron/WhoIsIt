@@ -6,6 +6,7 @@ import type {
   SocketUpdatePlayerReadyRequest,
   SocketUpdatePlayerReadyResponse,
   SocketPlayerJoinedEvent,
+  SocketPlayerLeftEvent,
   SocketGameStartedEvent,
 } from "@whois-it/contracts";
 
@@ -82,6 +83,17 @@ export const useGameSocket = () => {
     [],
   );
 
+  const onPlayerLeft = useCallback(
+    (callback: (event: SocketPlayerLeftEvent) => void) => {
+      socketRef.current.on("playerLeft", callback);
+
+      return () => {
+        socketRef.current.off("playerLeft", callback);
+      };
+    },
+    [],
+  );
+
   const onGameStarted = useCallback(
     (callback: (event: SocketGameStartedEvent) => void) => {
       socketRef.current.on("gameStarted", callback);
@@ -100,6 +112,7 @@ export const useGameSocket = () => {
     updatePlayerReady,
     onLobbyUpdate,
     onPlayerJoined,
+    onPlayerLeft,
     onGameStarted,
   };
 };
