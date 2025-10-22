@@ -10,12 +10,12 @@ import { Chip } from "@heroui/chip";
 import { Divider } from "@heroui/divider";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
+import { Avatar } from "@heroui/avatar";
 
 import { useGameSocket } from "@/hooks/use-game-socket";
 import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
-import { Avatar } from "@heroui/avatar";
 
 interface LobbyClientProps {
   dict: any;
@@ -263,21 +263,15 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                   >
                     <div className="flex gap-3 items-start">
                       <Avatar
-                      size="lg"
-                        src={player.avatarUrl}
                         name={player.username}
+                        size="lg"
+                        src={player.avatarUrl}
                       />
                       <div className="flex items-start gap-1 flex-col">
-                        <p className="font-medium">
-                          {player.username}
-                        </p>
+                        <p className="font-medium">{player.username}</p>
 
                         {player.role === "host" && (
-                          <Chip
-                            color="primary"
-                            size="sm"
-                            variant="flat"
-                          >
+                          <Chip color="primary" size="sm" variant="flat">
                             {dict.lobby.host}
                           </Chip>
                         )}
