@@ -24,10 +24,10 @@ import type {
   ClientToServerEvents,
 } from '@whois-it/contracts';
 
-type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
+export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
   user?: User | null;
 };
-type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
+export type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
 
 // Track connected users and their socket IDs for reconnection handling
 interface ConnectedUser {

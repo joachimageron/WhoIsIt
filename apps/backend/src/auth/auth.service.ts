@@ -13,6 +13,7 @@ import { User } from '../database/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { EmailService } from '../email/email.service';
+import { JwtPayload } from './types/jwt-payload.type';
 
 @Injectable()
 export class AuthService {
@@ -78,9 +79,9 @@ export class AuthService {
     }
 
     // Generate JWT
-    const payload = {
+    const payload: JwtPayload = {
       sub: user.id,
-      email: user.email,
+      email: user.email ?? null,
       username: user.username,
     };
     const accessToken = this.jwtService.sign(payload);
@@ -120,9 +121,9 @@ export class AuthService {
     user.lastSeenAt = new Date();
     await this.userRepository.save(user);
 
-    const payload = {
+    const payload: JwtPayload = {
       sub: user.id,
-      email: user.email,
+      email: user.email ?? null,
       username: user.username,
     };
 

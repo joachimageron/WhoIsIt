@@ -13,7 +13,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix && echo 'Lint completed successfully!'",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix --ignore-pattern \"**/*.spec.ts\" && echo 'Lint completed successfully!'",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

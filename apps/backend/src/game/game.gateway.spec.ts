@@ -37,27 +37,20 @@ describe('GameGateway', () => {
   } as Game;
 
   const mockLobbyResponse: GameLobbyResponse = {
+    id: 'game-123',
+    visibility: 'public',
+    ruleConfig:{},
     roomCode: 'ABC12',
     status: 'lobby',
     characterSetId: 'char-set-1',
-    characterSetName: 'Classic Characters',
     maxPlayers: 4,
     turnTimerSeconds: 60,
-    host: {
-      id: 'player-1',
-      userId: 'user-123',
-      displayName: 'Test User',
-      avatarUrl: null,
-      role: 'host',
-      isReady: false,
-      joinedAt: new Date().toISOString(),
-    },
     players: [
       {
         id: 'player-1',
         userId: 'user-123',
-        displayName: 'Test User',
-        avatarUrl: null,
+        username: 'testuser',
+        avatarUrl: undefined,
         role: 'host',
         isReady: false,
         joinedAt: new Date().toISOString(),

@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from '../auth/auth.service';
 import { User } from '../database/entities/user.entity';
+import { JwtPayload } from '../auth/types/jwt-payload.type';
 
 // Extended socket type with user property
 interface AuthenticatedSocket extends Socket {
@@ -25,7 +26,8 @@ export class WsAuthAdapter extends IoAdapter {
     const server = super.createIOServer(port, options) as Server;
     const jwtService = this.app.get(JwtService);
     const authService = this.app.get(AuthService);
-    const jwtSecret = this.configService.get('JWT_SECRET') || 'your-secret-key';
+    const jwtSecret: string =
+      this.configService.get('JWT_SECRET') || 'your-secret-key';
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     server.use(async (socket: AuthenticatedSocket, next) => {
@@ -66,7 +68,7 @@ export class WsAuthAdapter extends IoAdapter {
         }
 
         // Verify JWT token and cast to our payload type
-        const payload = jwtService.verify(token, {
+        const payload = jwtService.verify<JwtPayload>(token, {
           secret: jwtSecret,
         });
 
