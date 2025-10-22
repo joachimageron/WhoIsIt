@@ -104,3 +104,34 @@ export interface ClientToServerEvents {
   ) => void;
 }
 
+// Character Sets API Types
+export type CharacterSetResponseDto = {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  visibility: string;
+  isDefault: boolean;
+  metadata: Record<string, unknown>;
+  characterCount?: number;
+};
+
+export type TraitValueResponseDto = {
+  id: string;
+  traitId: string;
+  traitName: string;
+  traitSlug: string;
+  valueText: string;
+};
+
+export type CharacterResponseDto = {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string | null;
+  summary?: string | null;
+  metadata: Record<string, unknown>;
+  isActive: boolean;
+  traits?: TraitValueResponseDto[];
+};
+
