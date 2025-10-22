@@ -181,10 +181,10 @@
    - [ ] Tests unitaires pour ces endpoints
 
 3. **Sécurité Socket.IO**
-   - [ ] Middleware d'authentification Socket.IO (validation JWT/cookie)
-   - [ ] Gestion des reconnexions automatiques
-   - [ ] Timeout et cleanup des lobbies abandonnés
-   - [ ] Tests pour GameGateway
+   - [x] Middleware d'authentification Socket.IO (validation JWT/cookie)
+   - [x] Gestion des reconnexions automatiques
+   - [x] Timeout et cleanup des lobbies abandonnés
+   - [x] Tests pour GameGateway
 
 4. **CI/CD de base**
    - [ ] Workflow GitHub Actions pour lint + test + build

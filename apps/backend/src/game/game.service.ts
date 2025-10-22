@@ -177,6 +177,18 @@ export class GameService {
     return this.mapToLobbyResponse(game);
   }
 
+  async getGameByRoomCode(roomCode: string): Promise<Game | null> {
+    const normalizedRoomCode = roomCode.trim().toUpperCase();
+    return this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        characterSet: true,
+        host: true,
+        players: { user: true },
+      },
+    });
+  }
+
   async updatePlayerReady(
     playerId: string,
     isReady: boolean,
