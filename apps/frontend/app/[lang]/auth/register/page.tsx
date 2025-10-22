@@ -171,9 +171,7 @@ export default function RegisterPage() {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">
-          Sign Up
-        </p>
+        <p className="pb-4 text-left text-3xl font-semibold">Sign Up</p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired

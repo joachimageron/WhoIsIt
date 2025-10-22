@@ -29,7 +29,7 @@ export const viewport: Viewport = {
 };
 
 export async function generateStaticParams() {
-  return [{ lang: 'en' }, { lang: 'fr' }];
+  return [{ lang: "en" }, { lang: "fr" }];
 }
 
 export default async function RootLayout({
@@ -53,7 +53,7 @@ export default async function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
-            <Navbar lang={lang} dict={dict} />
+            <Navbar dict={dict} lang={lang} />
             <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
               {children}
             </main>
@@ -64,7 +64,9 @@ export default async function RootLayout({
                 href="https://heroui.com?utm_source=next-app-template"
                 title="heroui.com homepage"
               >
-                <span className="text-default-600">{dict.footer.poweredBy}</span>
+                <span className="text-default-600">
+                  {dict.footer.poweredBy}
+                </span>
                 <p className="text-primary">HeroUI</p>
               </Link>
             </footer>

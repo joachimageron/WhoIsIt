@@ -1,5 +1,7 @@
 "use client";
 
+import type { Locale } from "@/dictionaries";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -23,6 +25,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import {
   TwitterIcon,
   GithubIcon,
@@ -31,7 +34,6 @@ import {
   Logo,
 } from "@/components/icons";
 import { useAuth } from "@/lib/hooks/use-auth";
-import type { Locale } from "@/dictionaries";
 
 interface NavbarProps {
   lang: Locale;
@@ -91,7 +93,10 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href={`/${lang}`}>
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={`/${lang}`}
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </NextLink>
@@ -129,40 +134,46 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
+          <LanguageSwitcher currentLang={lang} />
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
           {isAuthenticated && user ? (
             <Tooltip
               content={
-              <div className="px-1 py-2">
-                <Listbox aria-label="User Actions" onAction={(key) => {
-                if (key === "logout") {
-                  handleLogout();
-                }
-                }}>
-                <ListboxItem key="profile" className="h-14 gap-2">
-                  <p className="font-semibold">{dict.auth.signedInAs}</p>
-                  <p className="font-semibold">{user.email}</p>
-                </ListboxItem>
-                <ListboxItem key="settings">{dict.nav.settings}</ListboxItem>
-                <ListboxItem
-                  key="logout"
-                  className="text-danger"
-                  color="danger"
-                >
-                  {dict.auth.logOut}
-                </ListboxItem>
-                </Listbox>
-              </div>
+                <div className="px-1 py-2">
+                  <Listbox
+                    aria-label="User Actions"
+                    onAction={(key) => {
+                      if (key === "logout") {
+                        handleLogout();
+                      }
+                    }}
+                  >
+                    <ListboxItem key="profile" className="h-14 gap-2">
+                      <p className="font-semibold">{dict.auth.signedInAs}</p>
+                      <p className="font-semibold">{user.email}</p>
+                    </ListboxItem>
+                    <ListboxItem key="settings">
+                      {dict.nav.settings}
+                    </ListboxItem>
+                    <ListboxItem
+                      key="logout"
+                      className="text-danger"
+                      color="danger"
+                    >
+                      {dict.auth.logOut}
+                    </ListboxItem>
+                  </Listbox>
+                </div>
               }
             >
               <Avatar
-              as="button"
-              className="transition-transform"
-              name={user.displayName}
-              size="sm"
-              src={user.avatarUrl || undefined}
+                as="button"
+                className="transition-transform"
+                name={user.displayName}
+                size="sm"
+                src={user.avatarUrl || undefined}
               />
             </Tooltip>
           ) : (
@@ -194,6 +205,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
+        <LanguageSwitcher currentLang={lang} />
         <NavbarMenuToggle />
       </NavbarContent>
 
