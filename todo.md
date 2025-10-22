@@ -242,9 +242,9 @@ The WhoIsIt project is a multiplayer guessing game with a **solid foundation** i
    - [ ] Transition status: lobby → in_progress
 
 5. **Guards et Protection**
-   - [ ] Middleware frontend pour routes /game/* (authentifié ou invité avec session)
-   - [ ] Gestion des invités (stockage temporaire)
-   - [ ] Empêcher les accès non autorisés
+   - [x] Middleware frontend pour routes /game/* (authentifié ou invité avec session)
+   - [x] Gestion des invités (stockage temporaire)
+   - [x] Empêcher les accès non autorisés
 
 ### Phase 3 : Mécanique de Jeu Core (3-4 semaines)
 
