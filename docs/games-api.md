@@ -21,7 +21,7 @@ Creates a new game lobby with a unique room code.
 ```json
 {
   "characterSetId": "uuid",
-  "hostDisplayName": "Player One",
+  "hostUsername": "Player One",
   "hostUserId": "uuid (optional)",
   "visibility": "private",
   "maxPlayers": 8,
@@ -32,7 +32,7 @@ Creates a new game lobby with a unique room code.
 
 **Required Fields:**
 - `characterSetId` - UUID of the character set to use
-- `hostDisplayName` OR `hostUserId` - The host must have either a display name or a user ID
+- `hostUsername` OR `hostUserId` - The host must have either a username or a user ID
 
 **Optional Fields:**
 - `visibility` - "public" or "private" (default: "private")
@@ -59,7 +59,7 @@ Creates a new game lobby with a unique room code.
   "players": [
     {
       "id": "uuid",
-      "displayName": "Player One",
+      "username": "Player One",
       "avatarUrl": null,
       "role": "host",
       "isReady": true,
@@ -83,14 +83,14 @@ Join an existing game lobby using the room code.
 
 ```json
 {
-  "displayName": "Player Two",
+  "username": "Player Two",
   "userId": "uuid (optional)",
   "avatarUrl": "https://example.com/avatar.png (optional)"
 }
 ```
 
 **Required Fields:**
-- `displayName` OR `userId` - Must have either a display name or a user ID
+- `username` OR `userId` - Must have either a username or a user ID
 
 **Response:** Same structure as Create Game response, but with the new player added to the players array.
 
@@ -172,7 +172,7 @@ curl -X POST http://localhost:4000/games \
   -H "Content-Type: application/json" \
   -d '{
     "characterSetId": "character-set-uuid",
-    "hostDisplayName": "Player One",
+    "hostUsername": "Player One",
     "visibility": "private",
     "maxPlayers": 8
   }'
@@ -184,7 +184,7 @@ curl -X POST http://localhost:4000/games \
 curl -X POST http://localhost:4000/games/ABC12/join \
   -H "Content-Type: application/json" \
   -d '{
-    "displayName": "Player Two"
+    "username": "Player Two"
   }'
 ```
 
@@ -211,7 +211,7 @@ const createResponse = await fetch('http://localhost:4000/games', {
   },
   body: JSON.stringify({
     characterSetId: 'uuid',
-    hostDisplayName: 'Player One',
+    hostUsername: 'Player One',
     visibility: 'private',
   }),
 });
@@ -224,7 +224,7 @@ const joinResponse = await fetch(`http://localhost:4000/games/${roomCode}/join`,
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    displayName: 'Player Two',
+    username: 'Player Two',
   }),
 });
 const updatedGame = await joinResponse.json();
