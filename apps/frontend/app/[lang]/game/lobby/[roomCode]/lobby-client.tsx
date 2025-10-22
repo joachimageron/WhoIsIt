@@ -31,6 +31,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     updatePlayerReady,
     onLobbyUpdate,
     onPlayerJoined,
+    onGameStarted,
   } = useGameSocket();
   const { lobby, setLobby, isConnected, setConnected } = useGameStore();
   const { user } = useAuthStore();
@@ -112,11 +113,31 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       setLobby(event.lobby);
     });
 
+    const unsubscribeGameStarted = onGameStarted((event) => {
+      setLobby(event.lobby);
+      addToast({
+        color: "success",
+        title: dict.lobby.gameStarting,
+        description: dict.lobby.redirectingToGame,
+      });
+      // TODO: Navigate to game page when it exists
+      // router.push(`/${lang}/game/play/${event.roomCode}`);
+    });
+
     return () => {
       unsubscribeLobbyUpdate();
       unsubscribePlayerJoined();
+      unsubscribeGameStarted();
     };
-  }, [onLobbyUpdate, onPlayerJoined, setLobby]);
+  }, [
+    onLobbyUpdate,
+    onPlayerJoined,
+    onGameStarted,
+    setLobby,
+    dict,
+    router,
+    lang,
+  ]);
 
   const handleToggleReady = useCallback(async () => {
     if (!currentPlayer) return;

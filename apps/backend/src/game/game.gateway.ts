@@ -65,6 +65,13 @@ export class GameGateway
 
   constructor(private readonly gameService: GameService) {}
 
+  /**
+   * Normalize room code to uppercase and trimmed
+   */
+  private normalizeRoomCode(roomCode: string): string {
+    return roomCode.trim().toUpperCase();
+  }
+
   afterInit() {
     this.logger.log('WebSocket Gateway initialized');
     // Start periodic cleanup of abandoned lobbies
@@ -123,7 +130,7 @@ export class GameGateway
   ): Promise<SocketJoinRoomResponse> {
     try {
       const { roomCode } = data;
-      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
       // Join the Socket.IO room
       await client.join(normalizedRoomCode);
@@ -167,7 +174,7 @@ export class GameGateway
   ): Promise<SocketLeaveRoomResponse> {
     try {
       const { roomCode } = data;
-      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
       await client.leave(normalizedRoomCode);
 
@@ -197,7 +204,7 @@ export class GameGateway
   ): Promise<SocketUpdatePlayerReadyResponse> {
     try {
       const { roomCode, playerId, isReady } = data;
-      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
       // Update connection tracking
       const connection = this.connectedUsers.get(client.id);
@@ -232,7 +239,7 @@ export class GameGateway
    */
   async broadcastLobbyUpdate(roomCode: string) {
     try {
-      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
       const lobby =
         await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
       this.server.to(normalizedRoomCode).emit('lobbyUpdate', lobby);
@@ -247,7 +254,7 @@ export class GameGateway
    */
   async broadcastGameStarted(roomCode: string) {
     try {
-      const normalizedRoomCode = roomCode.trim().toUpperCase();
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
       const lobby =
         await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
       this.server.to(normalizedRoomCode).emit('gameStarted', {

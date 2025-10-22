@@ -94,7 +94,7 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
             isRequired
             label={dict.game.join.roomCode}
             labelPlacement="outside"
-            maxLength={6}
+            maxLength={5}
             name="roomCode"
             placeholder={dict.game.join.roomCodePlaceholder}
             type="text"

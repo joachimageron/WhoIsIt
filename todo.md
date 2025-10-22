@@ -1,19 +1,20 @@
 # WhoIsIt - Project Analysis & Roadmap
 
-**Last Updated:** October 2025  
-**Status:** Phase 1 Complete ✅ | Phase 2 Planned 🚧 | Phase 3+ Future 📋
+**Last Updated:** October 22, 2025  
+**Status:** Phase 2 Complete ✅ | Phase 3 Planned 🚧 | Phase 4+ Future 📋
 
 ## 📊 Quick Summary
 
-The WhoIsIt project is a multiplayer guessing game with a **solid foundation** in place:
+The WhoIsIt project is a multiplayer guessing game with **Phase 2 successfully completed**:
 
 - ✅ **Backend API complete**: Authentication, character sets, game lobby, and start game functionality
 - ✅ **Socket.IO real-time system**: Secure WebSocket gateway with authentication and reconnection
 - ✅ **CI/CD pipeline**: Automated testing and building with GitHub Actions
-- 🚧 **Frontend**: Authentication pages complete, but game pages (create, join, lobby, play) not yet implemented
+- ✅ **Frontend game pages**: Create, join, and lobby pages with real-time Socket.IO integration
+- ✅ **Code quality improvements**: Refactored duplicated code, improved type safety
 - 🚧 **Gameplay**: Core game mechanics (questions, answers, guessing) planned but not implemented
 
-**Next Priority:** Implement frontend game pages and connect them to the existing backend APIs (Phase 2).
+**Next Priority:** Implement gameplay core mechanics (Phase 3).
 
 ---
 
@@ -208,7 +209,7 @@ The WhoIsIt project is a multiplayer guessing game with a **solid foundation** i
    - [x] Protection de branche main avec checks obligatoires
    - [x] Cache pnpm pour accélérer CI
 
-### Phase 2 : Expérience Lobby Complète (2-3 semaines)
+### Phase 2 : Expérience Lobby Complète (2-3 semaines) ✅ COMPLETE
 
 **Objectif :** Permettre aux utilisateurs de créer, rejoindre et démarrer une partie
 
@@ -232,6 +233,7 @@ The WhoIsIt project is a multiplayer guessing game with a **solid foundation** i
    - [x] Bouton "Démarrer" pour l'hôte (quand tous prêts)
    - [x] Indicateur de connexion Socket.IO
    - [x] Gestion erreurs et déconnexions
+   - [x] Écoute de l'événement gameStarted
 
 4. **Backend - Démarrage de Partie**
    - [x] Endpoint POST /games/:roomCode/start
@@ -246,6 +248,14 @@ The WhoIsIt project is a multiplayer guessing game with a **solid foundation** i
    - [x] Middleware frontend pour routes /game/* (authentifié ou invité avec session)
    - [x] Gestion des invités (stockage temporaire)
    - [x] Empêcher les accès non autorisés
+
+6. **Code Quality Improvements** ✨
+   - [x] Refactored room code normalization (removed duplication)
+   - [x] Improved type safety (removed `any` types)
+   - [x] Fixed inconsistent maxLength for room code input
+   - [x] Added missing gameStarted event handler in lobby
+   - [x] All 115 tests passing
+   - [x] No lint errors
 
 ### Phase 3 : Mécanique de Jeu Core (3-4 semaines)
 
