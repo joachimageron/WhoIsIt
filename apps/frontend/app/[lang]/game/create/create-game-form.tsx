@@ -1,6 +1,6 @@
 "use client";
 
-import type { CharacterSetResponseDto } from "@whois-it/contracts";
+import type { CharacterSetResponseDto, CreateGameRequest } from "@whois-it/contracts";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
