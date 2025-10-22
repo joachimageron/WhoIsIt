@@ -167,18 +167,18 @@
 **Objectif :** Corriger les bugs, sécuriser, standardiser la configuration
 
 1. **Fixes urgents**
-   - [ ] Corriger le test email.service.spec.ts (URL forgot-password)
-   - [ ] Créer .env.example pour frontend avec toutes les variables
-   - [ ] Unifier API_URL → NEXT_PUBLIC_API_URL partout
-   - [ ] Valider configuration CORS et cookies entre front/back
+   - [x] Corriger le test email.service.spec.ts (URL forgot-password)
+   - [x] Créer .env.example pour frontend avec toutes les variables
+   - [x] Unifier API_URL → NEXT_PUBLIC_API_URL partout
+   - [x] Valider configuration CORS et cookies entre front/back
 
 2. **API Catalogue Personnages**
-   - [ ] Créer CharacterSetsController
-   - [ ] Endpoint GET /character-sets (liste tous les sets publics)
-   - [ ] Endpoint GET /character-sets/:id (détails + traits)
-   - [ ] Endpoint GET /character-sets/:id/characters (liste personnages avec traits)
-   - [ ] Ajouter types dans @whois-it/contracts
-   - [ ] Tests unitaires pour ces endpoints
+   - [x] Créer CharacterSetsController
+   - [x] Endpoint GET /character-sets (liste tous les sets publics)
+   - [x] Endpoint GET /character-sets/:id (détails + traits)
+   - [x] Endpoint GET /character-sets/:id/characters (liste personnages avec traits)
+   - [x] Ajouter types dans @whois-it/contracts
+   - [x] Tests unitaires pour ces endpoints
 
 3. **Sécurité Socket.IO**
    - [x] Middleware d'authentification Socket.IO (validation JWT/cookie)
@@ -187,9 +187,9 @@
    - [x] Tests pour GameGateway
 
 4. **CI/CD de base**
-   - [ ] Workflow GitHub Actions pour lint + test + build
-   - [ ] Protection de branche main avec checks obligatoires
-   - [ ] Cache pnpm pour accélérer CI
+   - [x] Workflow GitHub Actions pour lint + test + build
+   - [x] Protection de branche main avec checks obligatoires
+   - [x] Cache pnpm pour accélérer CI
 
 ### Phase 2 : Expérience Lobby Complète (2-3 semaines)
 
