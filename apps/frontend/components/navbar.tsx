@@ -135,7 +135,7 @@ export const Navbar = () => {
               <Avatar
               as="button"
               className="transition-transform"
-              name={user.displayName}
+              name={user.displayName || user.username}
               size="sm"
               src={user.avatarUrl || undefined}
               />
