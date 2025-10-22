@@ -24,8 +24,14 @@ interface LobbyClientProps {
 
 export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
   const router = useRouter();
-  const { socket, joinRoom, updatePlayerReady, onLobbyUpdate, onPlayerJoined } =
-    useGameSocket();
+  const {
+    socket,
+    joinRoom,
+    leaveRoom,
+    updatePlayerReady,
+    onLobbyUpdate,
+    onPlayerJoined,
+  } = useGameSocket();
   const { lobby, setLobby, isConnected, setConnected } = useGameStore();
   const { user } = useAuthStore();
   const [isJoining, setIsJoining] = useState(true);
@@ -49,10 +55,15 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
         setLobby(lobbyData);
 
+        // Find current player in the lobby data
+        const player = lobbyData.players.find(
+          (p) => p.username === user?.username || p.userId === user?.id,
+        );
+
         // Then join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,
-          playerId: currentPlayer?.id,
+          playerId: player?.id,
         });
 
         if (response.success && response.lobby) {
@@ -73,7 +84,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     };
 
     initLobby();
-  }, [roomCode, joinRoom, setLobby, dict, router, lang, currentPlayer?.id]);
+  }, [roomCode]);
 
   // Listen to socket connection status
   useEffect(() => {
@@ -166,9 +177,18 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     }
   }, [roomCode, dict.lobby.errors.failedToStartGame]);
 
-  const handleLeaveLobby = () => {
-    router.push(`/${lang}`);
-  };
+  const handleLeaveLobby = useCallback(async () => {
+    try {
+      // Leave the room via Socket.IO
+      if (currentPlayer) {
+        await leaveRoom({ roomCode });
+      }
+    } catch {
+      // Ignore errors when leaving
+    } finally {
+      router.push(`/${lang}`);
+    }
+  }, [roomCode, currentPlayer, leaveRoom, router, lang]);
 
   if (isJoining || !lobby) {
     return (
