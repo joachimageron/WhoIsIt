@@ -101,19 +101,6 @@
       "goToLogin": "Aller à la connexion"
     }
   },
-  "game": {
-    "join": {
-      "title": "Rejoindre une Partie",
-      "roomCode": "Code de Partie",
-      "roomCodePlaceholder": "Entrez le code à 6 caractères",
-      "joinButton": "Rejoindre",
-      "backToHome": "Retour à l'accueil",
-      "enterRoomCode": "Veuillez entrer un code de partie",
-      "invalidRoomCode": "Le code doit contenir 6 caractères",
-      "joinFailed": "Échec de la connexion à la partie",
-      "joining": "Connexion en cours..."
-    }
-  },
   "footer": {
     "poweredBy": "Propulsé par"
   },
@@ -136,6 +123,17 @@
       "fillCharacterSet": "Veuillez sélectionner un jeu de personnages",
       "creationFailed": "Échec de la création de la partie",
       "noCharacterSets": "Aucun jeu de personnages disponible"
+    },
+    "join": {
+      "title": "Rejoindre une Partie",
+      "roomCode": "Code de Partie",
+      "roomCodePlaceholder": "Entrez le code à 6 caractères",
+      "joinButton": "Rejoindre",
+      "backToHome": "Retour à l'accueil",
+      "enterRoomCode": "Veuillez entrer un code de partie",
+      "invalidRoomCode": "Le code doit contenir 6 caractères",
+      "joinFailed": "Échec de la connexion à la partie",
+      "joining": "Connexion en cours..."
     }
   },
   "lobby": {

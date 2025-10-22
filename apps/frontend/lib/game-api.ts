@@ -2,9 +2,31 @@ import type {
   CreateGameRequest,
   JoinGameRequest,
   GameLobbyResponse,
+  CharacterSetResponseDto,
 } from "@whois-it/contracts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
+/**
+ * Get all character sets
+ */
+export const getCharacterSets = async (): Promise<
+  CharacterSetResponseDto[]
+> => {
+  const response = await fetch(`${API_URL}/character-sets`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get character sets" }));
+
+    throw new Error(error.message || "Failed to get character sets");
+  }
+
+  return response.json();
+};
 
 /**
  * Create a new game
