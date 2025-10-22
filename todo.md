@@ -212,34 +212,34 @@ The WhoIsIt project is a multiplayer guessing game with a **solid foundation** i
 **Objectif :** Permettre aux utilisateurs de créer, rejoindre et démarrer une partie
 
 1. **Frontend - Création de Partie**
-   - [ ] Page /game/create avec formulaire
-   - [ ] Appel GET /character-sets pour afficher les options
-   - [ ] Appel POST /games avec characterSetId, maxPlayers, timer
-   - [ ] Redirection vers /game/lobby/[roomCode]
+   - [x] Page /game/create avec formulaire
+   - [x] Appel GET /character-sets pour afficher les options
+   - [x] Appel POST /games avec characterSetId, maxPlayers, timer
+   - [x] Redirection vers /game/lobby/[roomCode]
 
 2. **Frontend - Rejoindre une Partie**
-   - [ ] Page /game/join avec input room code
-   - [ ] Validation format room code
-   - [ ] Appel POST /games/:roomCode/join
-   - [ ] Redirection vers /game/lobby/[roomCode]
+   - [x] Page /game/join avec input room code
+   - [x] Validation format room code
+   - [x] Appel POST /games/:roomCode/join
+   - [x] Redirection vers /game/lobby/[roomCode]
 
 3. **Frontend - Page Lobby**
-   - [ ] Page /game/lobby/[roomCode]
-   - [ ] Utilisation de useGameSocket pour connexion temps réel
-   - [ ] Liste des joueurs avec statut prêt/non prêt
-   - [ ] Bouton "Prêt" pour chaque joueur
-   - [ ] Bouton "Démarrer" pour l'hôte (quand tous prêts)
-   - [ ] Indicateur de connexion Socket.IO
-   - [ ] Gestion erreurs et déconnexions
+   - [x] Page /game/lobby/[roomCode]
+   - [x] Utilisation de useGameSocket pour connexion temps réel
+   - [x] Liste des joueurs avec statut prêt/non prêt
+   - [x] Bouton "Prêt" pour chaque joueur
+   - [x] Bouton "Démarrer" pour l'hôte (quand tous prêts)
+   - [x] Indicateur de connexion Socket.IO
+   - [x] Gestion erreurs et déconnexions
 
 4. **Backend - Démarrage de Partie**
-   - [ ] Endpoint POST /games/:roomCode/start
-   - [ ] Validation que l'hôte démarre
-   - [ ] Validation que tous les joueurs sont prêts
-   - [ ] Initialisation du premier round
-   - [ ] Attribution secrète d'un personnage à chaque joueur
-   - [ ] Événement Socket.IO gameStarted
-   - [ ] Transition status: lobby → in_progress
+   - [x] Endpoint POST /games/:roomCode/start
+   - [x] Validation que l'hôte démarre
+   - [x] Validation que tous les joueurs sont prêts
+   - [x] Initialisation du premier round
+   - [x] Attribution secrète d'un personnage à chaque joueur
+   - [x] Événement Socket.IO gameStarted
+   - [x] Transition status: lobby → in_progress
 
 5. **Guards et Protection**
    - [x] Middleware frontend pour routes /game/* (authentifié ou invité avec session)

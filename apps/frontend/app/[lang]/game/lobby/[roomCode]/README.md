@@ -5,6 +5,7 @@ This directory contains the game lobby page implementation for the WhoIsIt appli
 ## Overview
 
 The lobby page allows players to:
+
 - View the room code
 - See all players in the lobby with their ready status
 - Toggle their ready status (non-host players)
@@ -16,10 +17,13 @@ The lobby page allows players to:
 ## Components
 
 ### `page.tsx`
+
 Server-side page component that fetches the dictionary translations and passes them to the client component.
 
 ### `lobby-client.tsx`
+
 Main client component that implements the lobby interface with:
+
 - Socket.IO real-time connection via `useGameSocket` hook
 - REST API calls via `game-api.ts` helper
 - State management via `useGameStore` Zustand store
@@ -28,23 +32,28 @@ Main client component that implements the lobby interface with:
 ## Features
 
 ### Real-time Updates
+
 The lobby uses Socket.IO to receive real-time updates:
+
 - `lobbyUpdate` - When lobby state changes
 - `playerJoined` - When a new player joins
 - Connection status monitoring
 
 ### Player Ready Status
+
 - Non-host players can toggle their ready status
 - Host can see when all players are ready
 - Visual indicators show ready/not ready status
 
 ### Starting the Game
+
 - Only the host can start the game
 - Start button is enabled only when:
   - All players are ready
   - At least 2 players are in the lobby
 
 ### Error Handling
+
 - Failed to join lobby: Redirects to home page with error toast
 - Failed to update ready status: Shows error toast
 - Failed to start game: Shows error toast
@@ -53,6 +62,7 @@ The lobby uses Socket.IO to receive real-time updates:
 ## Usage
 
 Navigate to `/[lang]/game/lobby/[roomCode]` where:
+
 - `[lang]` is the language code (e.g., `en`, `fr`)
 - `[roomCode]` is the 5-character room code
 
@@ -72,10 +82,12 @@ Example: `/en/game/lobby/ABC12`
 ## API Integration
 
 ### REST API Endpoints Used
+
 - `GET /games/:roomCode` - Fetch initial lobby state
 - `POST /games/:roomCode/start` - Start the game
 
 ### Socket.IO Events Used
+
 - `joinRoom` - Join the lobby for real-time updates
 - `leaveRoom` - Leave the lobby
 - `updatePlayerReady` - Update player ready status
@@ -85,6 +97,7 @@ Example: `/en/game/lobby/ABC12`
 ## Translations
 
 The lobby page uses internationalization with the following keys in the dictionary:
+
 - `lobby.title` - Page title
 - `lobby.roomCode` - Room code label
 - `lobby.host` - Host badge
@@ -105,6 +118,7 @@ The lobby page uses internationalization with the following keys in the dictiona
 ## Future Enhancements
 
 Potential improvements:
+
 - Add player avatars
 - Show character set information
 - Add lobby chat
