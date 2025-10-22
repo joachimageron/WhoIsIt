@@ -164,9 +164,7 @@ describe('GameGateway', () => {
 
       gateway.handleConnection(socket);
 
-      expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('guest'),
-      );
+      expect(loggerSpy).toHaveBeenCalledWith(expect.stringContaining('guest'));
       expect(loggerSpy).toHaveBeenCalledWith(
         expect.stringContaining('authenticated: false'),
       );
@@ -226,12 +224,17 @@ describe('GameGateway', () => {
       const socket = createMockSocket(mockUser);
       mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
 
-      const result = await gateway.handleJoinRoom(socket, { roomCode: 'abc12' });
+      const result = await gateway.handleJoinRoom(socket, {
+        roomCode: 'abc12',
+      });
 
       expect(result.success).toBe(true);
       expect(result.lobby).toEqual(mockLobbyResponse);
       expect(socket.join).toHaveBeenCalledWith('ABC12');
-      expect(socket.emit).toHaveBeenCalledWith('lobbyUpdate', mockLobbyResponse);
+      expect(socket.emit).toHaveBeenCalledWith(
+        'lobbyUpdate',
+        mockLobbyResponse,
+      );
       expect(socket.to).toHaveBeenCalledWith('ABC12');
     });
 
@@ -262,14 +265,13 @@ describe('GameGateway', () => {
       mockGameService.getLobbyByRoomCode.mockRejectedValue(error);
       const loggerSpy = jest.spyOn(Logger.prototype, 'error');
 
-      const result = await gateway.handleJoinRoom(socket, { roomCode: 'INVALID' });
+      const result = await gateway.handleJoinRoom(socket, {
+        roomCode: 'INVALID',
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Game not found');
-      expect(loggerSpy).toHaveBeenCalledWith(
-        'Error in handleJoinRoom:',
-        error,
-      );
+      expect(loggerSpy).toHaveBeenCalledWith('Error in handleJoinRoom:', error);
     });
   });
 
@@ -281,7 +283,9 @@ describe('GameGateway', () => {
       gateway.handleConnection(socket);
       await gateway.handleJoinRoom(socket, { roomCode: 'ABC12' });
 
-      const result = await gateway.handleLeaveRoom(socket, { roomCode: 'abc12' });
+      const result = await gateway.handleLeaveRoom(socket, {
+        roomCode: 'abc12',
+      });
 
       expect(result.success).toBe(true);
       expect(socket.leave).toHaveBeenCalledWith('ABC12');
@@ -293,11 +297,16 @@ describe('GameGateway', () => {
       socket.leave = jest.fn().mockRejectedValue(error);
       const loggerSpy = jest.spyOn(Logger.prototype, 'error');
 
-      const result = await gateway.handleLeaveRoom(socket, { roomCode: 'ABC12' });
+      const result = await gateway.handleLeaveRoom(socket, {
+        roomCode: 'ABC12',
+      });
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Leave failed');
-      expect(loggerSpy).toHaveBeenCalledWith('Error in handleLeaveRoom:', error);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Error in handleLeaveRoom:',
+        error,
+      );
     });
   });
 
@@ -417,7 +426,7 @@ describe('GameGateway', () => {
   describe('onModuleDestroy', () => {
     it('should clean up cleanup interval', () => {
       const loggerSpy = jest.spyOn(Logger.prototype, 'log');
-      
+
       gateway.afterInit(); // Start the interval
       gateway.onModuleDestroy();
 
@@ -444,6 +453,7 @@ describe('GameGateway', () => {
       gateway.server.sockets.adapter.rooms = mockRooms;
 
       // Manually trigger cleanup
+
       await (gateway as any).cleanupAbandonedLobbies();
 
       // Should log that it's cleaning up the abandoned lobby

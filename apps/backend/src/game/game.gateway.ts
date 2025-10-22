@@ -12,6 +12,7 @@ import { Server, Socket } from 'socket.io';
 import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { GameService } from './game.service';
 import { User } from '../database/entities/user.entity';
+import { GameStatus } from '../database/enums';
 import type {
   SocketJoinRoomRequest,
   SocketJoinRoomResponse,
@@ -260,7 +261,6 @@ export class GameGateway
   private async cleanupAbandonedLobbies() {
     try {
       const now = new Date();
-      const cutoffTime = new Date(now.getTime() - this.LOBBY_TIMEOUT_MS);
 
       // Find lobbies that haven't had any activity (no connected users)
       const inactiveLobbyRooms = new Set<string>();
@@ -300,7 +300,10 @@ export class GameGateway
             const gameAge = now.getTime() - game.createdAt.getTime();
 
             // Only cleanup lobbies (not started games) that are old enough
-            if (game.status === 'lobby' && gameAge > this.LOBBY_TIMEOUT_MS) {
+            if (
+              game.status === GameStatus.LOBBY &&
+              gameAge > this.LOBBY_TIMEOUT_MS
+            ) {
               this.logger.log(
                 `Cleaning up abandoned lobby: ${roomCode} (age: ${Math.floor(gameAge / 1000 / 60)}m)`,
               );

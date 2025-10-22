@@ -1,9 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { CharacterSetsService } from './character-sets.service';
-import {
-  CharacterSetResponseDto,
-  CharacterResponseDto,
-} from './dto';
+import { CharacterSetResponseDto, CharacterResponseDto } from './dto';
 
 @Controller('character-sets')
 export class CharacterSetsController {
