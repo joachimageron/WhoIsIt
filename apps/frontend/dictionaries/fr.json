@@ -107,5 +107,29 @@
   "common": {
     "search": "Rechercher",
     "language": "Langue"
+  },
+  "lobby": {
+    "title": "Lobby de Jeu",
+    "roomCode": "Code de Salle",
+    "host": "Hôte",
+    "players": "Joueurs",
+    "waitingForPlayers": "En attente de joueurs...",
+    "readyStatus": "Prêt",
+    "notReadyStatus": "Pas Prêt",
+    "toggleReady": "Basculer Prêt",
+    "startGame": "Démarrer le Jeu",
+    "leaveLobby": "Quitter le Lobby",
+    "connected": "Connecté",
+    "disconnected": "Déconnecté",
+    "connecting": "Connexion...",
+    "allPlayersReady": "Tous les joueurs sont prêts !",
+    "waitingForHost": "En attente du démarrage par l'hôte...",
+    "errors": {
+      "failedToJoin": "Échec de la connexion au lobby",
+      "failedToUpdateReady": "Échec de la mise à jour du statut",
+      "failedToStartGame": "Échec du démarrage du jeu",
+      "disconnected": "Vous avez été déconnecté du lobby",
+      "roomNotFound": "Salle introuvable"
+    }
   }
 }

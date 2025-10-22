@@ -107,5 +107,29 @@
   "common": {
     "search": "Search",
     "language": "Language"
+  },
+  "lobby": {
+    "title": "Game Lobby",
+    "roomCode": "Room Code",
+    "host": "Host",
+    "players": "Players",
+    "waitingForPlayers": "Waiting for players to join...",
+    "readyStatus": "Ready",
+    "notReadyStatus": "Not Ready",
+    "toggleReady": "Toggle Ready",
+    "startGame": "Start Game",
+    "leaveLobby": "Leave Lobby",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "connecting": "Connecting...",
+    "allPlayersReady": "All players are ready!",
+    "waitingForHost": "Waiting for host to start the game...",
+    "errors": {
+      "failedToJoin": "Failed to join lobby",
+      "failedToUpdateReady": "Failed to update ready status",
+      "failedToStartGame": "Failed to start game",
+      "disconnected": "You have been disconnected from the lobby",
+      "roomNotFound": "Room not found"
+    }
   }
 }
