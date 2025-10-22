@@ -18,7 +18,6 @@ export async function seedUsers(dataSource: DataSource): Promise<void> {
     {
       email: 'alice@example.com',
       username: 'alice',
-      displayName: 'Alice Wonder',
       passwordHash: hashedPassword,
       avatarUrl: '/avatar/avatar_0.jpg',
       isGuest: false,
@@ -27,7 +26,6 @@ export async function seedUsers(dataSource: DataSource): Promise<void> {
     {
       email: 'bob@example.com',
       username: 'bob',
-      displayName: 'Bob Builder',
       passwordHash: hashedPassword,
       avatarUrl: '/avatar/avatar_1.jpg',
       isGuest: false,
@@ -36,18 +34,17 @@ export async function seedUsers(dataSource: DataSource): Promise<void> {
     {
       email: 'charlie@example.com',
       username: 'charlie',
-      displayName: 'Charlie Brown',
       passwordHash: hashedPassword,
       avatarUrl: '/avatar/avatar_2.jpg',
       isGuest: false,
       locale: 'en',
     },
     {
-      displayName: 'Guest Player 1',
+      username: 'guest1',
       isGuest: true,
     },
     {
-      displayName: 'Guest Player 2',
+      username: 'guest2',
       isGuest: true,
     },
   ];

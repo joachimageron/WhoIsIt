@@ -4,7 +4,7 @@ export type GamePlayerRole = "host" | "player" | "spectator";
 
 export type CreateGameRequest = {
   characterSetId: string;
-  hostDisplayName?: string;
+  hostUsername?: string;
   hostUserId?: string;
   visibility?: GameVisibility;
   maxPlayers?: number | null;
@@ -13,14 +13,14 @@ export type CreateGameRequest = {
 };
 
 export type JoinGameRequest = {
-  displayName?: string;
+  username?: string;
   userId?: string;
   avatarUrl?: string;
 };
 
 export type GamePlayerResponse = {
   id: string;
-  displayName: string;
+  username: string;
   avatarUrl?: string;
   role: GamePlayerRole;
   isReady: boolean;
