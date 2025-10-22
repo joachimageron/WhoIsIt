@@ -12,7 +12,12 @@ import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail, looksLikeEmail } from "@/lib/utils/validation";
 
-export default function LoginPage() {
+interface LoginFormProps {
+  dict: any;
+  lang: string;
+}
+
+export function LoginForm({ dict, lang }: LoginFormProps) {
   const router = useRouter();
   const { setUser, setLoading, setError, clearError, isLoading, error } =
     useAuthStore();
@@ -27,13 +32,13 @@ export default function LoginPage() {
     clearError();
 
     if (!emailOrUsername || !password) {
-      setError("Please fill in all fields");
+      setError(dict.auth.login.fillAllFields);
 
       return;
     }
 
     if (looksLikeEmail(emailOrUsername) && !isValidEmail(emailOrUsername)) {
-      setError("Please enter a valid email address");
+      setError(dict.auth.login.invalidEmail);
 
       return;
     }
@@ -44,9 +49,11 @@ export default function LoginPage() {
       const user = await authApi.login({ emailOrUsername, password });
 
       setUser(user);
-      router.push("/");
+      router.push(`/${lang}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(
+        err instanceof Error ? err.message : dict.auth.login.loginFailed,
+      );
     } finally {
       setLoading(false);
     }
@@ -56,23 +63,25 @@ export default function LoginPage() {
     if (error) {
       addToast({
         color: "danger",
-        title: error ? "Login Failed" : "",
+        title: error ? dict.auth.login.loginFailed : "",
         description: error || "",
       });
     }
-  }, [error]);
+  }, [error, dict]);
 
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">Log In</p>
+        <p className="pb-4 text-left text-3xl font-semibold">
+          {dict.auth.login.title}
+        </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired
-            label="Email or Username"
+            label={dict.auth.login.emailOrUsername}
             labelPlacement="outside"
             name="emailOrUsername"
-            placeholder="Enter your email or username"
+            placeholder={dict.auth.login.emailOrUsernamePlaceholder}
             type="text"
             value={emailOrUsername}
             variant="bordered"
@@ -95,27 +104,27 @@ export default function LoginPage() {
                 )}
               </button>
             }
-            label="Password"
+            label={dict.auth.login.password}
             labelPlacement="outside"
             name="password"
-            placeholder="Enter your password"
+            placeholder={dict.auth.login.passwordPlaceholder}
             type={isVisible ? "text" : "password"}
             value={password}
             variant="bordered"
             onChange={(e) => setPassword(e.target.value)}
           />
           <div className="flex items-center justify-between py-2">
-            <Link href="/auth/forgot-password" size="sm">
-              Forgot password?
+            <Link href={`/${lang}/auth/forgot-password`} size="sm">
+              {dict.auth.login.forgotPassword}
             </Link>
           </div>
           <Button color="primary" isLoading={isLoading} type="submit">
-            Log In
+            {dict.auth.login.loginButton}
           </Button>
         </form>
         <p className="text-small text-center">
-          <Link href="/auth/register" size="sm">
-            Don&apos;t have an account? Sign Up
+          <Link href={`/${lang}/auth/register`} size="sm">
+            {dict.auth.login.noAccount}
           </Link>
         </p>
       </div>

@@ -1,17 +1,21 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Spinner } from "@heroui/spinner";
 import { Icon } from "@iconify/react";
 
 import * as authApi from "@/lib/auth-api";
 
-export default function VerifyEmailPage() {
+interface VerifyEmailFormProps {
+  dict: any;
+  lang: string;
+  token: string;
+}
+
+export function VerifyEmailForm({ dict, lang, token }: VerifyEmailFormProps) {
   const router = useRouter();
-  const params = useParams();
-  const token = params["verify-token"] as string;
 
   const [status, setStatus] = useState<
     "loading" | "success" | "error" | "invalid"
@@ -47,10 +51,9 @@ export default function VerifyEmailPage() {
       {status === "loading" && (
         <div className="flex flex-col items-center gap-4">
           <Spinner size="lg" />
-          <h2 className="text-2xl font-semibold">Verifying your email...</h2>
-          <p className="text-default-500 text-center">
-            Please wait while we verify your email address.
-          </p>
+          <h2 className="text-2xl font-semibold">
+            {dict.auth.verifyEmail.verifying}
+          </h2>
         </div>
       )}
 
@@ -62,18 +65,19 @@ export default function VerifyEmailPage() {
               icon="solar:check-circle-bold"
             />
           </div>
-          <h2 className="text-2xl font-semibold">Email Verified!</h2>
+          <h2 className="text-2xl font-semibold">
+            {dict.auth.verifyEmail.success}
+          </h2>
           <p className="text-default-500 text-center">
-            Your email has been successfully verified. You can now enjoy all
-            features of WhoIsIt.
+            {dict.auth.verifyEmail.successMessage}
           </p>
           <Button
             className="mt-4"
             color="primary"
             size="lg"
-            onPress={() => router.push("/")}
+            onPress={() => router.push(`/${lang}/auth/login`)}
           >
-            Go to Home
+            {dict.auth.verifyEmail.goToLogin}
           </Button>
         </div>
       )}
@@ -86,18 +90,20 @@ export default function VerifyEmailPage() {
               icon="solar:close-circle-bold"
             />
           </div>
-          <h2 className="text-2xl font-semibold">Verification Failed</h2>
+          <h2 className="text-2xl font-semibold">
+            {dict.auth.verifyEmail.failed}
+          </h2>
           <p className="text-danger text-center">{errorMessage}</p>
           <div className="mt-4 flex gap-2">
             <Button
               color="primary"
               variant="bordered"
-              onPress={() => router.push("/auth/register")}
+              onPress={() => router.push(`/${lang}/auth/register`)}
             >
-              Register Again
+              {dict.nav.signUp}
             </Button>
-            <Button color="primary" onPress={() => router.push("/")}>
-              Go to Home
+            <Button color="primary" onPress={() => router.push(`/${lang}`)}>
+              {dict.nav.home}
             </Button>
           </div>
         </div>
@@ -111,17 +117,18 @@ export default function VerifyEmailPage() {
               icon="solar:danger-triangle-bold"
             />
           </div>
-          <h2 className="text-2xl font-semibold">Invalid Link</h2>
+          <h2 className="text-2xl font-semibold">
+            {dict.auth.verifyEmail.failed}
+          </h2>
           <p className="text-default-500 text-center">
-            This verification link is invalid or has expired. Please register
-            again or request a new verification email.
+            {dict.auth.verifyEmail.failedMessage}
           </p>
           <Button
             className="mt-4"
             color="primary"
-            onPress={() => router.push("/auth/register")}
+            onPress={() => router.push(`/${lang}/auth/register`)}
           >
-            Go to Registration
+            {dict.nav.signUp}
           </Button>
         </div>
       )}

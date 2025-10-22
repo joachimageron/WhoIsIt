@@ -1,5 +1,7 @@
 "use client";
 
+import type { Locale } from "@/dictionaries";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
@@ -23,6 +25,7 @@ import clsx from "clsx";
 
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import {
   TwitterIcon,
   GithubIcon,
@@ -32,14 +35,38 @@ import {
 } from "@/components/icons";
 import { useAuth } from "@/lib/hooks/use-auth";
 
-export const Navbar = () => {
+interface NavbarProps {
+  lang: Locale;
+  dict: any;
+}
+
+export const Navbar = ({ lang, dict }: NavbarProps) => {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuth();
 
   const handleLogout = async () => {
     await logout();
-    router.push("/auth/login");
+    router.push(`/${lang}/auth/login`);
   };
+
+  const navItems = [
+    { label: dict.nav.home, href: `/${lang}` },
+    { label: dict.nav.docs, href: `/${lang}/docs` },
+    { label: dict.nav.pricing, href: `/${lang}/pricing` },
+    { label: dict.nav.blog, href: `/${lang}/blog` },
+    { label: dict.nav.about, href: `/${lang}/about` },
+  ];
+
+  const navMenuItems = [
+    { label: dict.nav.profile, href: `/${lang}/profile` },
+    { label: dict.nav.dashboard, href: `/${lang}/dashboard` },
+    { label: dict.nav.projects, href: `/${lang}/projects` },
+    { label: dict.nav.team, href: `/${lang}/team` },
+    { label: dict.nav.calendar, href: `/${lang}/calendar` },
+    { label: dict.nav.settings, href: `/${lang}/settings` },
+    { label: dict.nav.helpFeedback, href: `/${lang}/help-feedback` },
+    { label: dict.nav.logout, href: `/${lang}/logout` },
+  ];
 
   const searchInput = (
     <Input
@@ -66,13 +93,16 @@ export const Navbar = () => {
     <HeroUINavbar maxWidth="xl" position="sticky">
       <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
         <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
+          <NextLink
+            className="flex justify-start items-center gap-1"
+            href={`/${lang}`}
+          >
             <Logo />
             <p className="font-bold text-inherit">ACME</p>
           </NextLink>
         </NavbarBrand>
         <ul className="hidden lg:flex gap-4 justify-start ml-2">
-          {siteConfig.navItems.map((item) => (
+          {navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
                 className={clsx(
@@ -104,6 +134,7 @@ export const Navbar = () => {
             <GithubIcon className="text-default-500" />
           </Link>
           <ThemeSwitch />
+          <LanguageSwitcher currentLang={lang} />
         </NavbarItem>
         <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
         <NavbarItem className="hidden md:flex">
@@ -120,16 +151,18 @@ export const Navbar = () => {
                     }}
                   >
                     <ListboxItem key="profile" className="h-14 gap-2">
-                      <p className="font-semibold">Signed in as</p>
+                      <p className="font-semibold">{dict.auth.signedInAs}</p>
                       <p className="font-semibold">{user.email}</p>
                     </ListboxItem>
-                    <ListboxItem key="settings">Settings</ListboxItem>
+                    <ListboxItem key="settings">
+                      {dict.nav.settings}
+                    </ListboxItem>
                     <ListboxItem
                       key="logout"
                       className="text-danger"
                       color="danger"
                     >
-                      Log Out
+                      {dict.auth.logOut}
                     </ListboxItem>
                   </Listbox>
                 </div>
@@ -148,19 +181,19 @@ export const Navbar = () => {
               <Button
                 as={NextLink}
                 className="text-sm font-normal text-default-600"
-                href="/auth/login"
+                href={`/${lang}/auth/login`}
                 variant="flat"
               >
-                Login
+                {dict.nav.login}
               </Button>
               <Button
                 as={NextLink}
                 className="text-sm font-normal"
                 color="primary"
-                href="/auth/register"
+                href={`/${lang}/auth/register`}
                 variant="flat"
               >
-                Sign Up
+                {dict.nav.signUp}
               </Button>
             </>
           )}
@@ -172,23 +205,24 @@ export const Navbar = () => {
           <GithubIcon className="text-default-500" />
         </Link>
         <ThemeSwitch />
+        <LanguageSwitcher currentLang={lang} />
         <NavbarMenuToggle />
       </NavbarContent>
 
       <NavbarMenu>
         {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
-          {siteConfig.navMenuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`}>
+          {navMenuItems.map((item, index) => (
+            <NavbarMenuItem key={`${item.label}-${index}`}>
               <Link
                 color={
                   index === 2
                     ? "primary"
-                    : index === siteConfig.navMenuItems.length - 1
+                    : index === navMenuItems.length - 1
                       ? "danger"
                       : "foreground"
                 }
-                href="#"
+                href={item.href}
                 size="lg"
               >
                 {item.label}
@@ -198,13 +232,13 @@ export const Navbar = () => {
           {!isAuthenticated && (
             <>
               <NavbarMenuItem>
-                <Link color="primary" href="/auth/login" size="lg">
-                  Login
+                <Link color="primary" href={`/${lang}/auth/login`} size="lg">
+                  {dict.nav.login}
                 </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
-                <Link color="primary" href="/auth/register" size="lg">
-                  Sign Up
+                <Link color="primary" href={`/${lang}/auth/register`} size="lg">
+                  {dict.nav.signUp}
                 </Link>
               </NavbarMenuItem>
             </>
@@ -219,7 +253,7 @@ export const Navbar = () => {
               </NavbarMenuItem>
               <NavbarMenuItem>
                 <Link color="danger" size="lg" onPress={handleLogout}>
-                  Log Out
+                  {dict.auth.logOut}
                 </Link>
               </NavbarMenuItem>
             </>

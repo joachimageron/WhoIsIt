@@ -8,7 +8,12 @@ import { addToast } from "@heroui/toast";
 
 import * as authApi from "@/lib/auth-api";
 
-export default function ForgotPasswordPage() {
+interface ForgotPasswordFormProps {
+  dict: any;
+  lang: string;
+}
+
+export function ForgotPasswordForm({ dict, lang }: ForgotPasswordFormProps) {
   const [email, setEmail] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -18,7 +23,7 @@ export default function ForgotPasswordPage() {
     setError("");
 
     if (!email) {
-      setError("Please enter your email address");
+      setError(dict.auth.forgotPassword.enterEmail);
 
       return;
     }
@@ -29,13 +34,14 @@ export default function ForgotPasswordPage() {
       await authApi.forgotPassword(email);
       addToast({
         color: "success",
-        title: "Reset Link Sent",
-        description:
-          "If an account exists with this email, you will receive a password reset link shortly.",
+        title: dict.auth.forgotPassword.resetLinkSent,
+        description: dict.auth.forgotPassword.resetLinkDescription,
       });
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to send reset link",
+        err instanceof Error
+          ? err.message
+          : dict.auth.forgotPassword.sendFailed,
       );
     } finally {
       setIsLoading(false);
@@ -45,33 +51,34 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">Forgot Password</p>
+        <p className="pb-4 text-left text-3xl font-semibold">
+          {dict.auth.forgotPassword.title}
+        </p>
         <p className="text-small text-default-500 pb-2">
-          Enter your email address and we&apos;ll send you a link to reset your
-          password.
+          {dict.auth.forgotPassword.description}
         </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {error && <div className="text-small text-danger">{error}</div>}
           <Input
             isRequired
             isDisabled={isLoading}
-            label="Email"
+            label={dict.auth.forgotPassword.email}
             labelPlacement="outside"
             name="email"
-            placeholder="Enter your email"
+            placeholder={dict.auth.forgotPassword.emailPlaceholder}
             type="email"
             value={email}
             variant="bordered"
             onChange={(e) => setEmail(e.target.value)}
           />
           <Button color="primary" isLoading={isLoading} type="submit">
-            Send Reset Link
+            {dict.auth.forgotPassword.sendButton}
           </Button>
         </form>
 
         <p className="text-small text-center">
-          <Link href="/login" size="sm">
-            Back to Log In
+          <Link href={`/${lang}/auth/login`} size="sm">
+            {dict.auth.forgotPassword.backToLogin}
           </Link>
         </p>
       </div>

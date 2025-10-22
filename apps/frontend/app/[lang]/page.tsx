@@ -6,20 +6,26 @@ import { button as buttonStyles } from "@heroui/theme";
 import { siteConfig } from "@/config/site";
 import { title, subtitle } from "@/components/primitives";
 import { GithubIcon } from "@/components/icons";
+import { getDictionary, type Locale } from "@/dictionaries";
 
-export default function Home() {
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
   return (
     <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
       <div className="inline-block max-w-xl text-center justify-center">
-        <span className={title()}>Build&nbsp;</span>
-        <span className={title({ color: "violet" })}>WhoIsIt&nbsp;</span>
-        <br />
-        <span className={title()}>
-          games with collaborative, real-time clues.
+        <span className={title()}>{dict.home.title1}&nbsp;</span>
+        <span className={title({ color: "violet" })}>
+          {dict.home.title2}&nbsp;
         </span>
-        <div className={subtitle({ class: "mt-4" })}>
-          Spin up matches instantly with HeroUI, Socket.IO and Zustand.
-        </div>
+        <br />
+        <span className={title()}>{dict.home.title3}</span>
+        <div className={subtitle({ class: "mt-4" })}>{dict.home.subtitle}</div>
       </div>
 
       <div className="flex gap-3">
@@ -32,7 +38,7 @@ export default function Home() {
           })}
           href={siteConfig.links.docs}
         >
-          Frontend docs
+          {dict.home.frontendDocs}
         </Link>
         <Link
           isExternal
@@ -40,14 +46,15 @@ export default function Home() {
           href={siteConfig.links.github}
         >
           <GithubIcon size={20} />
-          Backend docs
+          {dict.home.backendDocs}
         </Link>
       </div>
 
       <div className="mt-8">
         <Snippet hideCopyButton hideSymbol variant="bordered">
           <span>
-            Get started by editing <Code color="primary">app/page.tsx</Code>
+            {dict.home.getStarted}{" "}
+            <Code color="primary">app/[lang]/page.tsx</Code>
           </span>
         </Snippet>
       </div>

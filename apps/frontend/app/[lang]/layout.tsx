@@ -8,6 +8,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
+import { getDictionary, type Locale } from "@/dictionaries";
 
 export const metadata: Metadata = {
   title: {
@@ -27,13 +28,22 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({
+export async function generateStaticParams() {
+  return [{ lang: "en" }, { lang: "fr" }];
+}
+
+export default async function RootLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ lang: Locale }>;
 }) {
+  const { lang } = await params;
+  const dict = await getDictionary(lang);
+
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang={lang}>
       <head />
       <body
         className={clsx(
@@ -43,7 +53,7 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
-            <Navbar />
+            <Navbar dict={dict} lang={lang} />
             <main className="container mx-auto max-w-7xl pt-16 px-6 flex-grow">
               {children}
             </main>
@@ -54,7 +64,9 @@ export default function RootLayout({
                 href="https://heroui.com?utm_source=next-app-template"
                 title="heroui.com homepage"
               >
-                <span className="text-default-600">Powered by</span>
+                <span className="text-default-600">
+                  {dict.footer.poweredBy}
+                </span>
                 <p className="text-primary">HeroUI</p>
               </Link>
             </footer>

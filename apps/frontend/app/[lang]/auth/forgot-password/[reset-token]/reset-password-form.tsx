@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
@@ -10,10 +10,18 @@ import { addToast } from "@heroui/toast";
 
 import * as authApi from "@/lib/auth-api";
 
-export default function ResetPasswordTokenPage() {
+interface ResetPasswordFormProps {
+  dict: any;
+  lang: string;
+  token: string;
+}
+
+export function ResetPasswordForm({
+  dict,
+  lang,
+  token,
+}: ResetPasswordFormProps) {
   const router = useRouter();
-  const params = useParams();
-  const token = params["reset-token"] as string;
 
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -29,26 +37,14 @@ export default function ResetPasswordTokenPage() {
     e.preventDefault();
     setError("");
 
-    if (!token) {
-      setError("Invalid or missing reset token");
-
-      return;
-    }
-
     if (!password || !confirmPassword) {
-      setError("Please fill in all fields");
-
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
+      setError(dict.auth.register.fillAllFields);
 
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(dict.auth.resetPassword.passwordsNoMatch);
 
       return;
     }
@@ -59,53 +55,33 @@ export default function ResetPasswordTokenPage() {
       await authApi.resetPassword(token, password);
       addToast({
         color: "success",
-        title: "Password Reset",
-        description: "Password reset successfully! Redirecting to login...",
+        title: dict.auth.resetPassword.resetSuccess,
+        description: dict.auth.resetPassword.resetSuccessMessage,
       });
       // Success
       // Redirect to login after a short delay
       setTimeout(() => {
-        router.push("/auth/login");
+        router.push(`/${lang}/auth/login`);
       }, 2000);
     } catch (err) {
       addToast({
         color: "danger",
-        title: "Reset Failed",
+        title: dict.auth.resetPassword.resetFailed,
         description:
-          err instanceof Error ? err.message : "Failed to reset password",
+          err instanceof Error
+            ? err.message
+            : dict.auth.resetPassword.resetFailed,
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!token) {
-    return (
-      <div className="flex h-full w-full items-center justify-center">
-        <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-          <p className="pb-4 text-left text-3xl font-semibold">
-            Reset Password
-          </p>
-          <div className="text-small text-danger">
-            Invalid or missing reset token. Please request a new password reset
-            link.
-          </div>
-          <p className="text-small text-center">
-            <Link href="/auth/forgot-password" size="sm">
-              Request Password Reset
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">Reset Password</p>
-        <p className="text-small text-default-500 pb-2">
-          Please enter your new password.
+        <p className="pb-4 text-left text-3xl font-semibold">
+          {dict.auth.resetPassword.title}
         </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
@@ -126,10 +102,10 @@ export default function ResetPasswordTokenPage() {
               </button>
             }
             isDisabled={isLoading}
-            label="New Password"
+            label={dict.auth.resetPassword.newPassword}
             labelPlacement="outside"
             name="password"
-            placeholder="Enter your new password"
+            placeholder={dict.auth.resetPassword.newPasswordPlaceholder}
             type={isVisible ? "text" : "password"}
             value={password}
             variant="bordered"
@@ -153,10 +129,10 @@ export default function ResetPasswordTokenPage() {
               </button>
             }
             isDisabled={isLoading}
-            label="Confirm New Password"
+            label={dict.auth.resetPassword.confirmPassword}
             labelPlacement="outside"
             name="confirmPassword"
-            placeholder="Confirm your new password"
+            placeholder={dict.auth.resetPassword.confirmPasswordPlaceholder}
             type={isConfirmVisible ? "text" : "password"}
             value={confirmPassword}
             variant="bordered"
@@ -164,12 +140,12 @@ export default function ResetPasswordTokenPage() {
           />
           {error && <div className="text-small text-danger">{error}</div>}
           <Button color="primary" isLoading={isLoading} type="submit">
-            Reset Password
+            {dict.auth.resetPassword.resetButton}
           </Button>
         </form>
         <p className="text-small text-center">
-          <Link href="/auth/login" size="sm">
-            Back to Log In
+          <Link href={`/${lang}/auth/login`} size="sm">
+            {dict.auth.resetPassword.backToLogin}
           </Link>
         </p>
       </div>

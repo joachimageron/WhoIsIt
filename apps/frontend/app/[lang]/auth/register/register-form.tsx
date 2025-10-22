@@ -13,7 +13,12 @@ import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
 
-export default function RegisterPage() {
+interface RegisterFormProps {
+  dict: any;
+  lang: string;
+}
+
+export function RegisterForm({ dict, lang }: RegisterFormProps) {
   const router = useRouter();
   const { setUser, setLoading, setError, clearError, isLoading, error } =
     useAuthStore();
@@ -48,25 +53,25 @@ export default function RegisterPage() {
       !formData.password ||
       !formData.confirmPassword
     ) {
-      setError("Please fill in all required fields");
+      setError(dict.auth.register.fillAllFields);
 
       return;
     }
 
     if (!isValidEmail(formData.email)) {
-      setError("Please enter a valid email address");
+      setError(dict.auth.register.invalidEmail);
 
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match");
+      setError(dict.auth.register.passwordsNoMatch);
 
       return;
     }
 
     if (!agreedToTerms) {
-      setError("Please agree to the terms and privacy policy");
+      setError(dict.auth.register.agreeToTermsError);
 
       return;
     }
@@ -84,7 +89,11 @@ export default function RegisterPage() {
       setRegistrationSuccess(true);
       // Don't redirect immediately - show verification message
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
+      setError(
+        err instanceof Error
+          ? err.message
+          : dict.auth.register.registrationFailed,
+      );
     } finally {
       setLoading(false);
     }
@@ -97,16 +106,15 @@ export default function RegisterPage() {
     try {
       await authApi.resendVerificationEmail(formData.email);
       addToast({
-        title: "Success",
-        description:
-          "Verification email sent successfully! Please check your inbox.",
+        title: dict.auth.register.verificationSent,
+        description: dict.auth.register.emailResent,
         color: "success",
       });
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to resend verification email",
+          : dict.auth.register.registrationFailed,
       );
     } finally {
       setIsResending(false);
@@ -116,12 +124,12 @@ export default function RegisterPage() {
   useEffect(() => {
     if (error) {
       addToast({
-        title: "Error",
+        title: dict.auth.register.registrationFailed,
         description: error,
         color: "danger",
       });
     }
-  }, [error]);
+  }, [error, dict]);
 
   if (registrationSuccess) {
     return (
@@ -134,19 +142,15 @@ export default function RegisterPage() {
                 icon="solar:check-circle-bold"
               />
             </div>
-            <h2 className="text-2xl font-semibold">Registration Successful!</h2>
+            <h2 className="text-2xl font-semibold">
+              {dict.auth.register.verificationSent}
+            </h2>
             <p className="text-default-500 text-center">
-              We&apos;ve sent a verification email to{" "}
-              <strong>{formData.email}</strong>. Please check your inbox and
-              click the verification link to activate your account.
+              {dict.auth.register.verificationMessage.replace(
+                "{email}",
+                formData.email,
+              )}
             </p>
-            <div className="rounded-medium mt-2 p-4">
-              <p className="text-primary-600 text-sm">
-                <Icon className="inline mr-1" icon="solar:info-circle-bold" />
-                Didn&apos;t receive the email? Check your spam folder or click
-                below to resend.
-              </p>
-            </div>
             <div className="mt-4 flex gap-2">
               <Button
                 color="primary"
@@ -154,10 +158,10 @@ export default function RegisterPage() {
                 variant="bordered"
                 onPress={handleResendEmail}
               >
-                Resend Email
+                {dict.auth.register.resendVerification}
               </Button>
-              <Button color="primary" onPress={() => router.push("/")}>
-                Go to Home
+              <Button color="primary" onPress={() => router.push(`/${lang}`)}>
+                {dict.nav.home}
               </Button>
             </div>
           </div>
@@ -170,15 +174,15 @@ export default function RegisterPage() {
     <div className="flex h-full w-full items-center justify-center">
       <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
         <p className="pb-4 text-left text-3xl font-semibold">
-          Sign Up
+          {dict.auth.register.title}
         </p>
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             isRequired
-            label="Username"
+            label={dict.auth.register.username}
             labelPlacement="outside"
             name="username"
-            placeholder="Enter your username"
+            placeholder={dict.auth.register.usernamePlaceholder}
             type="text"
             value={formData.username}
             variant="bordered"
@@ -186,10 +190,10 @@ export default function RegisterPage() {
           />
           <Input
             isRequired
-            label="Email"
+            label={dict.auth.register.email}
             labelPlacement="outside"
             name="email"
-            placeholder="Enter your email"
+            placeholder={dict.auth.register.emailPlaceholder}
             type="email"
             value={formData.email}
             variant="bordered"
@@ -212,10 +216,10 @@ export default function RegisterPage() {
                 )}
               </button>
             }
-            label="Password"
+            label={dict.auth.register.password}
             labelPlacement="outside"
             name="password"
-            placeholder="Enter your password"
+            placeholder={dict.auth.register.passwordPlaceholder}
             type={isVisible ? "text" : "password"}
             value={formData.password}
             variant="bordered"
@@ -238,10 +242,10 @@ export default function RegisterPage() {
                 )}
               </button>
             }
-            label="Confirm Password"
+            label={dict.auth.register.confirmPassword}
             labelPlacement="outside"
             name="confirmPassword"
-            placeholder="Confirm your password"
+            placeholder={dict.auth.register.confirmPasswordPlaceholder}
             type={isConfirmVisible ? "text" : "password"}
             value={formData.confirmPassword}
             variant="bordered"
@@ -254,22 +258,15 @@ export default function RegisterPage() {
             size="sm"
             onValueChange={setAgreedToTerms}
           >
-            I agree with the&nbsp;
-            <Link className="relative z-1" href="#" size="sm">
-              Terms
-            </Link>
-            &nbsp; and&nbsp;
-            <Link className="relative z-1" href="#" size="sm">
-              Privacy Policy
-            </Link>
+            {dict.auth.register.agreeToTerms}
           </Checkbox>
           <Button color="primary" isLoading={isLoading} type="submit">
-            Sign Up
+            {dict.auth.register.signUpButton}
           </Button>
         </form>
         <p className="text-small text-center">
-          <Link href="/auth/login" size="sm">
-            Already have an account? Log In
+          <Link href={`/${lang}/auth/login`} size="sm">
+            {dict.auth.register.haveAccount}
           </Link>
         </p>
       </div>
