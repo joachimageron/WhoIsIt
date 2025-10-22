@@ -152,6 +152,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Alice',
       slug: 'alice',
+      imageUrl: '/character/character_0.jpg',
       traits: {
         gender: femaleValue,
         hairColor: blondHair,
@@ -162,6 +163,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Bob',
       slug: 'bob',
+      imageUrl: '/character/character_1.jpg',
       traits: {
         gender: maleValue,
         hairColor: brownHair,
@@ -172,6 +174,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Charlie',
       slug: 'charlie',
+      imageUrl: '/character/character_2.jpg',
       traits: {
         gender: maleValue,
         hairColor: blackHair,
@@ -182,6 +185,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Diana',
       slug: 'diana',
+      imageUrl: '/character/character_3.jpg',
       traits: {
         gender: femaleValue,
         hairColor: redHair,
@@ -192,6 +196,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Edward',
       slug: 'edward',
+      imageUrl: '/character/character_4.jpg',
       traits: {
         gender: maleValue,
         hairColor: whiteHair,
@@ -202,6 +207,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Fiona',
       slug: 'fiona',
+      imageUrl: '/character/character_5.jpg',
       traits: {
         gender: femaleValue,
         hairColor: brownHair,
@@ -212,6 +218,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'George',
       slug: 'george',
+      imageUrl: '/character/character_6.jpg',
       traits: {
         gender: maleValue,
         hairColor: blondHair,
@@ -222,6 +229,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Hannah',
       slug: 'hannah',
+      imageUrl: '/character/character_7.jpg',
       traits: {
         gender: femaleValue,
         hairColor: blackHair,
@@ -236,7 +244,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
       set: classicSet,
       name: charData.name,
       slug: charData.slug,
-      imageUrl: null,
+      imageUrl: charData.imageUrl,
       summary: `${charData.name} is a character in the classic set`,
       isActive: true,
       metadata: {},
@@ -341,26 +349,31 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
     {
       name: 'Aragorn',
       slug: 'aragorn',
+      imageUrl: '/character/character_8.jpg',
       traits: { class: warriorClass, weapon: swordWeapon },
     },
     {
       name: 'Gandalf',
       slug: 'gandalf',
+      imageUrl: '/character/character_9.jpg',
       traits: { class: mageClass, weapon: staffWeapon },
     },
     {
       name: 'Legolas',
       slug: 'legolas',
+      imageUrl: '/character/character_10.jpg',
       traits: { class: rogueClass, weapon: bowWeapon },
     },
     {
       name: 'Frodo',
       slug: 'frodo',
+      imageUrl: '/character/character_11.jpg',
       traits: { class: rogueClass, weapon: daggerWeapon },
     },
     {
       name: 'Boromir',
       slug: 'boromir',
+      imageUrl: '/character/character_12.jpg',
       traits: { class: warriorClass, weapon: swordWeapon },
     },
   ];
@@ -370,7 +383,7 @@ export async function seedCharacterSets(dataSource: DataSource): Promise<void> {
       set: fantasySet,
       name: charData.name,
       slug: charData.slug,
-      imageUrl: null,
+      imageUrl: charData.imageUrl,
       summary: `${charData.name} is a hero in the fantasy set`,
       isActive: true,
       metadata: {},

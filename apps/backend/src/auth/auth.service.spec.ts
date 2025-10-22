@@ -69,7 +69,7 @@ describe('AuthService', () => {
         username: registerDto.username,
         displayName: registerDto.displayName,
         passwordHash: 'hashed-password',
-        avatarUrl: null,
+        avatarUrl: '/avatar/avatar_5.jpg',
         isGuest: false,
       };
 
@@ -96,6 +96,16 @@ describe('AuthService', () => {
           { username: registerDto.username },
         ],
       });
+      // Verify that avatarUrl is set to a valid avatar path
+      expect(mockUserRepository.create).toHaveBeenCalled();
+      const createCallArgs = mockUserRepository.create.mock
+        .calls[0] as unknown[];
+      const userObject = createCallArgs[0] as { avatarUrl?: string };
+      expect(userObject.avatarUrl).toBeDefined();
+      expect(userObject.avatarUrl).toMatch(/^\/avatar\/avatar_\d+\.jpg$/);
+      expect(userObject.avatarUrl).toMatch(
+        /^\/avatar\/avatar_(0|[1-9]|1[0-7])\.jpg$/,
+      );
     });
 
     it('should throw ConflictException if user already exists', async () => {

@@ -46,12 +46,17 @@ export class AuthService {
     ); // 24 hours from now
     const lastSeenAt = new Date();
 
+    // Select random avatar
+    const avatarNumber = Math.floor(Math.random() * 18);
+    const avatarUrl = `/avatar/avatar_${avatarNumber}.jpg`;
+
     // Create user
     const user = this.userRepository.create({
       email,
       username,
       displayName,
       passwordHash,
+      avatarUrl,
       isGuest: false,
       emailVerified: false,
       verificationToken,
