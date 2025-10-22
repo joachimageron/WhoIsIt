@@ -30,7 +30,76 @@
   },
   "auth": {
     "signedInAs": "Signed in as",
-    "logOut": "Log Out"
+    "logOut": "Log Out",
+    "login": {
+      "title": "Log In",
+      "emailOrUsername": "Email or Username",
+      "emailOrUsernamePlaceholder": "Enter your email or username",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "loginButton": "Log In",
+      "noAccount": "Don't have an account? Sign Up",
+      "fillAllFields": "Please fill in all fields",
+      "invalidEmail": "Please enter a valid email address",
+      "loginFailed": "Login Failed"
+    },
+    "register": {
+      "title": "Sign Up",
+      "username": "Username",
+      "usernamePlaceholder": "Choose a username",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Choose a password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "agreeToTerms": "I agree to the Terms of Service and Privacy Policy",
+      "signUpButton": "Sign Up",
+      "haveAccount": "Already have an account? Log In",
+      "fillAllFields": "Please fill in all required fields",
+      "invalidEmail": "Please enter a valid email address",
+      "passwordsNoMatch": "Passwords do not match",
+      "agreeToTermsError": "Please agree to the terms and privacy policy",
+      "registrationFailed": "Registration failed",
+      "verificationSent": "Verification Email Sent",
+      "verificationMessage": "We've sent a verification link to your email. Please check your inbox and click the link to activate your account.",
+      "resendVerification": "Resend Verification Email",
+      "emailResent": "Verification email resent successfully"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "description": "Enter your email address and we'll send you a link to reset your password.",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "sendButton": "Send Reset Link",
+      "backToLogin": "Back to Log In",
+      "enterEmail": "Please enter your email address",
+      "resetLinkSent": "Reset Link Sent",
+      "resetLinkDescription": "If an account exists with this email, you will receive a password reset link shortly.",
+      "sendFailed": "Failed to send reset link"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "resetButton": "Reset Password",
+      "passwordsNoMatch": "Passwords do not match",
+      "resetSuccess": "Password Reset Successfully",
+      "resetSuccessMessage": "Your password has been reset. You can now log in with your new password.",
+      "backToLogin": "Back to Log In",
+      "resetFailed": "Failed to reset password"
+    },
+    "verifyEmail": {
+      "verifying": "Verifying your email...",
+      "success": "Email Verified Successfully",
+      "successMessage": "Your email has been verified. You can now log in to your account.",
+      "failed": "Verification Failed",
+      "failedMessage": "The verification link is invalid or has expired.",
+      "goToLogin": "Go to Log In"
+    }
   },
   "footer": {
     "poweredBy": "Powered by"

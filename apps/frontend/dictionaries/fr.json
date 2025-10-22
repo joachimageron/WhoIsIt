@@ -30,7 +30,76 @@
   },
   "auth": {
     "signedInAs": "Connecté en tant que",
-    "logOut": "Déconnexion"
+    "logOut": "Déconnexion",
+    "login": {
+      "title": "Connexion",
+      "emailOrUsername": "Email ou nom d'utilisateur",
+      "emailOrUsernamePlaceholder": "Entrez votre email ou nom d'utilisateur",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Entrez votre mot de passe",
+      "forgotPassword": "Mot de passe oublié ?",
+      "loginButton": "Se connecter",
+      "noAccount": "Pas de compte ? S'inscrire",
+      "fillAllFields": "Veuillez remplir tous les champs",
+      "invalidEmail": "Veuillez entrer une adresse email valide",
+      "loginFailed": "Échec de la connexion"
+    },
+    "register": {
+      "title": "Inscription",
+      "username": "Nom d'utilisateur",
+      "usernamePlaceholder": "Choisissez un nom d'utilisateur",
+      "email": "Email",
+      "emailPlaceholder": "Entrez votre email",
+      "password": "Mot de passe",
+      "passwordPlaceholder": "Choisissez un mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "agreeToTerms": "J'accepte les Conditions d'utilisation et la Politique de confidentialité",
+      "signUpButton": "S'inscrire",
+      "haveAccount": "Déjà un compte ? Se connecter",
+      "fillAllFields": "Veuillez remplir tous les champs obligatoires",
+      "invalidEmail": "Veuillez entrer une adresse email valide",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "agreeToTermsError": "Veuillez accepter les conditions et la politique de confidentialité",
+      "registrationFailed": "Échec de l'inscription",
+      "verificationSent": "Email de vérification envoyé",
+      "verificationMessage": "Nous avons envoyé un lien de vérification à votre email. Veuillez vérifier votre boîte de réception et cliquer sur le lien pour activer votre compte.",
+      "resendVerification": "Renvoyer l'email de vérification",
+      "emailResent": "Email de vérification renvoyé avec succès"
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "description": "Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+      "email": "Email",
+      "emailPlaceholder": "Entrez votre email",
+      "sendButton": "Envoyer le lien",
+      "backToLogin": "Retour à la connexion",
+      "enterEmail": "Veuillez entrer votre adresse email",
+      "resetLinkSent": "Lien de réinitialisation envoyé",
+      "resetLinkDescription": "Si un compte existe avec cet email, vous recevrez un lien de réinitialisation sous peu.",
+      "sendFailed": "Échec de l'envoi du lien"
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Entrez votre nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez votre nouveau mot de passe",
+      "resetButton": "Réinitialiser le mot de passe",
+      "passwordsNoMatch": "Les mots de passe ne correspondent pas",
+      "resetSuccess": "Mot de passe réinitialisé avec succès",
+      "resetSuccessMessage": "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+      "backToLogin": "Retour à la connexion",
+      "resetFailed": "Échec de la réinitialisation du mot de passe"
+    },
+    "verifyEmail": {
+      "verifying": "Vérification de votre email...",
+      "success": "Email vérifié avec succès",
+      "successMessage": "Votre email a été vérifié. Vous pouvez maintenant vous connecter à votre compte.",
+      "failed": "Échec de la vérification",
+      "failedMessage": "Le lien de vérification est invalide ou a expiré.",
+      "goToLogin": "Aller à la connexion"
+    }
   },
   "footer": {
     "poweredBy": "Propulsé par"
