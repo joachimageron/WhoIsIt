@@ -101,6 +101,19 @@
       "goToLogin": "Go to Log In"
     }
   },
+  "game": {
+    "join": {
+      "title": "Join a Game",
+      "roomCode": "Room Code",
+      "roomCodePlaceholder": "Enter 6-character room code",
+      "joinButton": "Join Game",
+      "backToHome": "Back to Home",
+      "enterRoomCode": "Please enter a room code",
+      "invalidRoomCode": "Room code must be 6 characters",
+      "joinFailed": "Failed to join game",
+      "joining": "Joining game..."
+    }
+  },
   "footer": {
     "poweredBy": "Powered by"
   },
