@@ -2,10 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CharacterSetsController } from './character-sets.controller';
 import { CharacterSetsService } from './character-sets.service';
 import { NotFoundException } from '@nestjs/common';
-import {
-  CharacterSetResponseDto,
-  CharacterResponseDto,
-} from './dto';
+import { CharacterSetResponseDto, CharacterResponseDto } from './dto';
 
 describe('CharacterSetsController', () => {
   let controller: CharacterSetsController;

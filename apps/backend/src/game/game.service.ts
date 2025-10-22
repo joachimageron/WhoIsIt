@@ -219,7 +219,9 @@ export class GameService {
     }
 
     if (!game.players || game.players.length < 2) {
-      throw new BadRequestException('Need at least 2 players to start the game');
+      throw new BadRequestException(
+        'Need at least 2 players to start the game',
+      );
     }
 
     const allPlayersReady = game.players.every((player) => player.isReady);

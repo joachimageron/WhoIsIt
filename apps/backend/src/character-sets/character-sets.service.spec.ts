@@ -115,7 +115,7 @@ describe('CharacterSetsService', () => {
 
       mockCharacterSetRepository.find.mockResolvedValue(mockCharacterSets);
 
-      const result = await service.findAll();
+      await service.findAll();
 
       // Verify the repository was called with correct order
       expect(mockCharacterSetRepository.find).toHaveBeenCalledWith({
@@ -237,6 +237,7 @@ describe('CharacterSetsService', () => {
           summary: 'Alice is a character',
           metadata: {},
           isActive: true,
+
           traitValues: [
             {
               traitValue: {
@@ -260,7 +261,7 @@ describe('CharacterSetsService', () => {
                 },
               },
             },
-          ] as any,
+          ] as unknown as Character['traitValues'],
         },
         {
           id: 'char-2',
@@ -270,6 +271,7 @@ describe('CharacterSetsService', () => {
           summary: 'Bob is a character',
           metadata: {},
           isActive: true,
+
           traitValues: [
             {
               traitValue: {
@@ -282,7 +284,7 @@ describe('CharacterSetsService', () => {
                 },
               },
             },
-          ] as any,
+          ] as unknown as Character['traitValues'],
         },
       ];
 
@@ -343,13 +345,15 @@ describe('CharacterSetsService', () => {
       await service.findCharacters(setId);
 
       // Verify that the query filters by isActive: true
-      expect(mockCharacterRepository.find).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            isActive: true,
-          }),
-        }),
-      );
+      expect(mockCharacterRepository.find).toHaveBeenCalledWith({
+        where: { set: { id: setId }, isActive: true },
+        relations: [
+          'traitValues',
+          'traitValues.traitValue',
+          'traitValues.traitValue.trait',
+        ],
+        order: { name: 'ASC' },
+      });
     });
 
     it('should handle characters with no trait values', async () => {
