@@ -101,12 +101,42 @@
       "goToLogin": "Go to Log In"
     }
   },
+  "game": {
+    "join": {
+      "title": "Join a Game",
+      "roomCode": "Room Code",
+      "roomCodePlaceholder": "Enter 6-character room code",
+      "joinButton": "Join Game",
+      "backToHome": "Back to Home",
+      "enterRoomCode": "Please enter a room code",
+      "invalidRoomCode": "Room code must be 6 characters",
+      "joinFailed": "Failed to join game",
+      "joining": "Joining game..."
+    }
+  },
   "footer": {
     "poweredBy": "Powered by"
   },
   "common": {
     "search": "Search",
     "language": "Language"
+  },
+  "game": {
+    "create": {
+      "title": "Create Game",
+      "characterSet": "Character Set",
+      "characterSetPlaceholder": "Select a character set",
+      "maxPlayers": "Maximum Players",
+      "maxPlayersPlaceholder": "Enter max players (optional)",
+      "turnTimer": "Turn Timer (seconds)",
+      "turnTimerPlaceholder": "Enter turn timer in seconds (optional)",
+      "createButton": "Create Game",
+      "creating": "Creating...",
+      "loadingCharacterSets": "Loading character sets...",
+      "fillCharacterSet": "Please select a character set",
+      "creationFailed": "Failed to create game",
+      "noCharacterSets": "No character sets available"
+    }
   },
   "lobby": {
     "title": "Game Lobby",

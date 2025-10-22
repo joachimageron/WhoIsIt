@@ -101,12 +101,42 @@
       "goToLogin": "Aller à la connexion"
     }
   },
+  "game": {
+    "join": {
+      "title": "Rejoindre une Partie",
+      "roomCode": "Code de Partie",
+      "roomCodePlaceholder": "Entrez le code à 6 caractères",
+      "joinButton": "Rejoindre",
+      "backToHome": "Retour à l'accueil",
+      "enterRoomCode": "Veuillez entrer un code de partie",
+      "invalidRoomCode": "Le code doit contenir 6 caractères",
+      "joinFailed": "Échec de la connexion à la partie",
+      "joining": "Connexion en cours..."
+    }
+  },
   "footer": {
     "poweredBy": "Propulsé par"
   },
   "common": {
     "search": "Rechercher",
     "language": "Langue"
+  },
+  "game": {
+    "create": {
+      "title": "Créer une partie",
+      "characterSet": "Jeu de personnages",
+      "characterSetPlaceholder": "Sélectionnez un jeu de personnages",
+      "maxPlayers": "Nombre maximum de joueurs",
+      "maxPlayersPlaceholder": "Entrez le nombre maximum de joueurs (optionnel)",
+      "turnTimer": "Temps par tour (secondes)",
+      "turnTimerPlaceholder": "Entrez le temps par tour en secondes (optionnel)",
+      "createButton": "Créer la partie",
+      "creating": "Création en cours...",
+      "loadingCharacterSets": "Chargement des jeux de personnages...",
+      "fillCharacterSet": "Veuillez sélectionner un jeu de personnages",
+      "creationFailed": "Échec de la création de la partie",
+      "noCharacterSets": "Aucun jeu de personnages disponible"
+    }
   },
   "lobby": {
     "title": "Lobby de Jeu",
