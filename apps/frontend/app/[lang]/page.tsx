@@ -21,7 +21,7 @@ export default async function Home({
           <span className={title({ size: "lg" })}>
             {dict.home.title1}&nbsp;
           </span>
-          <span className={title({ size: "lg", color: "violet" })}>
+          <span className={title({ size: "lg", color: "yellow" })}>
             {dict.home.title2}&nbsp;
           </span>
           <br />
@@ -48,7 +48,7 @@ export default async function Home({
         </Link>
         <Link
           className={buttonStyles({
-            color: "secondary",
+            color: "primary",
             radius: "lg",
             variant: "bordered",
             size: "lg",
@@ -62,11 +62,11 @@ export default async function Home({
 
       {/* How to Play Section */}
       <div className="mt-12 w-full max-w-4xl px-4">
-        <h2 className={title({ size: "sm", class: "text-center mb-8" })}>
+        <h2 className={title({ size: "sm", class: "pb-8 block" })}>
           {dict.home.howToPlay}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="bg-gradient-to-br from-violet-500/10 to-fuchsia-500/10">
+          <Card className="bg-default-50">
             <CardBody className="text-center p-6">
               <div className="text-4xl mb-4">🎮</div>
               <h3 className="text-xl font-bold mb-2">
@@ -80,7 +80,7 @@ export default async function Home({
             </CardBody>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10">
+          <Card className="bg-default-50">
             <CardBody className="text-center p-6">
               <div className="text-4xl mb-4">❓</div>
               <h3 className="text-xl font-bold mb-2">
@@ -94,7 +94,7 @@ export default async function Home({
             </CardBody>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10">
+          <Card className="bg-default-50">
             <CardBody className="text-center p-6">
               <div className="text-4xl mb-4">🏆</div>
               <h3 className="text-xl font-bold mb-2">
