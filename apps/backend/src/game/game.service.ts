@@ -148,7 +148,7 @@ export class GameService {
 
     // Check if this player already exists in the game (including those who left)
     let existingPlayer: GamePlayer | undefined;
-    
+
     if (joiningUser) {
       // For authenticated users, match by userId
       existingPlayer = game.players?.find(
@@ -182,7 +182,7 @@ export class GameService {
       existingPlayer.leftAt = null;
       existingPlayer.isReady = false;
       existingPlayer.username = username; // Update username in case it changed
-      
+
       const preferredAvatar = request.avatarUrl?.trim();
       if (preferredAvatar && preferredAvatar.length > 0) {
         existingPlayer.avatarUrl = preferredAvatar;
