@@ -695,6 +695,42 @@ describe('GameService', () => {
     });
   });
 
+  describe('markPlayerAsLeft', () => {
+    it('should successfully mark player as left', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-123',
+        leftAt: null,
+        game: { status: GameStatus.LOBBY } as Game,
+      } as GamePlayer;
+
+      mockPlayerRepository.findOne.mockResolvedValue(mockPlayer);
+      mockPlayerRepository.save.mockImplementation((player) =>
+        Promise.resolve(player),
+      );
+
+      const result = await service.markPlayerAsLeft('player-123');
+
+      expect(result.leftAt).toBeInstanceOf(Date);
+      expect(mockPlayerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'player-123',
+          leftAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it('should throw NotFoundException if player not found', async () => {
+      mockPlayerRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.markPlayerAsLeft('non-existent')).rejects.toThrow(
+        NotFoundException,
+      );
+      await expect(service.markPlayerAsLeft('non-existent')).rejects.toThrow(
+        'Player not found',
+      );
+    });
+  });
+
   describe('startGame', () => {
     it('should successfully start a game with all players ready', async () => {
       const mockCharacterSet: CharacterSet = {

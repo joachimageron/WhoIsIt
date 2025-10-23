@@ -83,6 +83,11 @@ export type SocketPlayerJoinedEvent = {
   lobby: GameLobbyResponse;
 };
 
+export type SocketPlayerLeftEvent = {
+  roomCode: string;
+  lobby: GameLobbyResponse;
+};
+
 export type SocketGameStartedEvent = {
   roomCode: string;
   lobby: GameLobbyResponse;
@@ -92,6 +97,7 @@ export type SocketGameStartedEvent = {
 export interface ServerToClientEvents {
   lobbyUpdate: (lobby: GameLobbyResponse) => void;
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
+  playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
 }
 

@@ -237,6 +237,20 @@ export class GameService {
     return this.playerRepository.save(player);
   }
 
+  async markPlayerAsLeft(playerId: string): Promise<GamePlayer> {
+    const player = await this.playerRepository.findOne({
+      where: { id: playerId },
+      relations: { game: true },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    player.leftAt = new Date();
+    return this.playerRepository.save(player);
+  }
+
   async startGame(roomCode: string): Promise<GameLobbyResponse> {
     const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
@@ -393,11 +407,13 @@ export class GameService {
   }
 
   private mapToLobbyResponse(game: Game): GameLobbyResponse {
-    const players = [...(game.players ?? [])].sort((a, b) => {
-      const aTime = a.joinedAt?.getTime?.() ?? 0;
-      const bTime = b.joinedAt?.getTime?.() ?? 0;
-      return aTime - bTime;
-    });
+    const players = [...(game.players ?? [])]
+      .filter((player) => !player.leftAt) // Filter out players who have left
+      .sort((a, b) => {
+        const aTime = a.joinedAt?.getTime?.() ?? 0;
+        const bTime = b.joinedAt?.getTime?.() ?? 0;
+        return aTime - bTime;
+      });
 
     const playerResponses: GamePlayerResponse[] = players.map((player) => ({
       id: player.id,
