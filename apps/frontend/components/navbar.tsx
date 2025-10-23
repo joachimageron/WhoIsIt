@@ -129,10 +129,9 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
               />
             </Tooltip>
           ) : (
-            <>
+            <div className="flex gap-2">
               <Button
                 as={NextLink}
-                className="text-sm font-normal text-default-600"
                 href={`/${lang}/auth/login`}
                 variant="flat"
               >
@@ -140,14 +139,13 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
               </Button>
               <Button
                 as={NextLink}
-                className="text-sm font-normal"
                 color="primary"
                 href={`/${lang}/auth/register`}
                 variant="flat"
               >
                 {dict.nav.signUp}
               </Button>
-            </>
+            </div>
           )}
         </NavbarItem>
       </NavbarContent>
@@ -158,7 +156,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu>
+      <NavbarMenu >
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item.label}-${index}`}>
