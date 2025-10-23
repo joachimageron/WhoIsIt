@@ -602,6 +602,178 @@ describe('GameService', () => {
       expect(result).toBeDefined();
       expect(mockPlayerRepository.create).not.toHaveBeenCalled();
     });
+
+    it('should allow authenticated user to rejoin after leaving', async () => {
+      const mockUser: User = {
+        id: 'user-789',
+        username: 'rejoinuser',
+        avatarUrl: 'https://example.com/avatar.jpg',
+      } as User;
+
+      const mockCharacterSet: CharacterSet = {
+        id: 'char-set-123',
+        name: 'Test Set',
+      } as CharacterSet;
+
+      const mockPlayer: GamePlayer = {
+        id: 'player-789',
+        user: mockUser,
+        username: 'rejoinuser',
+        avatarUrl: mockUser.avatarUrl,
+        leftAt: new Date('2024-01-01T10:00:00Z'), // Player previously left
+        isReady: false,
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        characterSet: mockCharacterSet,
+        players: [mockPlayer],
+        createdAt: new Date(),
+      } as Game;
+
+      const joinRequest: JoinGameRequest = {
+        userId: 'user-789',
+        username: 'rejoinuser',
+      };
+
+      mockGameRepository.findOne
+        .mockResolvedValueOnce(mockGame)
+        .mockResolvedValueOnce({
+          ...mockGame,
+          players: [{ ...mockPlayer, leftAt: null }],
+        });
+      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockPlayerRepository.save.mockImplementation((player) =>
+        Promise.resolve({ ...player, leftAt: null }),
+      );
+
+      const result = await service.joinGame('ABC12', joinRequest);
+
+      expect(result).toBeDefined();
+      expect(mockPlayerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'player-789',
+          leftAt: null,
+          isReady: false,
+        }),
+      );
+      expect(mockPlayerRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should allow guest to rejoin after leaving (matched by username)', async () => {
+      const mockCharacterSet: CharacterSet = {
+        id: 'char-set-123',
+        name: 'Test Set',
+      } as CharacterSet;
+
+      const mockGuestPlayer: GamePlayer = {
+        id: 'player-guest-123',
+        username: 'guestplayer',
+        user: null,
+        leftAt: new Date('2024-01-01T10:00:00Z'), // Guest previously left
+        isReady: false,
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        characterSet: mockCharacterSet,
+        players: [mockGuestPlayer],
+        createdAt: new Date(),
+      } as Game;
+
+      const joinRequest: JoinGameRequest = {
+        username: 'guestplayer',
+      };
+
+      mockGameRepository.findOne
+        .mockResolvedValueOnce(mockGame)
+        .mockResolvedValueOnce({
+          ...mockGame,
+          players: [{ ...mockGuestPlayer, leftAt: null }],
+        });
+      mockPlayerRepository.save.mockImplementation((player) =>
+        Promise.resolve({ ...player, leftAt: null }),
+      );
+
+      const result = await service.joinGame('ABC12', joinRequest);
+
+      expect(result).toBeDefined();
+      expect(mockPlayerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 'player-guest-123',
+          leftAt: null,
+          isReady: false,
+        }),
+      );
+      expect(mockPlayerRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should count only active players when checking if game is full', async () => {
+      const mockCharacterSet: CharacterSet = {
+        id: 'char-set-123',
+        name: 'Test Set',
+      } as CharacterSet;
+
+      const mockLeftPlayer: GamePlayer = {
+        id: 'player-left',
+        username: 'leftplayer',
+        leftAt: new Date('2024-01-01T10:00:00Z'),
+      } as GamePlayer;
+
+      const mockActivePlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'active1',
+      } as GamePlayer;
+
+      const mockActivePlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'active2',
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.LOBBY,
+        characterSet: mockCharacterSet,
+        maxPlayers: 3,
+        players: [mockLeftPlayer, mockActivePlayer1, mockActivePlayer2],
+        createdAt: new Date(),
+      } as Game;
+
+      const mockNewPlayer: GamePlayer = {
+        id: 'player-new',
+        username: 'newplayer',
+      } as GamePlayer;
+
+      const joinRequest: JoinGameRequest = {
+        username: 'newplayer',
+      };
+
+      mockGameRepository.findOne
+        .mockResolvedValueOnce(mockGame)
+        .mockResolvedValueOnce({
+          ...mockGame,
+          players: [
+            mockLeftPlayer,
+            mockActivePlayer1,
+            mockActivePlayer2,
+            mockNewPlayer,
+          ],
+        });
+      mockPlayerRepository.create.mockReturnValue(mockNewPlayer);
+      mockPlayerRepository.save.mockResolvedValue(mockNewPlayer);
+
+      const result = await service.joinGame('ABC12', joinRequest);
+
+      expect(result).toBeDefined();
+      expect(mockPlayerRepository.create).toHaveBeenCalled();
+      // Should succeed even though there are 3 total players,
+      // because one has left and maxPlayers is 3
+    });
   });
 
   describe('getLobbyByRoomCode', () => {

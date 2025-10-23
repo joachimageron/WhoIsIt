@@ -136,14 +136,6 @@ export class GameService {
       throw new BadRequestException('Game is not joinable');
     }
 
-    if (
-      typeof game.maxPlayers === 'number' &&
-      game.players &&
-      game.players.length >= game.maxPlayers
-    ) {
-      throw new BadRequestException('Game is full');
-    }
-
     let joiningUser: User | null = null;
     if (request.userId) {
       joiningUser = await this.userRepository.findOne({
@@ -152,12 +144,26 @@ export class GameService {
       if (!joiningUser) {
         throw new NotFoundException('Joining user not found');
       }
+    }
 
-      const alreadyJoined = game.players?.some(
+    // Check if this player already exists in the game (including those who left)
+    let existingPlayer: GamePlayer | undefined;
+    
+    if (joiningUser) {
+      // For authenticated users, match by userId
+      existingPlayer = game.players?.find(
         (player) => player.user?.id === joiningUser?.id,
       );
-      if (alreadyJoined) {
-        return this.mapToLobbyResponse(game);
+    } else {
+      // For guests, match by username (case-insensitive)
+      const requestUsername = request.username?.trim();
+      if (requestUsername) {
+        existingPlayer = game.players?.find(
+          (player) =>
+            !player.user && // Must be a guest player
+            player.username &&
+            player.username.toLowerCase() === requestUsername.toLowerCase(),
+        );
       }
     }
 
@@ -166,6 +172,40 @@ export class GameService {
       throw new BadRequestException('A username is required');
     }
 
+    if (existingPlayer) {
+      // If player already exists and hasn't left, return current state
+      if (!existingPlayer.leftAt) {
+        return this.mapToLobbyResponse(game);
+      }
+
+      // Player is rejoining - clear leftAt and reset ready state
+      existingPlayer.leftAt = null;
+      existingPlayer.isReady = false;
+      existingPlayer.username = username; // Update username in case it changed
+      
+      const preferredAvatar = request.avatarUrl?.trim();
+      if (preferredAvatar && preferredAvatar.length > 0) {
+        existingPlayer.avatarUrl = preferredAvatar;
+      } else if (joiningUser?.avatarUrl) {
+        existingPlayer.avatarUrl = joiningUser.avatarUrl;
+      }
+
+      await this.playerRepository.save(existingPlayer);
+
+      const refreshedGame = await this.loadLobbyById(game.id);
+      return this.mapToLobbyResponse(refreshedGame);
+    }
+
+    // Check if game is full (only count active players)
+    const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+    if (
+      typeof game.maxPlayers === 'number' &&
+      activePlayers.length >= game.maxPlayers
+    ) {
+      throw new BadRequestException('Game is full');
+    }
+
+    // Create new player
     const preferredAvatar = request.avatarUrl?.trim();
 
     const player = this.playerRepository.create({
