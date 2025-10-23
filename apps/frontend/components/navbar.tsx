@@ -41,7 +41,6 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
   };
 
   const navItems = [
-    { label: dict.nav.home, href: `/${lang}` },
     { label: dict.nav.createGame, href: `/${lang}/game/create` },
     { label: dict.nav.joinGame, href: `/${lang}/game/join` },
   ];
@@ -63,7 +62,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
             <p className="font-bold text-inherit">WhoIsIt</p>
           </NextLink>
         </NavbarBrand>
-        <ul className="hidden lg:flex gap-4 justify-start ml-2">
+        <ul className="hidden sm:flex gap-4 justify-start ml-2">
           {navItems.map((item) => (
             <NavbarItem key={item.href}>
               <NextLink
@@ -89,7 +88,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
           <ThemeSwitch />
           <LanguageSwitcher currentLang={lang} />
         </NavbarItem>
-        <NavbarItem className="hidden md:flex">
+        <NavbarItem className="hidden sm:flex">
           {isAuthenticated && user ? (
             <Tooltip
               content={

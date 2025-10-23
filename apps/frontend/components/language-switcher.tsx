@@ -1,41 +1,37 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { Button } from "@heroui/button";
-import NextLink from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { Select, SelectItem } from "@heroui/select";
+import { ChangeEventHandler } from "react";
 
-const locales = [
-  { code: "en", label: "EN" },
-  { code: "fr", label: "FR" },
-];
+const locales = ["en", "fr"];
 
 export const LanguageSwitcher = ({ currentLang }: { currentLang: string }) => {
   const pathname = usePathname();
+  const router = useRouter();
 
-  const switchLocale = (newLocale: string) => {
-    if (!pathname) return "/";
+  const switchLocale: ChangeEventHandler<HTMLSelectElement> = (e) => {
+    if (!e || typeof e !== "object" || !("target" in e)) return;
+    if (!pathname) return;
     const segments = pathname.split("/");
 
-    segments[1] = newLocale;
+    segments[1] = e.target.value;
 
-    return segments.join("/");
+    router.push(segments.join("/"));
   };
 
   return (
     <div className="flex gap-1">
-      {locales.map((locale) => (
-        <Button
-          key={locale.code}
-          as={NextLink}
-          className="min-w-unit-12"
-          color={currentLang === locale.code ? "primary" : "default"}
-          href={switchLocale(locale.code)}
-          size="sm"
-          variant={currentLang === locale.code ? "solid" : "light"}
-        >
-          {locale.label}
-        </Button>
-      ))}
+      <Select
+      className="w-18"
+        selectedKeys={[currentLang]}
+        variant="bordered"
+        onChange={switchLocale}
+      >
+        {locales.map((local) => (
+          <SelectItem key={local}>{local}</SelectItem>
+        ))}
+      </Select>
     </div>
   );
 };
