@@ -59,6 +59,7 @@ export type SocketJoinRoomResponse = {
 
 export type SocketLeaveRoomRequest = {
   roomCode: string;
+  playerId?: string;
 };
 
 export type SocketLeaveRoomResponse = {

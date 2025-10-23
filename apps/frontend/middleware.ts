@@ -8,7 +8,7 @@ const locales = ["en", "fr"];
 const defaultLocale = "en";
 
 // Routes that require authentication or guest session
-const protectedGameRoutes = ["/game"];
+const protectedGameRoutes = ["/game/create"];
 
 function getLocale(request: NextRequest): string {
   // Get locale from Accept-Language header

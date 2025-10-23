@@ -211,7 +211,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     try {
       // Leave the room via Socket.IO
       if (currentPlayer) {
-        await leaveRoom({ roomCode });
+        await leaveRoom({ roomCode, playerId: currentPlayer.id });
       }
     } catch {
       // Ignore errors when leaving
