@@ -1,29 +1,21 @@
 {
   "nav": {
     "home": "Home",
-    "docs": "Docs",
-    "pricing": "Pricing",
-    "blog": "Blog",
-    "about": "About",
-    "profile": "Profile",
-    "dashboard": "Dashboard",
-    "projects": "Projects",
-    "team": "Team",
-    "calendar": "Calendar",
-    "settings": "Settings",
-    "helpFeedback": "Help & Feedback",
-    "logout": "Logout",
+    "createGame": "Create Game",
+    "joinGame": "Join Game",
     "login": "Login",
-    "signUp": "Sign Up"
+    "signUp": "Sign Up",
+    "settings": "Settings",
+    "logout": "Logout"
   },
   "home": {
-    "title1": "Build",
-    "title2": "WhoIsIt",
-    "title3": "games with collaborative, real-time clues.",
-    "subtitle": "Spin up matches instantly with HeroUI, Socket.IO and Zustand.",
-    "frontendDocs": "Frontend docs",
-    "backendDocs": "Backend docs",
-    "getStarted": "Get started by editing"
+    "title1": "Guess",
+    "title2": "Who's Who",
+    "title3": "in real-time multiplayer experience!",
+    "subtitle": "Create or join a game, ask questions and find your opponents' mystery characters.",
+    "createGameButton": "Create a Game",
+    "joinGameButton": "Join a Game",
+    "howToPlay": "How to Play"
   },
   "about": {
     "title": "About"
