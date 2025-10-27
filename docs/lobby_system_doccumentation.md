@@ -281,7 +281,7 @@ GamePlayer {
 
 ### Scénario 1: Rejoin Utilisateur Authentifié
 
-```
+```asciidoc
 1. UserA (userId="abc") rejoint le lobby
    → GamePlayer créé avec user.id="abc", leftAt=null
    
@@ -298,7 +298,7 @@ GamePlayer {
 
 ### Scénario 2: Rejoin Invité
 
-```
+```asciidoc
 1. Guest rejoint avec username="GuestPlayer"
    → GamePlayer créé avec user=null, username="GuestPlayer"
    
@@ -315,7 +315,7 @@ GamePlayer {
 
 ### Scénario 3: Capacité avec Joueurs Partis
 
-```
+```asciidoc
 Lobby: maxPlayers = 3
 
 État actuel:
@@ -335,7 +335,7 @@ Si Player3 essaie de revenir après Player4:
 
 ### Scénario 4: Invité Déconnecté (WebSocket)
 
-```
+```asciidoc
 1. Guest rejoint via REST API
    → GamePlayer créé, playerId="guest-123"
    
@@ -357,7 +357,7 @@ Si Player3 essaie de revenir après Player4:
 
 ### Scénario 5: Leave via Socket.IO
 
-```
+```asciidoc
 Cas A: Utilisateur Authentifié Leave
 → playerId disponible via:
   1. Paramètre leaveRoom({ playerId })
@@ -493,7 +493,7 @@ const currentPlayer = lobby?.players.find(
 
 ### Gestion des Déconnexions
 
-```
+```asciidoc
 WebSocket Déconnexion:
 → handleDisconnect() appelé automatiquement
 → Connection supprimée de connectedUsers
@@ -713,7 +713,7 @@ WHERE game_id = 'game-uuid'
 
 ### Diagramme de Séquence: Join Complet
 
-```
+```asciidoc
 Client          REST API        Socket.IO       Database
   |                |                |               |
   |-- POST join -->|                |               |
@@ -734,7 +734,7 @@ Client          REST API        Socket.IO       Database
 
 ### Diagramme de Séquence: Leave
 
-```
+```asciidoc
 Client          Socket.IO       Database
   |                |               |
   |-- emit leaveRoom ->            |
