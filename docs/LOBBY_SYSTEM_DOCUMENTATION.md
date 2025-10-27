@@ -133,6 +133,7 @@ socket.emit('joinRoom', {
 ```
 
 **Événements émis:**
+
 - `lobbyUpdate` → Au joueur qui rejoint
 - `playerJoined` → Aux autres joueurs dans le lobby
 
@@ -169,6 +170,7 @@ socket.emit('leaveRoom', {
 ```
 
 **Événements émis:**
+
 - `playerLeft` → Aux autres joueurs
 - `lobbyUpdate` → Aux autres joueurs
 
@@ -192,6 +194,7 @@ socket.emit('updatePlayerReady', {
 ```
 
 **Événement émis:**
+
 - `lobbyUpdate` → À tous les joueurs dans le lobby
 
 ### 5. Démarrer la Partie
@@ -216,6 +219,7 @@ POST /games/:roomCode/start
 ```
 
 **Événement émis:**
+
 - `gameStarted` → À tous les joueurs
 
 ## Gestion des Joueurs
@@ -223,6 +227,7 @@ POST /games/:roomCode/start
 ### Types de Joueurs
 
 #### 1. Utilisateur Authentifié
+
 ```typescript
 GamePlayer {
   id: "uuid",
@@ -239,6 +244,7 @@ GamePlayer {
 **Identification:** Par `userId`
 
 #### 2. Invité (Guest)
+
 ```typescript
 GamePlayer {
   id: "uuid",
@@ -404,6 +410,7 @@ private mapToLobbyResponse(game: Game): GameLobbyResponse {
 ```
 
 **Points clés:**
+
 - Seuls les joueurs avec `leftAt = null` sont inclus
 - Tri par date de join (anciens d'abord)
 - `leftAt` dans la réponse est toujours undefined car filtré
@@ -672,6 +679,7 @@ WHERE game_id = 'game-uuid'
 ### Problème: Invité ne disparaît pas après leave
 
 **Solution:** S'assurer que:
+
 1. `playerId` est envoyé dans `leaveRoom()`
 2. `connection.playerId` est défini dans `joinRoom()`
 3. `markPlayerAsLeft()` est appelé avec le bon playerId
@@ -679,6 +687,7 @@ WHERE game_id = 'game-uuid'
 ### Problème: Joueur apparaît en doublon après rejoin
 
 **Solution:** Vérifier:
+
 1. Logique de recherche dans `joinGame()`
 2. Pour authentifiés: match par `userId`
 3. Pour invités: match par `username` insensible casse
@@ -687,6 +696,7 @@ WHERE game_id = 'game-uuid'
 ### Problème: Lobby affiche joueurs partis
 
 **Solution:** Vérifier:
+
 1. `mapToLobbyResponse()` filtre `!player.leftAt`
 2. `leftAt` est bien défini dans `markPlayerAsLeft()`
 3. Backend émet `lobbyUpdate` après leave
@@ -694,6 +704,7 @@ WHERE game_id = 'game-uuid'
 ### Problème: "Game is full" mais places libres
 
 **Solution:** Vérifier:
+
 1. Compte seulement `filter(p => !p.leftAt)`
 2. Pas de comptage de tous les GamePlayer
 3. Query TypeORM charge bien les relations
@@ -741,14 +752,17 @@ Client          Socket.IO       Database
 ## Résumé des Corrections Récentes
 
 ### Fix #1: Rejoin Logic
+
 - **Problème:** Joueurs invisibles après rejoin
 - **Solution:** Effacer `leftAt` sur rejoin existant
 
 ### Fix #2: Guest Leave
+
 - **Problème:** Invités ne disparaissent pas
 - **Solution:** Tracker et utiliser `playerId` dans connections
 
 ### Fix #3: Capacity Check
+
 - **Problème:** Joueurs partis bloquent nouveaux joins
 - **Solution:** Compter seulement `leftAt = null`
 
