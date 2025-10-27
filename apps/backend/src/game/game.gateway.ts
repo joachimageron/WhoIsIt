@@ -34,6 +34,7 @@ interface ConnectedUser {
   socketId: string;
   userId: string | null;
   roomCode: string | null;
+  playerId: string | null; // Add playerId tracking
   connectedAt: Date;
   lastSeenAt: Date;
 }
@@ -92,6 +93,7 @@ export class GameGateway
       socketId: client.id,
       userId,
       roomCode: null,
+      playerId: null, // Initialize playerId
       connectedAt: new Date(),
       lastSeenAt: new Date(),
     });
@@ -129,7 +131,7 @@ export class GameGateway
     @MessageBody() data: SocketJoinRoomRequest,
   ): Promise<SocketJoinRoomResponse> {
     try {
-      const { roomCode } = data;
+      const { roomCode, playerId } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
       // Join the Socket.IO room
@@ -139,6 +141,7 @@ export class GameGateway
       const connection = this.connectedUsers.get(client.id);
       if (connection) {
         connection.roomCode = normalizedRoomCode;
+        connection.playerId = playerId ?? null; // Store the playerId
         connection.lastSeenAt = new Date();
       }
 
@@ -173,33 +176,34 @@ export class GameGateway
     @MessageBody() data: SocketLeaveRoomRequest,
   ): Promise<SocketLeaveRoomResponse> {
     try {
-      const { roomCode } = data;
+      const { roomCode, playerId: requestPlayerId } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
-      // Get the current player ID from connection tracking
+      // Get the player ID from either the request or connection tracking
       const connection = this.connectedUsers.get(client.id);
-      let playerId: string | null = null;
+      let playerId: string | null =
+        requestPlayerId ?? connection?.playerId ?? null;
 
-      // Try to find the player in the lobby
-      try {
-        const lobby =
-          await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
-        const userId = client.user?.id;
-        const username = client.user?.username;
+      // If we still don't have a playerId, try to find it from the lobby
+      if (!playerId) {
+        try {
+          const lobby =
+            await this.gameService.getLobbyByRoomCode(normalizedRoomCode);
+          const userId = client.user?.id;
 
-        // Find the player by userId or username
-        const player = lobby.players.find(
-          (p) =>
-            (userId && p.userId === userId) ||
-            (username && p.username === username),
-        );
-
-        if (player) {
-          playerId = player.id;
+          // Try to find the player by userId (for authenticated users)
+          if (userId) {
+            const player = lobby.players.find((p) => p.userId === userId);
+            if (player) {
+              playerId = player.id;
+            }
+          }
+        } catch {
+          // If we can't get the lobby, that's okay - player might have already left
+          this.logger.warn(
+            `Could not get lobby for room ${normalizedRoomCode}`,
+          );
         }
-      } catch {
-        // If we can't get the lobby, that's okay - player might have already left
-        this.logger.warn(`Could not get lobby for room ${normalizedRoomCode}`);
       }
 
       // Leave the Socket.IO room first
@@ -208,6 +212,7 @@ export class GameGateway
       // Update connection tracking
       if (connection && connection.roomCode === normalizedRoomCode) {
         connection.roomCode = null;
+        connection.playerId = null; // Clear the playerId
         connection.lastSeenAt = new Date();
       }
 

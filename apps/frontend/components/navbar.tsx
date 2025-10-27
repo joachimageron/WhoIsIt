@@ -129,11 +129,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
             </Tooltip>
           ) : (
             <div className="flex gap-2">
-              <Button
-                as={NextLink}
-                href={`/${lang}/auth/login`}
-                variant="flat"
-              >
+              <Button as={NextLink} href={`/${lang}/auth/login`} variant="flat">
                 {dict.nav.login}
               </Button>
               <Button
@@ -155,7 +151,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
         <NavbarMenuToggle />
       </NavbarContent>
 
-      <NavbarMenu >
+      <NavbarMenu>
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item.label}-${index}`}>

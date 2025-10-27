@@ -51,24 +51,24 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
       // Join the game with user info if authenticated, or as guest
       const joinData = user
         ? {
-            username: user.username,
-            userId: user.id,
-            avatarUrl: user.avatarUrl || undefined,
+        username: user.username,
+        userId: user.id,
+        avatarUrl: user.avatarUrl || undefined,
           }
         : {
-            username: "Guest", // Guest players will need to provide a username
+        username: `Guest-${Math.random().toString(36).substring(2, 7)}`, // Guest players with random suffix
           };
 
       await gameApi.joinGame(trimmedCode, joinData);
 
       // Redirect to lobby page
       router.push(`/${lang}/game/lobby/${trimmedCode}`);
-    } catch (err) {
+        } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : dict.game.join.joinFailed;
 
       setError(errorMessage);
-    } finally {
+        } finally {
       setIsLoading(false);
     }
   };
