@@ -14,6 +14,7 @@ import {
   PlayerSecretStatus,
   QuestionCategory,
   AnswerType,
+  AnswerValue,
 } from '../database/enums';
 import {
   CharacterSet,
@@ -24,6 +25,7 @@ import {
   PlayerSecret,
   Character,
   Question,
+  Answer,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -34,6 +36,8 @@ import type {
   AskQuestionRequest,
   QuestionResponse,
   GameStateResponse,
+  SubmitAnswerRequest,
+  AnswerResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -58,6 +62,8 @@ export class GameService {
     private readonly characterRepository: Repository<Character>,
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
+    @InjectRepository(Answer)
+    private readonly answerRepository: Repository<Answer>,
   ) {}
 
   /**
@@ -718,6 +724,220 @@ export class GameService {
       category: question.category,
       answerType: question.answerType,
       askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Submit an answer to a question
+   */
+  async submitAnswer(
+    roomCode: string,
+    request: SubmitAnswerRequest,
+  ): Promise<AnswerResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Get the game with all necessary relations
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+        rounds: true,
+      },
+      order: {
+        rounds: { roundNumber: 'DESC' },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    // Get the current round
+    const currentRound = game.rounds?.[0];
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    if (currentRound.state !== RoundState.AWAITING_ANSWER) {
+      throw new BadRequestException(
+        `Cannot submit answer in round state: ${currentRound.state}`,
+      );
+    }
+
+    // Get the question being answered
+    const question = await this.questionRepository.findOne({
+      where: { id: request.questionId },
+      relations: {
+        round: true,
+        askedBy: true,
+        targetPlayer: true,
+        answers: true,
+      },
+    });
+
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    if (question.round.id !== currentRound.id) {
+      throw new BadRequestException('Question is not for the current round');
+    }
+
+    // Check if question has already been answered
+    if (question.answers && question.answers.length > 0) {
+      throw new BadRequestException('Question has already been answered');
+    }
+
+    // Get the player submitting the answer
+    const answeringPlayer = await this.playerRepository.findOne({
+      where: { id: request.playerId },
+      relations: { game: true, secret: { character: { traitValues: { traitValue: { trait: true } } } } },
+    });
+
+    if (!answeringPlayer) {
+      throw new NotFoundException('Player not found');
+    }
+
+    if (answeringPlayer.game.id !== game.id) {
+      throw new BadRequestException('Player is not in this game');
+    }
+
+    // Validate that the answering player is the target player (if specified)
+    if (question.targetPlayer) {
+      if (question.targetPlayer.id !== answeringPlayer.id) {
+        throw new BadRequestException(
+          'Only the targeted player can answer this question',
+        );
+      }
+    } else {
+      // If no target player specified, any player except the asker can answer
+      if (question.askedBy.id === answeringPlayer.id) {
+        throw new BadRequestException('Cannot answer your own question');
+      }
+    }
+
+    // Calculate the answer based on the player's secret character
+    const calculatedAnswer = await this.calculateAnswer(
+      answeringPlayer,
+      question,
+      request,
+    );
+
+    // Create the answer
+    const answer = this.answerRepository.create({
+      question,
+      answeredBy: answeringPlayer,
+      answerValue: calculatedAnswer.answerValue,
+      answerText: calculatedAnswer.answerText,
+      latencyMs: calculatedAnswer.latencyMs,
+    });
+
+    const savedAnswer = await this.answerRepository.save(answer);
+
+    // Update the round state to AWAITING_QUESTION (next turn)
+    await this.advanceToNextTurn(currentRound, game);
+
+    // Return the answer response
+    return this.mapToAnswerResponse(savedAnswer, answeringPlayer);
+  }
+
+  /**
+   * Calculate the answer based on the player's secret character
+   */
+  private async calculateAnswer(
+    player: GamePlayer,
+    question: Question,
+    request: SubmitAnswerRequest,
+  ): Promise<{
+    answerValue: AnswerValue;
+    answerText?: string | null;
+    latencyMs?: number | null;
+  }> {
+    // If the player doesn't have a secret character yet, throw an error
+    if (!player.secret || !player.secret.character) {
+      throw new InternalServerErrorException(
+        'Player does not have a secret character assigned',
+      );
+    }
+
+    const secretCharacter = player.secret.character;
+
+    // For boolean questions, automatically determine the answer based on traits
+    if (question.answerType === AnswerType.BOOLEAN) {
+      // Use the provided answer value (player decides based on their secret character)
+      return {
+        answerValue: request.answerValue as AnswerValue,
+        answerText: null,
+        latencyMs: null,
+      };
+    }
+
+    // For text questions, use the provided answer text
+    if (question.answerType === AnswerType.TEXT) {
+      return {
+        answerValue: request.answerValue as AnswerValue,
+        answerText: request.answerText ?? null,
+        latencyMs: null,
+      };
+    }
+
+    // Default fallback
+    return {
+      answerValue: request.answerValue as AnswerValue,
+      answerText: request.answerText ?? null,
+      latencyMs: null,
+    };
+  }
+
+  /**
+   * Advance to the next player's turn
+   */
+  private async advanceToNextTurn(
+    currentRound: Round,
+    game: Game,
+  ): Promise<void> {
+    // Get all active players
+    const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+
+    if (activePlayers.length === 0) {
+      throw new InternalServerErrorException('No active players found');
+    }
+
+    // Find the current active player's index
+    const currentPlayerIndex = activePlayers.findIndex(
+      (p) => p.id === currentRound.activePlayer?.id,
+    );
+
+    // Get the next player (circular)
+    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
+    const nextPlayer = activePlayers[nextPlayerIndex];
+
+    // Update the round state
+    currentRound.state = RoundState.AWAITING_QUESTION;
+    currentRound.activePlayer = nextPlayer;
+    await this.roundRepository.save(currentRound);
+  }
+
+  /**
+   * Map Answer entity to AnswerResponse
+   */
+  private mapToAnswerResponse(
+    answer: Answer,
+    answeringPlayer: GamePlayer,
+  ): AnswerResponse {
+    return {
+      id: answer.id,
+      questionId: answer.question.id,
+      answeredByPlayerId: answeringPlayer.id,
+      answeredByPlayerUsername: answeringPlayer.username,
+      answerValue: answer.answerValue,
+      answerText: answer.answerText ?? undefined,
+      latencyMs: answer.latencyMs ?? undefined,
+      answeredAt: answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
     };
   }
 }

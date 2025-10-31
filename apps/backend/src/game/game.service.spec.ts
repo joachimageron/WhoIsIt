@@ -15,6 +15,7 @@ import {
   PlayerSecret,
   Character,
   Question,
+  Answer,
 } from '../database/entities';
 import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
 import type { CreateGameRequest, JoinGameRequest } from '@whois-it/contracts';
@@ -66,6 +67,12 @@ describe('GameService', () => {
     findOne: jest.fn(),
   };
 
+  const mockAnswerRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -101,6 +108,10 @@ describe('GameService', () => {
         {
           provide: getRepositoryToken(Question),
           useValue: mockQuestionRepository,
+        },
+        {
+          provide: getRepositoryToken(Answer),
+          useValue: mockAnswerRepository,
         },
       ],
     }).compile();
