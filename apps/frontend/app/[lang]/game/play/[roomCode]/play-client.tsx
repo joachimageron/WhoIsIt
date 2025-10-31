@@ -1,5 +1,7 @@
 "use client";
 
+import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
+
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody } from "@heroui/card";
@@ -13,6 +15,7 @@ import { QuestionHistory } from "./components/question-history";
 import { GameHeader } from "./components/game-header";
 import { GuessModal } from "./components/guess-modal";
 import { TurnTimer } from "./components/turn-timer";
+import { AnswerModal } from "./components/answer-modal";
 
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
@@ -27,7 +30,15 @@ interface GamePlayClientProps {
 
 export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const router = useRouter();
-  const { socket, joinRoom, leaveRoom, onQuestionAsked } = useGameSocket();
+  const {
+    socket,
+    joinRoom,
+    leaveRoom,
+    onQuestionAsked,
+    onAnswerSubmitted,
+    onGuessResult,
+    onGameOver,
+  } = useGameSocket();
   const {
     playState,
     setGameState,
@@ -41,6 +52,9 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
   const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
   const [lobby, setLobby] = useState<any>(null);
+  const [pendingQuestion, setPendingQuestion] =
+    useState<QuestionResponse | null>(null);
+  const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
 
   // Initialize game on mount
   useEffect(() => {
@@ -119,12 +133,88 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     const unsubscribeQuestionAsked = onQuestionAsked((event) => {
       addQuestion(event.question);
       setGameState(event.gameState);
+
+      // Check if this question is directed at the current player
+      if (
+        event.question.targetPlayerId &&
+        event.question.targetPlayerId === currentPlayerId
+      ) {
+        setPendingQuestion(event.question);
+        setIsAnswerModalOpen(true);
+      }
     });
 
     return () => {
       unsubscribeQuestionAsked();
     };
-  }, [onQuestionAsked, addQuestion, setGameState]);
+  }, [onQuestionAsked, addQuestion, setGameState, currentPlayerId]);
+
+  // Listen to answer submitted events
+  useEffect(() => {
+    const unsubscribeAnswerSubmitted = onAnswerSubmitted((event) => {
+      setGameState(event.gameState);
+      addToast({
+        color: "success",
+        title: dict.play.answerSubmitted || "Answer submitted",
+        description: `${event.answer.answeredByPlayerUsername} answered the question`,
+      });
+
+      // Clear pending question if it was answered
+      if (pendingQuestion && event.answer.questionId === pendingQuestion.id) {
+        setPendingQuestion(null);
+        setIsAnswerModalOpen(false);
+      }
+    });
+
+    return () => {
+      unsubscribeAnswerSubmitted();
+    };
+  }, [onAnswerSubmitted, setGameState, dict, pendingQuestion]);
+
+  // Listen to guess result events
+  useEffect(() => {
+    const unsubscribeGuessResult = onGuessResult((event) => {
+      setGameState(event.gameState);
+      const { guess } = event;
+
+      if (guess.isCorrect) {
+        addToast({
+          color: "success",
+          title: dict.play.correctGuess || "Correct guess!",
+          description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
+        });
+      } else {
+        addToast({
+          color: "danger",
+          title: dict.play.incorrectGuess || "Incorrect guess",
+          description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
+        });
+      }
+    });
+
+    return () => {
+      unsubscribeGuessResult();
+    };
+  }, [onGuessResult, setGameState, dict]);
+
+  // Listen to game over events
+  useEffect(() => {
+    const unsubscribeGameOver = onGameOver((event) => {
+      addToast({
+        color: "success",
+        title: dict.play.gameOver || "Game Over!",
+        description: event.result.winnerUsername
+          ? `${event.result.winnerUsername} won the game!`
+          : "Game ended",
+      });
+      // Navigate to results page
+      router.push(`/${lang}/game/results/${roomCode}`);
+    });
+
+    return () => {
+      unsubscribeGameOver();
+    };
+  }, [onGameOver, router, lang, roomCode, dict]);
 
   const handleLeaveGame = useCallback(async () => {
     try {
@@ -138,16 +228,92 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     }
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
 
-  const handleGuess = useCallback(async (_characterId: string) => {
-    // TODO: Implement guess API call when backend is ready
-    // For now, just show a toast
-    addToast({
-      color: "primary",
-      title: "Guess feature coming soon",
-      description:
-        "The guess functionality will be available once the backend is ready.",
-    });
-  }, []);
+  const handleGuess = useCallback(
+    async (characterId: string) => {
+      if (!currentPlayerId) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: "Player ID not found",
+        });
+
+        return;
+      }
+
+      try {
+        const guess = await gameApi.submitGuess(roomCode, {
+          playerId: currentPlayerId,
+          targetCharacterId: characterId,
+        });
+
+        setIsGuessModalOpen(false);
+
+        if (guess.isCorrect) {
+          addToast({
+            color: "success",
+            title: dict.play.correctGuess || "Correct guess!",
+            description: `You guessed correctly: ${guess.targetCharacterName}`,
+          });
+        } else {
+          addToast({
+            color: "danger",
+            title: dict.play.incorrectGuess || "Incorrect guess",
+            description: "Your guess was incorrect. You have been eliminated.",
+          });
+        }
+      } catch (error) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+    [currentPlayerId, roomCode, dict],
+  );
+
+  const handleSubmitAnswer = useCallback(
+    async (
+      questionId: string,
+      answerValue: AnswerValue,
+      answerText?: string,
+    ) => {
+      if (!currentPlayerId) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          description: "Player ID not found",
+        });
+
+        return;
+      }
+
+      try {
+        await gameApi.submitAnswer(roomCode, {
+          playerId: currentPlayerId,
+          questionId,
+          answerValue,
+          answerText,
+        });
+
+        addToast({
+          color: "success",
+          title: dict.play.answerSubmitted || "Answer submitted",
+          description: "Your answer has been submitted successfully",
+        });
+
+        setPendingQuestion(null);
+        setIsAnswerModalOpen(false);
+      } catch (error) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+    [currentPlayerId, roomCode, dict],
+  );
 
   if (isLoading || !playState || !playState.gameState) {
     return (
@@ -237,6 +403,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         isOpen={isGuessModalOpen}
         onClose={() => setIsGuessModalOpen(false)}
         onGuess={handleGuess}
+      />
+
+      {/* Answer Modal */}
+      <AnswerModal
+        dict={dict}
+        isOpen={isAnswerModalOpen}
+        question={pendingQuestion}
+        onClose={() => {
+          setIsAnswerModalOpen(false);
+          setPendingQuestion(null);
+        }}
+        onSubmitAnswer={handleSubmitAnswer}
       />
     </div>
   );

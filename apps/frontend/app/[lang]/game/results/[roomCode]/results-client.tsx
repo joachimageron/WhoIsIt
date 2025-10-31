@@ -1,6 +1,6 @@
 "use client";
 
-import type { GameResultsResponse, GameStatus } from "@whois-it/contracts";
+import type { GameOverResult } from "@whois-it/contracts";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,6 +20,7 @@ import {
 } from "@heroui/table";
 
 import { useAuthStore } from "@/store/auth-store";
+import * as gameApi from "@/lib/game-api";
 
 interface Dictionary {
   results: {
@@ -71,13 +72,16 @@ export function GameResultsClient({
 }: GameResultsClientProps) {
   const router = useRouter();
   const { user } = useAuthStore();
-  const [results, setResults] = useState<GameResultsResponse | null>(null);
+  const [results, setResults] = useState<GameOverResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Find current player in results
   const currentPlayer = results?.players.find(
-    (p) => p.username === user?.username || p.userId === user?.id,
+    (p) => p.playerUsername === user?.username || p.userId === user?.id,
   );
+
+  // Find winner
+  const winner = results?.players.find((p) => p.isWinner);
 
   // Helper function to format placement
   const formatPlacement = (placement: number): string => {
@@ -106,79 +110,9 @@ export function GameResultsClient({
       try {
         setIsLoading(true);
 
-        // TODO: Replace with actual API call when backend is ready
-        // const resultsData = await gameApi.getGameResults(roomCode);
-        // setResults(resultsData);
+        const resultsData = await gameApi.getGameResults(roomCode);
 
-        // Mock data for now (since backend is not ready)
-        const mockResults: GameResultsResponse = {
-          id: "mock-game-id",
-          roomCode: roomCode.toUpperCase(),
-          status: "completed" as GameStatus,
-          characterSetId: "classic-characters",
-          startedAt: new Date(Date.now() - 600000).toISOString(),
-          endedAt: new Date().toISOString(),
-          totalRounds: 12,
-          totalDurationSeconds: 600,
-          winner: {
-            id: "player-1",
-            username: user?.username || "Player1",
-            userId: user?.id,
-            isWinner: true,
-            placement: 1,
-            questionsAsked: 8,
-            questionsAnswered: 6,
-            correctGuesses: 1,
-            incorrectGuesses: 0,
-            totalGuesses: 1,
-            timePlayedSeconds: 580,
-            finalScore: 850,
-          },
-          players: [
-            {
-              id: "player-1",
-              username: user?.username || "Player1",
-              userId: user?.id,
-              isWinner: true,
-              placement: 1,
-              questionsAsked: 8,
-              questionsAnswered: 6,
-              correctGuesses: 1,
-              incorrectGuesses: 0,
-              totalGuesses: 1,
-              timePlayedSeconds: 580,
-              finalScore: 850,
-            },
-            {
-              id: "player-2",
-              username: "Player2",
-              isWinner: false,
-              placement: 2,
-              questionsAsked: 7,
-              questionsAnswered: 8,
-              correctGuesses: 0,
-              incorrectGuesses: 1,
-              totalGuesses: 1,
-              timePlayedSeconds: 600,
-              finalScore: 650,
-            },
-            {
-              id: "player-3",
-              username: "Player3",
-              isWinner: false,
-              placement: 3,
-              questionsAsked: 5,
-              questionsAnswered: 7,
-              correctGuesses: 0,
-              incorrectGuesses: 1,
-              totalGuesses: 1,
-              timePlayedSeconds: 400,
-              finalScore: 450,
-            },
-          ],
-        };
-
-        setResults(mockResults);
+        setResults(resultsData);
       } catch (error) {
         addToast({
           color: "danger",
@@ -192,7 +126,7 @@ export function GameResultsClient({
     };
 
     loadResults();
-  }, [roomCode, user, dict, lang, router]);
+  }, [roomCode, dict, lang, router]);
 
   if (isLoading) {
     return (
@@ -213,7 +147,6 @@ export function GameResultsClient({
     return null;
   }
 
-  const winner = results.winner;
   const isCurrentPlayerWinner = currentPlayer?.isWinner || false;
 
   return (
@@ -237,19 +170,21 @@ export function GameResultsClient({
                 </h2>
                 <div className="flex items-center justify-center gap-3">
                   <Avatar
-                    name={winner.username}
+                    name={winner.playerUsername}
                     size="lg"
-                    src={winner.avatarUrl}
+                    src={undefined}
                   />
                   <div className="text-left">
-                    <p className="text-xl font-semibold">{winner.username}</p>
+                    <p className="text-xl font-semibold">
+                      {winner.playerUsername}
+                    </p>
                     <Chip color="success" size="sm" variant="flat">
                       {dict.results.winner}
                     </Chip>
                   </div>
                 </div>
                 <p className="mt-4 text-lg font-semibold text-success">
-                  {dict.results.score}: {winner.finalScore}
+                  {dict.results.score}: {winner.score}
                 </p>
                 {isCurrentPlayerWinner && (
                   <p className="mt-2 text-lg font-bold text-warning">
@@ -293,7 +228,7 @@ export function GameResultsClient({
                     {dict.results.duration}
                   </p>
                   <p className="text-lg font-semibold">
-                    {formatDuration(results.totalDurationSeconds)}
+                    {formatDuration(results.gameDurationSeconds)}
                   </p>
                 </div>
               </div>
@@ -335,9 +270,11 @@ export function GameResultsClient({
                   .sort((a, b) => a.placement - b.placement)
                   .map((player) => (
                     <TableRow
-                      key={player.id}
+                      key={player.playerId}
                       className={
-                        player.id === currentPlayer?.id ? "bg-primary-50" : ""
+                        player.playerId === currentPlayer?.playerId
+                          ? "bg-primary-50"
+                          : ""
                       }
                     >
                       <TableCell>
@@ -352,12 +289,14 @@ export function GameResultsClient({
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar
-                            name={player.username}
+                            name={player.playerUsername}
                             size="sm"
-                            src={player.avatarUrl}
+                            src={undefined}
                           />
-                          <span className="font-medium">{player.username}</span>
-                          {player.id === currentPlayer?.id && (
+                          <span className="font-medium">
+                            {player.playerUsername}
+                          </span>
+                          {player.playerId === currentPlayer?.playerId && (
                             <Chip color="primary" size="sm" variant="flat">
                               {dict.results.you}
                             </Chip>
@@ -365,9 +304,7 @@ export function GameResultsClient({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <span className="font-semibold">
-                          {player.finalScore}
-                        </span>
+                        <span className="font-semibold">{player.score}</span>
                       </TableCell>
                       <TableCell>{player.questionsAsked}</TableCell>
                       <TableCell>
