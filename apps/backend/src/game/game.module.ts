@@ -9,6 +9,7 @@ import {
   PlayerSecret,
   Character,
   Question,
+  Answer,
 } from '../database/entities';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
@@ -24,11 +25,12 @@ import { GameGateway } from './game.gateway';
       Round,
       PlayerSecret,
       Character,
-      Question
+      Question,
+      Answer,
     ]),
   ],
   controllers: [GameController],
   providers: [GameService, GameGateway],
   exports: [GameService],
 })
-export class GameModule {}
+export class GameModule { }
