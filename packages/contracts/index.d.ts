@@ -109,6 +109,7 @@ export interface ServerToClientEvents {
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
+  questionAsked: (event: SocketQuestionAskedEvent) => void;
   answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
 }
 
@@ -156,44 +157,5 @@ export type CharacterResponseDto = {
   metadata: Record<string, unknown>;
   isActive: boolean;
   traits?: TraitValueResponseDto[];
-};
-
-// Answer System Types
-export type SubmitAnswerRequest = {
-  questionId: string;
-  answerValue: AnswerValue;
-  answerText?: string | null;
-  latencyMs?: number | null;
-};
-
-export type AnswerResponse = {
-  id: string;
-  questionId: string;
-  answeredBy: {
-    id: string;
-    username: string;
-  };
-  answerValue: AnswerValue;
-  answerText?: string | null;
-  latencyMs?: number | null;
-  answeredAt: string;
-};
-
-export type QuestionResponse = {
-  id: string;
-  roundId: string;
-  askedBy: {
-    id: string;
-    username: string;
-  };
-  targetPlayer?: {
-    id: string;
-    username: string;
-  } | null;
-  questionText: string;
-  category: QuestionCategory;
-  answerType: AnswerType;
-  askedAt: string;
-  answer?: AnswerResponse;
 };
 
