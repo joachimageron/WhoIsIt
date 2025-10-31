@@ -55,6 +55,12 @@ describe('GameService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
+    createQueryBuilder: jest.fn(() => ({
+      innerJoin: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getCount: jest.fn().mockResolvedValue(0),
+    })),
   };
 
   const mockCharacterRepository = {
@@ -2200,6 +2206,480 @@ describe('GameService', () => {
           state: 'awaiting_question',
           activePlayer: mockPlayer2,
         }),
+      );
+    });
+  });
+
+  describe('submitGuess', () => {
+    it('should successfully submit a correct guess and reveal target player secret', async () => {
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        character: mockCharacter,
+        status: 'hidden' as any,
+      } as PlayerSecret;
+
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockTargetPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Target',
+        game: { id: 'game-123' } as Game,
+        secret: mockPlayerSecret,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+        players: [mockGuessingPlayer, mockTargetPlayer],
+      } as Game;
+
+      const mockGuess: Guess = {
+        id: 'guess-123',
+        round: mockRound,
+        guessedBy: mockGuessingPlayer,
+        targetPlayer: mockTargetPlayer,
+        targetCharacter: mockCharacter,
+        isCorrect: true,
+        latencyMs: null,
+        guessedAt: new Date(),
+      } as Guess;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockTargetPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
+      mockGuessRepository.create.mockReturnValue(mockGuess);
+      mockGuessRepository.save.mockResolvedValue(mockGuess);
+      mockGuessRepository.createQueryBuilder.mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(2),
+      });
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      const result = await service.submitGuess('ABC12', request);
+
+      expect(result).toBeDefined();
+      expect(result.isCorrect).toBe(true);
+      expect(result.guessedByPlayerId).toBe('player-1');
+      expect(result.targetPlayerId).toBe('player-2');
+      expect(result.targetCharacterId).toBe('char-1');
+      expect(mockPlayerSecretRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: 'revealed',
+        }),
+      );
+    });
+
+    it('should successfully submit an incorrect guess', async () => {
+      const mockCorrectCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockGuessedCharacter: Character = {
+        id: 'char-2',
+        name: 'Character 2',
+      } as Character;
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        character: mockCorrectCharacter,
+        status: 'hidden' as any,
+      } as PlayerSecret;
+
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockTargetPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Target',
+        game: { id: 'game-123' } as Game,
+        secret: mockPlayerSecret,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+        players: [mockGuessingPlayer, mockTargetPlayer],
+      } as Game;
+
+      const mockGuess: Guess = {
+        id: 'guess-123',
+        round: mockRound,
+        guessedBy: mockGuessingPlayer,
+        targetPlayer: mockTargetPlayer,
+        targetCharacter: mockGuessedCharacter,
+        isCorrect: false,
+        latencyMs: null,
+        guessedAt: new Date(),
+      } as Guess;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockTargetPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue(mockGuessedCharacter);
+      mockGuessRepository.create.mockReturnValue(mockGuess);
+      mockGuessRepository.save.mockResolvedValue(mockGuess);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-2',
+      };
+
+      const result = await service.submitGuess('ABC12', request);
+
+      expect(result).toBeDefined();
+      expect(result.isCorrect).toBe(false);
+      expect(result.guessedByPlayerId).toBe('player-1');
+      expect(result.targetPlayerId).toBe('player-2');
+      expect(result.targetCharacterId).toBe('char-2');
+      expect(mockPlayerSecretRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('should mark game as completed when only 1 unrevealed player remains', async () => {
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        character: mockCharacter,
+        status: 'hidden' as any,
+      } as PlayerSecret;
+
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockTargetPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Target',
+        game: { id: 'game-123' } as Game,
+        secret: mockPlayerSecret,
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+        players: [mockGuessingPlayer, mockTargetPlayer],
+      } as Game;
+
+      const mockGuess: Guess = {
+        id: 'guess-123',
+        round: mockRound,
+        guessedBy: mockGuessingPlayer,
+        targetPlayer: mockTargetPlayer,
+        targetCharacter: mockCharacter,
+        isCorrect: true,
+        latencyMs: null,
+        guessedAt: new Date(),
+      } as Guess;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockTargetPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
+      mockGuessRepository.create.mockReturnValue(mockGuess);
+      mockGuessRepository.save.mockResolvedValue(mockGuess);
+      mockGuessRepository.createQueryBuilder.mockReturnValue({
+        innerJoin: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        getCount: jest.fn().mockResolvedValue(1),
+      });
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await service.submitGuess('ABC12', request);
+
+      expect(mockGameRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: GameStatus.COMPLETED,
+          endedAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it('should throw NotFoundException if game not found', async () => {
+      mockGameRepository.findOne.mockResolvedValue(null);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should throw BadRequestException if game is not in progress', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.COMPLETED,
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw NotFoundException if guesser player not found', async () => {
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(null);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should throw BadRequestException if guesser is not in the game', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'different-game' } as Game,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(mockPlayer);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw NotFoundException if target character not found', async () => {
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+      } as GamePlayer;
+
+      const mockTargetPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Target',
+        game: { id: 'game-123' } as Game,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockTargetPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue(null);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+
+    it('should throw BadRequestException if guessing own character', async () => {
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockGuessingPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue({
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-1',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        BadRequestException,
+      );
+    });
+
+    it('should throw InternalServerErrorException if target player has no secret', async () => {
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockGuessingPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Guesser',
+        game: { id: 'game-123' } as Game,
+      } as GamePlayer;
+
+      const mockTargetPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Target',
+        game: { id: 'game-123' } as Game,
+        secret: null,
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne
+        .mockResolvedValueOnce(mockGuessingPlayer)
+        .mockResolvedValueOnce(mockTargetPlayer);
+      mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
+
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      await expect(service.submitGuess('ABC12', request)).rejects.toThrow(
+        InternalServerErrorException,
       );
     });
   });
