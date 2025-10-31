@@ -49,6 +49,7 @@ describe('GameService', () => {
     create: jest.fn(),
     save: jest.fn(),
     findOne: jest.fn(),
+    find: jest.fn(),
   };
 
   const mockPlayerSecretRepository = {
@@ -1140,6 +1141,456 @@ describe('GameService', () => {
       expect(error.message).toContain(
         'Not enough characters in the set for all players',
       );
+    });
+  });
+
+  describe('askQuestion', () => {
+    it('should successfully ask a question', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer],
+        rounds: [mockRound],
+      } as Game;
+
+      const mockQuestion = {
+        id: 'question-1',
+        round: mockRound,
+        askedBy: mockPlayer,
+        questionText: 'Does your character have brown hair?',
+        category: 'trait',
+        answerType: 'boolean',
+        askedAt: new Date(),
+      };
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockRoundRepository.findOne.mockResolvedValue(mockRound);
+      mockQuestionRepository.create.mockReturnValue(mockQuestion);
+      mockQuestionRepository.save.mockResolvedValue(mockQuestion);
+      mockRoundRepository.save.mockResolvedValue({
+        ...mockRound,
+        state: 'awaiting_answer',
+      });
+
+      const result = await service.askQuestion('ABC12', {
+        roomCode: 'ABC12',
+        playerId: 'player-1',
+        questionText: 'Does your character have brown hair?',
+        category: 'trait',
+        answerType: 'boolean',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.questionText).toBe('Does your character have brown hair?');
+      expect(mockQuestionRepository.save).toHaveBeenCalled();
+      expect(mockRoundRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if game not found', async () => {
+      mockGameRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.askQuestion('NOTFOUND', {
+          roomCode: 'NOTFOUND',
+          playerId: 'player-1',
+          questionText: 'Test question?',
+          category: 'trait',
+          answerType: 'boolean',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if not player turn', async () => {
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer1,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer1, mockPlayer2],
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockRoundRepository.findOne.mockResolvedValue(mockRound);
+
+      await expect(
+        service.askQuestion('ABC12', {
+          roomCode: 'ABC12',
+          playerId: 'player-2',
+          questionText: 'Test question?',
+          category: 'trait',
+          answerType: 'boolean',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('submitAnswer', () => {
+    it('should successfully submit an answer', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer,
+        state: 'awaiting_answer' as any,
+        game: { id: 'game-123' } as Game,
+      } as Round;
+
+      const mockQuestion = {
+        id: 'question-1',
+        round: mockRound,
+        askedBy: mockPlayer,
+        targetPlayer: mockPlayer,
+        questionText: 'Does your character have brown hair?',
+      } as Question;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer],
+      } as Game;
+
+      const mockPlayerSecret = {
+        id: 'secret-1',
+        player: mockPlayer,
+        character: { id: 'char-1', name: 'Character 1' } as Character,
+      } as PlayerSecret;
+
+      const mockAnswer = {
+        id: 'answer-1',
+        question: mockQuestion,
+        answeredBy: mockPlayer,
+        answerValue: 'yes',
+        answeredAt: new Date(),
+      };
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockPlayerSecretRepository.findOne.mockResolvedValue(mockPlayerSecret);
+      mockAnswerRepository.create.mockReturnValue(mockAnswer);
+      mockAnswerRepository.save.mockResolvedValue(mockAnswer);
+      mockRoundRepository.save.mockResolvedValue(mockRound);
+      mockRoundRepository.create.mockReturnValue({
+        id: 'round-2',
+        roundNumber: 2,
+      });
+
+      const result = await service.submitAnswer('ABC12', {
+        roomCode: 'ABC12',
+        playerId: 'player-1',
+        questionId: 'question-1',
+        answerValue: 'yes',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.answerValue).toBe('yes');
+      expect(mockAnswerRepository.save).toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException if question not found', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [{ id: 'player-1' } as GamePlayer],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockQuestionRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          roomCode: 'ABC12',
+          playerId: 'player-1',
+          questionId: 'non-existent',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('makeGuess', () => {
+    it('should successfully make a correct guess', async () => {
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+      } as GamePlayer;
+
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer1,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer1, mockPlayer2],
+        rounds: [mockRound],
+      } as Game;
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        player: mockPlayer2,
+        character: mockCharacter,
+      } as PlayerSecret;
+
+      const mockGuess = {
+        id: 'guess-1',
+        round: mockRound,
+        guessedBy: mockPlayer1,
+        targetPlayer: mockPlayer2,
+        targetCharacter: mockCharacter,
+        isCorrect: true,
+        guessedAt: new Date(),
+      };
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockRoundRepository.findOne.mockResolvedValue(mockRound);
+      mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
+      mockPlayerSecretRepository.findOne.mockResolvedValue(mockPlayerSecret);
+      mockGuessRepository.create.mockReturnValue(mockGuess);
+      mockGuessRepository.save.mockResolvedValue(mockGuess);
+      mockGameRepository.save.mockResolvedValue({
+        ...mockGame,
+        status: GameStatus.COMPLETED,
+      });
+
+      const result = await service.makeGuess('ABC12', {
+        roomCode: 'ABC12',
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.isCorrect).toBe(true);
+      expect(mockGuessRepository.save).toHaveBeenCalled();
+      expect(mockGameRepository.save).toHaveBeenCalled();
+    });
+
+    it('should eliminate player on incorrect guess', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as Character;
+
+      const mockWrongCharacter: Character = {
+        id: 'char-2',
+        name: 'Character 2',
+      } as Character;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer],
+        rounds: [],
+      } as Game;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer,
+        state: 'awaiting_question' as any,
+        game: mockGame,
+      } as Round;
+
+      mockGame.rounds = [mockRound];
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        player: mockPlayer,
+        character: mockCharacter,
+      } as PlayerSecret;
+
+      const mockGuess = {
+        id: 'guess-1',
+        round: mockRound,
+        guessedBy: mockPlayer,
+        targetCharacter: mockWrongCharacter,
+        isCorrect: false,
+        guessedAt: new Date(),
+      };
+
+      mockGameRepository.findOne
+        .mockResolvedValueOnce(mockGame)
+        .mockResolvedValueOnce(mockGame);
+      mockRoundRepository.findOne.mockResolvedValue(mockRound);
+      mockCharacterRepository.findOne.mockResolvedValue(mockWrongCharacter);
+      mockPlayerSecretRepository.findOne.mockResolvedValue(mockPlayerSecret);
+      mockGuessRepository.create.mockReturnValue(mockGuess);
+      mockGuessRepository.save.mockResolvedValue(mockGuess);
+      mockPlayerRepository.save.mockImplementation((player) =>
+        Promise.resolve(player),
+      );
+      mockRoundRepository.save.mockResolvedValue(mockRound);
+      mockRoundRepository.create.mockReturnValue({
+        id: 'round-2',
+        roundNumber: 2,
+      });
+
+      const result = await service.makeGuess('ABC12', {
+        roomCode: 'ABC12',
+        playerId: 'player-1',
+        targetCharacterId: 'char-2',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.isCorrect).toBe(false);
+      expect(mockPlayerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          leftAt: expect.any(Date),
+        }),
+      );
+    });
+
+    it('should throw NotFoundException if character not found', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-1',
+        roundNumber: 1,
+        activePlayer: mockPlayer,
+        state: 'awaiting_question' as any,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [mockPlayer],
+        rounds: [mockRound],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockRoundRepository.findOne.mockResolvedValue(mockRound);
+      mockCharacterRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.makeGuess('ABC12', {
+          roomCode: 'ABC12',
+          playerId: 'player-1',
+          targetCharacterId: 'non-existent',
+        }),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('checkGameOver', () => {
+    it('should return null if game not completed', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        players: [],
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
+      const result = await service.checkGameOver('ABC12');
+
+      expect(result).toBeNull();
+    });
+
+    it('should return game over result with scores', async () => {
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player 1',
+        leftAt: null,
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player 2',
+        leftAt: new Date(),
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.COMPLETED,
+        players: [mockPlayer1, mockPlayer2],
+        startedAt: new Date(Date.now() - 600000),
+        endedAt: new Date(),
+      } as Game;
+
+      const mockRounds = [
+        { id: 'round-1', roundNumber: 1 },
+        { id: 'round-2', roundNumber: 2 },
+      ];
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockRoundRepository.find.mockResolvedValue(mockRounds);
+      mockQuestionRepository.count.mockResolvedValue(5);
+      mockGuessRepository.find
+        .mockResolvedValueOnce([
+          { isCorrect: true },
+          { isCorrect: false },
+        ])
+        .mockResolvedValueOnce([{ isCorrect: false }]);
+
+      const result = await service.checkGameOver('ABC12');
+
+      expect(result).toBeDefined();
+      expect(result?.scores).toHaveLength(2);
+      expect(result?.totalRounds).toBe(2);
+      expect(result?.winnerId).toBeDefined();
     });
   });
 });
