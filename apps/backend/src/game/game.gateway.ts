@@ -335,6 +335,8 @@ export class GameGateway
 
   /**
    * Broadcast question asked event to all clients in a room
+   * Note: Round number is currently hardcoded to 0. A future enhancement
+   * would be to fetch the actual round data from the database.
    */
   broadcastQuestionAsked(roomCode: string, question: QuestionResponse): void {
     try {
@@ -365,6 +367,8 @@ export class GameGateway
 
   /**
    * Broadcast answer submitted event to all clients in a room
+   * Note: This creates minimal question and round data for the broadcast.
+   * A future enhancement would be to fetch the actual question and round data.
    */
   broadcastAnswerSubmitted(roomCode: string, answer: AnswerResponse): void {
     try {

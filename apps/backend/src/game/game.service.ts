@@ -781,6 +781,9 @@ export class GameService {
     }
 
     // Check if the guess is correct
+    // Note: Guesses require a target player because players are guessing
+    // which character another player has. If no target player is specified,
+    // the guess cannot be validated and will be marked as incorrect.
     let isCorrect = false;
     if (targetPlayer) {
       const targetSecret = await this.playerSecretRepository.findOne({
@@ -1057,7 +1060,9 @@ export class GameService {
       questionText: question.questionText,
       category: question.category,
       answerType: question.answerType,
-      askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
+      askedAt: question.askedAt
+        ? question.askedAt.toISOString()
+        : new Date().toISOString(),
     };
   }
 
@@ -1076,8 +1081,9 @@ export class GameService {
       answeredByUsername: answeredBy.username,
       answerValue: answer.answerValue,
       answerText: answer.answerText ?? undefined,
-      answeredAt:
-        answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
+      answeredAt: answer.answeredAt
+        ? answer.answeredAt.toISOString()
+        : new Date().toISOString(),
     };
   }
 
@@ -1100,7 +1106,9 @@ export class GameService {
       targetCharacterId: targetCharacter.id,
       targetCharacterName: targetCharacter.name,
       isCorrect: guess.isCorrect,
-      guessedAt: guess.guessedAt?.toISOString?.() ?? new Date().toISOString(),
+      guessedAt: guess.guessedAt
+        ? guess.guessedAt.toISOString()
+        : new Date().toISOString(),
     };
   }
 }
