@@ -198,5 +198,42 @@
       "selectCharacter": "Veuillez sélectionner un personnage",
       "enterQuestion": "Veuillez entrer une question"
     }
+  },
+  "results": {
+    "title": "Fin de Partie",
+    "winner": "Gagnant",
+    "congratulations": "Félicitations !",
+    "youWon": "Vous avez gagné !",
+    "youLost": "Plus de chance la prochaine fois !",
+    "gameStats": "Statistiques de la Partie",
+    "playerStats": "Statistiques des Joueurs",
+    "detailedStats": "Vos Statistiques Détaillées",
+    "you": "Vous",
+    "roomCode": "Code du Salon",
+    "duration": "Durée",
+    "rounds": "Manches",
+    "placement": "Classement",
+    "username": "Joueur",
+    "score": "Score",
+    "questionsAsked": "Questions Posées",
+    "questionsAnswered": "Questions Répondues",
+    "correctGuesses": "Bonnes Réponses",
+    "incorrectGuesses": "Mauvaises Réponses",
+    "totalGuesses": "Total Réponses",
+    "timePlayed": "Temps de Jeu",
+    "newGame": "Nouvelle Partie",
+    "backToHome": "Retour à l'Accueil",
+    "viewCharacterSet": "Voir le Set de Personnages",
+    "loading": "Chargement des résultats...",
+    "first": "1er",
+    "second": "2ème",
+    "third": "3ème",
+    "nth": "{n}ème",
+    "minutes": "{n} min",
+    "seconds": "{n} sec",
+    "errors": {
+      "failedToLoad": "Échec du chargement des résultats",
+      "gameNotCompleted": "Cette partie n'est pas encore terminée"
+    }
   }
 }
