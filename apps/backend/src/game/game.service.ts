@@ -1203,10 +1203,12 @@ export class GameService {
    * Calculate and assign placements to all players based on their scores
    */
   private async calculatePlacements(game: Game): Promise<void> {
-    const players = await this.playerRepository.find({
-      where: { game: { id: game.id }, leftAt: null as any },
-      order: { score: 'DESC' },
-    });
+    const players = await this.playerRepository
+      .createQueryBuilder('player')
+      .where('player.game_id = :gameId', { gameId: game.id })
+      .andWhere('player.leftAt IS NULL')
+      .orderBy('player.score', 'DESC')
+      .getMany();
 
     let currentPlacement = 1;
     let previousScore: number | null = null;
@@ -1333,9 +1335,7 @@ export class GameService {
 
     const gameDurationSeconds =
       game.startedAt && game.endedAt
-        ? Math.floor(
-            (game.endedAt.getTime() - game.startedAt.getTime()) / 1000,
-          )
+        ? Math.floor((game.endedAt.getTime() - game.startedAt.getTime()) / 1000)
         : 0;
 
     const totalRounds = game.rounds?.length ?? 0;
@@ -1353,7 +1353,10 @@ export class GameService {
           game.startedAt && player.joinedAt
             ? Math.floor(
                 ((game.endedAt ?? new Date()).getTime() -
-                  Math.max(game.startedAt.getTime(), player.joinedAt.getTime())) /
+                  Math.max(
+                    game.startedAt.getTime(),
+                    player.joinedAt.getTime(),
+                  )) /
                   1000,
               )
             : 0;

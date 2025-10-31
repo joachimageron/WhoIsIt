@@ -26,7 +26,6 @@ import type {
   GameStateResponse,
   AnswerResponse,
   GuessResponse,
-  GameOverResult,
 } from '@whois-it/contracts';
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -408,13 +407,14 @@ export class GameGateway
   async broadcastGameOver(roomCode: string) {
     try {
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
-      const result = await this.gameService.getGameOverResult(normalizedRoomCode);
-      
+      const result =
+        await this.gameService.getGameOverResult(normalizedRoomCode);
+
       this.server.to(normalizedRoomCode).emit('gameOver', {
         roomCode: normalizedRoomCode,
         result,
       });
-      
+
       this.logger.log(
         `Broadcasted game over to room ${normalizedRoomCode} (winner: ${result.winnerUsername ?? 'none'})`,
       );

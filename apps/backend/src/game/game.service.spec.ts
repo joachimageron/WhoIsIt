@@ -37,6 +37,12 @@ describe('GameService', () => {
     save: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
+    createQueryBuilder: jest.fn(() => ({
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getMany: jest.fn().mockResolvedValue([]),
+    })),
   };
 
   const mockCharacterSetRepository = {
@@ -2447,6 +2453,12 @@ describe('GameService', () => {
         .mockResolvedValueOnce(mockGuessingPlayer)
         .mockResolvedValueOnce(mockTargetPlayer);
       mockPlayerRepository.find.mockResolvedValue([mockGuessingPlayer, mockTargetPlayer]);
+      mockPlayerRepository.createQueryBuilder.mockReturnValue({
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([mockGuessingPlayer, mockTargetPlayer]),
+      });
       mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
       mockGuessRepository.create.mockReturnValue(mockGuess);
       mockGuessRepository.save.mockResolvedValue(mockGuess);
