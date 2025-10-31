@@ -27,6 +27,7 @@ import {
   Question,
   Answer,
   Guess,
+  PlayerStats,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -41,12 +42,19 @@ import type {
   AnswerResponse,
   SubmitGuessRequest,
   GuessResponse,
+  GameOverResult,
+  PlayerGameResult,
 } from '@whois-it/contracts';
 
 @Injectable()
 export class GameService {
   private static readonly ROOM_CODE_LENGTH = 5;
   private static readonly MAX_ROOM_CODE_ATTEMPTS = 10;
+
+  // Scoring constants
+  private static readonly SCORE_CORRECT_GUESS = 1000;
+  private static readonly SCORE_QUESTION_BONUS = 10;
+  private static readonly SCORE_ANSWER_BONUS = 5;
 
   constructor(
     @InjectRepository(Game)
@@ -69,6 +77,8 @@ export class GameService {
     private readonly answerRepository: Repository<Answer>,
     @InjectRepository(Guess)
     private readonly guessRepository: Repository<Guess>,
+    @InjectRepository(PlayerStats)
+    private readonly playerStatsRepository: Repository<PlayerStats>,
   ) {}
 
   /**
@@ -652,6 +662,10 @@ export class GameService {
 
     const savedQuestion = await this.questionRepository.save(question);
 
+    // Award points for asking a question
+    askedByPlayer.score += GameService.SCORE_QUESTION_BONUS;
+    await this.playerRepository.save(askedByPlayer);
+
     // Update the round state to AWAITING_ANSWER
     currentRound.state = RoundState.AWAITING_ANSWER;
     await this.roundRepository.save(currentRound);
@@ -845,6 +859,10 @@ export class GameService {
     });
 
     const savedAnswer = await this.answerRepository.save(answer);
+
+    // Award points for answering a question
+    answeringPlayer.score += GameService.SCORE_ANSWER_BONUS;
+    await this.playerRepository.save(answeringPlayer);
 
     // Update the round state to AWAITING_QUESTION (next turn)
     await this.advanceToNextTurn(currentRound, game);
@@ -1062,33 +1080,26 @@ export class GameService {
 
     // Handle game logic based on guess result
     if (isCorrect && targetPlayer) {
-      // Correct guess - reveal the target player's secret
+      // Correct guess - reveal the target player's secret and award points
       if (targetPlayer.secret) {
         targetPlayer.secret.status = PlayerSecretStatus.REVEALED;
         await this.playerSecretRepository.save(targetPlayer.secret);
       }
 
-      // Check if game should end (only one unrevealed player left or the guesser won)
-      const unrevealedPlayers = await this.playerSecretRepository
-        .createQueryBuilder('secret')
-        .innerJoin('secret.player', 'player')
-        .where('player.game_id = :gameId', { gameId: game.id })
-        .andWhere('player.leftAt IS NULL')
-        .andWhere('secret.status = :status', {
-          status: PlayerSecretStatus.HIDDEN,
-        })
-        .getCount();
+      // Award points to the guessing player
+      guessingPlayer.score += GameService.SCORE_CORRECT_GUESS;
+      await this.playerRepository.save(guessingPlayer);
 
-      if (unrevealedPlayers <= 1) {
-        // Game over - mark game as completed
-        game.status = GameStatus.COMPLETED;
-        game.endedAt = new Date();
-        await this.gameRepository.save(game);
+      // Check if game should end
+      const gameEnded = await this.checkAndHandleGameEnd(game, guessingPlayer);
+      if (!gameEnded) {
+        // Continue to next turn if game hasn't ended
+        await this.advanceToNextTurn(currentRound, game);
       }
     } else if (!isCorrect && targetPlayer) {
-      // Incorrect guess - eliminate the guesser (optional - depends on game rules)
-      // For now, we just record the incorrect guess
-      // Future: could eliminate player or apply penalty
+      // Incorrect guess - just record it
+      // The player can continue playing
+      await this.advanceToNextTurn(currentRound, game);
     }
 
     // Return the guess response
@@ -1124,6 +1135,257 @@ export class GameService {
       isCorrect: guess.isCorrect,
       latencyMs: guess.latencyMs ?? undefined,
       guessedAt: guess.guessedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Check if the game should end and handle the end if so
+   * Returns true if game ended, false otherwise
+   */
+  private async checkAndHandleGameEnd(
+    game: Game,
+    potentialWinner: GamePlayer,
+  ): Promise<boolean> {
+    // Get count of unrevealed players
+    const unrevealedPlayers = await this.playerSecretRepository
+      .createQueryBuilder('secret')
+      .innerJoin('secret.player', 'player')
+      .where('player.game_id = :gameId', { gameId: game.id })
+      .andWhere('player.leftAt IS NULL')
+      .andWhere('secret.status = :status', {
+        status: PlayerSecretStatus.HIDDEN,
+      })
+      .getCount();
+
+    // Check if only one player has unrevealed secret (they are the winner)
+    // or if the potential winner just made the winning guess
+    if (unrevealedPlayers <= 1) {
+      await this.endGame(game, potentialWinner);
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * End the game, calculate final scores, and save statistics
+   */
+  private async endGame(game: Game, winner: GamePlayer): Promise<void> {
+    // Mark game as completed
+    game.status = GameStatus.COMPLETED;
+    game.endedAt = new Date();
+    game.winner = winner.user ?? null;
+    await this.gameRepository.save(game);
+
+    // Close the current round
+    const currentRound = await this.roundRepository.findOne({
+      where: { game: { id: game.id } },
+      order: { roundNumber: 'DESC' },
+    });
+    if (currentRound) {
+      currentRound.state = RoundState.CLOSED;
+      currentRound.endedAt = new Date();
+      if (currentRound.startedAt) {
+        currentRound.durationMs =
+          currentRound.endedAt.getTime() - currentRound.startedAt.getTime();
+      }
+      await this.roundRepository.save(currentRound);
+    }
+
+    // Calculate placements based on scores
+    await this.calculatePlacements(game);
+
+    // Update player statistics for all players
+    await this.updatePlayerStatistics(game);
+  }
+
+  /**
+   * Calculate and assign placements to all players based on their scores
+   */
+  private async calculatePlacements(game: Game): Promise<void> {
+    const players = await this.playerRepository.find({
+      where: { game: { id: game.id }, leftAt: null as any },
+      order: { score: 'DESC' },
+    });
+
+    let currentPlacement = 1;
+    let previousScore: number | null = null;
+    let playersAtSameRank = 0;
+
+    for (const player of players) {
+      if (previousScore !== null && player.score < previousScore) {
+        currentPlacement += playersAtSameRank;
+        playersAtSameRank = 1;
+      } else {
+        playersAtSameRank++;
+      }
+
+      player.placement = currentPlacement;
+      previousScore = player.score;
+      await this.playerRepository.save(player);
+    }
+  }
+
+  /**
+   * Update player statistics after game ends
+   */
+  private async updatePlayerStatistics(game: Game): Promise<void> {
+    const players = await this.playerRepository.find({
+      where: { game: { id: game.id } },
+      relations: {
+        user: true,
+        askedQuestions: true,
+        answers: true,
+        guesses: true,
+      },
+    });
+
+    for (const player of players) {
+      // Only update stats for registered users (not guests)
+      if (!player.user) {
+        continue;
+      }
+
+      // Get or create player stats
+      let stats = await this.playerStatsRepository.findOne({
+        where: { userId: player.user.id },
+      });
+
+      if (!stats) {
+        stats = this.playerStatsRepository.create({
+          userId: player.user.id,
+          user: player.user,
+          gamesPlayed: 0,
+          gamesWon: 0,
+          totalQuestions: 0,
+          totalGuesses: 0,
+          fastestWinSeconds: null,
+          streak: 0,
+        });
+      }
+
+      // Update statistics
+      stats.gamesPlayed += 1;
+
+      // Check if this player won
+      const isWinner = game.winner?.id === player.user.id;
+      if (isWinner) {
+        stats.gamesWon += 1;
+
+        // Calculate game duration for fastest win
+        if (game.startedAt && game.endedAt) {
+          const gameDurationSeconds = Math.floor(
+            (game.endedAt.getTime() - game.startedAt.getTime()) / 1000,
+          );
+          if (
+            stats.fastestWinSeconds === null ||
+            stats.fastestWinSeconds === undefined ||
+            gameDurationSeconds < stats.fastestWinSeconds
+          ) {
+            stats.fastestWinSeconds = gameDurationSeconds;
+          }
+        }
+
+        // Update win streak
+        stats.streak += 1;
+      } else {
+        // Reset streak on loss
+        stats.streak = 0;
+      }
+
+      // Count questions and guesses
+      const questionsAsked = player.askedQuestions?.length ?? 0;
+      const guessesCount = player.guesses?.length ?? 0;
+
+      stats.totalQuestions += questionsAsked;
+      stats.totalGuesses += guessesCount;
+
+      await this.playerStatsRepository.save(stats);
+    }
+  }
+
+  /**
+   * Get game over result with all player statistics
+   */
+  async getGameOverResult(roomCode: string): Promise<GameOverResult> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: {
+          user: true,
+          askedQuestions: true,
+          answers: true,
+          guesses: true,
+        },
+        winner: true,
+        rounds: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.COMPLETED) {
+      throw new BadRequestException('Game is not completed yet');
+    }
+
+    const gameDurationSeconds =
+      game.startedAt && game.endedAt
+        ? Math.floor(
+            (game.endedAt.getTime() - game.startedAt.getTime()) / 1000,
+          )
+        : 0;
+
+    const totalRounds = game.rounds?.length ?? 0;
+
+    const playerResults: PlayerGameResult[] = (game.players ?? [])
+      .filter((p) => !p.leftAt)
+      .map((player) => {
+        const questionsAsked = player.askedQuestions?.length ?? 0;
+        const questionsAnswered = player.answers?.length ?? 0;
+        const allGuesses = player.guesses ?? [];
+        const correctGuesses = allGuesses.filter((g) => g.isCorrect).length;
+        const incorrectGuesses = allGuesses.filter((g) => !g.isCorrect).length;
+
+        const timePlayedSeconds =
+          game.startedAt && player.joinedAt
+            ? Math.floor(
+                ((game.endedAt ?? new Date()).getTime() -
+                  Math.max(game.startedAt.getTime(), player.joinedAt.getTime())) /
+                  1000,
+              )
+            : 0;
+
+        const isWinner = game.winner?.id === player.user?.id;
+
+        return {
+          playerId: player.id,
+          playerUsername: player.username,
+          userId: player.user?.id,
+          score: player.score,
+          questionsAsked,
+          questionsAnswered,
+          correctGuesses,
+          incorrectGuesses,
+          timePlayedSeconds,
+          isWinner,
+          placement: player.placement ?? 999,
+          leftAt: player.leftAt?.toISOString(),
+        };
+      })
+      .sort((a, b) => a.placement - b.placement);
+
+    return {
+      gameId: game.id,
+      roomCode: game.roomCode,
+      winnerId: game.winner?.id,
+      winnerUsername: playerResults.find((p) => p.isWinner)?.playerUsername,
+      totalRounds,
+      gameDurationSeconds,
+      endReason: 'victory',
+      players: playerResults,
     };
   }
 }
