@@ -15,7 +15,6 @@ import {
   PlayerStats,
 } from '../database/entities';
 import {
-  GamePlayerRole,
   GameStatus,
   PlayerSecretStatus,
   QuestionCategory,
@@ -227,7 +226,7 @@ describe('GameService - Scoring and Game End', () => {
             traitValues: [],
           },
         },
-      } as GamePlayer;
+      } as unknown as GamePlayer;
 
       const mockQuestion = {
         id: 'question-1',
@@ -242,7 +241,7 @@ describe('GameService - Scoring and Game End', () => {
           roundNumber: 1,
           state: RoundState.AWAITING_ANSWER,
         } as Round,
-      } as Question;
+      } as unknown as Question;
 
       const mockRound = {
         id: 'round-1',
@@ -510,22 +509,6 @@ describe('GameService - Scoring and Game End', () => {
       mockPlayerStatsRepository.findOne.mockResolvedValue(mockStats);
       mockPlayerStatsRepository.save.mockResolvedValue(mockStats);
 
-      // Call the private method through submitGuess which triggers endGame
-      const mockGame = {
-        id: 'game-1',
-        roomCode: 'ABC12',
-        status: GameStatus.IN_PROGRESS,
-        startedAt: new Date(Date.now() - 60000), // 1 minute ago
-        endedAt: new Date(),
-        winner: mockUser,
-        players: [mockWinningPlayer],
-      } as Game;
-
-      // This will test the full flow including statistics update
-      // We need to trigger the endGame method indirectly
-
-      // Note: In a real scenario, we'd test getGameOverResult
-      // which is a public method that uses the stats
     });
   });
 
