@@ -2028,7 +2028,7 @@ describe('GameService', () => {
         username: 'Player2',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as unknown as Character,
+          character: { id: 'char-1' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2037,7 +2037,7 @@ describe('GameService', () => {
         username: 'Player3',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-2', traitValues: [] } as unknown as Character,
+          character: { id: 'char-2' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2087,7 +2087,7 @@ describe('GameService', () => {
         username: 'Player1',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as unknown as Character,
+          character: { id: 'char-1' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
