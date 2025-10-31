@@ -27,7 +27,15 @@ interface GamePlayClientProps {
 
 export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const router = useRouter();
-  const { socket, joinRoom, leaveRoom, onQuestionAsked } = useGameSocket();
+  const {
+    socket,
+    joinRoom,
+    leaveRoom,
+    onQuestionAsked,
+    onAnswerSubmitted,
+    onGuessResult,
+    onGameOver,
+  } = useGameSocket();
   const {
     playState,
     setGameState,
@@ -126,6 +134,67 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     };
   }, [onQuestionAsked, addQuestion, setGameState]);
 
+  // Listen to answer submitted events
+  useEffect(() => {
+    const unsubscribeAnswerSubmitted = onAnswerSubmitted((event) => {
+      setGameState(event.gameState);
+      addToast({
+        color: "success",
+        title: dict.play.answerSubmitted || "Answer submitted",
+        description: `${event.answer.answeredByPlayerUsername} answered the question`,
+      });
+    });
+
+    return () => {
+      unsubscribeAnswerSubmitted();
+    };
+  }, [onAnswerSubmitted, setGameState, dict]);
+
+  // Listen to guess result events
+  useEffect(() => {
+    const unsubscribeGuessResult = onGuessResult((event) => {
+      setGameState(event.gameState);
+      const { guess } = event;
+
+      if (guess.isCorrect) {
+        addToast({
+          color: "success",
+          title: dict.play.correctGuess || "Correct guess!",
+          description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
+        });
+      } else {
+        addToast({
+          color: "danger",
+          title: dict.play.incorrectGuess || "Incorrect guess",
+          description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
+        });
+      }
+    });
+
+    return () => {
+      unsubscribeGuessResult();
+    };
+  }, [onGuessResult, setGameState, dict]);
+
+  // Listen to game over events
+  useEffect(() => {
+    const unsubscribeGameOver = onGameOver((event) => {
+      addToast({
+        color: "success",
+        title: dict.play.gameOver || "Game Over!",
+        description: event.result.winnerUsername
+          ? `${event.result.winnerUsername} won the game!`
+          : "Game ended",
+      });
+      // Navigate to results page
+      router.push(`/${lang}/game/results/${roomCode}`);
+    });
+
+    return () => {
+      unsubscribeGameOver();
+    };
+  }, [onGameOver, router, lang, roomCode, dict]);
+
   const handleLeaveGame = useCallback(async () => {
     try {
       if (currentPlayerId) {
@@ -138,16 +207,49 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     }
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
 
-  const handleGuess = useCallback(async (_characterId: string) => {
-    // TODO: Implement guess API call when backend is ready
-    // For now, just show a toast
-    addToast({
-      color: "primary",
-      title: "Guess feature coming soon",
-      description:
-        "The guess functionality will be available once the backend is ready.",
-    });
-  }, []);
+  const handleGuess = useCallback(
+    async (characterId: string) => {
+      if (!currentPlayerId) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: "Player ID not found",
+        });
+
+        return;
+      }
+
+      try {
+        const guess = await gameApi.submitGuess(roomCode, {
+          playerId: currentPlayerId,
+          targetCharacterId: characterId,
+        });
+
+        setIsGuessModalOpen(false);
+
+        if (guess.isCorrect) {
+          addToast({
+            color: "success",
+            title: dict.play.correctGuess || "Correct guess!",
+            description: `You guessed correctly: ${guess.targetCharacterName}`,
+          });
+        } else {
+          addToast({
+            color: "danger",
+            title: dict.play.incorrectGuess || "Incorrect guess",
+            description: "Your guess was incorrect. You have been eliminated.",
+          });
+        }
+      } catch (error) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+    [currentPlayerId, roomCode, dict],
+  );
 
   if (isLoading || !playState || !playState.gameState) {
     return (

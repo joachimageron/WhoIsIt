@@ -9,6 +9,9 @@ import type {
   SocketPlayerLeftEvent,
   SocketGameStartedEvent,
   SocketQuestionAskedEvent,
+  SocketAnswerSubmittedEvent,
+  SocketGuessResultEvent,
+  SocketGameOverEvent,
 } from "@whois-it/contracts";
 
 import { useEffect, useCallback, useRef } from "react";
@@ -117,6 +120,39 @@ export const useGameSocket = () => {
     [],
   );
 
+  const onAnswerSubmitted = useCallback(
+    (callback: (event: SocketAnswerSubmittedEvent) => void) => {
+      socketRef.current.on("answerSubmitted", callback);
+
+      return () => {
+        socketRef.current.off("answerSubmitted", callback);
+      };
+    },
+    [],
+  );
+
+  const onGuessResult = useCallback(
+    (callback: (event: SocketGuessResultEvent) => void) => {
+      socketRef.current.on("guessResult", callback);
+
+      return () => {
+        socketRef.current.off("guessResult", callback);
+      };
+    },
+    [],
+  );
+
+  const onGameOver = useCallback(
+    (callback: (event: SocketGameOverEvent) => void) => {
+      socketRef.current.on("gameOver", callback);
+
+      return () => {
+        socketRef.current.off("gameOver", callback);
+      };
+    },
+    [],
+  );
+
   return {
     socket: socketRef.current,
     joinRoom,
@@ -127,5 +163,8 @@ export const useGameSocket = () => {
     onPlayerLeft,
     onGameStarted,
     onQuestionAsked,
+    onAnswerSubmitted,
+    onGuessResult,
+    onGameOver,
   };
 };

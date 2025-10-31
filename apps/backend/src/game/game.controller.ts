@@ -17,6 +17,7 @@ import type {
   AnswerResponse,
   SubmitGuessRequest,
   GuessResponse,
+  GameOverResult,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
@@ -246,5 +247,16 @@ export class GameController {
     }
 
     return guess;
+  }
+
+  @Get(':roomCode/results')
+  async getGameResults(
+    @Param('roomCode') roomCode: string,
+  ): Promise<GameOverResult> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    return this.gameService.getGameOverResult(roomCode);
   }
 }

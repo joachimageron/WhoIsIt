@@ -7,6 +7,11 @@ import type {
   AskQuestionRequest,
   QuestionResponse,
   GameStateResponse,
+  SubmitAnswerRequest,
+  AnswerResponse,
+  SubmitGuessRequest,
+  GuessResponse,
+  GameOverResult,
 } from "@whois-it/contracts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -195,6 +200,81 @@ export const askQuestion = async (
       .catch(() => ({ message: "Failed to ask question" }));
 
     throw new Error(error.message || "Failed to ask question");
+  }
+
+  return response.json();
+};
+
+/**
+ * Submit an answer to a question
+ */
+export const submitAnswer = async (
+  roomCode: string,
+  data: SubmitAnswerRequest,
+): Promise<AnswerResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/answers`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to submit answer" }));
+
+    throw new Error(error.message || "Failed to submit answer");
+  }
+
+  return response.json();
+};
+
+/**
+ * Submit a guess
+ */
+export const submitGuess = async (
+  roomCode: string,
+  data: SubmitGuessRequest,
+): Promise<GuessResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/guesses`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to submit guess" }));
+
+    throw new Error(error.message || "Failed to submit guess");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get game results after game over
+ */
+export const getGameResults = async (
+  roomCode: string,
+): Promise<GameOverResult> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/results`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get game results" }));
+
+    throw new Error(error.message || "Failed to get game results");
   }
 
   return response.json();
