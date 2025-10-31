@@ -198,5 +198,40 @@
       "selectCharacter": "Please select a character",
       "enterQuestion": "Please enter a question"
     }
+  },
+  "results": {
+    "title": "Game Over",
+    "winner": "Winner",
+    "congratulations": "Congratulations!",
+    "youWon": "You Won!",
+    "youLost": "Better luck next time!",
+    "gameStats": "Game Statistics",
+    "playerStats": "Player Statistics",
+    "roomCode": "Room Code",
+    "duration": "Duration",
+    "rounds": "Rounds",
+    "placement": "Placement",
+    "username": "Player",
+    "score": "Score",
+    "questionsAsked": "Questions Asked",
+    "questionsAnswered": "Questions Answered",
+    "correctGuesses": "Correct Guesses",
+    "incorrectGuesses": "Incorrect Guesses",
+    "totalGuesses": "Total Guesses",
+    "timePlayed": "Time Played",
+    "newGame": "New Game",
+    "backToHome": "Back to Home",
+    "viewCharacterSet": "View Character Set",
+    "loading": "Loading results...",
+    "first": "1st",
+    "second": "2nd",
+    "third": "3rd",
+    "nth": "{n}th",
+    "minutes": "{n} min",
+    "seconds": "{n} sec",
+    "errors": {
+      "failedToLoad": "Failed to load game results",
+      "gameNotCompleted": "This game is not yet completed"
+    }
   }
 }

@@ -222,3 +222,33 @@ export type SocketAnswerSubmittedEvent = {
   gameState: GameStateResponse;
 };
 
+// Game Results API Types
+export type PlayerGameResult = {
+  id: string;
+  username: string;
+  userId?: string;
+  avatarUrl?: string;
+  isWinner: boolean;
+  placement: number;
+  questionsAsked: number;
+  questionsAnswered: number;
+  correctGuesses: number;
+  incorrectGuesses: number;
+  totalGuesses: number;
+  timePlayedSeconds: number;
+  finalScore: number;
+};
+
+export type GameResultsResponse = {
+  id: string;
+  roomCode: string;
+  status: GameStatus;
+  characterSetId: string;
+  startedAt?: string;
+  endedAt?: string;
+  totalRounds: number;
+  totalDurationSeconds: number;
+  winner?: PlayerGameResult;
+  players: PlayerGameResult[];
+};
+
