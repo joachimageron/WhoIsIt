@@ -1242,6 +1242,12 @@ describe('GameService', () => {
         } as PlayerSecret,
       } as GamePlayer;
 
+      const mockThirdPlayer: GamePlayer = {
+        id: 'player-3',
+        username: 'Player 3',
+        leftAt: null,
+      } as GamePlayer;
+
       const mockRound: Round = {
         id: 'round-1',
         endedAt: null,
@@ -1252,7 +1258,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         characterSet: mockCharacterSet,
-        players: [mockGuessingPlayer, mockTargetPlayer],
+        players: [mockGuessingPlayer, mockTargetPlayer, mockThirdPlayer],
         rounds: [mockRound],
       } as Game;
 
@@ -1281,6 +1287,7 @@ describe('GameService', () => {
 
       expect(result.isCorrect).toBe(false);
       expect(result.winnerId).toBeUndefined();
+      expect(result.gameStatus).toBe(GameStatus.IN_PROGRESS);
       expect(mockPlayerRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           id: 'player-1',
@@ -1367,6 +1374,7 @@ describe('GameService', () => {
 
       expect(result.isCorrect).toBe(false);
       expect(result.gameStatus).toBe(GameStatus.COMPLETED);
+      expect(result.winnerId).toBe('player-2'); // The remaining player wins
       expect(mockGameRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           status: GameStatus.COMPLETED,

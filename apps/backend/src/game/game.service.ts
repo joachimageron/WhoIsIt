@@ -680,13 +680,31 @@ export class GameService {
       await this.playerRepository.save(guessingPlayer);
 
       // Check if only one player remains (they win by default)
-      const remainingPlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+      // Filter players who haven't left, excluding the just-eliminated guessing player
+      const remainingPlayers =
+        game.players?.filter((p) => !p.leftAt && p.id !== guessingPlayer.id) ??
+        [];
 
       if (remainingPlayers.length === 1) {
         // Last player standing wins
         game.status = GameStatus.COMPLETED;
         game.endedAt = new Date();
         await this.gameRepository.save(game);
+      }
+    }
+
+    // Determine winner
+    let winnerId: string | undefined;
+    if (isCorrect) {
+      // Guessing player wins by correct guess
+      winnerId = guessingPlayer.id;
+    } else if (game.status === GameStatus.COMPLETED) {
+      // Last player standing wins
+      const remainingPlayers =
+        game.players?.filter((p) => !p.leftAt && p.id !== guessingPlayer.id) ??
+        [];
+      if (remainingPlayers.length === 1) {
+        winnerId = remainingPlayers[0].id;
       }
     }
 
@@ -708,7 +726,7 @@ export class GameService {
       isCorrect,
       guessedAt: savedGuess.guessedAt.toISOString(),
       gameStatus: game.status,
-      winnerId: isCorrect ? guessingPlayer.id : undefined,
+      winnerId,
     };
 
     return response;
