@@ -8,6 +8,7 @@ import type {
   SocketPlayerJoinedEvent,
   SocketPlayerLeftEvent,
   SocketGameStartedEvent,
+  SocketQuestionAskedEvent,
 } from "@whois-it/contracts";
 
 import { useEffect, useCallback, useRef } from "react";
@@ -105,6 +106,17 @@ export const useGameSocket = () => {
     [],
   );
 
+  const onQuestionAsked = useCallback(
+    (callback: (event: SocketQuestionAskedEvent) => void) => {
+      socketRef.current.on("questionAsked", callback);
+
+      return () => {
+        socketRef.current.off("questionAsked", callback);
+      };
+    },
+    [],
+  );
+
   return {
     socket: socketRef.current,
     joinRoom,
@@ -114,5 +126,6 @@ export const useGameSocket = () => {
     onPlayerJoined,
     onPlayerLeft,
     onGameStarted,
+    onQuestionAsked,
   };
 };

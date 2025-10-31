@@ -3,6 +3,10 @@ import type {
   JoinGameRequest,
   GameLobbyResponse,
   CharacterSetResponseDto,
+  CharacterResponseDto,
+  AskQuestionRequest,
+  QuestionResponse,
+  GameStateResponse,
 } from "@whois-it/contracts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -23,6 +27,30 @@ export const getCharacterSets = async (): Promise<
       .catch(() => ({ message: "Failed to get character sets" }));
 
     throw new Error(error.message || "Failed to get character sets");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get characters for a character set
+ */
+export const getCharacters = async (
+  characterSetId: string,
+): Promise<CharacterResponseDto[]> => {
+  const response = await fetch(
+    `${API_URL}/character-sets/${characterSetId}/characters`,
+    {
+      credentials: "include",
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get characters" }));
+
+    throw new Error(error.message || "Failed to get characters");
   }
 
   return response.json();
@@ -119,6 +147,54 @@ export const startGame = async (
       .catch(() => ({ message: "Failed to start game" }));
 
     throw new Error(error.message || "Failed to start game");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get game state
+ */
+export const getGameState = async (
+  roomCode: string,
+): Promise<GameStateResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/state`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get game state" }));
+
+    throw new Error(error.message || "Failed to get game state");
+  }
+
+  return response.json();
+};
+
+/**
+ * Ask a question
+ */
+export const askQuestion = async (
+  roomCode: string,
+  data: AskQuestionRequest,
+): Promise<QuestionResponse> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/questions`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to ask question" }));
+
+    throw new Error(error.message || "Failed to ask question");
   }
 
   return response.json();
