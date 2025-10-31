@@ -10,6 +10,9 @@ import type {
   CreateGameRequest,
   GameLobbyResponse,
   JoinGameRequest,
+  AskQuestionRequest,
+  QuestionResponse,
+  GameStateResponse,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
@@ -87,5 +90,57 @@ export class GameController {
     await this.gameGateway.broadcastGameStarted(roomCode);
 
     return result;
+  }
+
+  @Post(':roomCode/questions')
+  async askQuestion(
+    @Param('roomCode') roomCode: string,
+    @Body() body: AskQuestionRequest,
+  ): Promise<QuestionResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    if (!body?.playerId || body.playerId.trim().length === 0) {
+      throw new BadRequestException('playerId is required');
+    }
+
+    if (!body?.questionText || body.questionText.trim().length === 0) {
+      throw new BadRequestException('questionText is required');
+    }
+
+    if (!body?.category) {
+      throw new BadRequestException('category is required');
+    }
+
+    if (!body?.answerType) {
+      throw new BadRequestException('answerType is required');
+    }
+
+    const question = await this.gameService.askQuestion(roomCode, {
+      ...body,
+      questionText: body.questionText.trim(),
+      playerId: body.playerId.trim(),
+      targetPlayerId: body.targetPlayerId?.trim(),
+    });
+
+    // Get updated game state
+    const gameState = await this.gameService.getGameState(roomCode);
+
+    // Broadcast questionAsked event to all players in the room
+    this.gameGateway.broadcastQuestionAsked(roomCode, question, gameState);
+
+    return question;
+  }
+
+  @Get(':roomCode/state')
+  async getGameState(
+    @Param('roomCode') roomCode: string,
+  ): Promise<GameStateResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    return this.gameService.getGameState(roomCode);
   }
 }

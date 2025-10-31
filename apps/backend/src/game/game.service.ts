@@ -12,6 +12,8 @@ import {
   GameVisibility,
   RoundState,
   PlayerSecretStatus,
+  QuestionCategory,
+  AnswerType,
 } from '../database/enums';
 import {
   CharacterSet,
@@ -21,6 +23,7 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Question,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -28,6 +31,9 @@ import type {
   GamePlayerResponse,
   JoinGameRequest,
   GameVisibility as ContractGameVisibility,
+  AskQuestionRequest,
+  QuestionResponse,
+  GameStateResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -50,6 +56,8 @@ export class GameService {
     private readonly playerSecretRepository: Repository<PlayerSecret>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
+    @InjectRepository(Question)
+    private readonly questionRepository: Repository<Question>,
   ) {}
 
   /**
@@ -541,5 +549,175 @@ export class GameService {
     }
 
     return Math.max(0, Math.floor(value));
+  }
+
+  /**
+   * Ask a question during the game
+   */
+  async askQuestion(
+    roomCode: string,
+    request: AskQuestionRequest,
+  ): Promise<QuestionResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Get the game with all necessary relations
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+        rounds: { activePlayer: true },
+      },
+      order: {
+        rounds: { roundNumber: 'DESC' },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    // Get the current round
+    const currentRound = game.rounds?.[0];
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    if (currentRound.state !== RoundState.AWAITING_QUESTION) {
+      throw new BadRequestException(
+        `Cannot ask question in round state: ${currentRound.state}`,
+      );
+    }
+
+    // Validate that the player asking the question is the active player
+    if (
+      !currentRound.activePlayer ||
+      currentRound.activePlayer.id !== request.playerId
+    ) {
+      throw new BadRequestException(
+        'Only the active player can ask a question',
+      );
+    }
+
+    // Get the player asking the question
+    const askedByPlayer = await this.playerRepository.findOne({
+      where: { id: request.playerId },
+      relations: { game: true },
+    });
+
+    if (!askedByPlayer) {
+      throw new NotFoundException('Player not found');
+    }
+
+    // Get the target player if specified
+    let targetPlayer: GamePlayer | null = null;
+    if (request.targetPlayerId) {
+      targetPlayer = await this.playerRepository.findOne({
+        where: { id: request.targetPlayerId },
+        relations: { game: true },
+      });
+
+      if (!targetPlayer) {
+        throw new NotFoundException('Target player not found');
+      }
+
+      if (targetPlayer.game.id !== game.id) {
+        throw new BadRequestException('Target player is not in this game');
+      }
+    }
+
+    // Create the question
+    const question = this.questionRepository.create({
+      round: currentRound,
+      askedBy: askedByPlayer,
+      targetPlayer,
+      questionText: request.questionText.trim(),
+      category: request.category as QuestionCategory,
+      answerType: request.answerType as AnswerType,
+    });
+
+    const savedQuestion = await this.questionRepository.save(question);
+
+    // Update the round state to AWAITING_ANSWER
+    currentRound.state = RoundState.AWAITING_ANSWER;
+    await this.roundRepository.save(currentRound);
+
+    // Return the question response
+    return this.mapToQuestionResponse(
+      savedQuestion,
+      askedByPlayer,
+      targetPlayer,
+    );
+  }
+
+  /**
+   * Get the current game state for a room
+   */
+  async getGameState(roomCode: string): Promise<GameStateResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: { user: true },
+        rounds: { activePlayer: true },
+      },
+      order: {
+        rounds: { roundNumber: 'DESC' },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    const currentRound = game.rounds?.[0];
+    const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+
+    return {
+      id: game.id,
+      roomCode: game.roomCode,
+      status: game.status,
+      currentRoundNumber: currentRound?.roundNumber ?? 0,
+      currentRoundState: currentRound?.state ?? '',
+      activePlayerId: currentRound?.activePlayer?.id,
+      activePlayerUsername: currentRound?.activePlayer?.username,
+      players: activePlayers.map((player) => ({
+        id: player.id,
+        username: player.username,
+        avatarUrl: player.avatarUrl ?? undefined,
+        role: player.role,
+        isReady: player.isReady,
+        joinedAt: player.joinedAt?.toISOString?.() ?? new Date().toISOString(),
+        leftAt: player.leftAt?.toISOString?.(),
+        userId: player.user?.id,
+      })),
+    };
+  }
+
+  /**
+   * Map Question entity to QuestionResponse
+   */
+  private mapToQuestionResponse(
+    question: Question,
+    askedByPlayer: GamePlayer,
+    targetPlayer: GamePlayer | null,
+  ): QuestionResponse {
+    return {
+      id: question.id,
+      roundId: question.round.id,
+      roundNumber: question.round.roundNumber,
+      askedByPlayerId: askedByPlayer.id,
+      askedByPlayerUsername: askedByPlayer.username,
+      targetPlayerId: targetPlayer?.id,
+      targetPlayerUsername: targetPlayer?.username,
+      questionText: question.questionText,
+      category: question.category,
+      answerType: question.answerType,
+      askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
+    };
   }
 }
