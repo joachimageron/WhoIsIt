@@ -870,10 +870,13 @@ export class GameService {
     // Note: For now, we trust the player to provide the correct answer based on their secret character
     // In a future iteration, we could automatically validate the answer based on character traits
 
+    // answerValue has been validated by the controller to be a valid AnswerValue enum member
+    const validatedAnswerValue = request.answerValue as AnswerValue;
+
     // For boolean questions, use the provided answer value
     if (question.answerType === AnswerType.BOOLEAN) {
       return {
-        answerValue: request.answerValue as AnswerValue,
+        answerValue: validatedAnswerValue,
         answerText: null,
         latencyMs: null,
       };
@@ -882,7 +885,7 @@ export class GameService {
     // For text questions, use the provided answer text
     if (question.answerType === AnswerType.TEXT) {
       return {
-        answerValue: request.answerValue as AnswerValue,
+        answerValue: validatedAnswerValue,
         answerText: request.answerText ?? null,
         latencyMs: null,
       };
@@ -890,7 +893,7 @@ export class GameService {
 
     // Default fallback
     return {
-      answerValue: request.answerValue as AnswerValue,
+      answerValue: validatedAnswerValue,
       answerText: request.answerText ?? null,
       latencyMs: null,
     };
@@ -940,8 +943,7 @@ export class GameService {
       answerValue: answer.answerValue,
       answerText: answer.answerText ?? undefined,
       latencyMs: answer.latencyMs ?? undefined,
-      answeredAt:
-        answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
+      answeredAt: answer.answeredAt.toISOString(),
     };
   }
 }

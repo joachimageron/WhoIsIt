@@ -18,6 +18,7 @@ import type {
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
+import { AnswerValue } from '../database/enums';
 
 @Controller('games')
 export class GameController {
@@ -181,8 +182,8 @@ export class GameController {
       throw new BadRequestException('answerValue is required');
     }
 
-    const validAnswerValues = ['yes', 'no', 'unsure'];
-    if (!validAnswerValues.includes(body.answerValue)) {
+    const validAnswerValues = Object.values(AnswerValue);
+    if (!validAnswerValues.includes(body.answerValue as AnswerValue)) {
       throw new BadRequestException(
         `answerValue must be one of: ${validAnswerValues.join(', ')}`,
       );
