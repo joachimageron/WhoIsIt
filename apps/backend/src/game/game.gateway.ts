@@ -329,6 +329,31 @@ export class GameGateway
   }
 
   /**
+   * Broadcast answer submitted event to all clients in a room
+   */
+  broadcastAnswerSubmitted(
+    roomCode: string,
+    answerData: {
+      answer: import('@whois-it/contracts').AnswerResponse;
+      question: import('@whois-it/contracts').QuestionResponse;
+    },
+  ) {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+      this.server.to(normalizedRoomCode).emit('answerSubmitted', {
+        roomCode: normalizedRoomCode,
+        answer: answerData.answer,
+        question: answerData.question,
+      });
+      this.logger.log(
+        `Broadcasted answer submitted to room ${normalizedRoomCode}`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting answer submitted:', error);
+    }
+  }
+
+  /**
    * Start periodic cleanup of abandoned lobbies
    */
   private startLobbyCleanup() {

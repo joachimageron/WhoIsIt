@@ -10,6 +10,8 @@ import type {
   CreateGameRequest,
   GameLobbyResponse,
   JoinGameRequest,
+  SubmitAnswerRequest,
+  AnswerResponse,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
@@ -87,5 +89,36 @@ export class GameController {
     await this.gameGateway.broadcastGameStarted(roomCode);
 
     return result;
+  }
+
+  @Post(':roomCode/answers')
+  async submitAnswer(
+    @Param('roomCode') roomCode: string,
+    @Body() body: SubmitAnswerRequest,
+  ): Promise<AnswerResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    if (!body?.questionId || body.questionId.trim().length === 0) {
+      throw new BadRequestException('questionId is required');
+    }
+
+    if (!body?.answerValue) {
+      throw new BadRequestException('answerValue is required');
+    }
+
+    const { answer, question } = await this.gameService.submitAnswer(
+      roomCode,
+      body,
+    );
+
+    // Broadcast answerSubmitted event to all players in the room
+    this.gameGateway.broadcastAnswerSubmitted(roomCode, {
+      answer,
+      question,
+    });
+
+    return answer;
   }
 }

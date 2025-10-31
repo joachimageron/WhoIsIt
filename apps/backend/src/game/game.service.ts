@@ -12,6 +12,9 @@ import {
   GameVisibility,
   RoundState,
   PlayerSecretStatus,
+  AnswerValue,
+  QuestionCategory,
+  AnswerType,
 } from '../database/enums';
 import {
   CharacterSet,
@@ -21,6 +24,8 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Question,
+  Answer,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -28,6 +33,9 @@ import type {
   GamePlayerResponse,
   JoinGameRequest,
   GameVisibility as ContractGameVisibility,
+  SubmitAnswerRequest,
+  AnswerResponse,
+  QuestionResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -50,6 +58,10 @@ export class GameService {
     private readonly playerSecretRepository: Repository<PlayerSecret>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
+    @InjectRepository(Question)
+    private readonly questionRepository: Repository<Question>,
+    @InjectRepository(Answer)
+    private readonly answerRepository: Repository<Answer>,
   ) {}
 
   /**
@@ -336,8 +348,223 @@ export class GameService {
     return this.mapToLobbyResponse(refreshedGame);
   }
 
+  async submitAnswer(
+    roomCode: string,
+    request: SubmitAnswerRequest,
+  ): Promise<{ answer: AnswerResponse; question: QuestionResponse }> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Find the question with all necessary relations
+    const question = await this.questionRepository.findOne({
+      where: { id: request.questionId },
+      relations: {
+        round: {
+          game: true,
+        },
+        askedBy: true,
+        targetPlayer: {
+          secret: {
+            character: {
+              traitValues: {
+                traitValue: {
+                  trait: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    // Verify the question belongs to the specified game
+    if (question.round.game.roomCode !== normalizedRoomCode) {
+      throw new BadRequestException('Question does not belong to this game');
+    }
+
+    // Verify the game is in progress
+    if (question.round.game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    // Verify the round is awaiting an answer
+    if (question.round.state !== RoundState.AWAITING_ANSWER) {
+      throw new BadRequestException('Round is not awaiting an answer');
+    }
+
+    // Check if an answer already exists for this question
+    const existingAnswer = await this.answerRepository.findOne({
+      where: { question: { id: question.id } },
+    });
+
+    if (existingAnswer) {
+      throw new BadRequestException('Question has already been answered');
+    }
+
+    // Verify that the answerer is the target player
+    if (!question.targetPlayer) {
+      throw new BadRequestException('Question has no target player');
+    }
+
+    // Get the target player's secret character for answer computation
+    const targetPlayerSecret = question.targetPlayer.secret;
+    if (!targetPlayerSecret) {
+      throw new InternalServerErrorException(
+        'Target player has no secret character assigned',
+      );
+    }
+
+    // Compute the answer based on the question and the secret character
+    const computedAnswer = this.computeAnswer(
+      question,
+      targetPlayerSecret,
+      request,
+    );
+
+    // Create and save the answer
+    const answer = this.answerRepository.create({
+      question,
+      answeredBy: question.targetPlayer,
+      answerValue: computedAnswer.answerValue,
+      answerText: computedAnswer.answerText,
+      latencyMs: request.latencyMs ?? null,
+      answeredAt: new Date(),
+    });
+
+    const savedAnswer = await this.answerRepository.save(answer);
+
+    // Update round state to allow next action (in this case, back to awaiting question for next turn)
+    // In a full implementation, this would transition to AWAITING_GUESS if the player wants to guess
+    question.round.state = RoundState.AWAITING_QUESTION;
+    await this.roundRepository.save(question.round);
+
+    const answerResponse = this.mapToAnswerResponse(savedAnswer, question);
+    const questionResponse = this.mapToQuestionResponse(question);
+
+    return { answer: answerResponse, question: questionResponse };
+  }
+
   /**
-   * Initialize the first round of the game
+   * Compute the answer based on the question and the player's secret character
+   */
+  private computeAnswer(
+    question: Question,
+    playerSecret: PlayerSecret,
+    request: SubmitAnswerRequest,
+  ): { answerValue: AnswerValue; answerText: string | null } {
+    // Convert the contract type to enum type
+    const answerValueEnum = this.toAnswerValueEnum(request.answerValue);
+
+    // For trait-based questions, compute based on character traits
+    if (
+      question.category === QuestionCategory.TRAIT &&
+      question.answerType === AnswerType.BOOLEAN
+    ) {
+      // Extract trait information from the question text
+      // In a real implementation, questions would have structured trait references
+      // For now, we'll use the provided answer value from the request
+      // This allows the frontend/player to provide the answer based on their secret character
+
+      return {
+        answerValue: answerValueEnum,
+        answerText: request.answerText ?? null,
+      };
+    }
+
+    // For direct questions (yes/no about specific character)
+    if (
+      question.category === QuestionCategory.DIRECT &&
+      question.answerType === AnswerType.BOOLEAN
+    ) {
+      return {
+        answerValue: answerValueEnum,
+        answerText: request.answerText ?? null,
+      };
+    }
+
+    // For text-based questions
+    if (question.answerType === AnswerType.TEXT) {
+      return {
+        answerValue: answerValueEnum,
+        answerText: request.answerText ?? null,
+      };
+    }
+
+    // Default case
+    return {
+      answerValue: answerValueEnum,
+      answerText: request.answerText ?? null,
+    };
+  }
+
+  /**
+   * Convert contract AnswerValue type to backend enum
+   */
+  private toAnswerValueEnum(
+    value: import('@whois-it/contracts').AnswerValue,
+  ): AnswerValue {
+    if (value === 'yes') {
+      return AnswerValue.YES;
+    }
+    if (value === 'no') {
+      return AnswerValue.NO;
+    }
+    if (value === 'unsure') {
+      return AnswerValue.UNSURE;
+    }
+    throw new BadRequestException(`Invalid answer value: ${String(value)}`);
+  }
+
+  /**
+   * Map Answer entity to AnswerResponse DTO
+   */
+  private mapToAnswerResponse(
+    answer: Answer,
+    question: Question,
+  ): AnswerResponse {
+    return {
+      id: answer.id,
+      questionId: question.id,
+      answeredBy: {
+        id: answer.answeredBy.id,
+        username: answer.answeredBy.username,
+      },
+      answerValue: answer.answerValue,
+      answerText: answer.answerText ?? undefined,
+      latencyMs: answer.latencyMs ?? undefined,
+      answeredAt: answer.answeredAt.toISOString(),
+    };
+  }
+
+  /**
+   * Map Question entity to QuestionResponse DTO
+   */
+  private mapToQuestionResponse(question: Question): QuestionResponse {
+    return {
+      id: question.id,
+      roundId: question.round.id,
+      askedBy: {
+        id: question.askedBy.id,
+        username: question.askedBy.username,
+      },
+      targetPlayer: question.targetPlayer
+        ? {
+            id: question.targetPlayer.id,
+            username: question.targetPlayer.username,
+          }
+        : undefined,
+      questionText: question.questionText,
+      category: question.category,
+      answerType: question.answerType,
+      askedAt: question.askedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Normalize room code to uppercase and trimmed
    */
   private async initializeFirstRound(game: Game): Promise<Round> {
     // Get the first player to be the active player

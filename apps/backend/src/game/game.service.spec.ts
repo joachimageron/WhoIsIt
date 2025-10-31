@@ -14,6 +14,8 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Question,
+  Answer,
 } from '../database/entities';
 import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
 import type { CreateGameRequest, JoinGameRequest } from '@whois-it/contracts';
@@ -59,6 +61,18 @@ describe('GameService', () => {
     findOne: jest.fn(),
   };
 
+  const mockQuestionRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
+  const mockAnswerRepository = {
+    create: jest.fn(),
+    save: jest.fn(),
+    findOne: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -90,6 +104,14 @@ describe('GameService', () => {
         {
           provide: getRepositoryToken(Character),
           useValue: mockCharacterRepository,
+        },
+        {
+          provide: getRepositoryToken(Question),
+          useValue: mockQuestionRepository,
+        },
+        {
+          provide: getRepositoryToken(Answer),
+          useValue: mockAnswerRepository,
         },
       ],
     }).compile();
@@ -1104,6 +1126,368 @@ describe('GameService', () => {
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error.message).toContain(
         'Not enough characters in the set for all players',
+      );
+    });
+  });
+
+  describe('submitAnswer', () => {
+    it('should throw NotFoundException if question not found', async () => {
+      mockQuestionRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Question not found');
+    });
+
+    it('should throw BadRequestException if question does not belong to game', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          game: {
+            roomCode: 'XYZ99',
+            status: GameStatus.IN_PROGRESS,
+          },
+        },
+      } as Question;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Question does not belong to this game');
+    });
+
+    it('should throw BadRequestException if game is not in progress', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.LOBBY,
+          },
+        },
+      } as Question;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Game is not in progress');
+    });
+
+    it('should throw BadRequestException if round is not awaiting answer', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_question',
+        },
+      } as Question;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Round is not awaiting an answer');
+    });
+
+    it('should throw BadRequestException if question already answered', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_answer',
+        },
+        targetPlayer: {
+          id: 'player-1',
+        },
+      } as Question;
+
+      const mockExistingAnswer = {
+        id: 'answer-123',
+      } as Answer;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockAnswerRepository.findOne.mockResolvedValue(mockExistingAnswer);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Question has already been answered');
+    });
+
+    it('should throw BadRequestException if question has no target player', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_answer',
+        },
+        targetPlayer: null,
+      } as Question;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockAnswerRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Question has no target player');
+    });
+
+    it('should throw InternalServerErrorException if target player has no secret', async () => {
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          id: 'round-123',
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_answer',
+        },
+        askedBy: {
+          id: 'player-2',
+          username: 'Player 2',
+        },
+        targetPlayer: {
+          id: 'player-1',
+          username: 'Player 1',
+          secret: null,
+        },
+        questionText: 'Does your character wear glasses?',
+        category: 'trait',
+        answerType: 'boolean',
+        askedAt: new Date(),
+      } as Question;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockAnswerRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow(InternalServerErrorException);
+      await expect(
+        service.submitAnswer('ABC12', {
+          questionId: 'question-123',
+          answerValue: 'yes',
+        }),
+      ).rejects.toThrow('Target player has no secret character assigned');
+    });
+
+    it('should successfully submit an answer', async () => {
+      const mockPlayerSecret = {
+        id: 'secret-123',
+        character: {
+          id: 'char-123',
+          name: 'Test Character',
+        },
+      } as PlayerSecret;
+
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          id: 'round-123',
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_answer',
+        },
+        askedBy: {
+          id: 'player-2',
+          username: 'Player 2',
+        },
+        targetPlayer: {
+          id: 'player-1',
+          username: 'Player 1',
+          secret: mockPlayerSecret,
+        },
+        questionText: 'Does your character wear glasses?',
+        category: 'trait',
+        answerType: 'boolean',
+        askedAt: new Date(),
+      } as Question;
+
+      const mockAnswer = {
+        id: 'answer-123',
+        question: mockQuestion,
+        answeredBy: mockQuestion.targetPlayer,
+        answerValue: 'yes',
+        answerText: null,
+        latencyMs: 1500,
+        answeredAt: new Date(),
+      } as Answer;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockAnswerRepository.findOne.mockResolvedValue(null);
+      mockAnswerRepository.create.mockReturnValue(mockAnswer);
+      mockAnswerRepository.save.mockResolvedValue(mockAnswer);
+      mockRoundRepository.save.mockResolvedValue(mockQuestion.round);
+
+      const result = await service.submitAnswer('ABC12', {
+        questionId: 'question-123',
+        answerValue: 'yes',
+        latencyMs: 1500,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.answer).toBeDefined();
+      expect(result.answer.id).toBe('answer-123');
+      expect(result.answer.answeredBy.username).toBe('Player 1');
+      expect(result.answer.answerValue).toBe('yes');
+      expect(result.question).toBeDefined();
+      expect(result.question.id).toBe('question-123');
+
+      // Verify answer was created with correct data
+      expect(mockAnswerRepository.create).toHaveBeenCalledWith({
+        question: mockQuestion,
+        answeredBy: mockQuestion.targetPlayer,
+        answerValue: 'yes',
+        answerText: null,
+        latencyMs: 1500,
+        answeredAt: expect.any(Date),
+      });
+
+      // Verify answer was saved
+      expect(mockAnswerRepository.save).toHaveBeenCalledWith(mockAnswer);
+
+      // Verify round state was updated
+      expect(mockRoundRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'awaiting_question',
+        }),
+      );
+    });
+
+    it('should handle answer with text', async () => {
+      const mockPlayerSecret = {
+        id: 'secret-123',
+        character: {
+          id: 'char-123',
+          name: 'Test Character',
+        },
+      } as PlayerSecret;
+
+      const mockQuestion = {
+        id: 'question-123',
+        round: {
+          id: 'round-123',
+          game: {
+            roomCode: 'ABC12',
+            status: GameStatus.IN_PROGRESS,
+          },
+          state: 'awaiting_answer',
+        },
+        askedBy: {
+          id: 'player-2',
+          username: 'Player 2',
+        },
+        targetPlayer: {
+          id: 'player-1',
+          username: 'Player 1',
+          secret: mockPlayerSecret,
+        },
+        questionText: 'What color is your character?',
+        category: 'trait',
+        answerType: 'text',
+        askedAt: new Date(),
+      } as Question;
+
+      const mockAnswer = {
+        id: 'answer-123',
+        question: mockQuestion,
+        answeredBy: mockQuestion.targetPlayer,
+        answerValue: 'yes',
+        answerText: 'Blue',
+        latencyMs: null,
+        answeredAt: new Date(),
+      } as Answer;
+
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockAnswerRepository.findOne.mockResolvedValue(null);
+      mockAnswerRepository.create.mockReturnValue(mockAnswer);
+      mockAnswerRepository.save.mockResolvedValue(mockAnswer);
+      mockRoundRepository.save.mockResolvedValue(mockQuestion.round);
+
+      const result = await service.submitAnswer('ABC12', {
+        questionId: 'question-123',
+        answerValue: 'yes',
+        answerText: 'Blue',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.answer.answerText).toBe('Blue');
+
+      // Verify answer was created with text
+      expect(mockAnswerRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answerText: 'Blue',
+        }),
       );
     });
   });

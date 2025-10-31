@@ -1,6 +1,9 @@
 export type GameStatus = "lobby" | "in_progress" | "completed" | "aborted";
 export type GameVisibility = "public" | "private";
 export type GamePlayerRole = "host" | "player" | "spectator";
+export type AnswerValue = "yes" | "no" | "unsure";
+export type QuestionCategory = "trait" | "direct" | "meta";
+export type AnswerType = "boolean" | "text";
 
 export type CreateGameRequest = {
   characterSetId: string;
@@ -94,12 +97,19 @@ export type SocketGameStartedEvent = {
   lobby: GameLobbyResponse;
 };
 
+export type SocketAnswerSubmittedEvent = {
+  roomCode: string;
+  answer: AnswerResponse;
+  question: QuestionResponse;
+};
+
 // Socket.IO Events
 export interface ServerToClientEvents {
   lobbyUpdate: (lobby: GameLobbyResponse) => void;
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
+  answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
 }
 
 export interface ClientToServerEvents {
@@ -146,5 +156,44 @@ export type CharacterResponseDto = {
   metadata: Record<string, unknown>;
   isActive: boolean;
   traits?: TraitValueResponseDto[];
+};
+
+// Answer System Types
+export type SubmitAnswerRequest = {
+  questionId: string;
+  answerValue: AnswerValue;
+  answerText?: string | null;
+  latencyMs?: number | null;
+};
+
+export type AnswerResponse = {
+  id: string;
+  questionId: string;
+  answeredBy: {
+    id: string;
+    username: string;
+  };
+  answerValue: AnswerValue;
+  answerText?: string | null;
+  latencyMs?: number | null;
+  answeredAt: string;
+};
+
+export type QuestionResponse = {
+  id: string;
+  roundId: string;
+  askedBy: {
+    id: string;
+    username: string;
+  };
+  targetPlayer?: {
+    id: string;
+    username: string;
+  } | null;
+  questionText: string;
+  category: QuestionCategory;
+  answerType: AnswerType;
+  askedAt: string;
+  answer?: AnswerResponse;
 };
 
