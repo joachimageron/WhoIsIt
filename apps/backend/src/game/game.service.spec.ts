@@ -1606,7 +1606,7 @@ describe('GameService', () => {
         id: 'char-1',
         name: 'Character 1',
         traitValues: [],
-      } as Character;
+      } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
         id: 'secret-1',
@@ -1654,7 +1654,7 @@ describe('GameService', () => {
         category: 'trait' as any,
         answerType: 'boolean' as any,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       const mockAnswer = {
         id: 'answer-123',
@@ -1717,7 +1717,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.LOBBY,
         rounds: [],
-      } as Game;
+      } as unknown as Game;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
 
@@ -1741,7 +1741,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         rounds: [],
-      } as Game;
+      } as unknown as Game;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
 
@@ -1838,7 +1838,7 @@ describe('GameService', () => {
         id: 'question-123',
         round: { id: 'different-round' } as Round,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
@@ -1912,7 +1912,7 @@ describe('GameService', () => {
         id: 'question-123',
         round: mockRound,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
@@ -1950,7 +1950,7 @@ describe('GameService', () => {
         id: 'question-123',
         round: mockRound,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       const mockPlayer: GamePlayer = {
         id: 'player-1',
@@ -1987,7 +1987,7 @@ describe('GameService', () => {
         username: 'Player2',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as Character,
+          character: { id: 'char-1', traitValues: [] } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -1996,7 +1996,7 @@ describe('GameService', () => {
         username: 'Player3',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-2', traitValues: [] } as Character,
+          character: { id: 'char-2', traitValues: [] } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2020,7 +2020,7 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockPlayer2,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
@@ -2046,7 +2046,7 @@ describe('GameService', () => {
         username: 'Player1',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as Character,
+          character: { id: 'char-1', traitValues: [] } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2070,7 +2070,7 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: null,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
@@ -2095,7 +2095,7 @@ describe('GameService', () => {
         id: 'char-1',
         name: 'Character 1',
         traitValues: [],
-      } as Character;
+      } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
         id: 'secret-1',
@@ -2147,7 +2147,7 @@ describe('GameService', () => {
         category: 'trait' as any,
         answerType: 'boolean' as any,
         answers: [],
-      } as Question;
+      } as unknown as Question;
 
       const mockAnswer = {
         id: 'answer-123',
