@@ -102,6 +102,7 @@ export interface ServerToClientEvents {
   gameStarted: (event: SocketGameStartedEvent) => void;
   questionAsked: (event: SocketQuestionAskedEvent) => void;
   answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
+  guessResult: (event: SocketGuessResultEvent) => void;
 }
 
 export interface ClientToServerEvents {
@@ -219,6 +220,35 @@ export type AnswerResponse = {
 export type SocketAnswerSubmittedEvent = {
   roomCode: string;
   answer: AnswerResponse;
+  gameState: GameStateResponse;
+};
+
+// Guesses API Types
+export type SubmitGuessRequest = {
+  playerId: string;
+  targetPlayerId?: string;
+  targetCharacterId: string;
+};
+
+export type GuessResponse = {
+  id: string;
+  roundId: string;
+  roundNumber: number;
+  guessedByPlayerId: string;
+  guessedByPlayerUsername: string;
+  targetPlayerId?: string;
+  targetPlayerUsername?: string;
+  targetCharacterId: string;
+  targetCharacterName: string;
+  isCorrect: boolean;
+  latencyMs?: number;
+  guessedAt: string;
+};
+
+// Socket.IO Guess Events
+export type SocketGuessResultEvent = {
+  roomCode: string;
+  guess: GuessResponse;
   gameState: GameStateResponse;
 };
 
