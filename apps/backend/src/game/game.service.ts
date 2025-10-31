@@ -795,7 +795,10 @@ export class GameService {
     // Get the player submitting the answer
     const answeringPlayer = await this.playerRepository.findOne({
       where: { id: request.playerId },
-      relations: { game: true, secret: { character: { traitValues: { traitValue: { trait: true } } } } },
+      relations: {
+        game: true,
+        secret: { character: { traitValues: { traitValue: { trait: true } } } },
+      },
     });
 
     if (!answeringPlayer) {
@@ -821,7 +824,7 @@ export class GameService {
     }
 
     // Calculate the answer based on the player's secret character
-    const calculatedAnswer = await this.calculateAnswer(
+    const calculatedAnswer = this.calculateAnswer(
       answeringPlayer,
       question,
       request,
@@ -848,15 +851,15 @@ export class GameService {
   /**
    * Calculate the answer based on the player's secret character
    */
-  private async calculateAnswer(
+  private calculateAnswer(
     player: GamePlayer,
     question: Question,
     request: SubmitAnswerRequest,
-  ): Promise<{
+  ): {
     answerValue: AnswerValue;
     answerText?: string | null;
     latencyMs?: number | null;
-  }> {
+  } {
     // If the player doesn't have a secret character yet, throw an error
     if (!player.secret || !player.secret.character) {
       throw new InternalServerErrorException(
@@ -864,11 +867,11 @@ export class GameService {
       );
     }
 
-    const secretCharacter = player.secret.character;
+    // Note: For now, we trust the player to provide the correct answer based on their secret character
+    // In a future iteration, we could automatically validate the answer based on character traits
 
-    // For boolean questions, automatically determine the answer based on traits
+    // For boolean questions, use the provided answer value
     if (question.answerType === AnswerType.BOOLEAN) {
-      // Use the provided answer value (player decides based on their secret character)
       return {
         answerValue: request.answerValue as AnswerValue,
         answerText: null,
@@ -937,7 +940,8 @@ export class GameService {
       answerValue: answer.answerValue,
       answerText: answer.answerText ?? undefined,
       latencyMs: answer.latencyMs ?? undefined,
-      answeredAt: answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
+      answeredAt:
+        answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
     };
   }
 }
