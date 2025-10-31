@@ -96,7 +96,8 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     if (
       profileData.avatarUrl &&
       profileData.avatarUrl.trim() !== "" &&
-      !profileData.avatarUrl.startsWith("http")
+      !profileData.avatarUrl.startsWith("http") &&
+      !profileData.avatarUrl.startsWith("/")
     ) {
       addToast({
         color: "danger",

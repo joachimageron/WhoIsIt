@@ -26,6 +26,14 @@ describe('UpdateProfileDto', () => {
     expect(errors.length).toBe(0);
   });
 
+  it('should pass validation with local path avatarUrl', async () => {
+    const dto = new UpdateProfileDto();
+    dto.avatarUrl = '/avatar/avatar_5.jpg';
+
+    const errors = await validate(dto);
+    expect(errors.length).toBe(0);
+  });
+
   it('should fail validation with username shorter than 3 characters', async () => {
     const dto = new UpdateProfileDto();
     dto.username = 'ab';
@@ -42,15 +50,6 @@ describe('UpdateProfileDto', () => {
     const errors = await validate(dto);
     expect(errors.length).toBeGreaterThan(0);
     expect(errors[0].property).toBe('email');
-  });
-
-  it('should fail validation with invalid avatarUrl', async () => {
-    const dto = new UpdateProfileDto();
-    dto.avatarUrl = 'not-a-url';
-
-    const errors = await validate(dto);
-    expect(errors.length).toBeGreaterThan(0);
-    expect(errors[0].property).toBe('avatarUrl');
   });
 
   it('should pass validation with empty object', async () => {
