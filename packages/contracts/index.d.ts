@@ -145,14 +145,12 @@ export type CharacterResponseDto = {
 
 // Questions API Types
 export type QuestionCategory = "direct" | "meta";
-export type AnswerType = "boolean" | "text";
 
 export type AskQuestionRequest = {
   playerId: string;
   targetPlayerId?: string;
   questionText: string;
   category: QuestionCategory;
-  answerType: AnswerType;
 };
 
 export type QuestionResponse = {
@@ -165,7 +163,6 @@ export type QuestionResponse = {
   targetPlayerUsername?: string;
   questionText: string;
   category: QuestionCategory;
-  answerType: AnswerType;
   askedAt: string;
 };
 

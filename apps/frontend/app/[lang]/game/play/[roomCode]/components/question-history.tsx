@@ -79,9 +79,6 @@ function QuestionItem({ dict, question }: QuestionItemProps) {
         >
           {question.category}
         </Chip>
-        <Chip color="default" size="sm" variant="flat">
-          {question.answerType}
-        </Chip>
       </div>
     </div>
   );

@@ -33,11 +33,6 @@ export enum QuestionCategory {
   META = 'meta',
 }
 
-export enum AnswerType {
-  BOOLEAN = 'boolean',
-  TEXT = 'text',
-}
-
 export enum AnswerValue {
   YES = 'yes',
   NO = 'no',

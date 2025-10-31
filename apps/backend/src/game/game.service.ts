@@ -13,7 +13,6 @@ import {
   RoundState,
   PlayerSecretStatus,
   QuestionCategory,
-  AnswerType,
   AnswerValue,
 } from '../database/enums';
 import {
@@ -657,7 +656,6 @@ export class GameService {
       targetPlayer,
       questionText: request.questionText.trim(),
       category: request.category as QuestionCategory,
-      answerType: request.answerType as AnswerType,
     });
 
     const savedQuestion = await this.questionRepository.save(question);
@@ -741,7 +739,6 @@ export class GameService {
       targetPlayerUsername: targetPlayer?.username,
       questionText: question.questionText,
       category: question.category,
-      answerType: question.answerType,
       askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
     };
   }
@@ -895,28 +892,10 @@ export class GameService {
     // answerValue has been validated by the controller to be a valid AnswerValue enum member
     const validatedAnswerValue = request.answerValue as AnswerValue;
 
-    // For boolean questions, use the provided answer value
-    if (question.answerType === AnswerType.BOOLEAN) {
-      return {
-        answerValue: validatedAnswerValue,
-        answerText: null,
-        latencyMs: null,
-      };
-    }
-
-    // For text questions, use the provided answer text
-    if (question.answerType === AnswerType.TEXT) {
-      return {
-        answerValue: validatedAnswerValue,
-        answerText: request.answerText ?? null,
-        latencyMs: null,
-      };
-    }
-
-    // Default fallback
+    // All questions use boolean answers (yes/no/unsure)
     return {
       answerValue: validatedAnswerValue,
-      answerText: request.answerText ?? null,
+      answerText: null,
       latencyMs: null,
     };
   }

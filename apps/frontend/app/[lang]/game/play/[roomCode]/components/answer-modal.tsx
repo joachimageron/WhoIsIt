@@ -91,80 +91,62 @@ export function AnswerModal({
               >
                 {question.category}
               </Chip>
-              <Chip color="default" size="sm" variant="flat">
-                {question.answerType}
-              </Chip>
             </div>
           </div>
 
           {/* Answer Input */}
-          {question.answerType === "boolean" ? (
-            <RadioGroup
-              isDisabled={isSubmitting}
-              label={dict.play.yourAnswer || "Your Answer"}
-              value={answerValue}
-              onValueChange={(value) => setAnswerValue(value as AnswerValue)}
-            >
-              <Radio value="yes">
-                <div className="flex items-center gap-2">
-                  <Icon
-                    className="text-success"
-                    icon="solar:check-circle-bold"
-                    width={20}
-                  />
-                  <span>{dict.play.yes || "Yes"}</span>
-                </div>
-              </Radio>
-              <Radio value="no">
-                <div className="flex items-center gap-2">
-                  <Icon
-                    className="text-danger"
-                    icon="solar:close-circle-bold"
-                    width={20}
-                  />
-                  <span>{dict.play.no || "No"}</span>
-                </div>
-              </Radio>
-              <Radio value="unsure">
-                <div className="flex items-center gap-2">
-                  <Icon
-                    className="text-warning"
-                    icon="solar:question-circle-bold"
-                    width={20}
-                  />
-                  <span>{dict.play.unsure || "Unsure"}</span>
-                </div>
-              </Radio>
-            </RadioGroup>
-          ) : (
-            <Textarea
-              isDisabled={isSubmitting}
-              label={dict.play.yourAnswer || "Your Answer"}
-              maxRows={4}
-              minRows={2}
-              placeholder={dict.play.answerPlaceholder || "Type your answer..."}
-              value={answerText}
-              variant="bordered"
-              onChange={(e) => setAnswerText(e.target.value)}
-            />
-          )}
+          <RadioGroup
+            isDisabled={isSubmitting}
+            label={dict.play.yourAnswer || "Your Answer"}
+            value={answerValue}
+            onValueChange={(value) => setAnswerValue(value as AnswerValue)}
+          >
+            <Radio value="yes">
+              <div className="flex items-center gap-2">
+                <Icon
+                  className="text-success"
+                  icon="solar:check-circle-bold"
+                  width={20}
+                />
+                <span>{dict.play.yes || "Yes"}</span>
+              </div>
+            </Radio>
+            <Radio value="no">
+              <div className="flex items-center gap-2">
+                <Icon
+                  className="text-danger"
+                  icon="solar:close-circle-bold"
+                  width={20}
+                />
+                <span>{dict.play.no || "No"}</span>
+              </div>
+            </Radio>
+            <Radio value="unsure">
+              <div className="flex items-center gap-2">
+                <Icon
+                  className="text-warning"
+                  icon="solar:question-circle-bold"
+                  width={20}
+                />
+                <span>{dict.play.unsure || "Unsure"}</span>
+              </div>
+            </Radio>
+          </RadioGroup>
 
           {/* Optional Text Answer for Boolean Questions */}
-          {question.answerType === "boolean" && (
-            <Textarea
-              isDisabled={isSubmitting}
-              label={dict.play.optionalDetails || "Optional Details (Optional)"}
-              maxRows={3}
-              minRows={2}
-              placeholder={
-                dict.play.optionalDetailsPlaceholder ||
-                "Add any additional details..."
-              }
-              value={answerText}
-              variant="bordered"
-              onChange={(e) => setAnswerText(e.target.value)}
-            />
-          )}
+          <Textarea
+            isDisabled={isSubmitting}
+            label={dict.play.optionalDetails || "Optional Details (Optional)"}
+            maxRows={3}
+            minRows={2}
+            placeholder={
+              dict.play.optionalDetailsPlaceholder ||
+              "Add any additional details..."
+            }
+            value={answerText}
+            variant="bordered"
+            onChange={(e) => setAnswerText(e.target.value)}
+          />
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">

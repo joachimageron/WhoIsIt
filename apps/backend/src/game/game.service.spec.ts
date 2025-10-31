@@ -1213,7 +1213,6 @@ describe('GameService', () => {
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
         askedAt: new Date(),
       } as Question;
 
@@ -1233,7 +1232,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       const result = await service.askQuestion('ABC12', request);
@@ -1259,7 +1257,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('INVALID', request)).rejects.toThrow(
@@ -1284,7 +1281,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1310,7 +1306,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1345,7 +1340,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1380,7 +1374,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1416,7 +1409,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1460,7 +1452,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       const error = await service
@@ -1510,7 +1501,6 @@ describe('GameService', () => {
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
       };
 
       const error = await service
@@ -1552,7 +1542,6 @@ describe('GameService', () => {
         targetPlayer: null,
         questionText: 'How many characters remain?',
         category: 'meta' as any,
-        answerType: 'text' as any,
         askedAt: new Date(),
       } as Question;
 
@@ -1569,7 +1558,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         questionText: 'How many characters remain?',
         category: 'meta' as any,
-        answerType: 'text' as any,
       };
 
       const result = await service.askQuestion('ABC12', request);
@@ -1693,7 +1681,6 @@ describe('GameService', () => {
         targetPlayer: mockAnsweringPlayer,
         questionText: 'Does your character have glasses?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;
 
@@ -2186,7 +2173,6 @@ describe('GameService', () => {
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
         category: 'direct' as any,
-        answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;
 

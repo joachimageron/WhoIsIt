@@ -18,7 +18,6 @@ import {
   GameStatus,
   PlayerSecretStatus,
   QuestionCategory,
-  AnswerType,
   AnswerValue,
   RoundState,
 } from '../database/enums';
@@ -191,7 +190,6 @@ describe('GameService - Scoring and Game End', () => {
         askedBy: mockPlayer,
         questionText: 'Does your character have glasses?',
         category: QuestionCategory.DIRECT,
-        answerType: AnswerType.BOOLEAN,
         askedAt: new Date(),
       } as Question;
 
@@ -204,7 +202,6 @@ describe('GameService - Scoring and Game End', () => {
         playerId: 'player-1',
         questionText: 'Does your character have glasses?',
         category: 'direct',
-        answerType: 'boolean',
       });
 
       expect(mockPlayerRepository.save).toHaveBeenCalledWith(
@@ -231,7 +228,6 @@ describe('GameService - Scoring and Game End', () => {
         id: 'question-1',
         questionText: 'Does your character have glasses?',
         category: QuestionCategory.DIRECT,
-        answerType: AnswerType.BOOLEAN,
         askedBy: { id: 'player-1' } as GamePlayer,
         targetPlayer: mockAnsweringPlayer,
         answers: [],

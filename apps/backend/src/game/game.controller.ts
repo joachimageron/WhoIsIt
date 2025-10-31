@@ -126,17 +126,6 @@ export class GameController {
       );
     }
 
-    if (!body?.answerType) {
-      throw new BadRequestException('answerType is required');
-    }
-
-    const validAnswerTypes = ['boolean', 'text'];
-    if (!validAnswerTypes.includes(body.answerType)) {
-      throw new BadRequestException(
-        `answerType must be one of: ${validAnswerTypes.join(', ')}`,
-      );
-    }
-
     const question = await this.gameService.askQuestion(roomCode, {
       ...body,
       questionText: body.questionText.trim(),
