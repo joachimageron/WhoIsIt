@@ -31,6 +31,17 @@ export type VerifyEmailResponse = {
   message: string;
 };
 
+export type UpdateProfileData = {
+  username?: string;
+  email?: string;
+  avatarUrl?: string;
+};
+
+export type ChangePasswordData = {
+  currentPassword: string;
+  newPassword: string;
+};
+
 /**
  * Register a new user
  */
@@ -208,5 +219,55 @@ export const resetPassword = async (
       .catch(() => ({ message: "Failed to reset password" }));
 
     throw new Error(error.message || "Failed to reset password");
+  }
+};
+
+/**
+ * Update user profile
+ */
+export const updateProfile = async (data: UpdateProfileData): Promise<User> => {
+  const response = await fetch(`${API_URL}/auth/profile`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to update profile" }));
+
+    throw new Error(error.message || "Failed to update profile");
+  }
+
+  const user: User = await response.json();
+
+  return user;
+};
+
+/**
+ * Change user password
+ */
+export const changePassword = async (
+  data: ChangePasswordData,
+): Promise<void> => {
+  const response = await fetch(`${API_URL}/auth/change-password`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to change password" }));
+
+    throw new Error(error.message || "Failed to change password");
   }
 };

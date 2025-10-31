@@ -98,6 +98,8 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                     onAction={(key) => {
                       if (key === "logout") {
                         handleLogout();
+                      } else if (key === "profile") {
+                        router.push(`/${lang}/profile`);
                       }
                     }}
                   >
@@ -106,7 +108,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                       <p className="font-semibold">{user.email}</p>
                     </ListboxItem>
                     <ListboxItem key="settings">
-                      {dict.nav.settings}
+                      {dict.nav.profile}
                     </ListboxItem>
                     <ListboxItem
                       key="logout"

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Patch,
   Post,
   Request,
   Response,
@@ -12,6 +13,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { User } from '../database/entities/user.entity';
@@ -113,5 +116,35 @@ export class AuthController {
       resetPasswordDto.password,
     );
     return { message: 'Password reset successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  async updateProfile(
+    @Request() req: RequestWithUser,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    const user = await this.authService.updateProfile(
+      req.user.id,
+      updateProfileDto,
+    );
+
+    return {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarUrl: user.avatarUrl,
+      emailVerified: user.emailVerified,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('change-password')
+  async changePassword(
+    @Request() req: RequestWithUser,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    await this.authService.changePassword(req.user.id, changePasswordDto);
+    return { message: 'Password changed successfully' };
   }
 }
