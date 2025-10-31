@@ -33,4 +33,4 @@ import { GameGateway } from './game.gateway';
   providers: [GameService, GameGateway],
   exports: [GameService],
 })
-export class GameModule { }
+export class GameModule {}
