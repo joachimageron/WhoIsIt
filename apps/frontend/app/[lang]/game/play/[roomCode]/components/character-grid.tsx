@@ -147,16 +147,6 @@ function CharacterCard({
         >
           {character.name}
         </p>
-
-        {character.traits && character.traits.length > 0 && !isEliminated && (
-          <div className="flex flex-wrap justify-center gap-1">
-            {character.traits.slice(0, 2).map((trait) => (
-              <Chip key={trait.id} color="default" size="sm" variant="flat">
-                {trait.valueText}
-              </Chip>
-            ))}
-          </div>
-        )}
       </div>
     </button>
   );

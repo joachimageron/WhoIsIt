@@ -816,7 +816,7 @@ export class GameService {
       where: { id: request.playerId },
       relations: {
         game: true,
-        secret: { character: { traitValues: { traitValue: { trait: true } } } },
+        secret: { character: true },
       },
     });
 
@@ -891,7 +891,6 @@ export class GameService {
     }
 
     // Note: For now, we trust the player to provide the correct answer based on their secret character
-    // In a future iteration, we could automatically validate the answer based on character traits
 
     // answerValue has been validated by the controller to be a valid AnswerValue enum member
     const validatedAnswerValue = request.answerValue as AnswerValue;

@@ -73,7 +73,7 @@ function QuestionItem({ dict, question }: QuestionItemProps) {
 
       <div className="flex items-center gap-2">
         <Chip
-          color={question.category === "trait" ? "primary" : "default"}
+          color={question.category === "direct" ? "primary" : "default"}
           size="sm"
           variant="dot"
         >

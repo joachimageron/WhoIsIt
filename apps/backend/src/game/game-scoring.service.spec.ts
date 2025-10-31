@@ -190,7 +190,7 @@ describe('GameService - Scoring and Game End', () => {
         round: mockRound,
         askedBy: mockPlayer,
         questionText: 'Does your character have glasses?',
-        category: QuestionCategory.TRAIT,
+        category: QuestionCategory.DIRECT,
         answerType: AnswerType.BOOLEAN,
         askedAt: new Date(),
       } as Question;
@@ -203,7 +203,7 @@ describe('GameService - Scoring and Game End', () => {
       await service.askQuestion('ABC12', {
         playerId: 'player-1',
         questionText: 'Does your character have glasses?',
-        category: 'trait',
+        category: 'direct',
         answerType: 'boolean',
       });
 
@@ -223,7 +223,6 @@ describe('GameService - Scoring and Game End', () => {
         secret: {
           character: {
             id: 'char-1',
-            traitValues: [],
           },
         },
       } as unknown as GamePlayer;
@@ -231,7 +230,7 @@ describe('GameService - Scoring and Game End', () => {
       const mockQuestion = {
         id: 'question-1',
         questionText: 'Does your character have glasses?',
-        category: QuestionCategory.TRAIT,
+        category: QuestionCategory.DIRECT,
         answerType: AnswerType.BOOLEAN,
         askedBy: { id: 'player-1' } as GamePlayer,
         targetPlayer: mockAnsweringPlayer,

@@ -1212,7 +1212,7 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
         askedAt: new Date(),
       } as Question;
@@ -1232,7 +1232,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1258,7 +1258,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1283,7 +1283,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1309,7 +1309,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1344,7 +1344,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1379,7 +1379,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1415,7 +1415,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1459,7 +1459,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1509,7 +1509,7 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
       };
 
@@ -1646,7 +1646,7 @@ describe('GameService', () => {
       const mockCharacter: Character = {
         id: 'char-1',
         name: 'Character 1',
-        traitValues: [],
+        
       } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
@@ -1692,7 +1692,7 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockAnsweringPlayer,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;
@@ -2135,7 +2135,7 @@ describe('GameService', () => {
       const mockCharacter: Character = {
         id: 'char-1',
         name: 'Character 1',
-        traitValues: [],
+        
       } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
@@ -2185,7 +2185,7 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
+        category: 'direct' as any,
         answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;

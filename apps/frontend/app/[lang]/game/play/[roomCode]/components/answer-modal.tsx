@@ -85,7 +85,7 @@ export function AnswerModal({
             <p className="text-base font-medium">{question.questionText}</p>
             <div className="mt-2 flex items-center gap-2">
               <Chip
-                color={question.category === "trait" ? "primary" : "default"}
+                color={question.category === "direct" ? "primary" : "default"}
                 size="sm"
                 variant="dot"
               >

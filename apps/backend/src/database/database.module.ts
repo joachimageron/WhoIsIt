@@ -4,7 +4,6 @@ import {
   Answer,
   Character,
   CharacterSet,
-  CharacterTraitValue,
   Game,
   GameConfigSnapshot,
   GameEvent,
@@ -16,8 +15,6 @@ import {
   PlayerStats,
   Question,
   Round,
-  Trait,
-  TraitValue,
   User,
 } from './entities';
 
@@ -25,7 +22,6 @@ export const DATABASE_ENTITIES = [
   Answer,
   Character,
   CharacterSet,
-  CharacterTraitValue,
   Game,
   GameConfigSnapshot,
   GameEvent,
@@ -37,8 +33,6 @@ export const DATABASE_ENTITIES = [
   PlayerStats,
   Question,
   Round,
-  Trait,
-  TraitValue,
   User,
 ];
 

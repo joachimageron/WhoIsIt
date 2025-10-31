@@ -29,7 +29,6 @@ export enum RoundState {
 }
 
 export enum QuestionCategory {
-  TRAIT = 'trait',
   DIRECT = 'direct',
   META = 'meta',
 }
@@ -60,11 +59,4 @@ export enum PlayerPanelStatus {
   UNKNOWN = 'unknown',
   ELIMINATED = 'eliminated',
   HIGHLIGHTED = 'highlighted',
-}
-
-export enum TraitDataType {
-  BOOLEAN = 'boolean',
-  ENUM = 'enum',
-  TEXT = 'text',
-  NUMBER = 'number',
 }

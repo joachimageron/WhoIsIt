@@ -9,7 +9,6 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CharacterSet } from './character-set.entity';
-import { CharacterTraitValue } from './character-trait-value.entity';
 import { PlayerSecret } from './player-secret.entity';
 import { PlayerPanel } from './player-panel.entity';
 import { Guess } from './guess.entity';
@@ -46,12 +45,6 @@ export class Character {
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt!: Date;
-
-  @OneToMany(
-    () => CharacterTraitValue,
-    (traitValue: CharacterTraitValue) => traitValue.character,
-  )
-  traitValues?: CharacterTraitValue[];
 
   @OneToMany(() => PlayerSecret, (secret: PlayerSecret) => secret.character)
   secrets?: PlayerSecret[];

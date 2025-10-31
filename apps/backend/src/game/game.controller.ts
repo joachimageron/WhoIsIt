@@ -119,7 +119,7 @@ export class GameController {
       throw new BadRequestException('category is required');
     }
 
-    const validCategories = ['trait', 'direct', 'meta'];
+    const validCategories = ['direct', 'meta'];
     if (!validCategories.includes(body.category)) {
       throw new BadRequestException(
         `category must be one of: ${validCategories.join(', ')}`,
