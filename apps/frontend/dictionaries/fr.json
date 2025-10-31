@@ -143,12 +143,60 @@
     "allPlayersReady": "Tous les joueurs sont prêts !",
     "notAllPlayersReady": "Tous les joueurs doivent être prêts pour démarrer le jeu.",
     "waitingForHost": "En attente du démarrage par l'hôte...",
+    "gameStarting": "Démarrage de la partie !",
+    "redirectingToGame": "Redirection vers le jeu...",
     "errors": {
       "failedToJoin": "Échec de la connexion au lobby",
       "failedToUpdateReady": "Échec de la mise à jour du statut",
       "failedToStartGame": "Échec du démarrage du jeu",
       "disconnected": "Vous avez été déconnecté du lobby",
       "roomNotFound": "Salle introuvable"
+    }
+  },
+  "footer": {
+    "poweredBy": "Propulsé par"
+  },
+  "play": {
+    "title": "Partie en Cours",
+    "roomCode": "Code de Salle",
+    "round": "Tour",
+    "yourTurn": "À Votre Tour !",
+    "playerTurn": "Tour de {player}",
+    "waitingForTurn": "En attente de votre tour...",
+    "characterGrid": "Grille de Personnages",
+    "activeCharacters": "Personnages Actifs",
+    "eliminatedCharacters": "Personnages Éliminés",
+    "noCharactersYet": "Chargement des personnages...",
+    "questionsPanel": "Poser une Question",
+    "questionPlaceholder": "Tapez votre question ici...",
+    "selectPlayer": "Sélectionner le joueur cible",
+    "askButton": "Poser la Question",
+    "asking": "Envoi...",
+    "history": "Historique des Questions",
+    "noQuestionsYet": "Aucune question posée pour l'instant",
+    "askedBy": "Posée par",
+    "to": "à",
+    "answered": "Réponse",
+    "guessPanel": "Faire une Supposition",
+    "guessDescription": "Sélectionnez un personnage à deviner",
+    "selectCharacter": "Sélectionner un personnage",
+    "guessButton": "Deviner",
+    "guessing": "Tentative...",
+    "cancelGuess": "Annuler",
+    "timer": "Temps Restant",
+    "abandonGame": "Quitter le Jeu",
+    "confirmAbandon": "Êtes-vous sûr de vouloir quitter le jeu ?",
+    "yes": "Oui",
+    "no": "Non",
+    "connecting": "Connexion au jeu...",
+    "loadingGame": "Chargement de l'état du jeu...",
+    "errors": {
+      "failedToLoad": "Échec du chargement du jeu",
+      "failedToAskQuestion": "Échec de l'envoi de la question",
+      "failedToGuess": "Échec de la supposition",
+      "notYourTurn": "Ce n'est pas votre tour",
+      "selectCharacter": "Veuillez sélectionner un personnage",
+      "enterQuestion": "Veuillez entrer une question"
     }
   }
 }

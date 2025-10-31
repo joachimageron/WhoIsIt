@@ -127,8 +127,8 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
         title: dict.lobby.gameStarting,
         description: dict.lobby.redirectingToGame,
       });
-      // TODO: Navigate to game page when it exists
-      // router.push(`/${lang}/game/play/${event.roomCode}`);
+      // Navigate to game page
+      router.push(`/${lang}/game/play/${event.roomCode}`);
     });
 
     return () => {
