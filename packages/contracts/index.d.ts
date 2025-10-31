@@ -101,6 +101,7 @@ export interface ServerToClientEvents {
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
   questionAsked: (event: SocketQuestionAskedEvent) => void;
+  answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
 }
 
 export interface ClientToServerEvents {
@@ -190,6 +191,34 @@ export type GameStateResponse = {
 export type SocketQuestionAskedEvent = {
   roomCode: string;
   question: QuestionResponse;
+  gameState: GameStateResponse;
+};
+
+// Answers API Types
+export type AnswerValue = "yes" | "no" | "unsure";
+
+export type SubmitAnswerRequest = {
+  playerId: string;
+  questionId: string;
+  answerValue: AnswerValue;
+  answerText?: string;
+};
+
+export type AnswerResponse = {
+  id: string;
+  questionId: string;
+  answeredByPlayerId: string;
+  answeredByPlayerUsername: string;
+  answerValue: AnswerValue;
+  answerText?: string;
+  latencyMs?: number;
+  answeredAt: string;
+};
+
+// Socket.IO Answer Events
+export type SocketAnswerSubmittedEvent = {
+  roomCode: string;
+  answer: AnswerResponse;
   gameState: GameStateResponse;
 };
 

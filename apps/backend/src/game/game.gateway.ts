@@ -24,6 +24,7 @@ import type {
   ClientToServerEvents,
   QuestionResponse,
   GameStateResponse,
+  AnswerResponse,
 } from '@whois-it/contracts';
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -350,6 +351,29 @@ export class GameGateway
       );
     } catch (error) {
       this.logger.error('Error broadcasting question asked:', error);
+    }
+  }
+
+  /**
+   * Broadcast answer submitted event to all clients in a room
+   */
+  broadcastAnswerSubmitted(
+    roomCode: string,
+    answer: AnswerResponse,
+    gameState: GameStateResponse,
+  ) {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+      this.server.to(normalizedRoomCode).emit('answerSubmitted', {
+        roomCode: normalizedRoomCode,
+        answer,
+        gameState,
+      });
+      this.logger.log(
+        `Broadcasted answer submitted to room ${normalizedRoomCode}`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting answer submitted:', error);
     }
   }
 
