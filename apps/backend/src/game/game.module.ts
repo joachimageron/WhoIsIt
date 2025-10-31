@@ -8,6 +8,7 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Guess,
 } from '../database/entities';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
@@ -23,6 +24,7 @@ import { GameGateway } from './game.gateway';
       Round,
       PlayerSecret,
       Character,
+      Guess,
     ]),
   ],
   controllers: [GameController],

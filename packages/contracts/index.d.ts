@@ -94,12 +94,45 @@ export type SocketGameStartedEvent = {
   lobby: GameLobbyResponse;
 };
 
+// Guess Types
+export type MakeGuessRequest = {
+  playerId: string;
+  targetPlayerId: string;
+  targetCharacterId: string;
+};
+
+export type GuessResultResponse = {
+  id: string;
+  guessedBy: {
+    id: string;
+    username: string;
+  };
+  targetPlayer: {
+    id: string;
+    username: string;
+  };
+  targetCharacter: {
+    id: string;
+    name: string;
+  };
+  isCorrect: boolean;
+  guessedAt: string;
+  gameStatus: GameStatus;
+  winnerId?: string;
+};
+
+export type SocketGuessResultEvent = {
+  roomCode: string;
+  guess: GuessResultResponse;
+};
+
 // Socket.IO Events
 export interface ServerToClientEvents {
   lobbyUpdate: (lobby: GameLobbyResponse) => void;
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
+  guessResult: (event: SocketGuessResultEvent) => void;
 }
 
 export interface ClientToServerEvents {

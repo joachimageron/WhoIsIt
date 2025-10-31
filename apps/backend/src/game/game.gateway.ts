@@ -22,6 +22,7 @@ import type {
   SocketUpdatePlayerReadyResponse,
   ServerToClientEvents,
   ClientToServerEvents,
+  GuessResultResponse,
 } from '@whois-it/contracts';
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -325,6 +326,24 @@ export class GameGateway
       this.logger.log(`Broadcasted game started to room ${normalizedRoomCode}`);
     } catch (error) {
       this.logger.error('Error broadcasting game started:', error);
+    }
+  }
+
+  /**
+   * Broadcast guess result event to all clients in a room
+   */
+  broadcastGuessResult(roomCode: string, guess: GuessResultResponse): void {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+      this.server.to(normalizedRoomCode).emit('guessResult', {
+        roomCode: normalizedRoomCode,
+        guess,
+      });
+      this.logger.log(
+        `Broadcasted guess result to room ${normalizedRoomCode}: ${guess.isCorrect ? 'CORRECT' : 'INCORRECT'}`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting guess result:', error);
     }
   }
 

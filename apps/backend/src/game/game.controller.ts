@@ -10,6 +10,8 @@ import type {
   CreateGameRequest,
   GameLobbyResponse,
   JoinGameRequest,
+  MakeGuessRequest,
+  GuessResultResponse,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
@@ -85,6 +87,38 @@ export class GameController {
 
     // Broadcast gameStarted event to all players in the room
     await this.gameGateway.broadcastGameStarted(roomCode);
+
+    return result;
+  }
+
+  @Post(':roomCode/guesses')
+  async makeGuess(
+    @Param('roomCode') roomCode: string,
+    @Body() body: MakeGuessRequest,
+  ): Promise<GuessResultResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    if (!body?.playerId || body.playerId.trim().length === 0) {
+      throw new BadRequestException('playerId is required');
+    }
+
+    if (!body?.targetPlayerId || body.targetPlayerId.trim().length === 0) {
+      throw new BadRequestException('targetPlayerId is required');
+    }
+
+    if (
+      !body?.targetCharacterId ||
+      body.targetCharacterId.trim().length === 0
+    ) {
+      throw new BadRequestException('targetCharacterId is required');
+    }
+
+    const result = await this.gameService.makeGuess(roomCode, body);
+
+    // Broadcast guessResult event to all players in the room
+    this.gameGateway.broadcastGuessResult(roomCode, result);
 
     return result;
   }

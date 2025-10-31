@@ -21,6 +21,7 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Guess,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -28,6 +29,8 @@ import type {
   GamePlayerResponse,
   JoinGameRequest,
   GameVisibility as ContractGameVisibility,
+  MakeGuessRequest,
+  GuessResultResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -50,6 +53,8 @@ export class GameService {
     private readonly playerSecretRepository: Repository<PlayerSecret>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
+    @InjectRepository(Guess)
+    private readonly guessRepository: Repository<Guess>,
   ) {}
 
   /**
@@ -541,5 +546,171 @@ export class GameService {
     }
 
     return Math.max(0, Math.floor(value));
+  }
+
+  /**
+   * Make a guess about another player's secret character
+   */
+  async makeGuess(
+    roomCode: string,
+    request: MakeGuessRequest,
+  ): Promise<GuessResultResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Load the game with all necessary relations
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        characterSet: true,
+        players: {
+          user: true,
+          secret: {
+            character: true,
+          },
+        },
+        rounds: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Validate game is in progress
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    // Find the guessing player
+    const guessingPlayer = game.players?.find((p) => p.id === request.playerId);
+
+    if (!guessingPlayer) {
+      throw new NotFoundException('Guessing player not found');
+    }
+
+    // Validate that the guessing player hasn't left
+    if (guessingPlayer.leftAt) {
+      throw new BadRequestException('Player has left the game');
+    }
+
+    // Find the target player
+    const targetPlayer = game.players?.find(
+      (p) => p.id === request.targetPlayerId,
+    );
+
+    if (!targetPlayer) {
+      throw new NotFoundException('Target player not found');
+    }
+
+    // Validate that the target player hasn't left
+    if (targetPlayer.leftAt) {
+      throw new BadRequestException('Target player has left the game');
+    }
+
+    // Validate that players are not guessing themselves
+    if (guessingPlayer.id === targetPlayer.id) {
+      throw new BadRequestException('Cannot guess your own character');
+    }
+
+    // Get the target character
+    const targetCharacter = await this.characterRepository.findOne({
+      where: { id: request.targetCharacterId },
+      relations: { set: true },
+    });
+
+    if (!targetCharacter) {
+      throw new NotFoundException('Target character not found');
+    }
+
+    // Validate that the character belongs to the game's character set
+    if (targetCharacter.set.id !== game.characterSet.id) {
+      throw new BadRequestException(
+        'Character does not belong to the game character set',
+      );
+    }
+
+    // Get the target player's secret character
+    const targetSecret = targetPlayer.secret;
+
+    if (!targetSecret) {
+      throw new InternalServerErrorException(
+        'Target player has no secret character assigned',
+      );
+    }
+
+    // Check if the guess is correct
+    const isCorrect = targetSecret.character.id === targetCharacter.id;
+
+    // Get the current round
+    const currentRound = game.rounds?.find((r) => !r.endedAt);
+
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    // Create the guess record
+    const guess = this.guessRepository.create({
+      round: currentRound,
+      guessedBy: guessingPlayer,
+      targetPlayer,
+      targetCharacter,
+      isCorrect,
+      guessedAt: new Date(),
+    });
+
+    const savedGuess = await this.guessRepository.save(guess);
+
+    // Handle the result
+    if (isCorrect) {
+      // Correct guess - mark game as completed and set winner
+      game.status = GameStatus.COMPLETED;
+      game.endedAt = new Date();
+
+      // Reveal the target player's secret
+      targetSecret.status = PlayerSecretStatus.REVEALED;
+      targetSecret.revealedAt = new Date();
+
+      await Promise.all([
+        this.gameRepository.save(game),
+        this.playerSecretRepository.save(targetSecret),
+      ]);
+    } else {
+      // Incorrect guess - eliminate the guessing player
+      guessingPlayer.leftAt = new Date();
+      await this.playerRepository.save(guessingPlayer);
+
+      // Check if only one player remains (they win by default)
+      const remainingPlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+
+      if (remainingPlayers.length === 1) {
+        // Last player standing wins
+        game.status = GameStatus.COMPLETED;
+        game.endedAt = new Date();
+        await this.gameRepository.save(game);
+      }
+    }
+
+    // Prepare the response
+    const response: GuessResultResponse = {
+      id: savedGuess.id,
+      guessedBy: {
+        id: guessingPlayer.id,
+        username: guessingPlayer.username,
+      },
+      targetPlayer: {
+        id: targetPlayer.id,
+        username: targetPlayer.username,
+      },
+      targetCharacter: {
+        id: targetCharacter.id,
+        name: targetCharacter.name,
+      },
+      isCorrect,
+      guessedAt: savedGuess.guessedAt.toISOString(),
+      gameStatus: game.status,
+      winnerId: isCorrect ? guessingPlayer.id : undefined,
+    };
+
+    return response;
   }
 }
