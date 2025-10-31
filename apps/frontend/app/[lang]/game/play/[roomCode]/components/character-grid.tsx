@@ -4,9 +4,8 @@ import type { CharacterResponseDto } from "@whois-it/contracts";
 
 import React, { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
-import { Avatar } from "@heroui/avatar";
-import { Chip } from "@heroui/chip";
 import { Icon } from "@iconify/react";
+import Image from "next/image";
 
 interface CharacterGridProps {
   characters: CharacterResponseDto[];
@@ -52,7 +51,7 @@ export function CharacterGrid({
             <h3 className="mb-2 text-sm font-medium text-default-600">
               {dict.play.activeCharacters} ({activeCharacters.length})
             </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
               {activeCharacters.map((character) => (
                 <CharacterCard
                   key={character.id}
@@ -115,8 +114,8 @@ function CharacterCard({
         isEliminated
           ? "cursor-not-allowed border-default-200 bg-default-50 opacity-50"
           : isSelected
-            ? "border-primary bg-primary-50"
-            : "border-default-200 bg-default-100 hover:border-primary hover:bg-default-200"
+            ? "border-primary bg-default-100 hover:bg-default-200"
+            : "border-default-200 bg-default-100 hover:bg-default-200"
       }`}
       disabled={isEliminated}
       type="button"
@@ -132,16 +131,17 @@ function CharacterCard({
         </div>
       )}
 
-      <Avatar
-        className={isEliminated ? "opacity-30" : ""}
-        name={character.name}
-        size="lg"
-        src={character.imageUrl || undefined}
+      <Image
+        className={isEliminated ? "opacity-30" : "" + " rounded-xl"}
+        src={character.imageUrl ?? ""}
+        width={100}
+        height={100}
+        alt={character.name}
       />
 
-      <div className="flex w-full flex-col items-center gap-1">
+      <div className=" w-full ">
         <p
-          className={`text-center text-sm font-medium ${
+          className={` text-center text-sm font-medium ${
             isEliminated ? "line-through" : ""
           }`}
         >
