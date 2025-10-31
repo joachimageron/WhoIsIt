@@ -234,7 +234,7 @@ export type PlayerGameResult = {
   questionsAnswered: number;
   correctGuesses: number;
   incorrectGuesses: number;
-  totalGuesses: number;
+  totalGuesses: number; // Note: Should equal correctGuesses + incorrectGuesses for consistency
   timePlayedSeconds: number;
   finalScore: number;
 };

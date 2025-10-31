@@ -1,6 +1,6 @@
 "use client";
 
-import type { GameResultsResponse } from "@whois-it/contracts";
+import type { GameResultsResponse, GameStatus } from "@whois-it/contracts";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,8 +21,45 @@ import {
 
 import { useAuthStore } from "@/store/auth-store";
 
+interface Dictionary {
+  results: {
+    title: string;
+    winner: string;
+    congratulations: string;
+    youWon: string;
+    youLost: string;
+    gameStats: string;
+    playerStats: string;
+    detailedStats: string;
+    you: string;
+    roomCode: string;
+    duration: string;
+    rounds: string;
+    placement: string;
+    username: string;
+    score: string;
+    questionsAsked: string;
+    questionsAnswered: string;
+    correctGuesses: string;
+    incorrectGuesses: string;
+    timePlayed: string;
+    newGame: string;
+    backToHome: string;
+    loading: string;
+    first: string;
+    second: string;
+    third: string;
+    nth: string;
+    minutes: string;
+    seconds: string;
+    errors: {
+      failedToLoad: string;
+    };
+  };
+}
+
 interface GameResultsClientProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   roomCode: string;
 }
@@ -77,7 +114,7 @@ export function GameResultsClient({
         const mockResults: GameResultsResponse = {
           id: "mock-game-id",
           roomCode: roomCode.toUpperCase(),
-          status: "completed",
+          status: "completed" as GameStatus,
           characterSetId: "classic-characters",
           startedAt: new Date(Date.now() - 600000).toISOString(),
           endedAt: new Date().toISOString(),
@@ -322,7 +359,7 @@ export function GameResultsClient({
                           <span className="font-medium">{player.username}</span>
                           {player.id === currentPlayer?.id && (
                             <Chip color="primary" size="sm" variant="flat">
-                              You
+                              {dict.results.you}
                             </Chip>
                           )}
                         </div>
@@ -358,7 +395,9 @@ export function GameResultsClient({
       {/* Detailed Stats Grid (Optional - can be expanded) */}
       {currentPlayer && (
         <div className="mb-8">
-          <h2 className="mb-4 text-2xl font-bold">Your Detailed Stats</h2>
+          <h2 className="mb-4 text-2xl font-bold">
+            {dict.results.detailedStats}
+          </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardBody>

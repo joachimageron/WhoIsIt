@@ -207,6 +207,8 @@
     "youLost": "Better luck next time!",
     "gameStats": "Game Statistics",
     "playerStats": "Player Statistics",
+    "detailedStats": "Your Detailed Stats",
+    "you": "You",
     "roomCode": "Room Code",
     "duration": "Duration",
     "rounds": "Rounds",
