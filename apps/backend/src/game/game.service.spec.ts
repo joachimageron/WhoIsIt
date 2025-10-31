@@ -310,7 +310,7 @@ describe('GameService', () => {
         characterSet: mockCharacterSet,
         status: GameStatus.LOBBY,
         players: [],
-      } as Game;
+      } as unknown as Game;
 
       mockCharacterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
       mockGameRepository.exists.mockResolvedValue(false);
@@ -433,7 +433,7 @@ describe('GameService', () => {
         characterSet: mockCharacterSet,
         status: GameStatus.LOBBY,
         players: [],
-      } as Game;
+      } as unknown as Game;
 
       const mockNewPlayer: GamePlayer = {
         id: 'player-guest',
@@ -484,7 +484,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         players: [],
-      } as Game;
+      } as unknown as Game;
 
       const joinRequest: JoinGameRequest = {
         username: 'player',
@@ -536,7 +536,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.LOBBY,
         players: [],
-      } as Game;
+      } as unknown as Game;
 
       const joinRequest: JoinGameRequest = {
         userId: 'non-existent',
@@ -560,7 +560,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.LOBBY,
         players: [],
-      } as Game;
+      } as unknown as Game;
 
       const joinRequest: JoinGameRequest = {};
 
@@ -796,7 +796,7 @@ describe('GameService', () => {
         characterSet: { id: 'char-set-123' } as CharacterSet,
         players: [],
         createdAt: new Date(),
-      } as Game;
+      } as unknown as Game;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
 
@@ -1110,7 +1110,7 @@ describe('GameService', () => {
 
       const error = await service
         .startGame('ABC12')
-        .catch((err) => err as Error);
+        .catch((err) => err) as BadRequestException;
 
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error.message).toContain(
@@ -1249,7 +1249,7 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         rounds: [],
-      } as Game;
+      } as unknown as Game;
 
       mockGameRepository.findOne.mockResolvedValue(mockGame);
 
@@ -1413,7 +1413,7 @@ describe('GameService', () => {
 
       const error = await service
         .askQuestion('ABC12', request)
-        .catch((err) => err as Error);
+        .catch((err) => err) as NotFoundException;
 
       expect(error).toBeInstanceOf(NotFoundException);
       expect(error.message).toBe('Target player not found');
@@ -1463,7 +1463,7 @@ describe('GameService', () => {
 
       const error = await service
         .askQuestion('ABC12', request)
-        .catch((err) => err as Error);
+        .catch((err) => err) as BadRequestException;
 
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error.message).toBe('Target player is not in this game');
