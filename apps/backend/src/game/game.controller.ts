@@ -15,6 +15,8 @@ import type {
   GameStateResponse,
   SubmitAnswerRequest,
   AnswerResponse,
+  SubmitGuessRequest,
+  GuessResponse,
 } from '@whois-it/contracts';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
@@ -203,5 +205,41 @@ export class GameController {
     this.gameGateway.broadcastAnswerSubmitted(roomCode, answer, gameState);
 
     return answer;
+  }
+
+  @Post(':roomCode/guesses')
+  async submitGuess(
+    @Param('roomCode') roomCode: string,
+    @Body() body: SubmitGuessRequest,
+  ): Promise<GuessResponse> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    if (!body?.playerId || body.playerId.trim().length === 0) {
+      throw new BadRequestException('playerId is required');
+    }
+
+    if (
+      !body?.targetCharacterId ||
+      body.targetCharacterId.trim().length === 0
+    ) {
+      throw new BadRequestException('targetCharacterId is required');
+    }
+
+    const guess = await this.gameService.submitGuess(roomCode, {
+      ...body,
+      playerId: body.playerId.trim(),
+      targetPlayerId: body.targetPlayerId?.trim(),
+      targetCharacterId: body.targetCharacterId.trim(),
+    });
+
+    // Get updated game state
+    const gameState = await this.gameService.getGameState(roomCode);
+
+    // Broadcast guessResult event to all players in the room
+    this.gameGateway.broadcastGuessResult(roomCode, guess, gameState);
+
+    return guess;
   }
 }
