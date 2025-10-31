@@ -262,57 +262,57 @@ The WhoIsIt project is a multiplayer guessing game with **Phase 2 successfully c
 **Objectif :** Implémenter le gameplay complet (questions, réponses, guesses, scoring)
 
 1. **Backend - Système de Questions**
-   - [ ] Endpoint POST /games/:roomCode/questions (poser une question)
-   - [ ] Validation que c'est le tour du joueur
-   - [ ] Enregistrement Question entity
-   - [ ] Événement Socket.IO questionAsked
-   - [ ] Transition du tour
+   - [x] Endpoint POST /games/:roomCode/questions (poser une question)
+   - [x] Validation que c'est le tour du joueur
+   - [x] Enregistrement Question entity
+   - [x] Événement Socket.IO questionAsked
+   - [x] Transition du tour
 
 2. **Backend - Système de Réponses**
-   - [ ] Endpoint POST /games/:roomCode/answers (répondre à question)
-   - [ ] Validation du répondeur (joueur ciblé)
-   - [ ] Enregistrement Answer entity
-   - [ ] Calcul de la réponse basé sur personnage secret
-   - [ ] Événement Socket.IO answerSubmitted
-   - [ ] Mise à jour de l'état du round
+   - [x] Endpoint POST /games/:roomCode/answers (répondre à question)
+   - [x] Validation du répondeur (joueur ciblé)
+   - [x] Enregistrement Answer entity
+   - [x] Calcul de la réponse basé sur personnage secret
+   - [x] Événement Socket.IO answerSubmitted
+   - [x] Mise à jour de l'état du round
 
 3. **Backend - Système de Guesses**
-   - [ ] Endpoint POST /games/:roomCode/guesses (deviner personnage)
-   - [ ] Validation du joueur qui devine
-   - [ ] Vérification si correct
-   - [ ] Enregistrement Guess entity
-   - [ ] Événement Socket.IO guessResult (correct/incorrect)
-   - [ ] Élimination du joueur si incorrect
-   - [ ] Victoire si correct
+   - [x] Endpoint POST /games/:roomCode/guesses (deviner personnage)
+   - [x] Validation du joueur qui devine
+   - [x] Vérification si correct
+   - [x] Enregistrement Guess entity
+   - [x] Événement Socket.IO guessResult (correct/incorrect)
+   - [x] Élimination du joueur si incorrect
+   - [x] Victoire si correct
 
 4. **Backend - Système de Rounds et Scoring**
-   - [ ] Avancement automatique des rounds
-   - [ ] Calcul du score (temps, tentatives)
-   - [ ] Détection de fin de partie (un seul joueur restant ou victoire)
-   - [ ] Sauvegarde statistiques joueurs
-   - [ ] Événement Socket.IO gameOver avec résultats
+   - [x] Avancement automatique des rounds
+   - [x] Calcul du score (temps, tentatives)
+   - [x] Détection de fin de partie (un seul joueur restant ou victoire)
+   - [x] Sauvegarde statistiques joueurs
+   - [x] Événement Socket.IO gameOver avec résultats
 
 5. **Frontend - Interface de Jeu**
-   - [ ] Page /game/play/[roomCode]
-   - [ ] Grille de personnages (avec état éliminé/actif)
-   - [ ] Panel de questions avec input
-   - [ ] Historique des Q&A
-   - [ ] Interface de guess (sélectionner personnage)
-   - [ ] Timer de tour
-   - [ ] Indicateur "votre tour" / "tour de X"
-   - [ ] Bouton "Abandonner"
+   - [x] Page /game/play/[roomCode]
+   - [x] Grille de personnages (avec état éliminé/actif)
+   - [x] Panel de questions avec input
+   - [x] Historique des Q&A
+   - [x] Interface de guess (sélectionner personnage)
+   - [x] Timer de tour
+   - [x] Indicateur "votre tour" / "tour de X"
+   - [x] Bouton "Abandonner"
 
 6. **Frontend - Écran de Fin de Partie**
-   - [ ] Page /game/results/[roomCode]
-   - [ ] Affichage du gagnant
-   - [ ] Tableau des scores
-   - [ ] Historique complet de la partie
-   - [ ] Bouton "Nouvelle partie" / "Retour au menu"
+   - [x] Page /game/results/[roomCode]
+   - [x] Affichage du gagnant
+   - [x] Tableau des scores
+   - [x] Historique complet de la partie
+   - [x] Bouton "Nouvelle partie" / "Retour au menu"
 
 7. **Types et Contracts**
-   - [ ] Types pour Question, Answer, Guess
-   - [ ] Événements Socket.IO pour gameplay
-   - [ ] États de jeu complets dans game-store
+   - [x] Types pour Question, Answer, Guess
+   - [x] Événements Socket.IO pour gameplay
+   - [x] États de jeu complets dans game-store
 
 ### Phase 4 : Qualité et Fiabilité (2 semaines)
 
