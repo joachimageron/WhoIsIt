@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { Card, CardBody } from "@heroui/card";
+import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 
@@ -9,11 +11,13 @@ import { CharacterGrid } from "./components/character-grid";
 import { QuestionsPanel } from "./components/questions-panel";
 import { QuestionHistory } from "./components/question-history";
 import { GameHeader } from "./components/game-header";
+import { GuessModal } from "./components/guess-modal";
+import { TurnTimer } from "./components/turn-timer";
 
-import { useGameSocket } from "@/hooks/use-game-socket";
-import { useGameStore } from "@/store/game-store";
-import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
+import { useAuthStore } from "@/store/auth-store";
+import { useGameStore } from "@/store/game-store";
+import { useGameSocket } from "@/hooks/use-game-socket";
 
 interface GamePlayClientProps {
   dict: any;
@@ -35,6 +39,8 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
+  const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
+  const [lobby, setLobby] = useState<any>(null);
 
   // Initialize game on mount
   useEffect(() => {
@@ -56,11 +62,15 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           setCurrentPlayerId(player.id);
         }
 
-        // Get lobby to retrieve characterSetId
-        const lobby = await gameApi.getLobby(roomCode);
+        // Get lobby to retrieve characterSetId and turnTimerSeconds
+        const lobbyData = await gameApi.getLobby(roomCode);
+
+        setLobby(lobbyData);
 
         // Load characters
-        const characters = await gameApi.getCharacters(lobby.characterSetId);
+        const characters = await gameApi.getCharacters(
+          lobbyData.characterSetId,
+        );
 
         setCharacters(characters);
 
@@ -128,6 +138,17 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     }
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
 
+  const handleGuess = useCallback(async (_characterId: string) => {
+    // TODO: Implement guess API call when backend is ready
+    // For now, just show a toast
+    addToast({
+      color: "primary",
+      title: "Guess feature coming soon",
+      description:
+        "The guess functionality will be available once the backend is ready.",
+    });
+  }, []);
+
   if (isLoading || !playState || !playState.gameState) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -167,8 +188,33 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           />
         </div>
 
-        {/* Right Panel - Questions and History */}
+        {/* Right Panel - Questions, Timer, and History */}
         <div className="flex flex-col gap-4">
+          {/* Turn Timer */}
+          {lobby?.turnTimerSeconds && (
+            <TurnTimer
+              dict={dict}
+              isMyTurn={isMyTurn}
+              turnTimerSeconds={lobby.turnTimerSeconds}
+            />
+          )}
+
+          {/* Make a Guess Button */}
+          <Card>
+            <CardBody className="p-3">
+              <Button
+                fullWidth
+                color="success"
+                isDisabled={!isMyTurn}
+                startContent={<Icon icon="solar:target-bold" width={20} />}
+                variant="shadow"
+                onPress={() => setIsGuessModalOpen(true)}
+              >
+                {dict.play.guessPanel}
+              </Button>
+            </CardBody>
+          </Card>
+
           {/* Questions Panel */}
           <QuestionsPanel
             currentPlayerId={currentPlayerId}
@@ -182,6 +228,16 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           <QuestionHistory dict={dict} questions={questions} />
         </div>
       </div>
+
+      {/* Guess Modal */}
+      <GuessModal
+        characters={characters}
+        dict={dict}
+        eliminatedIds={playState.eliminatedCharacterIds}
+        isOpen={isGuessModalOpen}
+        onClose={() => setIsGuessModalOpen(false)}
+        onGuess={handleGuess}
+      />
     </div>
   );
 }
