@@ -41,8 +41,8 @@
   - Frontend only: `pnpm dev:frontend` (runs `next dev --turbopack` on port 3000)
   - Backend only: `pnpm dev:backend` (runs `nest start --watch` on port 4000)
 - **Backend helpers** (seed/reset DB):
-  - `pnpm --filter @whois-it/backend seed` (seeds users and "Classic Characters" set with 24 characters)
-  - `pnpm --filter @whois-it/backend db:reset` (resets database)
+  - `pnpm seed` (seeds users and "Classic Characters" set with 24 characters)
+  - `pnpm db:reset` (resets database)
 - **Build**:
   - `pnpm build` (builds all workspaces)
   - Frontend only: `pnpm --filter @whois-it/frontend build`
