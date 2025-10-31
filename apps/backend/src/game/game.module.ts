@@ -11,6 +11,7 @@ import {
   Question,
   Answer,
   Guess,
+  PlayerStats,
 } from '../database/entities';
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
@@ -28,7 +29,8 @@ import { GameGateway } from './game.gateway';
       Character,
       Question,
       Answer,
-      Guess
+      Guess,
+      PlayerStats,
     ]),
   ],
   controllers: [GameController],

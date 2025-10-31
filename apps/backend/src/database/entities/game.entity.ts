@@ -76,6 +76,13 @@ export class Game {
   @Column({ type: 'timestamptz', nullable: true })
   endedAt?: Date | null;
 
+  @ManyToOne(() => User, (user: User) => user.wonGames, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'winner_user_id' })
+  winner?: User | null;
+
   @OneToMany(() => GamePlayer, (player: GamePlayer) => player.game)
   players?: GamePlayer[];
 

@@ -70,6 +70,9 @@ export class User {
   @OneToMany(() => Game, (game: Game) => game.host)
   hostedGames?: Game[];
 
+  @OneToMany(() => Game, (game: Game) => game.winner)
+  wonGames?: Game[];
+
   @OneToMany(() => GamePlayer, (player: GamePlayer) => player.user)
   gamePlayers?: GamePlayer[];
 

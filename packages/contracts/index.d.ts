@@ -103,6 +103,7 @@ export interface ServerToClientEvents {
   questionAsked: (event: SocketQuestionAskedEvent) => void;
   answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
   guessResult: (event: SocketGuessResultEvent) => void;
+  gameOver: (event: SocketGameOverEvent) => void;
 }
 
 export interface ClientToServerEvents {
@@ -252,33 +253,36 @@ export type SocketGuessResultEvent = {
   gameState: GameStateResponse;
 };
 
-// Game Results API Types
+// Game Results and Scoring Types
 export type PlayerGameResult = {
-  id: string;
-  username: string;
+  playerId: string;
+  playerUsername: string;
   userId?: string;
-  avatarUrl?: string;
-  isWinner: boolean;
-  placement: number;
+  score: number;
   questionsAsked: number;
   questionsAnswered: number;
   correctGuesses: number;
   incorrectGuesses: number;
-  totalGuesses: number; // Note: Should equal correctGuesses + incorrectGuesses for consistency
   timePlayedSeconds: number;
-  finalScore: number;
+  isWinner: boolean;
+  placement: number;
+  leftAt?: string;
 };
 
-export type GameResultsResponse = {
-  id: string;
+export type GameOverResult = {
+  gameId: string;
   roomCode: string;
-  status: GameStatus;
-  characterSetId: string;
-  startedAt?: string;
-  endedAt?: string;
+  winnerId?: string;
+  winnerUsername?: string;
   totalRounds: number;
-  totalDurationSeconds: number;
-  winner?: PlayerGameResult;
+  gameDurationSeconds: number;
+  endReason: "victory" | "last_player_standing" | "aborted";
   players: PlayerGameResult[];
+};
+
+// Socket.IO Game Over Event
+export type SocketGameOverEvent = {
+  roomCode: string;
+  result: GameOverResult;
 };
 

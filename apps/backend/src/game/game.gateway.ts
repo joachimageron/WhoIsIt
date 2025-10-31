@@ -402,6 +402,28 @@ export class GameGateway
   }
 
   /**
+   * Broadcast game over event to all clients in a room
+   */
+  async broadcastGameOver(roomCode: string) {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+      const result =
+        await this.gameService.getGameOverResult(normalizedRoomCode);
+
+      this.server.to(normalizedRoomCode).emit('gameOver', {
+        roomCode: normalizedRoomCode,
+        result,
+      });
+
+      this.logger.log(
+        `Broadcasted game over to room ${normalizedRoomCode} (winner: ${result.winnerUsername ?? 'none'})`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting game over:', error);
+    }
+  }
+
+  /**
    * Start periodic cleanup of abandoned lobbies
    */
   private startLobbyCleanup() {

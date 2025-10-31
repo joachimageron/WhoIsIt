@@ -240,6 +240,11 @@ export class GameController {
     // Broadcast guessResult event to all players in the room
     this.gameGateway.broadcastGuessResult(roomCode, guess, gameState);
 
+    // Check if game has ended and broadcast gameOver if so
+    if (gameState.status === 'completed') {
+      await this.gameGateway.broadcastGameOver(roomCode);
+    }
+
     return guess;
   }
 }

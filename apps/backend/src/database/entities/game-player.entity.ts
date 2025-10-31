@@ -71,6 +71,12 @@ export class GamePlayer {
   @Column({ type: 'text', nullable: true })
   lastSocketId?: string | null;
 
+  @Column({ type: 'int', default: 0 })
+  score!: number;
+
+  @Column({ type: 'int', nullable: true })
+  placement?: number | null;
+
   @OneToOne(() => PlayerSecret, (secret: PlayerSecret) => secret.player)
   secret?: PlayerSecret;
 
