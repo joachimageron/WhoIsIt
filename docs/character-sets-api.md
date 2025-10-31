@@ -30,31 +30,16 @@ Returns a list of all available character sets.
     "metadata": {
       "theme": "classic"
     },
-    "characterCount": 8
-  },
-  {
-    "id": "uuid",
-    "name": "Fantasy Heroes",
-    "slug": "fantasy-heroes",
-    "description": "A fantasy-themed set with warriors, mages, and rogues",
-    "visibility": "public",
-    "isDefault": false,
-    "metadata": {
-      "theme": "fantasy"
-    },
-    "characterCount": 5
+    "characterCount": 24
   }
 ]
 ```
 
 ### Get a Specific Character Set
 
-Returns details about a specific character set.
+Returns details about a single character set by ID.
 
 **Endpoint:** `GET /character-sets/:id`
-
-**Parameters:**
-- `id` (path parameter) - UUID of the character set
 
 **Response:**
 
@@ -69,21 +54,19 @@ Returns details about a specific character set.
   "metadata": {
     "theme": "classic"
   },
-  "characterCount": 8
+  "characterCount": 24
 }
 ```
 
 **Error Responses:**
-- `404 Not Found` - Character set not found
 
-### Get Characters in a Set
+- `404 Not Found` if the character set does not exist
 
-Returns all active characters in a specific character set, including their trait values.
+### List Characters in a Character Set
+
+Returns all active characters in a specific character set.
 
 **Endpoint:** `GET /character-sets/:id/characters`
-
-**Parameters:**
-- `id` (path parameter) - UUID of the character set
 
 **Response:**
 
@@ -93,126 +76,94 @@ Returns all active characters in a specific character set, including their trait
     "id": "uuid",
     "name": "Alice",
     "slug": "alice",
-    "imageUrl": null,
+    "imageUrl": "/character/character_0.jpg",
     "summary": "Alice is a character in the classic set",
     "metadata": {},
-    "isActive": true,
-    "traits": [
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Gender",
-        "traitSlug": "gender",
-        "valueText": "Female"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Hair Color",
-        "traitSlug": "hair-color",
-        "valueText": "Blond"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Wears Glasses",
-        "traitSlug": "has-glasses",
-        "valueText": "No"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Wears Hat",
-        "traitSlug": "has-hat",
-        "valueText": "No"
-      }
-    ]
+    "isActive": true
   },
   {
     "id": "uuid",
     "name": "Bob",
     "slug": "bob",
-    "imageUrl": null,
+    "imageUrl": "/character/character_1.jpg",
     "summary": "Bob is a character in the classic set",
     "metadata": {},
-    "isActive": true,
-    "traits": [
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Gender",
-        "traitSlug": "gender",
-        "valueText": "Male"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Hair Color",
-        "traitSlug": "hair-color",
-        "valueText": "Brown"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Wears Glasses",
-        "traitSlug": "has-glasses",
-        "valueText": "Yes"
-      },
-      {
-        "id": "uuid",
-        "traitId": "uuid",
-        "traitName": "Wears Hat",
-        "traitSlug": "has-hat",
-        "valueText": "No"
-      }
-    ]
+    "isActive": true
   }
 ]
 ```
 
+**Notes:**
+
+- Only active characters (`isActive: true`) are returned
+- Characters are sorted by name in ascending order
+- The response does not include inactive characters
+
 **Error Responses:**
-- `404 Not Found` - Character set not found
 
-## Example Usage
+- `404 Not Found` if the character set does not exist
 
-### Using curl
+## Data Models
 
-**List all character sets:**
+### CharacterSet
 
-```bash
-curl -X GET http://localhost:4000/character-sets
-```
+| Field           | Type                  | Description                                      |
+| --------------- | --------------------- | ------------------------------------------------ |
+| `id`            | `string` (UUID)       | Unique identifier                                |
+| `name`          | `string`              | Display name of the character set                |
+| `slug`          | `string`              | URL-friendly identifier                          |
+| `description`   | `string` \| `null`    | Optional description                             |
+| `visibility`    | `'public'|'private'`  | Visibility setting                               |
+| `isDefault`     | `boolean`             | Whether this is the default character set        |
+| `metadata`      | `Record<string, any>` | Additional metadata (JSON)                       |
+| `characterCount`| `number`              | Number of characters in the set                  |
 
-**Get a specific character set:**
+### Character
 
-```bash
-curl -X GET http://localhost:4000/character-sets/{character-set-id}
-```
+| Field       | Type                  | Description                    |
+| ----------- | --------------------- | ------------------------------ |
+| `id`        | `string` (UUID)       | Unique identifier              |
+| `name`      | `string`              | Character's display name       |
+| `slug`      | `string`              | URL-friendly identifier        |
+| `imageUrl`  | `string` \| `null`    | URL to character image         |
+| `summary`   | `string` \| `null`    | Brief description              |
+| `metadata`  | `Record<string, any>` | Additional metadata (JSON)     |
+| `isActive`  | `boolean`             | Whether the character is active|
 
-**Get all characters in a set:**
+## Usage Examples
 
-```bash
-curl -X GET http://localhost:4000/character-sets/{character-set-id}/characters
-```
+### Creating a Game with a Character Set
 
-### Using fetch (JavaScript/TypeScript)
+When creating a new game, you specify the character set by its ID:
 
 ```typescript
-// List all character sets
-const response = await fetch('http://localhost:4000/character-sets');
-const characterSets = await response.json();
-
-// Get characters in a set
-const charactersResponse = await fetch(
-  `http://localhost:4000/character-sets/${setId}/characters`
-);
-const characters = await charactersResponse.json();
+POST /games
+{
+  "characterSetId": "uuid-from-character-sets-list",
+  "hostUsername": "Alice",
+  "visibility": "public",
+  "maxPlayers": 4
+}
 ```
 
-## Notes
+The game will use characters from the specified character set for gameplay.
 
-- Only active characters (`isActive: true`) are returned by the characters endpoint
-- Character sets are ordered by default status (default sets first) and then by name
-- Characters are ordered by name
-- All IDs are UUIDs
-- Trait values are returned as part of each character object, making it easy to filter or search by traits
+### Frontend Integration
+
+In the frontend, you can fetch character sets and their characters:
+
+```typescript
+// Fetch all character sets
+const characterSets = await fetch('/character-sets').then(res => res.json());
+
+// Get characters for a specific set
+const characters = await fetch(`/character-sets/${setId}/characters`)
+  .then(res => res.json());
+```
+
+## Implementation Notes
+
+- Character sets are seeded during database initialization
+- The "Classic Characters" set is marked as `isDefault: true`
+- All character set operations currently use TypeORM repositories
+- Character images are served from the `/character/` path

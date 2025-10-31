@@ -20,7 +20,7 @@
   - **Backend WebSocket gateway**: `apps/backend/src/game/game.gateway.ts` with custom WebSocket adapter `apps/backend/src/game/ws-auth.adapter.ts`.
   - **Authentication for sockets**: Adapter reads JWT from cookie `access_token` or `handshake.auth.token` and attaches `socket.user` (may be null). Important: connections are allowed even when unauthenticated, but code relies on `socket.user` when available.
   - **Game REST API**: `apps/backend/src/game/game.controller.ts`. Endpoints: `POST /games` (create), `POST /games/:roomCode/join` (join), `GET /games/:roomCode` (get lobby), `POST /games/:roomCode/start` (start + broadcasts).
-  - **Character Sets API**: `apps/backend/src/character-sets/character-sets.controller.ts` — CRUD operations for character sets, characters, and traits. Used when creating games.
+  - **Character Sets API**: `apps/backend/src/character-sets/character-sets.controller.ts` — CRUD operations for character sets and characters. Used when creating games.
   - **Auth API**: `apps/backend/src/auth/auth.controller.ts` — registration, login, email verification, password reset, logout. Uses JWT tokens in HTTP-only cookies.
   - **Email system**: `apps/backend/src/email/email.service.ts` with MJML templates in `src/email/templates/` — sends verification and password reset emails (or logs to console if not configured).
 
@@ -91,13 +91,13 @@ When editing backend socket auth, remember to update `.env` (copy `apps/backend/
 ## Database and entity relationships
 
 - **TypeORM** with auto-loading entities from `apps/backend/src/database/entities/`.
-- **Key entities**: User, Game, GamePlayer, Round, Question, Answer, Guess, Character, CharacterSet, Trait, TraitValue, GameEvent, UserStatistics, PlayerStatistics, Invitation.
-- **Seeding**: `src/seed.ts` creates demo users and "Classic Characters" set with 24 characters and 5 traits (gender, hair color, accessories, facial hair, eye color).
+- **Key entities**: User, Game, GamePlayer, Round, Question, Answer, Guess, Character, CharacterSet, GameEvent, UserStatistics, PlayerStatistics, Invitation.
+- **Seeding**: `src/seed.ts` creates demo users and "Classic Characters" set with 24 characters.
 - **DB_SYNC** env variable: when `true`, TypeORM auto-syncs schema (use only in dev). In production, use migrations.
 
 ## Testing and quality
 
-- **Backend tests**: Jest unit tests in `src/**/*.spec.ts` — 115/115 tests currently passing. Run with `pnpm test`.
+- **Backend tests**: Jest unit tests in `src/**/*.spec.ts` — 162/162 tests currently passing. Run with `pnpm test`.
 - **Frontend tests**: None yet — testing infrastructure not set up.
 - **ESLint**: Configured for both apps. Run `pnpm lint` to check all workspaces.
 - **CI/CD**: `.github/workflows/ci.yml` runs on push/PR to main/develop. Jobs: lint, test, build.
@@ -106,7 +106,7 @@ When editing backend socket auth, remember to update `.env` (copy `apps/backend/
 ## Current implementation status (Phase 2 complete)
 
 - ✅ **Authentication system**: Complete with email verification and password reset.
-- ✅ **Character sets API**: Full CRUD with characters and traits.
+- ✅ **Character sets API**: Full CRUD with characters.
 - ✅ **Game lobby system**: Create, join, get lobby state, real-time Socket.IO updates.
 - ✅ **Game start**: Start game and assign characters to players.
 - ✅ **CI/CD pipeline**: GitHub Actions workflow.
