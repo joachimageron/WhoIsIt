@@ -533,8 +533,8 @@ export class GameService {
         username: answer.answeredBy.username,
       },
       answerValue: answer.answerValue,
-      answerText: answer.answerText ?? undefined,
-      latencyMs: answer.latencyMs ?? undefined,
+      answerText: answer.answerText,
+      latencyMs: answer.latencyMs,
       answeredAt: answer.answeredAt.toISOString(),
     };
   }
@@ -555,7 +555,7 @@ export class GameService {
             id: question.targetPlayer.id,
             username: question.targetPlayer.username,
           }
-        : undefined,
+        : null,
       questionText: question.questionText,
       category: question.category,
       answerType: question.answerType,
@@ -564,7 +564,7 @@ export class GameService {
   }
 
   /**
-   * Normalize room code to uppercase and trimmed
+   * Initialize the first round of the game
    */
   private async initializeFirstRound(game: Game): Promise<Round> {
     // Get the first player to be the active player
