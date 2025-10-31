@@ -1,5 +1,7 @@
 "use client";
 
+import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
+
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardBody } from "@heroui/card";
@@ -13,6 +15,7 @@ import { QuestionHistory } from "./components/question-history";
 import { GameHeader } from "./components/game-header";
 import { GuessModal } from "./components/guess-modal";
 import { TurnTimer } from "./components/turn-timer";
+import { AnswerModal } from "./components/answer-modal";
 
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
@@ -49,6 +52,9 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
   const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
   const [lobby, setLobby] = useState<any>(null);
+  const [pendingQuestion, setPendingQuestion] =
+    useState<QuestionResponse | null>(null);
+  const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
 
   // Initialize game on mount
   useEffect(() => {
@@ -127,12 +133,21 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     const unsubscribeQuestionAsked = onQuestionAsked((event) => {
       addQuestion(event.question);
       setGameState(event.gameState);
+
+      // Check if this question is directed at the current player
+      if (
+        event.question.targetPlayerId &&
+        event.question.targetPlayerId === currentPlayerId
+      ) {
+        setPendingQuestion(event.question);
+        setIsAnswerModalOpen(true);
+      }
     });
 
     return () => {
       unsubscribeQuestionAsked();
     };
-  }, [onQuestionAsked, addQuestion, setGameState]);
+  }, [onQuestionAsked, addQuestion, setGameState, currentPlayerId]);
 
   // Listen to answer submitted events
   useEffect(() => {
@@ -143,12 +158,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         title: dict.play.answerSubmitted || "Answer submitted",
         description: `${event.answer.answeredByPlayerUsername} answered the question`,
       });
+
+      // Clear pending question if it was answered
+      if (pendingQuestion && event.answer.questionId === pendingQuestion.id) {
+        setPendingQuestion(null);
+        setIsAnswerModalOpen(false);
+      }
     });
 
     return () => {
       unsubscribeAnswerSubmitted();
     };
-  }, [onAnswerSubmitted, setGameState, dict]);
+  }, [onAnswerSubmitted, setGameState, dict, pendingQuestion]);
 
   // Listen to guess result events
   useEffect(() => {
@@ -251,6 +272,49 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     [currentPlayerId, roomCode, dict],
   );
 
+  const handleSubmitAnswer = useCallback(
+    async (
+      questionId: string,
+      answerValue: AnswerValue,
+      answerText?: string,
+    ) => {
+      if (!currentPlayerId) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          description: "Player ID not found",
+        });
+
+        return;
+      }
+
+      try {
+        await gameApi.submitAnswer(roomCode, {
+          playerId: currentPlayerId,
+          questionId,
+          answerValue,
+          answerText,
+        });
+
+        addToast({
+          color: "success",
+          title: dict.play.answerSubmitted || "Answer submitted",
+          description: "Your answer has been submitted successfully",
+        });
+
+        setPendingQuestion(null);
+        setIsAnswerModalOpen(false);
+      } catch (error) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      }
+    },
+    [currentPlayerId, roomCode, dict],
+  );
+
   if (isLoading || !playState || !playState.gameState) {
     return (
       <div className="flex h-full w-full items-center justify-center">
@@ -339,6 +403,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         isOpen={isGuessModalOpen}
         onClose={() => setIsGuessModalOpen(false)}
         onGuess={handleGuess}
+      />
+
+      {/* Answer Modal */}
+      <AnswerModal
+        dict={dict}
+        isOpen={isAnswerModalOpen}
+        question={pendingQuestion}
+        onClose={() => {
+          setIsAnswerModalOpen(false);
+          setPendingQuestion(null);
+        }}
+        onSubmitAnswer={handleSubmitAnswer}
       />
     </div>
   );
