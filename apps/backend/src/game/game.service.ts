@@ -26,6 +26,7 @@ import {
   Character,
   Question,
   Answer,
+  Guess,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -38,6 +39,8 @@ import type {
   GameStateResponse,
   SubmitAnswerRequest,
   AnswerResponse,
+  SubmitGuessRequest,
+  GuessResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -64,6 +67,8 @@ export class GameService {
     private readonly questionRepository: Repository<Question>,
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
+    @InjectRepository(Guess)
+    private readonly guessRepository: Repository<Guess>,
   ) {}
 
   /**
@@ -944,6 +949,181 @@ export class GameService {
       answerText: answer.answerText ?? undefined,
       latencyMs: answer.latencyMs ?? undefined,
       answeredAt: answer.answeredAt.toISOString(),
+    };
+  }
+
+  /**
+   * Submit a guess for a character
+   */
+  async submitGuess(
+    roomCode: string,
+    request: SubmitGuessRequest,
+  ): Promise<GuessResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Get the game with all necessary relations
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+        rounds: true,
+      },
+      order: {
+        rounds: { roundNumber: 'DESC' },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    // Get the current round
+    const currentRound = game.rounds?.[0];
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    // Get the player making the guess
+    const guessingPlayer = await this.playerRepository.findOne({
+      where: { id: request.playerId },
+      relations: {
+        game: true,
+      },
+    });
+
+    if (!guessingPlayer) {
+      throw new NotFoundException('Player not found');
+    }
+
+    if (guessingPlayer.game.id !== game.id) {
+      throw new BadRequestException('Player is not in this game');
+    }
+
+    // Get the target player if specified
+    let targetPlayer: GamePlayer | null = null;
+    if (request.targetPlayerId) {
+      targetPlayer = await this.playerRepository.findOne({
+        where: { id: request.targetPlayerId },
+        relations: {
+          game: true,
+          secret: { character: true },
+        },
+      });
+
+      if (!targetPlayer) {
+        throw new NotFoundException('Target player not found');
+      }
+
+      if (targetPlayer.game.id !== game.id) {
+        throw new BadRequestException('Target player is not in this game');
+      }
+
+      if (targetPlayer.id === guessingPlayer.id) {
+        throw new BadRequestException('Cannot guess your own character');
+      }
+    }
+
+    // Get the target character
+    const targetCharacter = await this.characterRepository.findOne({
+      where: { id: request.targetCharacterId },
+    });
+
+    if (!targetCharacter) {
+      throw new NotFoundException('Target character not found');
+    }
+
+    // Determine if the guess is correct
+    let isCorrect = false;
+    if (targetPlayer) {
+      // If guessing a specific player's character
+      if (!targetPlayer.secret || !targetPlayer.secret.character) {
+        throw new InternalServerErrorException(
+          'Target player does not have a secret character assigned',
+        );
+      }
+      isCorrect = targetPlayer.secret.character.id === targetCharacter.id;
+    }
+
+    // Create the guess
+    const guess = this.guessRepository.create({
+      round: currentRound,
+      guessedBy: guessingPlayer,
+      targetPlayer,
+      targetCharacter,
+      isCorrect,
+      latencyMs: null,
+    });
+
+    const savedGuess = await this.guessRepository.save(guess);
+
+    // Handle game logic based on guess result
+    if (isCorrect && targetPlayer) {
+      // Correct guess - reveal the target player's secret
+      if (targetPlayer.secret) {
+        targetPlayer.secret.status = PlayerSecretStatus.REVEALED;
+        await this.playerSecretRepository.save(targetPlayer.secret);
+      }
+
+      // Check if game should end (only one unrevealed player left or the guesser won)
+      const unrevealedPlayers = await this.playerSecretRepository
+        .createQueryBuilder('secret')
+        .innerJoin('secret.player', 'player')
+        .where('player.game_id = :gameId', { gameId: game.id })
+        .andWhere('player.leftAt IS NULL')
+        .andWhere('secret.status = :status', {
+          status: PlayerSecretStatus.HIDDEN,
+        })
+        .getCount();
+
+      if (unrevealedPlayers <= 1) {
+        // Game over - mark game as completed
+        game.status = GameStatus.COMPLETED;
+        game.endedAt = new Date();
+        await this.gameRepository.save(game);
+      }
+    } else if (!isCorrect && targetPlayer) {
+      // Incorrect guess - eliminate the guesser (optional - depends on game rules)
+      // For now, we just record the incorrect guess
+      // Future: could eliminate player or apply penalty
+    }
+
+    // Return the guess response
+    return this.mapToGuessResponse(
+      savedGuess,
+      guessingPlayer,
+      targetPlayer,
+      targetCharacter,
+      currentRound,
+    );
+  }
+
+  /**
+   * Map Guess entity to GuessResponse
+   */
+  private mapToGuessResponse(
+    guess: Guess,
+    guessingPlayer: GamePlayer,
+    targetPlayer: GamePlayer | null,
+    targetCharacter: Character,
+    round: Round,
+  ): GuessResponse {
+    return {
+      id: guess.id,
+      roundId: round.id,
+      roundNumber: round.roundNumber,
+      guessedByPlayerId: guessingPlayer.id,
+      guessedByPlayerUsername: guessingPlayer.username,
+      targetPlayerId: targetPlayer?.id,
+      targetPlayerUsername: targetPlayer?.username,
+      targetCharacterId: targetCharacter.id,
+      targetCharacterName: targetCharacter.name,
+      isCorrect: guess.isCorrect,
+      latencyMs: guess.latencyMs ?? undefined,
+      guessedAt: guess.guessedAt.toISOString(),
     };
   }
 }

@@ -25,6 +25,7 @@ import type {
   QuestionResponse,
   GameStateResponse,
   AnswerResponse,
+  GuessResponse,
 } from '@whois-it/contracts';
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -374,6 +375,29 @@ export class GameGateway
       );
     } catch (error) {
       this.logger.error('Error broadcasting answer submitted:', error);
+    }
+  }
+
+  /**
+   * Broadcast guess result event to all clients in a room
+   */
+  broadcastGuessResult(
+    roomCode: string,
+    guess: GuessResponse,
+    gameState: GameStateResponse,
+  ) {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+      this.server.to(normalizedRoomCode).emit('guessResult', {
+        roomCode: normalizedRoomCode,
+        guess,
+        gameState,
+      });
+      this.logger.log(
+        `Broadcasted guess result to room ${normalizedRoomCode} (correct: ${guess.isCorrect})`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting guess result:', error);
     }
   }
 
