@@ -107,9 +107,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                       <p className="font-semibold">{dict.auth.signedInAs}</p>
                       <p className="font-semibold">{user.email}</p>
                     </ListboxItem>
-                    <ListboxItem key="settings">
-                      {dict.nav.profile}
-                    </ListboxItem>
+                    <ListboxItem key="settings">{dict.nav.profile}</ListboxItem>
                     <ListboxItem
                       key="logout"
                       className="text-danger"

@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Card } from "@heroui/card";
-import { Divider } from "@heroui/divider";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 
@@ -44,6 +43,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
   useEffect(() => {
     if (!isAuthenticated) {
       router.push(`/${lang}/auth/login`);
+
       return;
     }
 
@@ -56,10 +56,9 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     }
   }, [user, isAuthenticated, router, lang]);
 
-  const handleProfileInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleProfileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -67,6 +66,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = e.target;
+
     setPasswordData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -79,6 +79,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.updateFailed,
         description: dict.auth.profile.invalidUsername,
       });
+
       return;
     }
 
@@ -88,6 +89,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.updateFailed,
         description: dict.auth.profile.invalidEmail,
       });
+
       return;
     }
 
@@ -101,6 +103,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.updateFailed,
         description: dict.auth.profile.invalidAvatarUrl,
       });
+
       return;
     }
 
@@ -147,6 +150,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.passwordChangeFailed,
         description: dict.auth.profile.fillAllFields,
       });
+
       return;
     }
 
@@ -156,6 +160,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.passwordChangeFailed,
         description: dict.auth.profile.passwordTooShort,
       });
+
       return;
     }
 
@@ -165,6 +170,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
         title: dict.auth.profile.passwordChangeFailed,
         description: dict.auth.profile.passwordsNoMatch,
       });
+
       return;
     }
 
@@ -248,10 +254,10 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
               onChange={handleProfileInputChange}
             />
             <Button
+              className="w-full"
               color="primary"
               isLoading={isLoadingProfile}
               type="submit"
-              className="w-full"
             >
               {isLoadingProfile
                 ? dict.auth.profile.updating
@@ -362,10 +368,10 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
                 onChange={handlePasswordInputChange}
               />
               <Button
+                className="w-full"
                 color="primary"
                 isLoading={isLoadingPassword}
                 type="submit"
-                className="w-full"
               >
                 {isLoadingPassword
                   ? dict.auth.profile.changing

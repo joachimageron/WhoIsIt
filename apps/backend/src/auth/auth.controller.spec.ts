@@ -12,6 +12,8 @@ describe('AuthController', () => {
     register: jest.fn(),
     login: jest.fn(),
     updateLastSeen: jest.fn(),
+    updateProfile: jest.fn(),
+    changePassword: jest.fn(),
   };
 
   const mockResponse = () => {
@@ -160,6 +162,78 @@ describe('AuthController', () => {
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Logged out successfully',
+      });
+    });
+  });
+
+  describe('updateProfile', () => {
+    it('should update user profile', async () => {
+      const mockUser = {
+        id: 'uuid-123',
+        email: 'test@example.com',
+        username: 'testuser',
+        avatarUrl: null,
+        emailVerified: true,
+      } as User;
+
+      const updateDto = {
+        username: 'newusername',
+        email: 'newemail@example.com',
+      };
+
+      mockAuthService.updateProfile.mockResolvedValue({
+        ...mockUser,
+        username: updateDto.username,
+        email: updateDto.email,
+      });
+
+      const req = { user: mockUser };
+      const result = await controller.updateProfile(
+        req as unknown as RequestWithUser,
+        updateDto,
+      );
+
+      expect(mockAuthService.updateProfile).toHaveBeenCalledWith(
+        mockUser.id,
+        updateDto,
+      );
+      expect(result).toEqual({
+        id: mockUser.id,
+        email: updateDto.email,
+        username: updateDto.username,
+        avatarUrl: mockUser.avatarUrl,
+        emailVerified: true,
+      });
+    });
+  });
+
+  describe('changePassword', () => {
+    it('should change user password', async () => {
+      const mockUser = {
+        id: 'uuid-123',
+        email: 'test@example.com',
+        username: 'testuser',
+      } as User;
+
+      const changePasswordDto = {
+        currentPassword: 'oldpassword',
+        newPassword: 'newpassword',
+      };
+
+      mockAuthService.changePassword.mockResolvedValue(undefined);
+
+      const req = { user: mockUser };
+      const result = await controller.changePassword(
+        req as unknown as RequestWithUser,
+        changePasswordDto,
+      );
+
+      expect(mockAuthService.changePassword).toHaveBeenCalledWith(
+        mockUser.id,
+        changePasswordDto,
+      );
+      expect(result).toEqual({
+        message: 'Password changed successfully',
       });
     });
   });
