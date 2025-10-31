@@ -98,16 +98,16 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                     onAction={(key) => {
                       if (key === "logout") {
                         handleLogout();
+                      } else if (key === "profile") {
+                        router.push(`/${lang}/profile`);
                       }
                     }}
                   >
-                    <ListboxItem key="profile" className="h-14 gap-2">
+                    <ListboxItem key="info" className="h-14 gap-2">
                       <p className="font-semibold">{dict.auth.signedInAs}</p>
                       <p className="font-semibold">{user.email}</p>
                     </ListboxItem>
-                    <ListboxItem key="settings">
-                      {dict.nav.settings}
-                    </ListboxItem>
+                    <ListboxItem key="profile">{dict.nav.profile}</ListboxItem>
                     <ListboxItem
                       key="logout"
                       className="text-danger"
