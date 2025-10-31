@@ -22,6 +22,11 @@ import type {
   SocketUpdatePlayerReadyResponse,
   ServerToClientEvents,
   ClientToServerEvents,
+  QuestionResponse,
+  AnswerResponse,
+  GuessResponse,
+  RoundResponse,
+  GameOverResult,
 } from '@whois-it/contracts';
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents> & {
@@ -325,6 +330,118 @@ export class GameGateway
       this.logger.log(`Broadcasted game started to room ${normalizedRoomCode}`);
     } catch (error) {
       this.logger.error('Error broadcasting game started:', error);
+    }
+  }
+
+  /**
+   * Broadcast question asked event to all clients in a room
+   */
+  broadcastQuestionAsked(roomCode: string, question: QuestionResponse): void {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      // Get the current round info
+      const round: RoundResponse = {
+        id: question.roundId,
+        roundNumber: 0, // This will be populated from the actual round
+        activePlayerId: question.askedById,
+        activePlayerUsername: question.askedByUsername,
+        state: 'awaiting_answer',
+        startedAt: new Date().toISOString(),
+      };
+
+      this.server.to(normalizedRoomCode).emit('questionAsked', {
+        roomCode: normalizedRoomCode,
+        question,
+        round,
+      });
+      this.logger.log(
+        `Broadcasted question asked to room ${normalizedRoomCode}`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting question asked:', error);
+    }
+  }
+
+  /**
+   * Broadcast answer submitted event to all clients in a room
+   */
+  broadcastAnswerSubmitted(roomCode: string, answer: AnswerResponse): void {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      // Create a basic question and round response
+      const question: QuestionResponse = {
+        id: answer.questionId,
+        roundId: '',
+        askedById: '',
+        askedByUsername: '',
+        questionText: '',
+        category: 'trait',
+        answerType: 'boolean',
+        askedAt: new Date().toISOString(),
+      };
+
+      const round: RoundResponse = {
+        id: '',
+        roundNumber: 0,
+        state: 'awaiting_question',
+        startedAt: new Date().toISOString(),
+      };
+
+      this.server.to(normalizedRoomCode).emit('answerSubmitted', {
+        roomCode: normalizedRoomCode,
+        answer,
+        question,
+        round,
+      });
+      this.logger.log(
+        `Broadcasted answer submitted to room ${normalizedRoomCode}`,
+      );
+    } catch (error) {
+      this.logger.error('Error broadcasting answer submitted:', error);
+    }
+  }
+
+  /**
+   * Broadcast guess result event to all clients in a room
+   */
+  broadcastGuessResult(roomCode: string, guess: GuessResponse): void {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      const round: RoundResponse = {
+        id: guess.roundId,
+        roundNumber: 0,
+        state: guess.isCorrect ? 'closed' : 'awaiting_question',
+        startedAt: new Date().toISOString(),
+      };
+
+      this.server.to(normalizedRoomCode).emit('guessResult', {
+        roomCode: normalizedRoomCode,
+        guess,
+        round,
+      });
+      this.logger.log(`Broadcasted guess result to room ${normalizedRoomCode}`);
+    } catch (error) {
+      this.logger.error('Error broadcasting guess result:', error);
+    }
+  }
+
+  /**
+   * Broadcast game over event to all clients in a room
+   */
+  broadcastGameOver(roomCode: string, result: GameOverResult): void {
+    try {
+      const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      this.server.to(normalizedRoomCode).emit('gameOver', {
+        roomCode: normalizedRoomCode,
+        result,
+      });
+      this.logger.log(`Broadcasted game over to room ${normalizedRoomCode}`);
+    } catch (error) {
+      this.logger.error('Error broadcasting game over:', error);
     }
   }
 

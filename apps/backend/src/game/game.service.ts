@@ -5,13 +5,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Not } from 'typeorm';
 import {
   GamePlayerRole,
   GameStatus,
   GameVisibility,
   RoundState,
   PlayerSecretStatus,
+  QuestionCategory,
+  AnswerType,
+  AnswerValue,
 } from '../database/enums';
 import {
   CharacterSet,
@@ -21,6 +24,9 @@ import {
   Round,
   PlayerSecret,
   Character,
+  Question,
+  Answer,
+  Guess,
 } from '../database/entities';
 import type {
   CreateGameRequest,
@@ -28,6 +34,14 @@ import type {
   GamePlayerResponse,
   JoinGameRequest,
   GameVisibility as ContractGameVisibility,
+  AskQuestionRequest,
+  QuestionResponse,
+  SubmitAnswerRequest,
+  AnswerResponse,
+  MakeGuessRequest,
+  GuessResponse,
+  GameOverResult,
+  PlayerScore,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -50,6 +64,12 @@ export class GameService {
     private readonly playerSecretRepository: Repository<PlayerSecret>,
     @InjectRepository(Character)
     private readonly characterRepository: Repository<Character>,
+    @InjectRepository(Question)
+    private readonly questionRepository: Repository<Question>,
+    @InjectRepository(Answer)
+    private readonly answerRepository: Repository<Answer>,
+    @InjectRepository(Guess)
+    private readonly guessRepository: Repository<Guess>,
   ) {}
 
   /**
@@ -541,5 +561,546 @@ export class GameService {
     }
 
     return Math.max(0, Math.floor(value));
+  }
+
+  /**
+   * Ask a question in the game
+   */
+  async askQuestion(
+    roomCode: string,
+    request: AskQuestionRequest,
+  ): Promise<QuestionResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+        rounds: { activePlayer: true },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    const player = game.players?.find((p) => p.id === request.playerId);
+    if (!player) {
+      throw new NotFoundException('Player not found in this game');
+    }
+
+    // Get the current round
+    const currentRound = await this.getCurrentRound(game.id);
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    // Validate it's the player's turn
+    if (currentRound.activePlayer?.id !== player.id) {
+      throw new BadRequestException('It is not your turn');
+    }
+
+    // Validate round state
+    if (currentRound.state !== RoundState.AWAITING_QUESTION) {
+      throw new BadRequestException(
+        'Round is not awaiting a question (current state: ' +
+          currentRound.state +
+          ')',
+      );
+    }
+
+    // Validate target player if specified
+    let targetPlayer: GamePlayer | undefined;
+    if (request.targetPlayerId) {
+      targetPlayer = game.players?.find((p) => p.id === request.targetPlayerId);
+      if (!targetPlayer) {
+        throw new NotFoundException('Target player not found in this game');
+      }
+    }
+
+    // Create the question
+    const question = this.questionRepository.create({
+      round: currentRound,
+      askedBy: player,
+      targetPlayer,
+      questionText: request.questionText,
+      category: this.mapQuestionCategory(request.category),
+      answerType: this.mapAnswerType(request.answerType),
+    });
+
+    const savedQuestion = await this.questionRepository.save(question);
+
+    // Update round state to awaiting answer
+    currentRound.state = RoundState.AWAITING_ANSWER;
+    await this.roundRepository.save(currentRound);
+
+    return this.mapToQuestionResponse(savedQuestion, player, targetPlayer);
+  }
+
+  /**
+   * Submit an answer to a question
+   */
+  async submitAnswer(
+    roomCode: string,
+    request: SubmitAnswerRequest,
+  ): Promise<AnswerResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    const player = game.players?.find((p) => p.id === request.playerId);
+    if (!player) {
+      throw new NotFoundException('Player not found in this game');
+    }
+
+    const question = await this.questionRepository.findOne({
+      where: { id: request.questionId },
+      relations: {
+        round: { activePlayer: true, game: true },
+        askedBy: true,
+        targetPlayer: true,
+      },
+    });
+
+    if (!question) {
+      throw new NotFoundException('Question not found');
+    }
+
+    // Validate the question belongs to the current game
+    if (question.round.game.id !== game.id) {
+      throw new BadRequestException('Question does not belong to this game');
+    }
+
+    // Validate that the answerer is the target player or the active player
+    const isTargetPlayer = question.targetPlayer?.id === player.id;
+    const isActivePlayer = question.round.activePlayer?.id === player.id;
+    if (!isTargetPlayer && !isActivePlayer) {
+      throw new BadRequestException(
+        'You are not authorized to answer this question',
+      );
+    }
+
+    // Get player's secret character to determine the answer
+    const playerSecret = await this.playerSecretRepository.findOne({
+      where: { player: { id: player.id } },
+      relations: { character: true },
+    });
+
+    if (!playerSecret) {
+      throw new InternalServerErrorException('Player secret not found');
+    }
+
+    // Create the answer
+    const answer = this.answerRepository.create({
+      question,
+      answeredBy: player,
+      answerValue: this.mapAnswerValue(request.answerValue),
+      answerText: request.answerText,
+      latencyMs: request.latencyMs,
+    });
+
+    const savedAnswer = await this.answerRepository.save(answer);
+
+    // Advance to next turn
+    await this.advanceRound(question.round);
+
+    return this.mapToAnswerResponse(savedAnswer, player, question);
+  }
+
+  /**
+   * Make a guess about a character
+   */
+  async makeGuess(
+    roomCode: string,
+    request: MakeGuessRequest,
+  ): Promise<GuessResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+        rounds: { activePlayer: true },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.IN_PROGRESS) {
+      throw new BadRequestException('Game is not in progress');
+    }
+
+    const player = game.players?.find((p) => p.id === request.playerId);
+    if (!player) {
+      throw new NotFoundException('Player not found in this game');
+    }
+
+    // Get the current round
+    const currentRound = await this.getCurrentRound(game.id);
+    if (!currentRound) {
+      throw new InternalServerErrorException('No active round found');
+    }
+
+    // Validate it's the player's turn
+    if (currentRound.activePlayer?.id !== player.id) {
+      throw new BadRequestException('It is not your turn to guess');
+    }
+
+    // Get target character
+    const targetCharacter = await this.characterRepository.findOne({
+      where: { id: request.targetCharacterId },
+    });
+
+    if (!targetCharacter) {
+      throw new NotFoundException('Character not found');
+    }
+
+    // Determine target player if specified
+    let targetPlayer: GamePlayer | undefined;
+    if (request.targetPlayerId) {
+      targetPlayer = game.players?.find((p) => p.id === request.targetPlayerId);
+      if (!targetPlayer) {
+        throw new NotFoundException('Target player not found in this game');
+      }
+    }
+
+    // Check if the guess is correct
+    let isCorrect = false;
+    if (targetPlayer) {
+      const targetSecret = await this.playerSecretRepository.findOne({
+        where: { player: { id: targetPlayer.id } },
+        relations: { character: true },
+      });
+
+      if (targetSecret) {
+        isCorrect = targetSecret.character.id === targetCharacter.id;
+      }
+    }
+
+    // Create the guess
+    const guess = this.guessRepository.create({
+      round: currentRound,
+      guessedBy: player,
+      targetPlayer,
+      targetCharacter,
+      isCorrect,
+      latencyMs: request.latencyMs,
+    });
+
+    const savedGuess = await this.guessRepository.save(guess);
+
+    // If incorrect, eliminate the player (mark them as left)
+    if (!isCorrect) {
+      player.leftAt = new Date();
+      await this.playerRepository.save(player);
+    }
+
+    // If correct, mark the game as completed
+    if (isCorrect) {
+      game.status = GameStatus.COMPLETED;
+      game.endedAt = new Date();
+      await this.gameRepository.save(game);
+    } else {
+      // Otherwise, advance to next player's turn
+      await this.advanceRound(currentRound);
+    }
+
+    return this.mapToGuessResponse(
+      savedGuess,
+      player,
+      targetPlayer,
+      targetCharacter,
+    );
+  }
+
+  /**
+   * Check if game is over and return results
+   */
+  async checkGameOver(roomCode: string): Promise<GameOverResult | null> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    if (game.status !== GameStatus.COMPLETED) {
+      return null;
+    }
+
+    // Get all rounds for scoring
+    const rounds = await this.roundRepository.find({
+      where: { game: { id: game.id } },
+      order: { roundNumber: 'ASC' },
+    });
+
+    const totalRounds = rounds.length;
+    const gameDurationMs =
+      game.endedAt && game.startedAt
+        ? game.endedAt.getTime() - game.startedAt.getTime()
+        : 0;
+
+    // Calculate scores for each player
+    const scores: PlayerScore[] = [];
+    for (const player of game.players || []) {
+      const questionsAsked = await this.questionRepository.count({
+        where: { askedBy: { id: player.id } },
+      });
+
+      const guesses = await this.guessRepository.find({
+        where: { guessedBy: { id: player.id } },
+      });
+
+      const correctGuesses = guesses.filter((g) => g.isCorrect).length;
+      const incorrectGuesses = guesses.filter((g) => !g.isCorrect).length;
+
+      // Score calculation: correct guesses * 100 - incorrect guesses * 50
+      const score = correctGuesses * 100 - incorrectGuesses * 50;
+
+      scores.push({
+        playerId: player.id,
+        username: player.username,
+        score,
+        isEliminated: !!player.leftAt,
+        questionsAsked,
+        correctGuesses,
+        incorrectGuesses,
+      });
+    }
+
+    // Sort scores by score descending
+    scores.sort((a, b) => b.score - a.score);
+
+    // Find winner (highest score)
+    const winner = scores[0];
+
+    return {
+      winnerId: winner?.playerId,
+      winnerUsername: winner?.username,
+      scores,
+      totalRounds,
+      gameDurationMs,
+    };
+  }
+
+  /**
+   * Get the current round for a game
+   */
+  private async getCurrentRound(gameId: string): Promise<Round | null> {
+    return this.roundRepository.findOne({
+      where: {
+        game: { id: gameId },
+        state: Not(RoundState.CLOSED),
+      },
+      relations: {
+        activePlayer: true,
+        game: true,
+      },
+      order: {
+        roundNumber: 'DESC',
+      },
+    });
+  }
+
+  /**
+   * Advance to the next round
+   */
+  private async advanceRound(currentRound: Round): Promise<void> {
+    const game = await this.gameRepository.findOne({
+      where: { id: currentRound.game.id },
+      relations: {
+        players: true,
+      },
+    });
+
+    if (!game) {
+      throw new InternalServerErrorException('Game not found');
+    }
+
+    // Get active players (not left)
+    const activePlayers =
+      game.players
+        ?.filter((p) => !p.leftAt)
+        .sort((a, b) => {
+          const aTime = a.joinedAt?.getTime?.() ?? 0;
+          const bTime = b.joinedAt?.getTime?.() ?? 0;
+          return aTime - bTime;
+        }) || [];
+
+    if (activePlayers.length === 0) {
+      // No active players, end the game
+      game.status = GameStatus.ABORTED;
+      game.endedAt = new Date();
+      await this.gameRepository.save(game);
+      return;
+    }
+
+    if (activePlayers.length === 1) {
+      // Only one player left, they win
+      game.status = GameStatus.COMPLETED;
+      game.endedAt = new Date();
+      await this.gameRepository.save(game);
+      return;
+    }
+
+    // Find the next player
+    const currentPlayerIndex = activePlayers.findIndex(
+      (p) => p.id === currentRound.activePlayer?.id,
+    );
+
+    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
+    const nextPlayer = activePlayers[nextPlayerIndex];
+
+    // Close current round
+    currentRound.state = RoundState.CLOSED;
+    currentRound.endedAt = new Date();
+    if (currentRound.startedAt) {
+      currentRound.durationMs =
+        currentRound.endedAt.getTime() - currentRound.startedAt.getTime();
+    }
+    await this.roundRepository.save(currentRound);
+
+    // Create next round
+    const nextRound = this.roundRepository.create({
+      game,
+      roundNumber: currentRound.roundNumber + 1,
+      activePlayer: nextPlayer,
+      state: RoundState.AWAITING_QUESTION,
+      startedAt: new Date(),
+    });
+
+    await this.roundRepository.save(nextRound);
+  }
+
+  /**
+   * Map question category from contract to enum
+   */
+  private mapQuestionCategory(category: string): QuestionCategory {
+    switch (category) {
+      case 'trait':
+        return QuestionCategory.TRAIT;
+      case 'direct':
+        return QuestionCategory.DIRECT;
+      case 'meta':
+        return QuestionCategory.META;
+      default:
+        throw new BadRequestException('Invalid question category');
+    }
+  }
+
+  /**
+   * Map answer type from contract to enum
+   */
+  private mapAnswerType(answerType: string): AnswerType {
+    switch (answerType) {
+      case 'boolean':
+        return AnswerType.BOOLEAN;
+      case 'text':
+        return AnswerType.TEXT;
+      default:
+        throw new BadRequestException('Invalid answer type');
+    }
+  }
+
+  /**
+   * Map answer value from contract to enum
+   */
+  private mapAnswerValue(answerValue: string): AnswerValue {
+    switch (answerValue) {
+      case 'yes':
+        return AnswerValue.YES;
+      case 'no':
+        return AnswerValue.NO;
+      case 'unsure':
+        return AnswerValue.UNSURE;
+      default:
+        throw new BadRequestException('Invalid answer value');
+    }
+  }
+
+  /**
+   * Map Question entity to QuestionResponse
+   */
+  private mapToQuestionResponse(
+    question: Question,
+    askedBy: GamePlayer,
+    targetPlayer?: GamePlayer,
+  ): QuestionResponse {
+    return {
+      id: question.id,
+      roundId: question.round.id,
+      askedById: askedBy.id,
+      askedByUsername: askedBy.username,
+      targetPlayerId: targetPlayer?.id,
+      targetPlayerUsername: targetPlayer?.username,
+      questionText: question.questionText,
+      category: question.category,
+      answerType: question.answerType,
+      askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Map Answer entity to AnswerResponse
+   */
+  private mapToAnswerResponse(
+    answer: Answer,
+    answeredBy: GamePlayer,
+    question: Question,
+  ): AnswerResponse {
+    return {
+      id: answer.id,
+      questionId: question.id,
+      answeredById: answeredBy.id,
+      answeredByUsername: answeredBy.username,
+      answerValue: answer.answerValue,
+      answerText: answer.answerText ?? undefined,
+      answeredAt:
+        answer.answeredAt?.toISOString?.() ?? new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Map Guess entity to GuessResponse
+   */
+  private mapToGuessResponse(
+    guess: Guess,
+    guessedBy: GamePlayer,
+    targetPlayer: GamePlayer | undefined,
+    targetCharacter: Character,
+  ): GuessResponse {
+    return {
+      id: guess.id,
+      roundId: guess.round.id,
+      guessedById: guessedBy.id,
+      guessedByUsername: guessedBy.username,
+      targetPlayerId: targetPlayer?.id,
+      targetPlayerUsername: targetPlayer?.username,
+      targetCharacterId: targetCharacter.id,
+      targetCharacterName: targetCharacter.name,
+      isCorrect: guess.isCorrect,
+      guessedAt: guess.guessedAt?.toISOString?.() ?? new Date().toISOString(),
+    };
   }
 }
