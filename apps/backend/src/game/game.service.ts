@@ -1232,6 +1232,7 @@ export class GameService {
    * Update player statistics after game ends
    */
   private async updatePlayerStatistics(game: Game): Promise<void> {
+    // Load players with their relations
     const players = await this.playerRepository.find({
       where: { game: { id: game.id } },
       relations: {
