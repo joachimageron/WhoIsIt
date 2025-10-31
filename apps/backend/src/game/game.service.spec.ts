@@ -2270,7 +2270,7 @@ describe('GameService', () => {
       mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
       mockGuessRepository.create.mockReturnValue(mockGuess);
       mockGuessRepository.save.mockResolvedValue(mockGuess);
-      mockGuessRepository.createQueryBuilder.mockReturnValue({
+      mockPlayerSecretRepository.createQueryBuilder.mockReturnValue({
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
@@ -2437,7 +2437,7 @@ describe('GameService', () => {
       mockCharacterRepository.findOne.mockResolvedValue(mockCharacter);
       mockGuessRepository.create.mockReturnValue(mockGuess);
       mockGuessRepository.save.mockResolvedValue(mockGuess);
-      mockGuessRepository.createQueryBuilder.mockReturnValue({
+      mockPlayerSecretRepository.createQueryBuilder.mockReturnValue({
         innerJoin: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
