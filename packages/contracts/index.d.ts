@@ -100,6 +100,7 @@ export interface ServerToClientEvents {
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
+  questionAsked: (event: SocketQuestionAskedEvent) => void;
 }
 
 export interface ClientToServerEvents {
@@ -146,5 +147,49 @@ export type CharacterResponseDto = {
   metadata: Record<string, unknown>;
   isActive: boolean;
   traits?: TraitValueResponseDto[];
+};
+
+// Questions API Types
+export type QuestionCategory = "trait" | "direct" | "meta";
+export type AnswerType = "boolean" | "text";
+
+export type AskQuestionRequest = {
+  playerId: string;
+  targetPlayerId?: string;
+  questionText: string;
+  category: QuestionCategory;
+  answerType: AnswerType;
+};
+
+export type QuestionResponse = {
+  id: string;
+  roundId: string;
+  roundNumber: number;
+  askedByPlayerId: string;
+  askedByPlayerUsername: string;
+  targetPlayerId?: string;
+  targetPlayerUsername?: string;
+  questionText: string;
+  category: QuestionCategory;
+  answerType: AnswerType;
+  askedAt: string;
+};
+
+export type GameStateResponse = {
+  id: string;
+  roomCode: string;
+  status: GameStatus;
+  currentRoundNumber: number;
+  currentRoundState: string;
+  activePlayerId?: string;
+  activePlayerUsername?: string;
+  players: GamePlayerResponse[];
+};
+
+// Socket.IO Question Events
+export type SocketQuestionAskedEvent = {
+  roomCode: string;
+  question: QuestionResponse;
+  gameState: GameStateResponse;
 };
 
