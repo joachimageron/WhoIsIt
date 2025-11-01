@@ -45,7 +45,7 @@ export function GuessModal({
               <p className="text-sm text-default-500">
                 {dict.play.confirmGuessDescription ||
                   "Are you sure you want to guess this character?"}
-              </p>  
+              </p>
 
               <div className="flex items-center gap-3">
                 <Avatar
@@ -56,7 +56,6 @@ export function GuessModal({
                 <p className="text-lg font-semibold">
                   {selectedCharacter.name}
                 </p>
-
               </div>
             </div>
           ) : (
