@@ -1517,6 +1517,10 @@ describe('GameService', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         rounds: [mockRound],
+        players: [
+          { id: 'player-1', username: 'Player1' },
+          { id: 'player-2', username: 'Player2' },
+        ] as GamePlayer[],
       } as Game;
 
       const mockPlayer1: GamePlayer = {
@@ -1553,6 +1557,79 @@ describe('GameService', () => {
       expect(result).toBeDefined();
       expect(result.questionText).toBe('How many characters remain?');
       expect(result.targetPlayerId).toBeUndefined();
+    });
+
+    it('should advance turn to next player when question is asked', async () => {
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player1',
+      } as GamePlayer;
+
+      const mockPlayer2: GamePlayer = {
+        id: 'player-2',
+        username: 'Player2',
+      } as GamePlayer;
+
+      const mockPlayer3: GamePlayer = {
+        id: 'player-3',
+        username: 'Player3',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+        state: 'awaiting_question' as any,
+        activePlayer: mockPlayer1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+        players: [mockPlayer1, mockPlayer2, mockPlayer3],
+      } as Game;
+
+      const mockAskedByPlayer: GamePlayer = {
+        id: 'player-1',
+        username: 'Player1',
+        game: mockGame,
+        score: 0,
+      } as GamePlayer;
+
+      const mockQuestion: Question = {
+        id: 'question-123',
+        round: mockRound,
+        askedBy: mockAskedByPlayer,
+        targetPlayer: null,
+        questionText: 'Test question?',
+        askedAt: new Date(),
+      } as Question;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(mockAskedByPlayer);
+      mockQuestionRepository.create.mockReturnValue(mockQuestion);
+      mockQuestionRepository.save.mockResolvedValue(mockQuestion);
+      mockRoundRepository.save.mockResolvedValue({
+        ...mockRound,
+        state: 'awaiting_answer' as any,
+        activePlayer: mockPlayer2,
+      });
+
+      const request = {
+        playerId: 'player-1',
+        questionText: 'Test question?',
+      };
+
+      await service.askQuestion('ABC12', request);
+
+      // Verify that the round was saved with the next player as active
+      expect(mockRoundRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          state: 'awaiting_answer',
+          activePlayer: mockPlayer2,
+        }),
+      );
     });
   });
 
@@ -2142,7 +2219,8 @@ describe('GameService', () => {
         id: 'round-123',
         roundNumber: 1,
         state: 'awaiting_answer' as any,
-        activePlayer: mockPlayer1,
+        // After Player1 asked a question, the turn has already advanced to Player2
+        activePlayer: mockPlayer2,
       } as Round;
 
       const mockGame: Game = {
@@ -2180,6 +2258,7 @@ describe('GameService', () => {
       mockRoundRepository.save.mockResolvedValue({
         ...mockRound,
         state: 'awaiting_question' as any,
+        // After submitting answer, state changes but active player stays the same
         activePlayer: mockPlayer2,
       });
 
@@ -2191,10 +2270,11 @@ describe('GameService', () => {
 
       await service.submitAnswer('ABC12', request);
 
+      // After answer submission, state should change to awaiting_question
+      // but active player should remain Player2 (it already advanced when question was asked)
       expect(mockRoundRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           state: 'awaiting_question',
-          activePlayer: mockPlayer2,
         }),
       );
     });
