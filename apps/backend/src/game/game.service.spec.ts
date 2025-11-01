@@ -2371,6 +2371,102 @@ describe('GameService', () => {
         }),
       );
     });
+
+    it('should save and return answerText when provided', async () => {
+      const mockCharacter: Character = {
+        id: 'char-1',
+        name: 'Character 1',
+      } as unknown as Character;
+
+      const mockPlayerSecret: PlayerSecret = {
+        id: 'secret-1',
+        character: mockCharacter,
+        status: 'hidden' as any,
+      } as PlayerSecret;
+
+      const mockAnsweringPlayer: GamePlayer = {
+        id: 'player-2',
+        username: 'Player2',
+        game: { id: 'game-123' } as Game,
+        secret: mockPlayerSecret,
+      } as GamePlayer;
+
+      const mockPlayer1: GamePlayer = {
+        id: 'player-1',
+        username: 'Player1',
+      } as GamePlayer;
+
+      const mockRound: Round = {
+        id: 'round-123',
+        roundNumber: 1,
+        state: 'awaiting_answer' as any,
+        activePlayer: mockPlayer1,
+      } as Round;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+        rounds: [mockRound],
+        players: [
+          mockPlayer1,
+          mockAnsweringPlayer,
+          { id: 'player-3', username: 'Player3', leftAt: null } as GamePlayer,
+        ],
+      } as Game;
+
+      const mockQuestion: Question = {
+        id: 'question-123',
+        round: mockRound,
+        askedBy: mockPlayer1,
+        targetPlayer: mockAnsweringPlayer,
+        questionText: 'Does your character have glasses?',
+        answers: [],
+      } as unknown as Question;
+
+      const answerTextContent = 'Yes, my character has round glasses';
+      const mockAnswer = {
+        id: 'answer-123',
+        question: mockQuestion,
+        answeredBy: mockAnsweringPlayer,
+        answerValue: 'yes' as any,
+        answerText: answerTextContent,
+        latencyMs: null,
+        answeredAt: new Date(),
+      };
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
+      mockPlayerRepository.findOne.mockResolvedValue(mockAnsweringPlayer);
+      mockAnswerRepository.create.mockReturnValue(mockAnswer);
+      mockAnswerRepository.save.mockResolvedValue(mockAnswer);
+      mockRoundRepository.save.mockResolvedValue({
+        ...mockRound,
+        state: 'awaiting_question' as any,
+        activePlayer: mockAnsweringPlayer,
+      });
+
+      const request = {
+        playerId: 'player-2',
+        questionId: 'question-123',
+        answerValue: 'yes' as any,
+        answerText: answerTextContent,
+      };
+
+      const result = await service.submitAnswer('ABC12', request);
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe('answer-123');
+      expect(result.answerValue).toBe('yes');
+      expect(result.answerText).toBe(answerTextContent);
+      
+      // Verify that answerRepository.create was called with the answerText
+      expect(mockAnswerRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          answerText: answerTextContent,
+        }),
+      );
+    });
   });
 
   describe('submitGuess', () => {
