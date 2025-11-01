@@ -2651,7 +2651,7 @@ describe('GameService', () => {
         username: 'Target',
         game: { id: 'game-123' } as Game,
         secret: null,
-      } as GamePlayer;
+      } as unknown as GamePlayer;
 
       const mockRound: Round = {
         id: 'round-123',
