@@ -100,6 +100,7 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
             type="text"
             value={roomCode}
             variant="bordered"
+            autoFocus
             onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           />
           <Button color="primary" isLoading={isLoading} type="submit">
