@@ -360,6 +360,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         gameState={gameState}
         isConnected={isConnected}
         isMyTurn={isMyTurn}
+        questionCount={questions.length}
         roomCode={roomCode}
         onLeaveGame={handleLeaveGame}
       />

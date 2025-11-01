@@ -191,6 +191,7 @@
     "title": "Partie en Cours",
     "roomCode": "Code de Salle",
     "round": "Tour",
+    "turn": "Tour",
     "yourTurn": "À Votre Tour !",
     "playerTurn": "Tour de {player}",
     "waitingForTurn": "En attente de votre tour...",

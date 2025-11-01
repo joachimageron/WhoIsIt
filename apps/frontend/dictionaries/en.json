@@ -191,6 +191,7 @@
     "title": "Game In Progress",
     "roomCode": "Room Code",
     "round": "Round",
+    "turn": "Turn",
     "yourTurn": "Your Turn!",
     "playerTurn": "{player}'s Turn",
     "waitingForTurn": "Waiting for your turn...",
