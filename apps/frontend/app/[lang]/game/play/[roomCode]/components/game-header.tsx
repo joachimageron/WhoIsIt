@@ -16,6 +16,7 @@ interface GameHeaderProps {
   isConnected: boolean;
   isMyTurn: boolean;
   roomCode: string;
+  questionCount: number;
   onLeaveGame: () => void;
 }
 
@@ -25,6 +26,7 @@ export function GameHeader({
   isConnected,
   isMyTurn,
   roomCode,
+  questionCount,
   onLeaveGame,
 }: GameHeaderProps) {
   return (
@@ -66,10 +68,10 @@ export function GameHeader({
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-default-500">
-                {dict.play.round}:
+                {dict.play.turn || dict.play.round}:
               </span>
               <span className="font-semibold">
-                {gameState.currentRoundNumber}
+                {questionCount + 1}
               </span>
             </div>
           </div>

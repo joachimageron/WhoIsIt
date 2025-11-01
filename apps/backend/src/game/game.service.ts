@@ -662,12 +662,9 @@ export class GameService {
     askedByPlayer.score += GameService.SCORE_QUESTION_BONUS;
     await this.playerRepository.save(askedByPlayer);
 
-    // Advance to the next player's turn
-    const nextPlayer = this.getNextPlayer(currentRound, game);
-
-    // Update the round state to AWAITING_ANSWER and advance to next player
+    // Update the round state to AWAITING_ANSWER
+    // Keep the same active player - they will remain active until answer is submitted
     currentRound.state = RoundState.AWAITING_ANSWER;
-    currentRound.activePlayer = nextPlayer;
     await this.roundRepository.save(currentRound);
 
     // Return the question response
@@ -721,6 +718,79 @@ export class GameService {
         userId: player.user?.id,
       })),
     };
+  }
+
+  /**
+   * Get all questions for a game
+   */
+  async getQuestions(roomCode: string): Promise<QuestionResponse[]> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        rounds: {
+          questions: {
+            askedBy: true,
+            targetPlayer: true,
+            round: true,
+          },
+        },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Flatten questions from all rounds and sort by creation time
+    const questions = game.rounds
+      ?.flatMap((round) => round.questions || [])
+      .sort(
+        (a, b) =>
+          new Date(a.askedAt).getTime() - new Date(b.askedAt).getTime(),
+      ) ?? [];
+
+    return questions.map((q) =>
+      this.mapToQuestionResponse(q, q.askedBy, q.targetPlayer ?? null),
+    );
+  }
+
+  /**
+   * Get all answers for a game
+   */
+  async getAnswers(roomCode: string): Promise<AnswerResponse[]> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        rounds: {
+          questions: {
+            answers: {
+              answeredBy: true,
+              question: true,
+            },
+          },
+        },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Flatten answers from all questions and sort by creation time
+    const answers = game.rounds
+      ?.flatMap((round) =>
+        round.questions?.flatMap((question) => question.answers || []) || [],
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime(),
+      ) ?? [];
+
+    return answers.map((a) => this.mapToAnswerResponse(a, a.answeredBy));
   }
 
   /**
@@ -862,8 +932,11 @@ export class GameService {
     answeringPlayer.score += GameService.SCORE_ANSWER_BONUS;
     await this.playerRepository.save(answeringPlayer);
 
+    // Advance to the next player's turn after answer is submitted
+    const nextPlayer = this.getNextPlayer(currentRound, game);
+    currentRound.activePlayer = nextPlayer;
+
     // Update the round state back to AWAITING_QUESTION
-    // Note: The turn was already advanced when the question was asked
     currentRound.state = RoundState.AWAITING_QUESTION;
     await this.roundRepository.save(currentRound);
 
@@ -914,8 +987,11 @@ export class GameService {
       throw new InternalServerErrorException('No active players found');
     }
 
-    // Find the current active player's index
-    const currentPlayerIndex = activePlayers.findIndex(
+    // Get all players (including eliminated ones) to maintain turn order
+    const allPlayers = game.players ?? [];
+
+    // Find the current active player's index in the full player list
+    const currentPlayerIndex = allPlayers.findIndex(
       (p) => p.id === currentRound.activePlayer?.id,
     );
 
@@ -924,9 +1000,21 @@ export class GameService {
       return activePlayers[0];
     }
 
-    // Get the next player (circular)
-    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-    return activePlayers[nextPlayerIndex];
+    // Find the next active player after the current one
+    // Loop through all players starting from the next position
+    let nextIndex = currentPlayerIndex + 1;
+    for (let i = 0; i < allPlayers.length; i++) {
+      const checkIndex = (nextIndex + i) % allPlayers.length;
+      const player = allPlayers[checkIndex];
+
+      // Check if this player is still active (not eliminated)
+      if (!player.leftAt) {
+        return player;
+      }
+    }
+
+    // Fallback: should not reach here if there are active players
+    return activePlayers[0];
   }
 
   /**
@@ -1090,9 +1178,16 @@ export class GameService {
         await this.advanceToNextTurn(currentRound, game);
       }
     } else if (!isCorrect && targetPlayer) {
-      // Incorrect guess - just record it
-      // The player can continue playing
-      await this.advanceToNextTurn(currentRound, game);
+      // Incorrect guess - eliminate the guessing player
+      guessingPlayer.leftAt = new Date();
+      await this.playerRepository.save(guessingPlayer);
+
+      // Check if game should end (only one player remaining)
+      const gameEnded = await this.checkAndHandleGameEnd(game, null);
+      if (!gameEnded) {
+        // Continue to next turn with remaining players
+        await this.advanceToNextTurn(currentRound, game);
+      }
     }
 
     // Return the guess response
@@ -1133,11 +1228,14 @@ export class GameService {
 
   /**
    * Check if the game should end and handle the end if so
-   * Returns true if game ended, false otherwise
+   * @param game The game to check
+   * @param potentialWinner The player who may have won (e.g., by correct guess).
+   *                        Pass null when checking after player elimination to auto-find winner.
+   * @returns true if game ended, false otherwise
    */
   private async checkAndHandleGameEnd(
     game: Game,
-    potentialWinner: GamePlayer,
+    potentialWinner: GamePlayer | null,
   ): Promise<boolean> {
     // Get count of unrevealed players
     const unrevealedPlayers = await this.playerSecretRepository
@@ -1152,9 +1250,30 @@ export class GameService {
 
     // Check if only one player has unrevealed secret (they are the winner)
     // or if the potential winner just made the winning guess
-    if (unrevealedPlayers <= 1) {
-      await this.endGame(game, potentialWinner);
-      return true;
+    if (unrevealedPlayers <= 1 || (potentialWinner && unrevealedPlayers === 1)) {
+      // Find the winner if not provided
+      let winner = potentialWinner;
+      if (!winner) {
+        // Find the last remaining player with unrevealed secret
+        const lastPlayerSecret = await this.playerSecretRepository
+          .createQueryBuilder('secret')
+          .innerJoin('secret.player', 'player')
+          .where('player.game_id = :gameId', { gameId: game.id })
+          .andWhere('player.leftAt IS NULL')
+          .andWhere('secret.status = :status', {
+            status: PlayerSecretStatus.HIDDEN,
+          })
+          .getOne();
+
+        if (lastPlayerSecret?.player) {
+          winner = lastPlayerSecret.player;
+        }
+      }
+
+      if (winner) {
+        await this.endGame(game, winner);
+        return true;
+      }
     }
 
     return false;

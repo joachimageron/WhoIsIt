@@ -70,9 +70,8 @@ export function QuestionsPanel({
         questionText: question.trim(),
       });
 
-      // Clear form
+      // Clear question text only, keep target player selected
       setQuestion("");
-      setTargetPlayerId("");
 
       addToast({
         color: "success",
