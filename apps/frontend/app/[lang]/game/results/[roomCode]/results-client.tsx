@@ -21,6 +21,7 @@ import {
 
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
+import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface Dictionary {
   results: {
@@ -214,12 +215,14 @@ export function GameResultsClient({
                   icon="mdi:identifier"
                   width={32}
                 />
-                <div>
-                  <p className="text-sm text-default-600">
-                    {dict.results.roomCode}
-                  </p>
-                  <p className="text-lg font-semibold">{results.roomCode}</p>
-                </div>
+                <RoomCodeDisplay
+                  copyErrorMessage={dict.results.errors.failedToCopyRoomCode}
+                  copySuccessMessage={dict.results.roomCodeCopied}
+                  label={dict.results.roomCode}
+                  roomCode={results.roomCode}
+                  showLabel={true}
+                  size="lg"
+                />
               </div>
               <div className="flex items-center gap-3">
                 <Icon className="text-primary" icon="mdi:clock" width={32} />

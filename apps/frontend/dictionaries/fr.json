@@ -159,6 +159,8 @@
   "lobby": {
     "title": "Lobby de Jeu",
     "roomCode": "Code de Salle",
+    "copyRoomCode": "Copier le Code",
+    "roomCodeCopied": "Code de salle copié !",
     "host": "Hôte",
     "players": "Joueurs",
     "waitingForPlayers": "En attente de joueurs...",
@@ -180,6 +182,7 @@
       "failedToJoin": "Échec de la connexion au lobby",
       "failedToUpdateReady": "Échec de la mise à jour du statut",
       "failedToStartGame": "Échec du démarrage du jeu",
+      "failedToCopyRoomCode": "Échec de la copie du code de salle",
       "disconnected": "Vous avez été déconnecté du lobby",
       "roomNotFound": "Salle introuvable"
     }
@@ -190,6 +193,7 @@
   "play": {
     "title": "Partie en Cours",
     "roomCode": "Code de Salle",
+    "roomCodeCopied": "Code de salle copié !",
     "round": "Tour",
     "yourTurn": "À Votre Tour !",
     "playerTurn": "Tour de {player}",
@@ -225,6 +229,7 @@
       "failedToLoad": "Échec du chargement du jeu",
       "failedToAskQuestion": "Échec de l'envoi de la question",
       "failedToGuess": "Échec de la supposition",
+      "failedToCopyRoomCode": "Échec de la copie du code de salle",
       "notYourTurn": "Ce n'est pas votre tour",
       "selectCharacter": "Veuillez sélectionner un personnage",
       "enterQuestion": "Veuillez entrer une question"
@@ -241,6 +246,7 @@
     "detailedStats": "Vos Statistiques Détaillées",
     "you": "Vous",
     "roomCode": "Code du Salon",
+    "roomCodeCopied": "Code de salle copié !",
     "duration": "Durée",
     "rounds": "Manches",
     "placement": "Classement",
@@ -264,6 +270,7 @@
     "seconds": "{n} sec",
     "errors": {
       "failedToLoad": "Échec du chargement des résultats",
+      "failedToCopyRoomCode": "Échec de la copie du code de salle",
       "gameNotCompleted": "Cette partie n'est pas encore terminée"
     }
   }

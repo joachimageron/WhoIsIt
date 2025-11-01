@@ -17,6 +17,7 @@ import { useGameSocket } from "@/hooks/use-game-socket";
 import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
+import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface LobbyClientProps {
   dict: any;
@@ -255,13 +256,15 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
             </Chip>
           </div>
           <div className="flex w-full items-center justify-between">
-            <div>
-              <p className="text-small text-default-500">
-                {dict.lobby.roomCode}
-              </p>
-              <p className="text-large font-semibold">{lobby.roomCode}</p>
-            </div>
+            <RoomCodeDisplay
+              copyErrorMessage={dict.lobby.errors.failedToCopyRoomCode}
+              copySuccessMessage={dict.lobby.roomCodeCopied}
+              label={dict.lobby.roomCode}
+              roomCode={lobby.roomCode}
+              size="md"
+            />
           </div>
+
         </CardHeader>
         <Divider />
         <CardBody className="gap-4 py-4">

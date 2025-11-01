@@ -162,6 +162,8 @@
   "lobby": {
     "title": "Game Lobby",
     "roomCode": "Room Code",
+    "copyRoomCode": "Copy Code",
+    "roomCodeCopied": "Room code copied!",
     "host": "Host",
     "players": "Players",
     "waitingForPlayers": "Waiting for players to join...",
@@ -183,6 +185,7 @@
       "failedToJoin": "Failed to join lobby",
       "failedToUpdateReady": "Failed to update ready status",
       "failedToStartGame": "Failed to start game",
+      "failedToCopyRoomCode": "Failed to copy room code",
       "disconnected": "You have been disconnected from the lobby",
       "roomNotFound": "Room not found"
     }
@@ -190,6 +193,7 @@
   "play": {
     "title": "Game In Progress",
     "roomCode": "Room Code",
+    "roomCodeCopied": "Room code copied!",
     "round": "Round",
     "yourTurn": "Your Turn!",
     "playerTurn": "{player}'s Turn",
@@ -225,6 +229,7 @@
       "failedToLoad": "Failed to load game",
       "failedToAskQuestion": "Failed to ask question",
       "failedToGuess": "Failed to make guess",
+      "failedToCopyRoomCode": "Failed to copy room code",
       "notYourTurn": "It's not your turn",
       "selectCharacter": "Please select a character",
       "enterQuestion": "Please enter a question"
@@ -241,6 +246,7 @@
     "detailedStats": "Your Detailed Stats",
     "you": "You",
     "roomCode": "Room Code",
+    "roomCodeCopied": "Room code copied!",
     "duration": "Duration",
     "rounds": "Rounds",
     "placement": "Placement",
@@ -264,6 +270,7 @@
     "seconds": "{n} sec",
     "errors": {
       "failedToLoad": "Failed to load game results",
+      "failedToCopyRoomCode": "Failed to copy room code",
       "gameNotCompleted": "This game is not yet completed"
     }
   }
