@@ -162,6 +162,8 @@
   "lobby": {
     "title": "Game Lobby",
     "roomCode": "Room Code",
+    "copyRoomCode": "Copy Code",
+    "roomCodeCopied": "Room code copied!",
     "host": "Host",
     "players": "Players",
     "waitingForPlayers": "Waiting for players to join...",

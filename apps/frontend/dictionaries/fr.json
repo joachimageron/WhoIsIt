@@ -159,6 +159,8 @@
   "lobby": {
     "title": "Lobby de Jeu",
     "roomCode": "Code de Salle",
+    "copyRoomCode": "Copier le Code",
+    "roomCodeCopied": "Code de salle copié !",
     "host": "Hôte",
     "players": "Joueurs",
     "waitingForPlayers": "En attente de joueurs...",
