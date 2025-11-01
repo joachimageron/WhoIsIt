@@ -179,6 +179,48 @@ export const getGameState = async (
 };
 
 /**
+ * Get all questions for a game
+ */
+export const getQuestions = async (
+  roomCode: string,
+): Promise<QuestionResponse[]> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/questions`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get questions" }));
+
+    throw new Error(error.message || "Failed to get questions");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get all answers for a game
+ */
+export const getAnswers = async (
+  roomCode: string,
+): Promise<AnswerResponse[]> => {
+  const response = await fetch(`${API_URL}/games/${roomCode}/answers`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get answers" }));
+
+    throw new Error(error.message || "Failed to get answers");
+  }
+
+  return response.json();
+};
+
+/**
  * Ask a question
  */
 export const askQuestion = async (

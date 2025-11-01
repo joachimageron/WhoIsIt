@@ -90,6 +90,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
 
         setCharacters(characters);
 
+        // Load existing questions and answers (for reconnection/refresh)
+        const [questions, answers] = await Promise.all([
+          gameApi.getQuestions(roomCode),
+          gameApi.getAnswers(roomCode),
+        ]);
+
+        // Add questions to store
+        questions.forEach((q) => addQuestion(q));
+
+        // Add answers to store
+        answers.forEach((a) => addAnswer(a));
+
         // Join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,

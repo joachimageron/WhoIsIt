@@ -721,6 +721,79 @@ export class GameService {
   }
 
   /**
+   * Get all questions for a game
+   */
+  async getQuestions(roomCode: string): Promise<QuestionResponse[]> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        rounds: {
+          questions: {
+            askedBy: true,
+            targetPlayer: true,
+            round: true,
+          },
+        },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Flatten questions from all rounds and sort by creation time
+    const questions = game.rounds
+      ?.flatMap((round) => round.questions || [])
+      .sort(
+        (a, b) =>
+          new Date(a.askedAt).getTime() - new Date(b.askedAt).getTime(),
+      ) ?? [];
+
+    return questions.map((q) =>
+      this.mapToQuestionResponse(q, q.askedBy, q.targetPlayer ?? null),
+    );
+  }
+
+  /**
+   * Get all answers for a game
+   */
+  async getAnswers(roomCode: string): Promise<AnswerResponse[]> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+      relations: {
+        rounds: {
+          questions: {
+            answers: {
+              answeredBy: true,
+              question: true,
+            },
+          },
+        },
+      },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Flatten answers from all questions and sort by creation time
+    const answers = game.rounds
+      ?.flatMap((round) =>
+        round.questions?.flatMap((question) => question.answers || []) || [],
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime(),
+      ) ?? [];
+
+    return answers.map((a) => this.mapToAnswerResponse(a, a.answeredBy));
+  }
+
+  /**
    * Map Question entity to QuestionResponse
    */
   private mapToQuestionResponse(

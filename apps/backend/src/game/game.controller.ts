@@ -142,6 +142,28 @@ export class GameController {
     return this.gameService.getGameState(roomCode);
   }
 
+  @Get(':roomCode/questions')
+  async getQuestions(
+    @Param('roomCode') roomCode: string,
+  ): Promise<QuestionResponse[]> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    return this.gameService.getQuestions(roomCode);
+  }
+
+  @Get(':roomCode/answers')
+  async getAnswers(
+    @Param('roomCode') roomCode: string,
+  ): Promise<AnswerResponse[]> {
+    if (!roomCode || roomCode.trim().length === 0) {
+      throw new BadRequestException('roomCode is required');
+    }
+
+    return this.gameService.getAnswers(roomCode);
+  }
+
   @Post(':roomCode/answers')
   async submitAnswer(
     @Param('roomCode') roomCode: string,
