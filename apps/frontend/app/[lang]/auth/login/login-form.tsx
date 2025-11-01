@@ -7,11 +7,11 @@ import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail, looksLikeEmail } from "@/lib/utils/validation";
-import { Form } from "@heroui/form";
 
 interface LoginFormProps {
   dict: any;

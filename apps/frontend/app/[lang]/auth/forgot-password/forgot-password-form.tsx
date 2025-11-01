@@ -5,9 +5,9 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import * as authApi from "@/lib/auth-api";
-import { Form } from "@heroui/form";
 
 interface ForgotPasswordFormProps {
   dict: any;
@@ -73,7 +73,7 @@ export function ForgotPasswordForm({ dict, lang }: ForgotPasswordFormProps) {
             variant="bordered"
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
+          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
             {dict.auth.forgotPassword.sendButton}
           </Button>
         </Form>
