@@ -222,6 +222,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     roomCode,
     dict.lobby.roomCodeCopied,
     dict.lobby.errors.failedToCopyRoomCode,
+    addToast,
   ]);
 
   const handleLeaveLobby = useCallback(async () => {
