@@ -213,11 +213,16 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       // Fallback for browsers that don't support clipboard API
       addToast({
         color: "danger",
-        title: "Failed to copy room code",
+        title: dict.lobby.errors.failedToCopyRoomCode,
         description: error instanceof Error ? error.message : String(error),
       });
     }
-  }, [lobby?.roomCode, roomCode, dict.lobby.roomCodeCopied]);
+  }, [
+    lobby?.roomCode,
+    roomCode,
+    dict.lobby.roomCodeCopied,
+    dict.lobby.errors.failedToCopyRoomCode,
+  ]);
 
   const handleLeaveLobby = useCallback(async () => {
     try {

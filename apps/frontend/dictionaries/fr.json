@@ -182,6 +182,7 @@
       "failedToJoin": "Échec de la connexion au lobby",
       "failedToUpdateReady": "Échec de la mise à jour du statut",
       "failedToStartGame": "Échec du démarrage du jeu",
+      "failedToCopyRoomCode": "Échec de la copie du code de salle",
       "disconnected": "Vous avez été déconnecté du lobby",
       "roomNotFound": "Salle introuvable"
     }
