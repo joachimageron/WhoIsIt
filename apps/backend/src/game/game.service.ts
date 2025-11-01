@@ -662,8 +662,24 @@ export class GameService {
     askedByPlayer.score += GameService.SCORE_QUESTION_BONUS;
     await this.playerRepository.save(askedByPlayer);
 
-    // Update the round state to AWAITING_ANSWER
+    // Advance to the next player's turn
+    const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
+    if (activePlayers.length === 0) {
+      throw new InternalServerErrorException('No active players found');
+    }
+
+    // Find the current active player's index
+    const currentPlayerIndex = activePlayers.findIndex(
+      (p) => p.id === currentRound.activePlayer?.id,
+    );
+
+    // Get the next player (circular)
+    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
+    const nextPlayer = activePlayers[nextPlayerIndex];
+
+    // Update the round state to AWAITING_ANSWER and advance to next player
     currentRound.state = RoundState.AWAITING_ANSWER;
+    currentRound.activePlayer = nextPlayer;
     await this.roundRepository.save(currentRound);
 
     // Return the question response
@@ -858,8 +874,10 @@ export class GameService {
     answeringPlayer.score += GameService.SCORE_ANSWER_BONUS;
     await this.playerRepository.save(answeringPlayer);
 
-    // Update the round state to AWAITING_QUESTION (next turn)
-    await this.advanceToNextTurn(currentRound, game);
+    // Update the round state back to AWAITING_QUESTION
+    // Note: The turn was already advanced when the question was asked
+    currentRound.state = RoundState.AWAITING_QUESTION;
+    await this.roundRepository.save(currentRound);
 
     // Return the answer response
     return this.mapToAnswerResponse(savedAnswer, answeringPlayer);
