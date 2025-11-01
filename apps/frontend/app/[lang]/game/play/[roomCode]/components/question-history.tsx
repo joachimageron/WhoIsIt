@@ -96,14 +96,6 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
 
       {answer && (
         <div className="mt-2 flex items-center gap-2 border-t border-default-200 pt-2">
-          <Icon
-            className="text-default-400"
-            icon="solar:chat-round-line-bold"
-            width={16}
-          />
-          <span className="text-xs text-default-500">
-            {answer.answeredByPlayerUsername}:
-          </span>
           <Chip
             color={getAnswerColor(answer.answerValue)}
             size="sm"
@@ -111,6 +103,13 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
           >
             {answer.answerValue.toUpperCase()}
           </Chip>
+          { answer.answerText && (
+            <span className="text-sm text-default-500">
+              {answer.answerText}
+            </span>
+          )
+          }
+
         </div>
       )}
     </div>
