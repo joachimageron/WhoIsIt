@@ -81,9 +81,6 @@ export function GameResultsClient({
     (p) => p.playerUsername === user?.username || p.userId === user?.id,
   );
 
-  // Find winner
-  const winner = results?.players.find((p) => p.isWinner);
-
   // Helper function to format placement
   const formatPlacement = (placement: number): string => {
     if (placement === 1) return dict.results.first;
@@ -148,59 +145,12 @@ export function GameResultsClient({
     return null;
   }
 
-  const isCurrentPlayerWinner = currentPlayer?.isWinner || false;
-
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
       {/* Header Section */}
       <div className="mb-8 text-center">
         <h1 className="mb-4 text-4xl font-bold">{dict.results.title}</h1>
-        <Card className="mx-auto max-w-2xl">
-          <CardBody className="text-center">
-            {winner && (
-              <>
-                <div className="mb-4">
-                  <Icon
-                    className="mx-auto text-warning"
-                    icon="mdi:trophy"
-                    width={64}
-                  />
-                </div>
-                <h2 className="mb-2 text-2xl font-bold">
-                  {dict.results.congratulations}
-                </h2>
-                <div className="flex items-center justify-center gap-3">
-                  <Avatar
-                    name={winner.playerUsername}
-                    size="lg"
-                    src={undefined}
-                  />
-                  <div className="text-left">
-                    <p className="text-xl font-semibold">
-                      {winner.playerUsername}
-                    </p>
-                    <Chip color="success" size="sm" variant="flat">
-                      {dict.results.winner}
-                    </Chip>
-                  </div>
-                </div>
-                <p className="mt-4 text-lg font-semibold text-success">
-                  {dict.results.score}: {winner.score}
-                </p>
-                {isCurrentPlayerWinner && (
-                  <p className="mt-2 text-lg font-bold text-warning">
-                    {dict.results.youWon}
-                  </p>
-                )}
-                {!isCurrentPlayerWinner && currentPlayer && (
-                  <p className="mt-2 text-lg text-default-600">
-                    {dict.results.youLost}
-                  </p>
-                )}
-              </>
-            )}
-          </CardBody>
-        </Card>
+        
       </div>
 
       {/* Game Stats Section */}
@@ -256,9 +206,6 @@ export function GameResultsClient({
           <CardBody>
             <Table
               aria-label="Player statistics table"
-              classNames={{
-                wrapper: "shadow-none",
-              }}
             >
               <TableHeader>
                 <TableColumn>{dict.results.placement}</TableColumn>
@@ -266,7 +213,6 @@ export function GameResultsClient({
                 <TableColumn>{dict.results.score}</TableColumn>
                 <TableColumn>{dict.results.questionsAsked}</TableColumn>
                 <TableColumn>{dict.results.correctGuesses}</TableColumn>
-                <TableColumn>{dict.results.timePlayed}</TableColumn>
               </TableHeader>
               <TableBody>
                 {results.players
@@ -274,11 +220,6 @@ export function GameResultsClient({
                   .map((player) => (
                     <TableRow
                       key={player.playerId}
-                      className={
-                        player.playerId === currentPlayer?.playerId
-                          ? "bg-primary-50"
-                          : ""
-                      }
                     >
                       <TableCell>
                         <Chip
@@ -320,9 +261,6 @@ export function GameResultsClient({
                         >
                           {player.correctGuesses}
                         </span>
-                      </TableCell>
-                      <TableCell>
-                        {formatDuration(player.timePlayedSeconds)}
                       </TableCell>
                     </TableRow>
                   ))}
