@@ -109,10 +109,6 @@ function QuestionItem({
             </>
           )}
         </div>
-
-        <Chip color="default" size="sm" variant="flat">
-          {dict.play.round} {question.roundNumber}
-        </Chip>
       </div>
 
       <p className="mb-2 text-sm">{question.questionText}</p>
