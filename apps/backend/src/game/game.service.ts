@@ -1006,7 +1006,7 @@ export class GameService {
     for (let i = 0; i < allPlayers.length; i++) {
       const checkIndex = (nextIndex + i) % allPlayers.length;
       const player = allPlayers[checkIndex];
-      
+
       // Check if this player is still active (not eliminated)
       if (!player.leftAt) {
         return player;
@@ -1228,7 +1228,10 @@ export class GameService {
 
   /**
    * Check if the game should end and handle the end if so
-   * Returns true if game ended, false otherwise
+   * @param game The game to check
+   * @param potentialWinner The player who may have won (e.g., by correct guess).
+   *                        Pass null when checking after player elimination to auto-find winner.
+   * @returns true if game ended, false otherwise
    */
   private async checkAndHandleGameEnd(
     game: Game,
@@ -1252,7 +1255,7 @@ export class GameService {
       let winner = potentialWinner;
       if (!winner) {
         // Find the last remaining player with unrevealed secret
-        const lastPlayer = await this.playerSecretRepository
+        const lastPlayerSecret = await this.playerSecretRepository
           .createQueryBuilder('secret')
           .innerJoin('secret.player', 'player')
           .where('player.game_id = :gameId', { gameId: game.id })
@@ -1260,14 +1263,13 @@ export class GameService {
           .andWhere('secret.status = :status', {
             status: PlayerSecretStatus.HIDDEN,
           })
-          .select('player')
           .getOne();
-        
-        if (lastPlayer) {
-          winner = lastPlayer.player;
+
+        if (lastPlayerSecret?.player) {
+          winner = lastPlayerSecret.player;
         }
       }
-      
+
       if (winner) {
         await this.endGame(game, winner);
         return true;
