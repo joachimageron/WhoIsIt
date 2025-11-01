@@ -98,7 +98,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                     onAction={(key) => {
                       if (key === "logout") {
                         handleLogout();
-                      } else if (key === "profile") {
+                      } else if (key === "info") {
                         router.push(`/${lang}/profile`);
                       }
                     }}
@@ -107,7 +107,6 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
                       <p className="font-semibold">{dict.auth.signedInAs}</p>
                       <p className="font-semibold">{user.email}</p>
                     </ListboxItem>
-                    <ListboxItem key="profile">{dict.nav.profile}</ListboxItem>
                     <ListboxItem
                       key="logout"
                       className="text-danger"
@@ -156,13 +155,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
           {navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item.label}-${index}`}>
               <Link
-                color={
-                  index === 2
-                    ? "primary"
-                    : index === navMenuItems.length - 1
-                      ? "danger"
-                      : "foreground"
-                }
+                color="foreground"
                 href={item.href}
                 size="lg"
               >
@@ -187,10 +180,9 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
           {isAuthenticated && user && (
             <>
               <NavbarMenuItem>
-                <div className="text-small">
-                  <p className="font-semibold">{user.username}</p>
-                  <p className="text-default-500">{user.email}</p>
-                </div>
+                <Link color="foreground" size="lg" href={`/${lang}/profile`}>
+                  {dict.nav.profile}
+                </Link>
               </NavbarMenuItem>
               <NavbarMenuItem>
                 <Link color="danger" size="lg" onPress={handleLogout}>
