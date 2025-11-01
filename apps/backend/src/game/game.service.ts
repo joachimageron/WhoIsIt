@@ -662,8 +662,12 @@ export class GameService {
     askedByPlayer.score += GameService.SCORE_QUESTION_BONUS;
     await this.playerRepository.save(askedByPlayer);
 
-    // Update the round state to AWAITING_ANSWER
+    // Advance to the next player's turn
+    const nextPlayer = this.getNextPlayer(currentRound, game);
+
+    // Update the round state to AWAITING_ANSWER and advance to next player
     currentRound.state = RoundState.AWAITING_ANSWER;
+    currentRound.activePlayer = nextPlayer;
     await this.roundRepository.save(currentRound);
 
     // Return the question response
@@ -858,8 +862,10 @@ export class GameService {
     answeringPlayer.score += GameService.SCORE_ANSWER_BONUS;
     await this.playerRepository.save(answeringPlayer);
 
-    // Update the round state to AWAITING_QUESTION (next turn)
-    await this.advanceToNextTurn(currentRound, game);
+    // Update the round state back to AWAITING_QUESTION
+    // Note: The turn was already advanced when the question was asked
+    currentRound.state = RoundState.AWAITING_QUESTION;
+    await this.roundRepository.save(currentRound);
 
     // Return the answer response
     return this.mapToAnswerResponse(savedAnswer, answeringPlayer);
@@ -898,12 +904,9 @@ export class GameService {
   }
 
   /**
-   * Advance to the next player's turn
+   * Get the next player in turn order
    */
-  private async advanceToNextTurn(
-    currentRound: Round,
-    game: Game,
-  ): Promise<void> {
+  private getNextPlayer(currentRound: Round, game: Game): GamePlayer {
     // Get all active players
     const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
 
@@ -916,9 +919,24 @@ export class GameService {
       (p) => p.id === currentRound.activePlayer?.id,
     );
 
+    // If current player not found, start from beginning
+    if (currentPlayerIndex === -1) {
+      return activePlayers[0];
+    }
+
     // Get the next player (circular)
     const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-    const nextPlayer = activePlayers[nextPlayerIndex];
+    return activePlayers[nextPlayerIndex];
+  }
+
+  /**
+   * Advance to the next player's turn
+   */
+  private async advanceToNextTurn(
+    currentRound: Round,
+    game: Game,
+  ): Promise<void> {
+    const nextPlayer = this.getNextPlayer(currentRound, game);
 
     // Update the round state
     currentRound.state = RoundState.AWAITING_QUESTION;

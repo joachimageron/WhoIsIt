@@ -169,6 +169,12 @@ describe('GameService - Scoring and Game End', () => {
         score: 0,
       } as GamePlayer;
 
+      const mockPlayer2 = {
+        id: 'player-2',
+        username: 'Player2',
+        score: 0,
+      } as GamePlayer;
+
       const mockRound = {
         id: 'round-1',
         roundNumber: 1,
@@ -181,6 +187,7 @@ describe('GameService - Scoring and Game End', () => {
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
         rounds: [mockRound],
+        players: [mockPlayer, mockPlayer2],
       } as Game;
 
       const mockQuestion = {
