@@ -203,6 +203,7 @@
     "selectPlayer": "Select target player",
     "askButton": "Ask Question",
     "asking": "Asking...",
+    "answerButton": "Answer",
     "history": "Question History",
     "noQuestionsYet": "No questions asked yet",
     "askedBy": "Asked by",

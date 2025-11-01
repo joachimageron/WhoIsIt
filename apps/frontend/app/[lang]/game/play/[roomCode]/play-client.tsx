@@ -413,8 +413,13 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           {/* Question History */}
           <QuestionHistory
             answers={playState.answers}
+            currentPlayerId={currentPlayerId}
             dict={dict}
             questions={questions}
+            onAnswerQuestion={(question) => {
+              setPendingQuestion(question);
+              setIsAnswerModalOpen(true);
+            }}
           />
         </div>
       </div>

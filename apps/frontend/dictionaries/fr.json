@@ -203,6 +203,7 @@
     "selectPlayer": "Sélectionner le joueur cible",
     "askButton": "Poser la Question",
     "asking": "Envoi...",
+    "answerButton": "Répondre",
     "history": "Historique des Questions",
     "noQuestionsYet": "Aucune question posée pour l'instant",
     "askedBy": "Posée par",
