@@ -59,6 +59,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   // Initialize game on mount
   useEffect(() => {
     const initGame = async () => {
+      if (!user) return;
       try {
         setIsLoading(true);
 
@@ -110,7 +111,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     };
 
     initGame();
-  }, [roomCode]);
+  }, [roomCode, user]);
 
   // Listen to socket connection status
   useEffect(() => {
