@@ -29,7 +29,7 @@ export function GameHeader({
 }: GameHeaderProps) {
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:items-center sm:justify-between">
+      <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
             <h1 className="text-xl font-bold sm:text-2xl">{dict.play.title}</h1>
@@ -75,7 +75,7 @@ export function GameHeader({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center sm:flex-col sm:items-end gap-2">
           {isMyTurn ? (
             <Chip
               color="primary"
