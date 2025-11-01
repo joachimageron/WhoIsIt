@@ -255,13 +255,16 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               {isConnected ? dict.lobby.connected : dict.lobby.disconnected}
             </Chip>
           </div>
-          <RoomCodeDisplay
-            copyErrorMessage={dict.lobby.errors.failedToCopyRoomCode}
-            copySuccessMessage={dict.lobby.roomCodeCopied}
-            label={dict.lobby.roomCode}
-            roomCode={lobby.roomCode}
-            size="md"
-          />
+          <div className="flex w-full items-center justify-between">
+            <RoomCodeDisplay
+              copyErrorMessage={dict.lobby.errors.failedToCopyRoomCode}
+              copySuccessMessage={dict.lobby.roomCodeCopied}
+              label={dict.lobby.roomCode}
+              roomCode={lobby.roomCode}
+              size="md"
+            />
+          </div>
+
         </CardHeader>
         <Divider />
         <CardBody className="gap-4 py-4">
