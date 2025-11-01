@@ -44,6 +44,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     setGameState,
     setCharacters,
     addQuestion,
+    addAnswer,
     isConnected,
     setConnected,
   } = useGameStore();
@@ -154,6 +155,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   useEffect(() => {
     const unsubscribeAnswerSubmitted = onAnswerSubmitted((event) => {
       setGameState(event.gameState);
+      addAnswer(event.answer);
       addToast({
         color: "success",
         title: dict.play.answerSubmitted || "Answer submitted",
@@ -170,7 +172,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     return () => {
       unsubscribeAnswerSubmitted();
     };
-  }, [onAnswerSubmitted, setGameState, dict, pendingQuestion]);
+  }, [onAnswerSubmitted, setGameState, addAnswer, dict, pendingQuestion]);
 
   // Listen to guess result events
   useEffect(() => {
@@ -392,7 +394,11 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           />
 
           {/* Question History */}
-          <QuestionHistory dict={dict} questions={questions} />
+          <QuestionHistory
+            answers={playState.answers}
+            dict={dict}
+            questions={questions}
+          />
         </div>
       </div>
 

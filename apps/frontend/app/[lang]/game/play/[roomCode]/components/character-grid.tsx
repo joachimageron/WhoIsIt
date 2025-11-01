@@ -132,11 +132,11 @@ function CharacterCard({
       )}
 
       <Image
+        alt={character.name}
         className={isEliminated ? "opacity-30" : "" + " rounded-xl"}
+        height={100}
         src={character.imageUrl ?? ""}
         width={100}
-        height={100}
-        alt={character.name}
       />
 
       <div className=" w-full ">

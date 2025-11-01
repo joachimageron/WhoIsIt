@@ -191,7 +191,6 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       await gameApi.startGame(roomCode);
       // After starting, the backend will update the game status
       // and we'll receive a lobbyUpdate event
-
     } catch (error) {
       addToast({
         color: "danger",

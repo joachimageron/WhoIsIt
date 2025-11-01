@@ -1,6 +1,6 @@
 "use client";
 
-import type { QuestionResponse } from "@whois-it/contracts";
+import type { QuestionResponse, AnswerResponse } from "@whois-it/contracts";
 
 import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -11,9 +11,14 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 interface QuestionHistoryProps {
   dict: any;
   questions: QuestionResponse[];
+  answers: Map<string, AnswerResponse>;
 }
 
-export function QuestionHistory({ dict, questions }: QuestionHistoryProps) {
+export function QuestionHistory({
+  dict,
+  questions,
+  answers,
+}: QuestionHistoryProps) {
   return (
     <Card>
       <CardHeader>
@@ -30,6 +35,7 @@ export function QuestionHistory({ dict, questions }: QuestionHistoryProps) {
               {[...questions].reverse().map((question) => (
                 <QuestionItem
                   key={question.id}
+                  answer={answers.get(question.id)}
                   dict={dict}
                   question={question}
                 />
@@ -45,9 +51,26 @@ export function QuestionHistory({ dict, questions }: QuestionHistoryProps) {
 interface QuestionItemProps {
   dict: any;
   question: QuestionResponse;
+  answer?: AnswerResponse;
 }
 
-function QuestionItem({ dict, question }: QuestionItemProps) {
+function QuestionItem({ dict, question, answer }: QuestionItemProps) {
+  // Determine answer color based on value
+  const getAnswerColor = (
+    answerValue: string,
+  ): "success" | "danger" | "warning" => {
+    switch (answerValue) {
+      case "yes":
+        return "success";
+      case "no":
+        return "danger";
+      case "unsure":
+        return "warning";
+      default:
+        return "warning";
+    }
+  };
+
   return (
     <div className="rounded-lg border border-default-200 bg-default-50 p-3">
       <div className="mb-2 flex items-start justify-between gap-2">
@@ -70,6 +93,26 @@ function QuestionItem({ dict, question }: QuestionItemProps) {
       </div>
 
       <p className="mb-2 text-sm">{question.questionText}</p>
+
+      {answer && (
+        <div className="mt-2 flex items-center gap-2 border-t border-default-200 pt-2">
+          <Icon
+            className="text-default-400"
+            icon="solar:chat-round-line-bold"
+            width={16}
+          />
+          <span className="text-xs text-default-500">
+            {answer.answeredByPlayerUsername}:
+          </span>
+          <Chip
+            color={getAnswerColor(answer.answerValue)}
+            size="sm"
+            variant="flat"
+          >
+            {answer.answerValue.toUpperCase()}
+          </Chip>
+        </div>
+      )}
     </div>
   );
 }
