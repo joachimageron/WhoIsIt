@@ -277,7 +277,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
             {!user.isGuest && user.email && (
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2">
-                  {user.emailVerified ? (
+                  {user.emailVerified === true ? (
                     <Chip
                       color="success"
                       startContent={<Icon icon="solar:check-circle-bold" />}
@@ -295,7 +295,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
                     </Chip>
                   )}
                 </div>
-                {!user.emailVerified && (
+                {user.emailVerified !== true && (
                   <Button
                     color="primary"
                     isLoading={isResendingVerification}
