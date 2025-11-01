@@ -202,6 +202,29 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     }
   }, [roomCode, dict.lobby.errors.failedToStartGame]);
 
+  const handleCopyRoomCode = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(lobby?.roomCode || roomCode);
+      addToast({
+        color: "success",
+        title: dict.lobby.roomCodeCopied,
+      });
+    } catch (error) {
+      // Fallback for browsers that don't support clipboard API
+      addToast({
+        color: "danger",
+        title: dict.lobby.errors.failedToCopyRoomCode,
+        description: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }, [
+    lobby?.roomCode,
+    roomCode,
+    dict.lobby.roomCodeCopied,
+    dict.lobby.errors.failedToCopyRoomCode,
+    addToast,
+  ]);
+
   const handleLeaveLobby = useCallback(async () => {
     try {
       // Leave the room via Socket.IO
@@ -261,6 +284,15 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               </p>
               <p className="text-large font-semibold">{lobby.roomCode}</p>
             </div>
+            <Button
+              color="primary"
+              size="sm"
+              startContent={<Icon icon="solar:copy-bold" width={16} />}
+              variant="flat"
+              onPress={handleCopyRoomCode}
+            >
+              {dict.lobby.copyRoomCode}
+            </Button>
           </div>
         </CardHeader>
         <Divider />

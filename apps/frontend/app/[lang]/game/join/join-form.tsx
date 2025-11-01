@@ -6,10 +6,10 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
-import { Form } from "@heroui/form";
 
 interface JoinFormProps {
   dict: any;
@@ -104,7 +104,7 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
             variant="bordered"
             onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           />
-          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
+          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
             {isLoading ? dict.game.join.joining : dict.game.join.joinButton}
           </Button>
         </Form>

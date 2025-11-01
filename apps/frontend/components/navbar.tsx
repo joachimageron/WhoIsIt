@@ -154,11 +154,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item.label}-${index}`}>
-              <Link
-                color="foreground"
-                href={item.href}
-                size="lg"
-              >
+              <Link color="foreground" href={item.href} size="lg">
                 {item.label}
               </Link>
             </NavbarMenuItem>
@@ -180,7 +176,7 @@ export const Navbar = ({ lang, dict }: NavbarProps) => {
           {isAuthenticated && user && (
             <>
               <NavbarMenuItem>
-                <Link color="foreground" size="lg" href={`/${lang}/profile`}>
+                <Link color="foreground" href={`/${lang}/profile`} size="lg">
                   {dict.nav.profile}
                 </Link>
               </NavbarMenuItem>

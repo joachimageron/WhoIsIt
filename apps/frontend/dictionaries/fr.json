@@ -159,6 +159,8 @@
   "lobby": {
     "title": "Lobby de Jeu",
     "roomCode": "Code de Salle",
+    "copyRoomCode": "Copier le Code",
+    "roomCodeCopied": "Code de salle copié !",
     "host": "Hôte",
     "players": "Joueurs",
     "waitingForPlayers": "En attente de joueurs...",
@@ -180,6 +182,7 @@
       "failedToJoin": "Échec de la connexion au lobby",
       "failedToUpdateReady": "Échec de la mise à jour du statut",
       "failedToStartGame": "Échec du démarrage du jeu",
+      "failedToCopyRoomCode": "Échec de la copie du code de salle",
       "disconnected": "Vous avez été déconnecté du lobby",
       "roomNotFound": "Salle introuvable"
     }
