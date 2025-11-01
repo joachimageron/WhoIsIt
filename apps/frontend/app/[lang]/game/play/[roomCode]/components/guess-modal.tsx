@@ -42,19 +42,21 @@ export function GuessModal({
         <ModalBody>
           {selectedCharacter ? (
             <div className="flex flex-col items-center gap-4">
-              <Avatar
-                name={selectedCharacter.name}
-                size="lg"
-                src={selectedCharacter.imageUrl || undefined}
-              />
-              <div className="text-center">
+              <p className="text-sm text-default-500">
+                {dict.play.confirmGuessDescription ||
+                  "Are you sure you want to guess this character?"}
+              </p>  
+
+              <div className="flex items-center gap-3">
+                <Avatar
+                  name={selectedCharacter.name}
+                  size="lg"
+                  src={selectedCharacter.imageUrl || undefined}
+                />
                 <p className="text-lg font-semibold">
                   {selectedCharacter.name}
                 </p>
-                <p className="mt-2 text-sm text-default-500">
-                  {dict.play.confirmGuessDescription ||
-                    "Are you sure you want to guess this character?"}
-                </p>
+
               </div>
             </div>
           ) : (
@@ -73,7 +75,7 @@ export function GuessModal({
             {dict.play.cancelGuess || "Cancel"}
           </Button>
           <Button
-            color="primary"
+            color="success"
             isDisabled={!selectedCharacter || isGuessing}
             isLoading={isGuessing}
             startContent={
