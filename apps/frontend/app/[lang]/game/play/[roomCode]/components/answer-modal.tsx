@@ -78,9 +78,6 @@ export function AnswerModal({
               <span className="font-medium">
                 {question.askedByPlayerUsername}
               </span>
-              <Chip color="default" size="sm" variant="flat">
-                {dict.play.round} {question.roundNumber}
-              </Chip>
             </div>
             <p className="text-base font-medium">{question.questionText}</p>
           </div>
