@@ -264,7 +264,6 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               size="md"
             />
           </div>
-
         </CardHeader>
         <Divider />
         <CardBody className="gap-4 py-4">

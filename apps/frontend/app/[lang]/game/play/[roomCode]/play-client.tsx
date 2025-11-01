@@ -4,6 +4,7 @@ import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
@@ -43,6 +44,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     playState,
     setGameState,
     setCharacters,
+    setMyCharacter,
     addQuestion,
     addAnswer,
     isConnected,
@@ -89,6 +91,21 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         );
 
         setCharacters(characters);
+
+        // Load player's assigned character
+        if (player) {
+          try {
+            const myCharacter = await gameApi.getPlayerCharacter(
+              roomCode,
+              player.id,
+            );
+
+            setMyCharacter(myCharacter);
+          } catch {
+            // Character might not be assigned yet if game hasn't started
+            // Silently ignore this error
+          }
+        }
 
         // Join via Socket.IO for real-time updates
         const response = await joinRoom({
@@ -333,7 +350,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     );
   }
 
-  const { gameState, characters, questions } = playState;
+  const { gameState, characters, questions, myCharacter } = playState;
   const isMyTurn = gameState.activePlayerId === currentPlayerId;
 
   return (
@@ -366,6 +383,47 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
               isMyTurn={isMyTurn}
               turnTimerSeconds={lobby.turnTimerSeconds}
             />
+          )}
+
+          {/* My Character Card */}
+          {myCharacter && (
+            <Card>
+              <CardBody className="p-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <Icon
+                      className="text-primary"
+                      icon="solar:user-id-bold"
+                      width={20}
+                    />
+                    <h3 className="text-sm font-semibold">
+                      {dict.play.yourCharacter || "Your Character"}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg bg-content2 p-3">
+                    {myCharacter.character.imageUrl && (
+                      <Image
+                        alt={myCharacter.character.name}
+                        className="h-16 w-16 rounded-lg object-cover"
+                        height={64}
+                        src={myCharacter.character.imageUrl}
+                        width={64}
+                      />
+                    )}
+                    <div className="flex flex-col gap-1">
+                      <p className="font-semibold text-primary">
+                        {myCharacter.character.name}
+                      </p>
+                      {myCharacter.character.summary && (
+                        <p className="text-xs text-foreground-500">
+                          {myCharacter.character.summary}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
           )}
 
           {/* Make a Guess Button */}
