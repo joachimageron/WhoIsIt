@@ -136,11 +136,16 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
       addQuestion(event.question);
       setGameState(event.gameState);
 
-      // Check if this question is directed at the current player
-      if (
-        event.question.targetPlayerId &&
-        event.question.targetPlayerId === currentPlayerId
-      ) {
+      // Check if this question can be answered by the current player
+      // Case 1: Question is specifically targeted at this player
+      // Case 2: Question has no target, so any player except the asker can answer
+      const canAnswer =
+        (event.question.targetPlayerId &&
+          event.question.targetPlayerId === currentPlayerId) ||
+        (!event.question.targetPlayerId &&
+          event.question.askedByPlayerId !== currentPlayerId);
+
+      if (canAnswer) {
         setPendingQuestion(event.question);
         setIsAnswerModalOpen(true);
       }
