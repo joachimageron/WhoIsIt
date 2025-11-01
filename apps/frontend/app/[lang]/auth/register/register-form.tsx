@@ -8,11 +8,11 @@ import { Checkbox } from "@heroui/checkbox";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
-import { Form } from "@heroui/form";
 
 interface RegisterFormProps {
   dict: any;
@@ -74,6 +74,7 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
 
     if (!agreedToTerms) {
       setAgreeToTermsError(dict.auth.register.agreeToTermsError);
+
       return;
     }
 

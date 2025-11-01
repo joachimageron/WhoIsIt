@@ -103,13 +103,11 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
           >
             {answer.answerValue.toUpperCase()}
           </Chip>
-          { answer.answerText && (
+          {answer.answerText && (
             <span className="text-sm text-default-500">
               {answer.answerText}
             </span>
-          )
-          }
-
+          )}
         </div>
       )}
     </div>

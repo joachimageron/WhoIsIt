@@ -23,8 +23,8 @@ export const LanguageSwitcher = ({ currentLang }: { currentLang: string }) => {
   return (
     <div className="flex gap-1">
       <Select
-        className="w-18"
         aria-label="Select Language"
+        className="w-18"
         selectedKeys={[currentLang]}
         variant="bordered"
         onChange={switchLocale}

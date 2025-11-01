@@ -7,9 +7,9 @@ import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import * as authApi from "@/lib/auth-api";
-import { Form } from "@heroui/form";
 
 interface ResetPasswordFormProps {
   dict: any;
@@ -141,7 +141,7 @@ export function ResetPasswordForm({
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {error && <div className="text-small text-danger">{error}</div>}
-          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
+          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
             {dict.auth.resetPassword.resetButton}
           </Button>
         </Form>
