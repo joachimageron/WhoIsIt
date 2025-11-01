@@ -663,19 +663,7 @@ export class GameService {
     await this.playerRepository.save(askedByPlayer);
 
     // Advance to the next player's turn
-    const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
-    if (activePlayers.length === 0) {
-      throw new InternalServerErrorException('No active players found');
-    }
-
-    // Find the current active player's index
-    const currentPlayerIndex = activePlayers.findIndex(
-      (p) => p.id === currentRound.activePlayer?.id,
-    );
-
-    // Get the next player (circular)
-    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-    const nextPlayer = activePlayers[nextPlayerIndex];
+    const nextPlayer = this.getNextPlayer(currentRound, game);
 
     // Update the round state to AWAITING_ANSWER and advance to next player
     currentRound.state = RoundState.AWAITING_ANSWER;
@@ -916,12 +904,9 @@ export class GameService {
   }
 
   /**
-   * Advance to the next player's turn
+   * Get the next player in turn order
    */
-  private async advanceToNextTurn(
-    currentRound: Round,
-    game: Game,
-  ): Promise<void> {
+  private getNextPlayer(currentRound: Round, game: Game): GamePlayer {
     // Get all active players
     const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
 
@@ -934,9 +919,24 @@ export class GameService {
       (p) => p.id === currentRound.activePlayer?.id,
     );
 
+    // If current player not found, start from beginning
+    if (currentPlayerIndex === -1) {
+      return activePlayers[0];
+    }
+
     // Get the next player (circular)
     const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-    const nextPlayer = activePlayers[nextPlayerIndex];
+    return activePlayers[nextPlayerIndex];
+  }
+
+  /**
+   * Advance to the next player's turn
+   */
+  private async advanceToNextTurn(
+    currentRound: Round,
+    game: Game,
+  ): Promise<void> {
+    const nextPlayer = this.getNextPlayer(currentRound, game);
 
     // Update the round state
     currentRound.state = RoundState.AWAITING_QUESTION;
