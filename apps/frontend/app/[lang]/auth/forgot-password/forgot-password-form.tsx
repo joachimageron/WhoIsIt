@@ -7,6 +7,7 @@ import { Link } from "@heroui/link";
 import { addToast } from "@heroui/toast";
 
 import * as authApi from "@/lib/auth-api";
+import { Form } from "@heroui/form";
 
 interface ForgotPasswordFormProps {
   dict: any;
@@ -57,9 +58,10 @@ export function ForgotPasswordForm({ dict, lang }: ForgotPasswordFormProps) {
         <p className="text-small text-default-500 pb-2">
           {dict.auth.forgotPassword.description}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {error && <div className="text-small text-danger">{error}</div>}
           <Input
+            autoFocus
             isRequired
             isDisabled={isLoading}
             label={dict.auth.forgotPassword.email}
@@ -71,10 +73,10 @@ export function ForgotPasswordForm({ dict, lang }: ForgotPasswordFormProps) {
             variant="bordered"
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button color="primary" isLoading={isLoading} type="submit">
+          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
             {dict.auth.forgotPassword.sendButton}
           </Button>
-        </form>
+        </Form>
 
         <p className="text-small text-center">
           <Link href={`/${lang}/auth/login`} size="sm">

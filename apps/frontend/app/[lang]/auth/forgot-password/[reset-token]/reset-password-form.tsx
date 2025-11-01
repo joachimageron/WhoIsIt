@@ -9,6 +9,7 @@ import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 
 import * as authApi from "@/lib/auth-api";
+import { Form } from "@heroui/form";
 
 interface ResetPasswordFormProps {
   dict: any;
@@ -83,8 +84,9 @@ export function ResetPasswordForm({
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.auth.resetPassword.title}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
+            autoFocus
             isRequired
             endContent={
               <button type="button" onClick={toggleVisibility}>
@@ -139,10 +141,10 @@ export function ResetPasswordForm({
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           {error && <div className="text-small text-danger">{error}</div>}
-          <Button color="primary" isLoading={isLoading} type="submit">
+          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
             {dict.auth.resetPassword.resetButton}
           </Button>
-        </form>
+        </Form>
         <p className="text-small text-center">
           <Link href={`/${lang}/auth/login`} size="sm">
             {dict.auth.resetPassword.backToLogin}

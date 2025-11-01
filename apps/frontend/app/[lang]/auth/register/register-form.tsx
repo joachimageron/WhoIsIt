@@ -12,6 +12,7 @@ import { addToast } from "@heroui/toast";
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
+import { Form } from "@heroui/form";
 
 interface RegisterFormProps {
   dict: any;
@@ -32,6 +33,7 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
     confirmPassword: "",
   });
   const [agreedToTerms, setAgreedToTerms] = React.useState(false);
+  const [agreeToTermsError, setAgreeToTermsError] = React.useState("");
   const [isResending, setIsResending] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -71,8 +73,7 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
     }
 
     if (!agreedToTerms) {
-      setError(dict.auth.register.agreeToTermsError);
-
+      setAgreeToTermsError(dict.auth.register.agreeToTermsError);
       return;
     }
 
@@ -176,8 +177,9 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.auth.register.title}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
+            autoFocus
             isRequired
             label={dict.auth.register.username}
             labelPlacement="outside"
@@ -252,7 +254,6 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
             onChange={handleInputChange}
           />
           <Checkbox
-            isRequired
             className="py-4"
             isSelected={agreedToTerms}
             size="sm"
@@ -260,10 +261,13 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
           >
             {dict.auth.register.agreeToTerms}
           </Checkbox>
-          <Button color="primary" isLoading={isLoading} type="submit">
+          {agreeToTermsError && (
+            <div className="text-small text-danger">{agreeToTermsError}</div>
+          )}
+          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
             {dict.auth.register.signUpButton}
           </Button>
-        </form>
+        </Form>
         <p className="text-small text-center">
           <Link href={`/${lang}/auth/login`} size="sm">
             {dict.auth.register.haveAccount}

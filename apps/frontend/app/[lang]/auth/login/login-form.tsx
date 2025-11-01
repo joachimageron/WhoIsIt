@@ -11,6 +11,7 @@ import { addToast } from "@heroui/toast";
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail, looksLikeEmail } from "@/lib/utils/validation";
+import { Form } from "@heroui/form";
 
 interface LoginFormProps {
   dict: any;
@@ -75,8 +76,9 @@ export function LoginForm({ dict, lang }: LoginFormProps) {
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.auth.login.title}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
+            autoFocus
             isRequired
             label={dict.auth.login.emailOrUsername}
             labelPlacement="outside"
@@ -118,10 +120,10 @@ export function LoginForm({ dict, lang }: LoginFormProps) {
               {dict.auth.login.forgotPassword}
             </Link>
           </div>
-          <Button color="primary" isLoading={isLoading} type="submit">
+          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
             {dict.auth.login.loginButton}
           </Button>
-        </form>
+        </Form>
         <p className="text-small text-center">
           <Link href={`/${lang}/auth/register`} size="sm">
             {dict.auth.login.noAccount}
