@@ -1090,9 +1090,16 @@ export class GameService {
         await this.advanceToNextTurn(currentRound, game);
       }
     } else if (!isCorrect && targetPlayer) {
-      // Incorrect guess - just record it
-      // The player can continue playing
-      await this.advanceToNextTurn(currentRound, game);
+      // Incorrect guess - eliminate the guessing player
+      guessingPlayer.leftAt = new Date();
+      await this.playerRepository.save(guessingPlayer);
+
+      // Check if game should end (only one player remaining)
+      const gameEnded = await this.checkAndHandleGameEnd(game, null);
+      if (!gameEnded) {
+        // Continue to next turn with remaining players
+        await this.advanceToNextTurn(currentRound, game);
+      }
     }
 
     // Return the guess response
@@ -1137,7 +1144,7 @@ export class GameService {
    */
   private async checkAndHandleGameEnd(
     game: Game,
-    potentialWinner: GamePlayer,
+    potentialWinner: GamePlayer | null,
   ): Promise<boolean> {
     // Get count of unrevealed players
     const unrevealedPlayers = await this.playerSecretRepository
@@ -1152,9 +1159,31 @@ export class GameService {
 
     // Check if only one player has unrevealed secret (they are the winner)
     // or if the potential winner just made the winning guess
-    if (unrevealedPlayers <= 1) {
-      await this.endGame(game, potentialWinner);
-      return true;
+    if (unrevealedPlayers <= 1 || (potentialWinner && unrevealedPlayers === 1)) {
+      // Find the winner if not provided
+      let winner = potentialWinner;
+      if (!winner) {
+        // Find the last remaining player with unrevealed secret
+        const lastPlayer = await this.playerSecretRepository
+          .createQueryBuilder('secret')
+          .innerJoin('secret.player', 'player')
+          .where('player.game_id = :gameId', { gameId: game.id })
+          .andWhere('player.leftAt IS NULL')
+          .andWhere('secret.status = :status', {
+            status: PlayerSecretStatus.HIDDEN,
+          })
+          .select('player')
+          .getOne();
+        
+        if (lastPlayer) {
+          winner = lastPlayer.player;
+        }
+      }
+      
+      if (winner) {
+        await this.endGame(game, winner);
+        return true;
+      }
     }
 
     return false;
