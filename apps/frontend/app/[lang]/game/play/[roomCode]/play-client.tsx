@@ -260,9 +260,37 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         return;
       }
 
+      if (!playState?.gameState) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: "Game state not found",
+        });
+
+        return;
+      }
+
+      // Find the target player (in a 2-player game, it's the opponent)
+      // In multiplayer games, the user should specify which player they're guessing
+      const otherPlayers = playState.gameState.players.filter(
+        (p) => p.id !== currentPlayerId,
+      );
+
+      let targetPlayerId: string | undefined;
+
+      if (otherPlayers.length === 1) {
+        // In a 2-player game, automatically target the opponent
+        targetPlayerId = otherPlayers[0].id;
+      } else if (otherPlayers.length > 1) {
+        // In multiplayer, we need to ask which player they're guessing
+        // For now, we'll leave it undefined (TODO: add player selection in guess modal)
+        targetPlayerId = undefined;
+      }
+
       try {
         const guess = await gameApi.submitGuess(roomCode, {
           playerId: currentPlayerId,
+          targetPlayerId,
           targetCharacterId: characterId,
         });
 
@@ -289,7 +317,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         });
       }
     },
-    [currentPlayerId, roomCode, dict],
+    [currentPlayerId, roomCode, dict, playState],
   );
 
   const handleSubmitAnswer = useCallback(
