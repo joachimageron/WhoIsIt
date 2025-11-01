@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Character } from './character.entity';
-import { Trait } from './trait.entity';
 import { Game } from './game.entity';
 import { GameConfigSnapshot } from './game-config-snapshot.entity';
 import { GameVisibility } from '../enums';
@@ -56,9 +55,6 @@ export class CharacterSet {
 
   @OneToMany(() => Character, (character: Character) => character.set)
   characters?: Character[];
-
-  @OneToMany(() => Trait, (trait: Trait) => trait.set)
-  traits?: Trait[];
 
   @OneToMany(() => Game, (game: Game) => game.characterSet)
   games?: Game[];

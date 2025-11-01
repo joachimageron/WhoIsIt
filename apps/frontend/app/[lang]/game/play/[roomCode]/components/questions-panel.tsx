@@ -66,8 +66,6 @@ export function QuestionsPanel({
         playerId: currentPlayerId,
         targetPlayerId: targetPlayerId || undefined,
         questionText: question.trim(),
-        category: "trait", // Default category
-        answerType: "boolean", // Default answer type
       });
 
       // Clear form

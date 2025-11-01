@@ -133,14 +133,6 @@ export type CharacterSetResponseDto = {
   characterCount?: number;
 };
 
-export type TraitValueResponseDto = {
-  id: string;
-  traitId: string;
-  traitName: string;
-  traitSlug: string;
-  valueText: string;
-};
-
 export type CharacterResponseDto = {
   id: string;
   name: string;
@@ -149,19 +141,13 @@ export type CharacterResponseDto = {
   summary?: string | null;
   metadata: Record<string, unknown>;
   isActive: boolean;
-  traits?: TraitValueResponseDto[];
 };
 
 // Questions API Types
-export type QuestionCategory = "trait" | "direct" | "meta";
-export type AnswerType = "boolean" | "text";
-
 export type AskQuestionRequest = {
   playerId: string;
   targetPlayerId?: string;
   questionText: string;
-  category: QuestionCategory;
-  answerType: AnswerType;
 };
 
 export type QuestionResponse = {
@@ -173,8 +159,6 @@ export type QuestionResponse = {
   targetPlayerId?: string;
   targetPlayerUsername?: string;
   questionText: string;
-  category: QuestionCategory;
-  answerType: AnswerType;
   askedAt: string;
 };
 

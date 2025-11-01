@@ -28,17 +28,6 @@ export enum RoundState {
   CLOSED = 'closed',
 }
 
-export enum QuestionCategory {
-  TRAIT = 'trait',
-  DIRECT = 'direct',
-  META = 'meta',
-}
-
-export enum AnswerType {
-  BOOLEAN = 'boolean',
-  TEXT = 'text',
-}
-
 export enum AnswerValue {
   YES = 'yes',
   NO = 'no',
@@ -60,11 +49,4 @@ export enum PlayerPanelStatus {
   UNKNOWN = 'unknown',
   ELIMINATED = 'eliminated',
   HIGHLIGHTED = 'highlighted',
-}
-
-export enum TraitDataType {
-  BOOLEAN = 'boolean',
-  ENUM = 'enum',
-  TEXT = 'text',
-  NUMBER = 'number',
 }

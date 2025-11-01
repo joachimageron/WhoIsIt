@@ -66,11 +66,6 @@ export class CharacterSetsService {
 
     const characters = await this.characterRepository.find({
       where: { set: { id: setId }, isActive: true },
-      relations: [
-        'traitValues',
-        'traitValues.traitValue',
-        'traitValues.traitValue.trait',
-      ],
       order: { name: 'ASC' },
     });
 
@@ -82,14 +77,6 @@ export class CharacterSetsService {
       summary: character.summary,
       metadata: character.metadata,
       isActive: character.isActive,
-      traits:
-        character.traitValues?.map((ctv) => ({
-          id: ctv.traitValue.id,
-          traitId: ctv.traitValue.trait.id,
-          traitName: ctv.traitValue.trait.name,
-          traitSlug: ctv.traitValue.trait.slug,
-          valueText: ctv.traitValue.valueText,
-        })) ?? [],
     }));
   }
 }

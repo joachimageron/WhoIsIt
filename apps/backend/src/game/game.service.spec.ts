@@ -1212,8 +1212,6 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
         askedAt: new Date(),
       } as Question;
 
@@ -1232,8 +1230,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       const result = await service.askQuestion('ABC12', request);
@@ -1258,8 +1254,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('INVALID', request)).rejects.toThrow(
@@ -1283,8 +1277,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1309,8 +1301,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1344,8 +1334,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1379,8 +1367,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1415,8 +1401,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       await expect(service.askQuestion('ABC12', request)).rejects.toThrow(
@@ -1459,8 +1443,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       const error = await service
@@ -1509,8 +1491,6 @@ describe('GameService', () => {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
         questionText: 'Test question?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
       };
 
       const error = await service
@@ -1551,8 +1531,6 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: null,
         questionText: 'How many characters remain?',
-        category: 'meta' as any,
-        answerType: 'text' as any,
         askedAt: new Date(),
       } as Question;
 
@@ -1568,8 +1546,6 @@ describe('GameService', () => {
       const request = {
         playerId: 'player-1',
         questionText: 'How many characters remain?',
-        category: 'meta' as any,
-        answerType: 'text' as any,
       };
 
       const result = await service.askQuestion('ABC12', request);
@@ -1646,7 +1622,7 @@ describe('GameService', () => {
       const mockCharacter: Character = {
         id: 'char-1',
         name: 'Character 1',
-        traitValues: [],
+        
       } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
@@ -1692,8 +1668,6 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockAnsweringPlayer,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;
 
@@ -2028,7 +2002,7 @@ describe('GameService', () => {
         username: 'Player2',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as unknown as Character,
+          character: { id: 'char-1' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2037,7 +2011,7 @@ describe('GameService', () => {
         username: 'Player3',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-2', traitValues: [] } as unknown as Character,
+          character: { id: 'char-2' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2087,7 +2061,7 @@ describe('GameService', () => {
         username: 'Player1',
         game: { id: 'game-123' } as Game,
         secret: {
-          character: { id: 'char-1', traitValues: [] } as unknown as Character,
+          character: { id: 'char-1' } as unknown as Character,
         } as PlayerSecret,
       } as GamePlayer;
 
@@ -2135,7 +2109,7 @@ describe('GameService', () => {
       const mockCharacter: Character = {
         id: 'char-1',
         name: 'Character 1',
-        traitValues: [],
+        
       } as unknown as Character;
 
       const mockPlayerSecret: PlayerSecret = {
@@ -2185,8 +2159,6 @@ describe('GameService', () => {
         askedBy: mockPlayer1,
         targetPlayer: mockPlayer2,
         questionText: 'Does your character have glasses?',
-        category: 'trait' as any,
-        answerType: 'boolean' as any,
         answers: [],
       } as unknown as Question;
 

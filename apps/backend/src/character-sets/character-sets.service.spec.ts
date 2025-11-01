@@ -221,7 +221,7 @@ describe('CharacterSetsService', () => {
   });
 
   describe('findCharacters', () => {
-    it('should return characters with their trait values', async () => {
+    it('should return characters', async () => {
       const setId = 'uuid-1';
       const mockCharacterSet: Partial<CharacterSet> = {
         id: setId,
@@ -237,31 +237,6 @@ describe('CharacterSetsService', () => {
           summary: 'Alice is a character',
           metadata: {},
           isActive: true,
-
-          traitValues: [
-            {
-              traitValue: {
-                id: 'tv-1',
-                valueText: 'Female',
-                trait: {
-                  id: 'trait-1',
-                  name: 'Gender',
-                  slug: 'gender',
-                },
-              },
-            },
-            {
-              traitValue: {
-                id: 'tv-2',
-                valueText: 'Blond',
-                trait: {
-                  id: 'trait-2',
-                  name: 'Hair Color',
-                  slug: 'hair-color',
-                },
-              },
-            },
-          ] as unknown as Character['traitValues'],
         },
         {
           id: 'char-2',
@@ -271,20 +246,6 @@ describe('CharacterSetsService', () => {
           summary: 'Bob is a character',
           metadata: {},
           isActive: true,
-
-          traitValues: [
-            {
-              traitValue: {
-                id: 'tv-3',
-                valueText: 'Male',
-                trait: {
-                  id: 'trait-1',
-                  name: 'Gender',
-                  slug: 'gender',
-                },
-              },
-            },
-          ] as unknown as Character['traitValues'],
         },
       ];
 
@@ -302,32 +263,10 @@ describe('CharacterSetsService', () => {
         summary: 'Alice is a character',
         metadata: {},
         isActive: true,
-        traits: [
-          {
-            id: 'tv-1',
-            traitId: 'trait-1',
-            traitName: 'Gender',
-            traitSlug: 'gender',
-            valueText: 'Female',
-          },
-          {
-            id: 'tv-2',
-            traitId: 'trait-2',
-            traitName: 'Hair Color',
-            traitSlug: 'hair-color',
-            valueText: 'Blond',
-          },
-        ],
       });
-      expect(result[1].traits).toHaveLength(1);
 
       expect(mockCharacterRepository.find).toHaveBeenCalledWith({
         where: { set: { id: setId }, isActive: true },
-        relations: [
-          'traitValues',
-          'traitValues.traitValue',
-          'traitValues.traitValue.trait',
-        ],
         order: { name: 'ASC' },
       });
     });
@@ -347,69 +286,8 @@ describe('CharacterSetsService', () => {
       // Verify that the query filters by isActive: true
       expect(mockCharacterRepository.find).toHaveBeenCalledWith({
         where: { set: { id: setId }, isActive: true },
-        relations: [
-          'traitValues',
-          'traitValues.traitValue',
-          'traitValues.traitValue.trait',
-        ],
         order: { name: 'ASC' },
       });
-    });
-
-    it('should handle characters with no trait values', async () => {
-      const setId = 'uuid-1';
-      const mockCharacterSet: Partial<CharacterSet> = {
-        id: setId,
-        name: 'Classic Characters',
-      };
-
-      const mockCharacters: Partial<Character>[] = [
-        {
-          id: 'char-1',
-          name: 'Alice',
-          slug: 'alice',
-          imageUrl: null,
-          summary: 'Alice is a character',
-          metadata: {},
-          isActive: true,
-          traitValues: [],
-        },
-      ];
-
-      mockCharacterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
-      mockCharacterRepository.find.mockResolvedValue(mockCharacters);
-
-      const result = await service.findCharacters(setId);
-
-      expect(result[0].traits).toEqual([]);
-    });
-
-    it('should handle characters with undefined trait values', async () => {
-      const setId = 'uuid-1';
-      const mockCharacterSet: Partial<CharacterSet> = {
-        id: setId,
-        name: 'Classic Characters',
-      };
-
-      const mockCharacters: Partial<Character>[] = [
-        {
-          id: 'char-1',
-          name: 'Alice',
-          slug: 'alice',
-          imageUrl: null,
-          summary: 'Alice is a character',
-          metadata: {},
-          isActive: true,
-          traitValues: undefined,
-        },
-      ];
-
-      mockCharacterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
-      mockCharacterRepository.find.mockResolvedValue(mockCharacters);
-
-      const result = await service.findCharacters(setId);
-
-      expect(result[0].traits).toEqual([]);
     });
 
     it('should return empty array when character set has no active characters', async () => {

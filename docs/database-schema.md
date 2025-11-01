@@ -31,7 +31,7 @@ Ce document décrit le modèle relationnel proposé pour l'application WhoIsIt. 
 
 ### `character_sets`
 
-Définit un pack de personnages et leurs traits.
+Définit un pack de personnages .
 
 | Colonne | Type | Description |
 | --- | --- | --- |
@@ -59,37 +59,6 @@ Définit un pack de personnages et leurs traits.
 | `is_active` | BOOLEAN | Permet de masquer un personnage |
 | `created_at` | TIMESTAMP | Création |
 
-### `traits`
-
-| Colonne | Type | Description |
-| --- | --- | --- |
-| `id` (PK) | UUID | Identifiant |
-| `set_id` (FK → character_sets) | UUID | Set concerné |
-| `name` | TEXT | Nom affiché |
-| `slug` | TEXT | Identifiant unique par set |
-| `data_type` | ENUM(`boolean`,`enum`,`text`,`number`) | Type logique |
-| `created_at` | TIMESTAMP | Création |
-
-### `trait_values`
-
-Valeurs disponibles pour un trait donné.
-
-| Colonne | Type |
-| --- | --- |
-| `id` (PK) | UUID |
-| `trait_id` (FK → traits) | UUID |
-| `value_text` | TEXT |
-| `sort_order` | INT |
-
-### `character_trait_values`
-
-Table de liaison entre `characters` et `trait_values`.
-
-| Colonne | Type |
-| --- | --- |
-| `character_id` (FK → characters) | UUID |
-| `trait_value_id` (FK → trait_values) | UUID |
-| PK composite | (`character_id`,`trait_value_id`) |
 
 ### `games`
 
@@ -181,7 +150,7 @@ Représente chaque participant à une partie.
 | `asked_by_player_id` (FK → game_players) | UUID |
 | `target_player_id` ❓ (FK → game_players) | UUID |
 | `question_text` | TEXT |
-| `category` | ENUM(`trait`,`direct`,`meta`) |
+| `category` | ENUM(`direct`,`meta`) |
 | `answer_type` | ENUM(`boolean`,`text`) |
 | `asked_at` | TIMESTAMP |
 
@@ -256,8 +225,7 @@ Agrégats par utilisateur.
 ## Relations principales (Vue d'ensemble)
 
 - `users` 1─n `character_sets`
-- `character_sets` 1─n `characters`, `traits`
-- `traits` 1─n `trait_values` ; `characters` n─n `trait_values`
+- `character_sets` 1─n `characters`
 - `users` 1─n `games` (hôte) ; `games` 1─n `game_players`
 - `game_players` 1─1 `player_secrets`
 - `games` 1─n `rounds` ; `rounds` 1─n `questions` 1─n `answers`
@@ -273,10 +241,6 @@ Agrégats par utilisateur.
 
 - **`character_sets`** : définit un pack de personnages (ex : « Classique », « Super-héros ») avec son auteur, sa visibilité et des métadonnées de règles.
 - **`characters`** : liste les personnages jouables d’un set donné, avec nom, image et attributs libres (JSONB) pour la personnalisation.
-- **`traits`** : décrit les caractéristiques disponibles dans un set (ex : couleur de cheveux, accessoires) ainsi que leur type de données.
-- **`trait_values`** : énumère les valeurs possibles pour un trait (ex : « roux », « lunettes »), afin de garder un vocabulaire cohérent.
-- **`character_trait_values`** : table de liaison qui associe chaque personnage aux valeurs qui le décrivent. Sert aux filtres de questions côté client.
-
 ## Déroulé d’une partie
 
 - **`games`** : enregistrement maître d’une partie avec code de salle, hôte, set de personnages choisi, état (lobby/en cours/terminée) et configuration des règles.
@@ -288,7 +252,7 @@ Agrégats par utilisateur.
 ## Rounds, questions et guesses
 
 - **`rounds`** : structure le tour par tour, identifie qui doit poser la prochaine question, stocke l’état du round et sa durée effective.
-- **`questions`** : conserve chaque question posée pendant un round, avec l’auteur, la cible éventuelle et un type (trait/direct/meta) utile pour les stats.
+- **`questions`** : conserve chaque question posée pendant un round, avec l’auteur, la cible éventuelle et un type (direct/meta) utile pour les stats.
 - **`answers`** : enregistre la réponse à une question (Oui/Non/Incertain ou texte libre), qui répond, la latence et le timestamp.
 - **`guesses`** : trace les tentatives de deviner le personnage, indique si elles sont correctes et mesure le temps de réaction.
 

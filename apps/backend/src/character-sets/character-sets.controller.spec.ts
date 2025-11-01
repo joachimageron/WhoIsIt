@@ -113,7 +113,7 @@ describe('CharacterSetsController', () => {
   });
 
   describe('findCharacters', () => {
-    it('should return an array of characters with their traits', async () => {
+    it('should return an array of characters', async () => {
       const setId = 'uuid-1';
       const expectedResult: CharacterResponseDto[] = [
         {
@@ -124,22 +124,6 @@ describe('CharacterSetsController', () => {
           summary: 'Alice is a character in the classic set',
           metadata: {},
           isActive: true,
-          traits: [
-            {
-              id: 'trait-val-1',
-              traitId: 'trait-1',
-              traitName: 'Gender',
-              traitSlug: 'gender',
-              valueText: 'Female',
-            },
-            {
-              id: 'trait-val-2',
-              traitId: 'trait-2',
-              traitName: 'Hair Color',
-              traitSlug: 'hair-color',
-              valueText: 'Blond',
-            },
-          ],
         },
         {
           id: 'char-2',
@@ -149,22 +133,6 @@ describe('CharacterSetsController', () => {
           summary: 'Bob is a character in the classic set',
           metadata: {},
           isActive: true,
-          traits: [
-            {
-              id: 'trait-val-3',
-              traitId: 'trait-1',
-              traitName: 'Gender',
-              traitSlug: 'gender',
-              valueText: 'Male',
-            },
-            {
-              id: 'trait-val-4',
-              traitId: 'trait-2',
-              traitName: 'Hair Color',
-              traitSlug: 'hair-color',
-              valueText: 'Brown',
-            },
-          ],
         },
       ];
 

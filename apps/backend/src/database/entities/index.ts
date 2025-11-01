@@ -1,6 +1,5 @@
 export * from './answer.entity';
 export * from './character-set.entity';
-export * from './character-trait-value.entity';
 export * from './character.entity';
 export * from './game-config-snapshot.entity';
 export * from './game-event.entity';
@@ -13,6 +12,4 @@ export * from './player-secret.entity';
 export * from './player-stats.entity';
 export * from './question.entity';
 export * from './round.entity';
-export * from './trait-value.entity';
-export * from './trait.entity';
 export * from './user.entity';

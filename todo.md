@@ -53,7 +53,7 @@ The WhoIsIt project is a multiplayer guessing game with **Phase 2 successfully c
 
 **Base de données :**
 
-- ✅ 15 entités TypeORM complètes (User, Game, GamePlayer, Round, Question, Answer, Guess, Character, CharacterSet, Trait, etc.)
+- ✅ 15 entités TypeORM complètes (User, Game, GamePlayer, Round, Question, Answer, Guess, Character, CharacterSet, etc.)
 - ✅ Scripts de seed fonctionnels (utilisateurs, character set "Classic Characters" avec 24 personnages)
 - ✅ Relations entre entités bien définies
 - ✅ Support des invitations, événements de jeu, statistiques joueurs
@@ -126,9 +126,9 @@ The WhoIsIt project is a multiplayer guessing game with **Phase 2 successfully c
 
 - ❌ **Aucune route GET /character-sets** pour lister les sets disponibles
 - ❌ **Aucune route GET /character-sets/:id** pour détails d'un set
-- ❌ **Aucune route GET /character-sets/:id/characters** pour récupérer personnages + traits
+- ❌ **Aucune route GET /character-sets/:id/characters** pour récupérer personnages
 - ❌ Impossible pour le frontend de permettre à l'hôte de choisir un character set lors de la création
-- ❌ Les entités CharacterSet, Character, Trait existent et sont seedées, mais pas exposées via API
+- ❌ Les entités CharacterSet, Character existent et sont seedées, mais pas exposées via API
 
 #### 🔒 Sécurité et Auth Avancée
 
@@ -193,8 +193,8 @@ The WhoIsIt project is a multiplayer guessing game with **Phase 2 successfully c
 2. **API Catalogue Personnages**
    - [x] Créer CharacterSetsController
    - [x] Endpoint GET /character-sets (liste tous les sets publics)
-   - [x] Endpoint GET /character-sets/:id (détails + traits)
-   - [x] Endpoint GET /character-sets/:id/characters (liste personnages avec traits)
+   - [x] Endpoint GET /character-sets/:id (détails)
+   - [x] Endpoint GET /character-sets/:id/characters (liste personnages)
    - [x] Ajouter types dans @whois-it/contracts
    - [x] Tests unitaires pour ces endpoints
 
