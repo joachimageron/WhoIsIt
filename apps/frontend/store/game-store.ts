@@ -3,6 +3,7 @@ import type {
   GameStateResponse,
   QuestionResponse,
   CharacterResponseDto,
+  AnswerResponse,
 } from "@whois-it/contracts";
 
 import { create } from "zustand";
@@ -11,6 +12,7 @@ export interface GamePlayState {
   gameState: GameStateResponse | null;
   characters: CharacterResponseDto[];
   questions: QuestionResponse[];
+  answers: Map<string, AnswerResponse>; // Maps questionId to answer
   eliminatedCharacterIds: Set<string>;
 }
 
@@ -23,6 +25,7 @@ export interface GameState {
   setGameState: (gameState: GameStateResponse | null) => void;
   setCharacters: (characters: CharacterResponseDto[]) => void;
   addQuestion: (question: QuestionResponse) => void;
+  addAnswer: (answer: AnswerResponse) => void;
   eliminateCharacter: (characterId: string) => void;
   resetPlayState: () => void;
   reset: () => void;
@@ -42,6 +45,7 @@ export const useGameStore = create<GameState>((set) => ({
             gameState,
             characters: [],
             questions: [],
+            answers: new Map(),
             eliminatedCharacterIds: new Set(),
           },
     })),
@@ -53,6 +57,7 @@ export const useGameStore = create<GameState>((set) => ({
             gameState: null,
             characters,
             questions: [],
+            answers: new Map(),
             eliminatedCharacterIds: new Set(),
           },
     })),
@@ -67,9 +72,24 @@ export const useGameStore = create<GameState>((set) => ({
             gameState: null,
             characters: [],
             questions: [question],
+            answers: new Map(),
             eliminatedCharacterIds: new Set(),
           },
     })),
+  addAnswer: (answer) =>
+    set((state) => {
+      if (!state.playState) return state;
+      const newAnswers = new Map(state.playState.answers);
+
+      newAnswers.set(answer.questionId, answer);
+
+      return {
+        playState: {
+          ...state.playState,
+          answers: newAnswers,
+        },
+      };
+    }),
   eliminateCharacter: (characterId) =>
     set((state) => {
       if (!state.playState) return state;

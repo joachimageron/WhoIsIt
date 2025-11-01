@@ -28,9 +28,9 @@ export function QuestionsPanel({
   currentPlayerId,
 }: QuestionsPanelProps) {
   const [question, setQuestion] = useState("");
-  const [targetPlayerId, setTargetPlayerId] = useState<string>(gameState.players.filter(
-    (p) => p.id !== currentPlayerId,
-  )[0]?.id || "");
+  const [targetPlayerId, setTargetPlayerId] = useState<string>(
+    gameState.players.filter((p) => p.id !== currentPlayerId)[0]?.id || "",
+  );
   const [isAsking, setIsAsking] = useState(false);
 
   const handleAskQuestion = async () => {
