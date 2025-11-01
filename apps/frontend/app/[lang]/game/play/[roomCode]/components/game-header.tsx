@@ -64,7 +64,7 @@ export function GameHeader({
               size="sm"
             />
 
-            <span className="mx-2 hidden text-default-300 sm:inline">|</span>
+            <span className="mx-2 text-default-300">|</span>
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-default-500">
@@ -77,7 +77,7 @@ export function GameHeader({
           </div>
         </div>
 
-        <div className="flex items-center sm:flex-col sm:items-end gap-2">
+        <div className="flex flex-wrap justify-center items-center sm:flex-col sm:items-end gap-2">
           {isMyTurn ? (
             <Chip
               color="primary"

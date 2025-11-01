@@ -744,12 +744,13 @@ export class GameService {
     }
 
     // Flatten questions from all rounds and sort by creation time
-    const questions = game.rounds
-      ?.flatMap((round) => round.questions || [])
-      .sort(
-        (a, b) =>
-          new Date(a.askedAt).getTime() - new Date(b.askedAt).getTime(),
-      ) ?? [];
+    const questions =
+      game.rounds
+        ?.flatMap((round) => round.questions || [])
+        .sort(
+          (a, b) =>
+            new Date(a.askedAt).getTime() - new Date(b.askedAt).getTime(),
+        ) ?? [];
 
     return questions.map((q) =>
       this.mapToQuestionResponse(q, q.askedBy, q.targetPlayer ?? null),
@@ -781,14 +782,17 @@ export class GameService {
     }
 
     // Flatten answers from all questions and sort by creation time
-    const answers = game.rounds
-      ?.flatMap((round) =>
-        round.questions?.flatMap((question) => question.answers || []) || [],
-      )
-      .sort(
-        (a, b) =>
-          new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime(),
-      ) ?? [];
+    const answers =
+      game.rounds
+        ?.flatMap(
+          (round) =>
+            round.questions?.flatMap((question) => question.answers || []) ||
+            [],
+        )
+        .sort(
+          (a, b) =>
+            new Date(a.answeredAt).getTime() - new Date(b.answeredAt).getTime(),
+        ) ?? [];
 
     return answers.map((a) => this.mapToAnswerResponse(a, a.answeredBy));
   }
@@ -971,7 +975,7 @@ export class GameService {
     // All questions use boolean answers (yes/no/unsure)
     return {
       answerValue: validatedAnswerValue,
-      answerText: null,
+      answerText: request.answerText || null,
       latencyMs: null,
     };
   }
@@ -1002,7 +1006,7 @@ export class GameService {
 
     // Find the next active player after the current one
     // Loop through all players starting from the next position
-    let nextIndex = currentPlayerIndex + 1;
+    const nextIndex = currentPlayerIndex + 1;
     for (let i = 0; i < allPlayers.length; i++) {
       const checkIndex = (nextIndex + i) % allPlayers.length;
       const player = allPlayers[checkIndex];
@@ -1250,7 +1254,10 @@ export class GameService {
 
     // Check if only one player has unrevealed secret (they are the winner)
     // or if the potential winner just made the winning guess
-    if (unrevealedPlayers <= 1 || (potentialWinner && unrevealedPlayers === 1)) {
+    if (
+      unrevealedPlayers <= 1 ||
+      (potentialWinner && unrevealedPlayers === 1)
+    ) {
       // Find the winner if not provided
       let winner = potentialWinner;
       if (!winner) {
