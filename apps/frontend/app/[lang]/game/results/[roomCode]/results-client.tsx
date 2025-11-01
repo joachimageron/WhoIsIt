@@ -150,7 +150,6 @@ export function GameResultsClient({
       {/* Header Section */}
       <div className="mb-8 text-center">
         <h1 className="mb-4 text-4xl font-bold">{dict.results.title}</h1>
-        
       </div>
 
       {/* Game Stats Section */}
@@ -204,9 +203,7 @@ export function GameResultsClient({
         <h2 className="mb-4 text-2xl font-bold">{dict.results.playerStats}</h2>
         <Card>
           <CardBody>
-            <Table
-              aria-label="Player statistics table"
-            >
+            <Table aria-label="Player statistics table">
               <TableHeader>
                 <TableColumn>{dict.results.placement}</TableColumn>
                 <TableColumn>{dict.results.username}</TableColumn>
@@ -218,9 +215,7 @@ export function GameResultsClient({
                 {results.players
                   .sort((a, b) => a.placement - b.placement)
                   .map((player) => (
-                    <TableRow
-                      key={player.playerId}
-                    >
+                    <TableRow key={player.playerId}>
                       <TableCell>
                         <Chip
                           color={player.placement === 1 ? "warning" : "default"}

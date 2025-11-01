@@ -70,9 +70,7 @@ export function GameHeader({
               <span className="text-sm text-default-500">
                 {dict.play.turn || dict.play.round}:
               </span>
-              <span className="font-semibold">
-                {questionCount + 1}
-              </span>
+              <span className="font-semibold">{questionCount + 1}</span>
             </div>
           </div>
         </div>

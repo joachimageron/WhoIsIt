@@ -92,7 +92,6 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
         </p>
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
-            autoFocus
             isRequired
             label={dict.game.join.roomCode}
             labelPlacement="outside"

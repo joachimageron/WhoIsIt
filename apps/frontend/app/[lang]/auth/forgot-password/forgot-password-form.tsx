@@ -61,7 +61,6 @@ export function ForgotPasswordForm({ dict, lang }: ForgotPasswordFormProps) {
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           {error && <div className="text-small text-danger">{error}</div>}
           <Input
-            autoFocus
             isRequired
             isDisabled={isLoading}
             label={dict.auth.forgotPassword.email}

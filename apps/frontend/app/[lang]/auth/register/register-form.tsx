@@ -180,7 +180,6 @@ export function RegisterForm({ dict, lang }: RegisterFormProps) {
         </p>
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
-            autoFocus
             isRequired
             label={dict.auth.register.username}
             labelPlacement="outside"
