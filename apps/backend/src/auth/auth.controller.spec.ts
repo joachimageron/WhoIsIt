@@ -134,6 +134,7 @@ describe('AuthController', () => {
         username: 'testuser',
         avatarUrl: null,
         isGuest: false,
+        emailVerified: true,
       } as User;
 
       const req = { user: mockUser };
@@ -148,6 +149,7 @@ describe('AuthController', () => {
         username: mockUser.username,
         avatarUrl: mockUser.avatarUrl,
         isGuest: mockUser.isGuest,
+        emailVerified: mockUser.emailVerified,
       });
     });
   });

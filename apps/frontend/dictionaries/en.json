@@ -52,7 +52,13 @@
       "passwordsNoMatch": "Passwords do not match",
       "passwordTooShort": "Password must be at least 6 characters",
       "fillAllFields": "Please fill in all required fields",
-      "emailVerificationRequired": "Email verification required. Check your inbox."
+      "emailVerificationRequired": "Email verification required. Check your inbox.",
+      "emailVerified": "Email Verified",
+      "emailNotVerified": "Email Not Verified",
+      "resendVerification": "Resend Verification Email",
+      "resendingVerification": "Sending...",
+      "verificationEmailSent": "Verification email sent successfully",
+      "verificationEmailFailed": "Failed to send verification email"
     },
     "login": {
       "title": "Log In",

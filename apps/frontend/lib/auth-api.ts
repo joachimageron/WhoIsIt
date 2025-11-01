@@ -17,6 +17,7 @@ export type User = {
   username: string;
   avatarUrl: string | null;
   isGuest?: boolean;
+  emailVerified?: boolean;
 };
 
 export type AuthResponse = {
