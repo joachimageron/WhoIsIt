@@ -2,7 +2,7 @@
 
 import type { CharacterResponseDto } from "@whois-it/contracts";
 
-import React, { useState } from "react";
+import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
@@ -11,17 +11,17 @@ interface CharacterGridProps {
   characters: CharacterResponseDto[];
   eliminatedIds: Set<string>;
   dict: any;
+  selectedCharacterId: string | null;
+  onSelectCharacter: (characterId: string | null) => void;
 }
 
 export function CharacterGrid({
   characters,
   eliminatedIds,
   dict,
+  selectedCharacterId,
+  onSelectCharacter,
 }: CharacterGridProps) {
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    null,
-  );
-
   const activeCharacters = characters.filter((c) => !eliminatedIds.has(c.id));
   const eliminatedCharacters = characters.filter((c) =>
     eliminatedIds.has(c.id),
@@ -59,7 +59,7 @@ export function CharacterGrid({
                   isEliminated={false}
                   isSelected={selectedCharacterId === character.id}
                   onClick={() =>
-                    setSelectedCharacterId(
+                    onSelectCharacter(
                       selectedCharacterId === character.id
                         ? null
                         : character.id,
