@@ -11,6 +11,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { addToast } from "@heroui/toast";
+import { Form } from "@heroui/form";
 
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
@@ -39,6 +40,7 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
         const sets = await gameApi.getCharacterSets();
 
         setCharacterSets(sets);
+        setSelectedCharacterSet(sets[0]?.id ?? "");
       } catch (err) {
         setError(
           err instanceof Error ? err.message : dict.game.create.creationFailed,
@@ -131,7 +133,7 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.game.create.title}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Select
             isRequired
             label={dict.game.create.characterSet}
@@ -170,7 +172,7 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
               ? dict.game.create.creating
               : dict.game.create.createButton}
           </Button>
-        </form>
+        </Form>
       </div>
     </div>
   );
