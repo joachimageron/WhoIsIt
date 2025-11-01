@@ -987,8 +987,11 @@ export class GameService {
       throw new InternalServerErrorException('No active players found');
     }
 
-    // Find the current active player's index
-    const currentPlayerIndex = activePlayers.findIndex(
+    // Get all players (including eliminated ones) to maintain turn order
+    const allPlayers = game.players ?? [];
+
+    // Find the current active player's index in the full player list
+    const currentPlayerIndex = allPlayers.findIndex(
       (p) => p.id === currentRound.activePlayer?.id,
     );
 
@@ -997,9 +1000,21 @@ export class GameService {
       return activePlayers[0];
     }
 
-    // Get the next player (circular)
-    const nextPlayerIndex = (currentPlayerIndex + 1) % activePlayers.length;
-    return activePlayers[nextPlayerIndex];
+    // Find the next active player after the current one
+    // Loop through all players starting from the next position
+    let nextIndex = currentPlayerIndex + 1;
+    for (let i = 0; i < allPlayers.length; i++) {
+      const checkIndex = (nextIndex + i) % allPlayers.length;
+      const player = allPlayers[checkIndex];
+      
+      // Check if this player is still active (not eliminated)
+      if (!player.leftAt) {
+        return player;
+      }
+    }
+
+    // Fallback: should not reach here if there are active players
+    return activePlayers[0];
   }
 
   /**
