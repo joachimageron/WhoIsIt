@@ -167,7 +167,7 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
             variant="bordered"
             onChange={(e) => setTurnTimer(e.target.value)}
           />
-          <Button color="primary" isLoading={isLoading} size="lg" type="submit">
+          <Button color="primary" fullWidth isLoading={isLoading} size="lg" type="submit">
             {isLoading
               ? dict.game.create.creating
               : dict.game.create.createButton}

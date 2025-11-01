@@ -9,6 +9,7 @@ import { addToast } from "@heroui/toast";
 
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
+import { Form } from "@heroui/form";
 
 interface JoinFormProps {
   dict: any;
@@ -89,7 +90,7 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.game.join.title}
         </p>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
             autoFocus
             isRequired
@@ -103,10 +104,10 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
             variant="bordered"
             onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           />
-          <Button color="primary" isLoading={isLoading} type="submit">
+          <Button color="primary" fullWidth isLoading={isLoading} type="submit">
             {isLoading ? dict.game.join.joining : dict.game.join.joinButton}
           </Button>
-        </form>
+        </Form>
         <p className="text-small text-center">
           <Link href={`/${lang}`} size="sm">
             {dict.game.join.backToHome}
