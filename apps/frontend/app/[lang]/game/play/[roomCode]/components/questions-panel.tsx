@@ -66,7 +66,6 @@ export function QuestionsPanel({
         playerId: currentPlayerId,
         targetPlayerId: targetPlayerId || undefined,
         questionText: question.trim(),
-        category: "direct", // Default category
       });
 
       // Clear form

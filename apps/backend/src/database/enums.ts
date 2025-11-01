@@ -28,11 +28,6 @@ export enum RoundState {
   CLOSED = 'closed',
 }
 
-export enum QuestionCategory {
-  DIRECT = 'direct',
-  META = 'meta',
-}
-
 export enum AnswerValue {
   YES = 'yes',
   NO = 'no',

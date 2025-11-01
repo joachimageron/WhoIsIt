@@ -12,7 +12,6 @@ import {
   GameVisibility,
   RoundState,
   PlayerSecretStatus,
-  QuestionCategory,
   AnswerValue,
 } from '../database/enums';
 import {
@@ -655,7 +654,6 @@ export class GameService {
       askedBy: askedByPlayer,
       targetPlayer,
       questionText: request.questionText.trim(),
-      category: request.category as QuestionCategory,
     });
 
     const savedQuestion = await this.questionRepository.save(question);
@@ -738,7 +736,6 @@ export class GameService {
       targetPlayerId: targetPlayer?.id,
       targetPlayerUsername: targetPlayer?.username,
       questionText: question.questionText,
-      category: question.category,
       askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
     };
   }

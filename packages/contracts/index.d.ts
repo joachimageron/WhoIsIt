@@ -144,13 +144,10 @@ export type CharacterResponseDto = {
 };
 
 // Questions API Types
-export type QuestionCategory = "direct" | "meta";
-
 export type AskQuestionRequest = {
   playerId: string;
   targetPlayerId?: string;
   questionText: string;
-  category: QuestionCategory;
 };
 
 export type QuestionResponse = {
@@ -162,7 +159,6 @@ export type QuestionResponse = {
   targetPlayerId?: string;
   targetPlayerUsername?: string;
   questionText: string;
-  category: QuestionCategory;
   askedAt: string;
 };
 

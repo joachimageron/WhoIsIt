@@ -115,17 +115,6 @@ export class GameController {
       throw new BadRequestException('questionText is required');
     }
 
-    if (!body?.category) {
-      throw new BadRequestException('category is required');
-    }
-
-    const validCategories = ['direct', 'meta'];
-    if (!validCategories.includes(body.category)) {
-      throw new BadRequestException(
-        `category must be one of: ${validCategories.join(', ')}`,
-      );
-    }
-
     const question = await this.gameService.askQuestion(roomCode, {
       ...body,
       questionText: body.questionText.trim(),

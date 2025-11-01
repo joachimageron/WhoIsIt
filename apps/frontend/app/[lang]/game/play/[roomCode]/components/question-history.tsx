@@ -70,16 +70,6 @@ function QuestionItem({ dict, question }: QuestionItemProps) {
       </div>
 
       <p className="mb-2 text-sm">{question.questionText}</p>
-
-      <div className="flex items-center gap-2">
-        <Chip
-          color={question.category === "direct" ? "primary" : "default"}
-          size="sm"
-          variant="dot"
-        >
-          {question.category}
-        </Chip>
-      </div>
     </div>
   );
 }

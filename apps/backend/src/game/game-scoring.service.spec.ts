@@ -17,7 +17,6 @@ import {
 import {
   GameStatus,
   PlayerSecretStatus,
-  QuestionCategory,
   AnswerValue,
   RoundState,
 } from '../database/enums';
@@ -189,7 +188,6 @@ describe('GameService - Scoring and Game End', () => {
         round: mockRound,
         askedBy: mockPlayer,
         questionText: 'Does your character have glasses?',
-        category: QuestionCategory.DIRECT,
         askedAt: new Date(),
       } as Question;
 
@@ -201,7 +199,6 @@ describe('GameService - Scoring and Game End', () => {
       await service.askQuestion('ABC12', {
         playerId: 'player-1',
         questionText: 'Does your character have glasses?',
-        category: 'direct',
       });
 
       expect(mockPlayerRepository.save).toHaveBeenCalledWith(
@@ -227,7 +224,6 @@ describe('GameService - Scoring and Game End', () => {
       const mockQuestion = {
         id: 'question-1',
         questionText: 'Does your character have glasses?',
-        category: QuestionCategory.DIRECT,
         askedBy: { id: 'player-1' } as GamePlayer,
         targetPlayer: mockAnsweringPlayer,
         answers: [],

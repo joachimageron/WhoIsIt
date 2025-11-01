@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { Round } from './round.entity';
 import { GamePlayer } from './game-player.entity';
-import { QuestionCategory } from '../enums';
 import { Answer } from './answer.entity';
 
 @Entity({ name: 'questions' })
@@ -39,13 +38,6 @@ export class Question {
 
   @Column({ type: 'text' })
   questionText!: string;
-
-  @Column({
-    type: 'enum',
-    enum: QuestionCategory,
-    enumName: 'question_category',
-  })
-  category!: QuestionCategory;
 
   @CreateDateColumn({ type: 'timestamptz' })
   askedAt!: Date;
