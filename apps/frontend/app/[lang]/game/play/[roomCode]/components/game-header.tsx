@@ -8,6 +8,8 @@ import { Chip } from "@heroui/chip";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
 
+import { RoomCodeDisplay } from "@/components/room-code-display";
+
 interface GameHeaderProps {
   dict: any;
   gameState: GameStateResponse;
@@ -51,12 +53,14 @@ export function GameHeader({
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-default-500">
-                {dict.play.roomCode}:
-              </span>
-              <span className="font-semibold">{roomCode}</span>
-            </div>
+            <RoomCodeDisplay
+              copyErrorMessage={dict.play.errors.failedToCopyRoomCode}
+              copySuccessMessage={dict.play.roomCodeCopied}
+              label={`${dict.play.roomCode}:`}
+              roomCode={roomCode}
+              showLabel={true}
+              size="sm"
+            />
 
             <span className="mx-2 hidden text-default-300 sm:inline">|</span>
 

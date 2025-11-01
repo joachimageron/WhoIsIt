@@ -193,6 +193,7 @@
   "play": {
     "title": "Game In Progress",
     "roomCode": "Room Code",
+    "roomCodeCopied": "Room code copied!",
     "round": "Round",
     "yourTurn": "Your Turn!",
     "playerTurn": "{player}'s Turn",
@@ -228,6 +229,7 @@
       "failedToLoad": "Failed to load game",
       "failedToAskQuestion": "Failed to ask question",
       "failedToGuess": "Failed to make guess",
+      "failedToCopyRoomCode": "Failed to copy room code",
       "notYourTurn": "It's not your turn",
       "selectCharacter": "Please select a character",
       "enterQuestion": "Please enter a question"
@@ -244,6 +246,7 @@
     "detailedStats": "Your Detailed Stats",
     "you": "You",
     "roomCode": "Room Code",
+    "roomCodeCopied": "Room code copied!",
     "duration": "Duration",
     "rounds": "Rounds",
     "placement": "Placement",
@@ -267,6 +270,7 @@
     "seconds": "{n} sec",
     "errors": {
       "failedToLoad": "Failed to load game results",
+      "failedToCopyRoomCode": "Failed to copy room code",
       "gameNotCompleted": "This game is not yet completed"
     }
   }
