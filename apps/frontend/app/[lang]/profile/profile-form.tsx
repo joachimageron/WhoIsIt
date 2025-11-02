@@ -239,6 +239,8 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     return null;
   }
 
+  console.log("Rendering ProfileForm for user:", user);
+
   return (
     <div className="flex h-full w-full items-center justify-center py-8">
       <div className="w-full max-w-2xl space-y-6">
@@ -275,7 +277,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
             />
             {/* Email Verification Status */}
             {!user.isGuest && user.email && (
-              <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
                 <div className="flex items-center gap-2">
                   {user.emailVerified === true ? (
                     <Chip
@@ -287,7 +289,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
                     </Chip>
                   ) : (
                     <Chip
-                      color="warning"
+                      color="danger"
                       startContent={<Icon icon="solar:danger-circle-bold" />}
                       variant="flat"
                     >
@@ -297,7 +299,7 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
                 </div>
                 {user.emailVerified !== true && (
                   <Button
-                    color="primary"
+                    
                     isLoading={isResendingVerification}
                     size="sm"
                     variant="flat"
