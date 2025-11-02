@@ -52,7 +52,13 @@
       "passwordsNoMatch": "Les mots de passe ne correspondent pas",
       "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
       "fillAllFields": "Veuillez remplir tous les champs obligatoires",
-      "emailVerificationRequired": "Vérification de l'email requise. Consultez votre boîte de réception."
+      "emailVerificationRequired": "Vérification de l'email requise. Consultez votre boîte de réception.",
+      "emailVerified": "Email vérifié",
+      "emailNotVerified": "Email non vérifié",
+      "resendVerification": "Renvoyer l'email de vérification",
+      "resendingVerification": "Envoi en cours...",
+      "verificationEmailSent": "Email de vérification envoyé avec succès",
+      "verificationEmailFailed": "Échec de l'envoi de l'email de vérification"
     },
     "login": {
       "title": "Connexion",
