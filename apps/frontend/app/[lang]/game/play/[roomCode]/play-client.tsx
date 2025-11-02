@@ -111,6 +111,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           }
         }
 
+        // Load existing questions and answers (for reconnection/refresh)
+        const [questions, answers] = await Promise.all([
+          gameApi.getQuestions(roomCode),
+          gameApi.getAnswers(roomCode),
+        ]);
+
+        // Add questions to store
+        questions.forEach((q) => addQuestion(q));
+
+        // Add answers to store
+        answers.forEach((a) => addAnswer(a));
+
         // Join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,
@@ -157,11 +169,16 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
       addQuestion(event.question);
       setGameState(event.gameState);
 
-      // Check if this question is directed at the current player
-      if (
-        event.question.targetPlayerId &&
-        event.question.targetPlayerId === currentPlayerId
-      ) {
+      // Check if this question can be answered by the current player
+      // Case 1: Question is specifically targeted at this player
+      // Case 2: Question has no target, so any player except the asker can answer
+      const canAnswer =
+        (event.question.targetPlayerId &&
+          event.question.targetPlayerId === currentPlayerId) ||
+        (!event.question.targetPlayerId &&
+          event.question.askedByPlayerId !== currentPlayerId);
+
+      if (canAnswer) {
         setPendingQuestion(event.question);
         setIsAnswerModalOpen(true);
       }
@@ -414,6 +431,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         gameState={gameState}
         isConnected={isConnected}
         isMyTurn={isMyTurn}
+        questionCount={questions.length}
         roomCode={roomCode}
         onLeaveGame={handleLeaveGame}
       />
@@ -516,8 +534,13 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           {/* Question History */}
           <QuestionHistory
             answers={playState.answers}
+            currentPlayerId={currentPlayerId}
             dict={dict}
             questions={questions}
+            onAnswerQuestion={(question) => {
+              setPendingQuestion(question);
+              setIsAnswerModalOpen(true);
+            }}
           />
         </div>
       </div>

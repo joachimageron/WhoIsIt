@@ -78,7 +78,6 @@ export function LoginForm({ dict, lang }: LoginFormProps) {
         </p>
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Input
-            autoFocus
             isRequired
             label={dict.auth.login.emailOrUsername}
             labelPlacement="outside"

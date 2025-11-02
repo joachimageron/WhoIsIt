@@ -5,7 +5,6 @@ import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
 import React, { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
 import { Button } from "@heroui/button";
-import { Chip } from "@heroui/chip";
 import { Icon } from "@iconify/react";
 import { RadioGroup, Radio } from "@heroui/radio";
 import { Textarea } from "@heroui/input";
@@ -78,9 +77,6 @@ export function AnswerModal({
               <span className="font-medium">
                 {question.askedByPlayerUsername}
               </span>
-              <Chip color="default" size="sm" variant="flat">
-                {dict.play.round} {question.roundNumber}
-              </Chip>
             </div>
             <p className="text-base font-medium">{question.questionText}</p>
           </div>

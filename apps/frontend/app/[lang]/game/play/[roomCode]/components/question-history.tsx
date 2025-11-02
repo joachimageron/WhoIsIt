@@ -7,17 +7,22 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { Icon } from "@iconify/react";
 import { ScrollShadow } from "@heroui/scroll-shadow";
+import { Button } from "@heroui/button";
 
 interface QuestionHistoryProps {
   dict: any;
   questions: QuestionResponse[];
   answers: Map<string, AnswerResponse>;
+  currentPlayerId: string | null;
+  onAnswerQuestion?: (question: QuestionResponse) => void;
 }
 
 export function QuestionHistory({
   dict,
   questions,
   answers,
+  currentPlayerId,
+  onAnswerQuestion,
 }: QuestionHistoryProps) {
   return (
     <Card>
@@ -36,8 +41,10 @@ export function QuestionHistory({
                 <QuestionItem
                   key={question.id}
                   answer={answers.get(question.id)}
+                  currentPlayerId={currentPlayerId}
                   dict={dict}
                   question={question}
+                  onAnswerQuestion={onAnswerQuestion}
                 />
               ))}
             </div>
@@ -52,9 +59,17 @@ interface QuestionItemProps {
   dict: any;
   question: QuestionResponse;
   answer?: AnswerResponse;
+  currentPlayerId: string | null;
+  onAnswerQuestion?: (question: QuestionResponse) => void;
 }
 
-function QuestionItem({ dict, question, answer }: QuestionItemProps) {
+function QuestionItem({
+  dict,
+  question,
+  answer,
+  currentPlayerId,
+  onAnswerQuestion,
+}: QuestionItemProps) {
   // Determine answer color based on value
   const getAnswerColor = (
     answerValue: string,
@@ -71,6 +86,14 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
     }
   };
 
+  // Check if this question is directed at the current player and hasn't been answered
+  const canAnswer =
+    currentPlayerId &&
+    !answer &&
+    ((question.targetPlayerId && question.targetPlayerId === currentPlayerId) ||
+      (!question.targetPlayerId &&
+        question.askedByPlayerId !== currentPlayerId));
+
   return (
     <div className="rounded-lg border border-default-200 bg-default-50 p-3">
       <div className="mb-2 flex items-start justify-between gap-2">
@@ -86,15 +109,11 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
             </>
           )}
         </div>
-
-        <Chip color="default" size="sm" variant="flat">
-          {dict.play.round} {question.roundNumber}
-        </Chip>
       </div>
 
       <p className="mb-2 text-sm">{question.questionText}</p>
 
-      {answer && (
+      {answer ? (
         <div className="mt-2 flex items-center gap-2 border-t border-default-200 pt-2">
           <Chip
             color={getAnswerColor(answer.answerValue)}
@@ -109,7 +128,19 @@ function QuestionItem({ dict, question, answer }: QuestionItemProps) {
             </span>
           )}
         </div>
-      )}
+      ) : canAnswer && onAnswerQuestion ? (
+        <div className="mt-2 border-t border-default-200 pt-2">
+          <Button
+            color="primary"
+            size="sm"
+            startContent={<Icon icon="solar:chat-round-bold" width={16} />}
+            variant="flat"
+            onPress={() => onAnswerQuestion(question)}
+          >
+            {dict.play.answerButton || "Answer"}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }

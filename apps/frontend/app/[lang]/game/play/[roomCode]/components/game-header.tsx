@@ -16,6 +16,7 @@ interface GameHeaderProps {
   isConnected: boolean;
   isMyTurn: boolean;
   roomCode: string;
+  questionCount: number;
   onLeaveGame: () => void;
 }
 
@@ -25,6 +26,7 @@ export function GameHeader({
   isConnected,
   isMyTurn,
   roomCode,
+  questionCount,
   onLeaveGame,
 }: GameHeaderProps) {
   return (
@@ -62,20 +64,18 @@ export function GameHeader({
               size="sm"
             />
 
-            <span className="mx-2 hidden text-default-300 sm:inline">|</span>
+            <span className="mx-2 text-default-300">|</span>
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-default-500">
-                {dict.play.round}:
+                {dict.play.turn || dict.play.round}:
               </span>
-              <span className="font-semibold">
-                {gameState.currentRoundNumber}
-              </span>
+              <span className="font-semibold">{questionCount + 1}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center sm:flex-col sm:items-end gap-2">
+        <div className="flex flex-wrap justify-center items-center sm:flex-col sm:items-end gap-2">
           {isMyTurn ? (
             <Chip
               color="primary"
