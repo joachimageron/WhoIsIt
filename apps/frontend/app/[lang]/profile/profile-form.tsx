@@ -7,6 +7,7 @@ import { Input } from "@heroui/input";
 import { Card } from "@heroui/card";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
+import { Chip } from "@heroui/chip";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
@@ -22,6 +23,8 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
   const { user, setUser, isAuthenticated } = useAuthStore();
   const [isLoadingProfile, setIsLoadingProfile] = React.useState(false);
   const [isLoadingPassword, setIsLoadingPassword] = React.useState(false);
+  const [isResendingVerification, setIsResendingVerification] =
+    React.useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const [isNewPasswordVisible, setIsNewPasswordVisible] = React.useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -206,9 +209,37 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!user?.email) {
+      return;
+    }
+
+    setIsResendingVerification(true);
+
+    try {
+      await authApi.resendVerificationEmail(user.email);
+
+      addToast({
+        color: "success",
+        title: dict.auth.profile.verificationEmailSent,
+        description: "",
+      });
+    } catch (err) {
+      addToast({
+        color: "danger",
+        title: dict.auth.profile.verificationEmailFailed,
+        description: err instanceof Error ? err.message : "",
+      });
+    } finally {
+      setIsResendingVerification(false);
+    }
+  };
+
   if (!user || !isAuthenticated) {
     return null;
   }
+
+  console.log("Rendering ProfileForm for user:", user);
 
   return (
     <div className="flex h-full w-full items-center justify-center py-8">
@@ -244,6 +275,43 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
               variant="bordered"
               onChange={handleProfileInputChange}
             />
+            {/* Email Verification Status */}
+            {!user.isGuest && user.email && (
+              <div className="flex gap-2">
+                <div className="flex items-center gap-2">
+                  {user.emailVerified === true ? (
+                    <Chip
+                      color="success"
+                      startContent={<Icon icon="solar:check-circle-bold" />}
+                      variant="flat"
+                    >
+                      {dict.auth.profile.emailVerified}
+                    </Chip>
+                  ) : (
+                    <Chip
+                      color="danger"
+                      startContent={<Icon icon="solar:danger-circle-bold" />}
+                      variant="flat"
+                    >
+                      {dict.auth.profile.emailNotVerified}
+                    </Chip>
+                  )}
+                </div>
+                {user.emailVerified !== true && (
+                  <Button
+                    
+                    isLoading={isResendingVerification}
+                    size="sm"
+                    variant="flat"
+                    onPress={handleResendVerification}
+                  >
+                    {isResendingVerification
+                      ? dict.auth.profile.resendingVerification
+                      : dict.auth.profile.resendVerification}
+                  </Button>
+                )}
+              </div>
+            )}
             <Input
               label={dict.auth.profile.avatarUrl}
               labelPlacement="outside"

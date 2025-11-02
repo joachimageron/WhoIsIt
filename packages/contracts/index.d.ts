@@ -143,6 +143,12 @@ export type CharacterResponseDto = {
   isActive: boolean;
 };
 
+export type PlayerCharacterResponse = {
+  playerId: string;
+  character: CharacterResponseDto;
+  assignedAt: string;
+};
+
 // Questions API Types
 export type AskQuestionRequest = {
   playerId: string;

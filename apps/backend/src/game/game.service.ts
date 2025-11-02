@@ -42,6 +42,7 @@ import type {
   GuessResponse,
   GameOverResult,
   PlayerGameResult,
+  PlayerCharacterResponse,
 } from '@whois-it/contracts';
 
 @Injectable()
@@ -1509,6 +1510,63 @@ export class GameService {
       gameDurationSeconds,
       endReason: 'victory',
       players: playerResults,
+    };
+  }
+
+  /**
+   * Get a player's assigned character
+   */
+  async getPlayerCharacter(
+    roomCode: string,
+    playerId: string,
+  ): Promise<PlayerCharacterResponse> {
+    const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+    // Get the game to verify it exists and is in progress
+    const game = await this.gameRepository.findOne({
+      where: { roomCode: normalizedRoomCode },
+    });
+
+    if (!game) {
+      throw new NotFoundException('Game not found');
+    }
+
+    // Get the player with their secret character
+    const player = await this.playerRepository.findOne({
+      where: { id: playerId },
+      relations: {
+        game: true,
+        secret: { character: true },
+      },
+    });
+
+    if (!player) {
+      throw new NotFoundException('Player not found');
+    }
+
+    if (player.game.id !== game.id) {
+      throw new BadRequestException('Player is not in this game');
+    }
+
+    if (!player.secret || !player.secret.character) {
+      throw new NotFoundException(
+        'No character has been assigned to this player yet',
+      );
+    }
+
+    // Return the player's assigned character
+    return {
+      playerId: player.id,
+      character: {
+        id: player.secret.character.id,
+        name: player.secret.character.name,
+        slug: player.secret.character.slug,
+        imageUrl: player.secret.character.imageUrl ?? null,
+        summary: player.secret.character.summary ?? null,
+        metadata: player.secret.character.metadata ?? {},
+        isActive: player.secret.character.isActive,
+      },
+      assignedAt: player.secret.assignedAt.toISOString(),
     };
   }
 }

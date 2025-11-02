@@ -4,6 +4,7 @@ import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
@@ -43,6 +44,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     playState,
     setGameState,
     setCharacters,
+    setMyCharacter,
     addQuestion,
     addAnswer,
     isConnected,
@@ -51,7 +53,11 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const { user } = useAuthStore();
   const [isLoading, setIsLoading] = useState(true);
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
+    null,
+  );
   const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
+  const [isGuessing, setIsGuessing] = useState(false);
   const [lobby, setLobby] = useState<any>(null);
   const [pendingQuestion, setPendingQuestion] =
     useState<QuestionResponse | null>(null);
@@ -89,6 +95,21 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         );
 
         setCharacters(characters);
+
+        // Load player's assigned character
+        if (player) {
+          try {
+            const myCharacter = await gameApi.getPlayerCharacter(
+              roomCode,
+              player.id,
+            );
+
+            setMyCharacter(myCharacter);
+          } catch {
+            // Character might not be assigned yet if game hasn't started
+            // Silently ignore this error
+          }
+        }
 
         // Load existing questions and answers (for reconnection/refresh)
         const [questions, answers] = await Promise.all([
@@ -248,49 +269,99 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     }
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
 
-  const handleGuess = useCallback(
-    async (characterId: string) => {
-      if (!currentPlayerId) {
+  const handleOpenGuessModal = useCallback(() => {
+    if (!selectedCharacterId) {
+      addToast({
+        color: "warning",
+        title: dict.play.errors.selectCharacter || "Please select a character",
+        description:
+          dict.play.errors.selectCharacterDescription ||
+          "Select a character from the grid before making a guess",
+      });
+
+      return;
+    }
+
+    setIsGuessModalOpen(true);
+  }, [selectedCharacterId, dict]);
+
+  const handleConfirmGuess = useCallback(async () => {
+    if (!selectedCharacterId) {
+      return;
+    }
+
+    if (!currentPlayerId) {
+      addToast({
+        color: "danger",
+        title: dict.play.errors.failedToGuess || "Failed to guess",
+        description: "Player ID not found",
+      });
+
+      return;
+    }
+
+    if (!playState?.gameState) {
+      addToast({
+        color: "danger",
+        title: dict.play.errors.failedToGuess || "Failed to guess",
+        description: "Game state not found",
+      });
+
+      return;
+    }
+
+    // Find the target player (in a 2-player game, it's the opponent)
+    // In multiplayer games, the user should specify which player they're guessing
+    const otherPlayers = playState.gameState.players.filter(
+      (p) => p.id !== currentPlayerId,
+    );
+
+    let targetPlayerId: string | undefined;
+
+    if (otherPlayers.length === 1) {
+      // In a 2-player game, automatically target the opponent
+      targetPlayerId = otherPlayers[0].id;
+    } else if (otherPlayers.length > 1) {
+      // In multiplayer, we need to ask which player they're guessing
+      // For now, we'll leave it undefined (TODO: add player selection in guess modal)
+      targetPlayerId = undefined;
+    }
+
+    setIsGuessing(true);
+
+    try {
+      const guess = await gameApi.submitGuess(roomCode, {
+        playerId: currentPlayerId,
+        targetPlayerId,
+        targetCharacterId: selectedCharacterId,
+      });
+
+      setIsGuessModalOpen(false);
+      setSelectedCharacterId(null);
+
+      if (guess.isCorrect) {
+        addToast({
+          color: "success",
+          title: dict.play.correctGuess || "Correct guess!",
+          description: `You guessed correctly: ${guess.targetCharacterName}`,
+        });
+      } else {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToGuess || "Failed to guess",
-          description: "Player ID not found",
-        });
-
-        return;
-      }
-
-      try {
-        const guess = await gameApi.submitGuess(roomCode, {
-          playerId: currentPlayerId,
-          targetCharacterId: characterId,
-        });
-
-        setIsGuessModalOpen(false);
-
-        if (guess.isCorrect) {
-          addToast({
-            color: "success",
-            title: dict.play.correctGuess || "Correct guess!",
-            description: `You guessed correctly: ${guess.targetCharacterName}`,
-          });
-        } else {
-          addToast({
-            color: "danger",
-            title: dict.play.incorrectGuess || "Incorrect guess",
-            description: "Your guess was incorrect. You have been eliminated.",
-          });
-        }
-      } catch (error) {
-        addToast({
-          color: "danger",
-          title: dict.play.errors.failedToGuess || "Failed to guess",
-          description: error instanceof Error ? error.message : String(error),
+          title: dict.play.incorrectGuess || "Incorrect guess",
+          description: "Your guess was incorrect. You have been eliminated.",
         });
       }
-    },
-    [currentPlayerId, roomCode, dict],
-  );
+    } catch (error) {
+      addToast({
+        color: "danger",
+        title: dict.play.errors.failedToGuess || "Failed to guess",
+        description: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsGuessing(false);
+    }
+  }, [selectedCharacterId, currentPlayerId, roomCode, dict, playState]);
 
   const handleSubmitAnswer = useCallback(
     async (
@@ -350,7 +421,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     );
   }
 
-  const { gameState, characters, questions } = playState;
+  const { gameState, characters, questions, myCharacter } = playState;
   const isMyTurn = gameState.activePlayerId === currentPlayerId;
 
   return (
@@ -372,6 +443,8 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
             characters={characters}
             dict={dict}
             eliminatedIds={playState.eliminatedCharacterIds}
+            selectedCharacterId={selectedCharacterId}
+            onSelectCharacter={setSelectedCharacterId}
           />
         </div>
 
@@ -386,19 +459,66 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
             />
           )}
 
+          {/* My Character Card */}
+          {myCharacter && (
+            <Card>
+              <CardBody className="p-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2">
+                    <Icon
+                      className="text-primary"
+                      icon="solar:user-id-bold"
+                      width={20}
+                    />
+                    <h3 className="text-sm font-semibold">
+                      {dict.play.yourCharacter || "Your Character"}
+                    </h3>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg bg-content2 p-3">
+                    {myCharacter.character.imageUrl && (
+                      <Image
+                        alt={myCharacter.character.name}
+                        className="h-16 w-16 rounded-lg object-cover"
+                        height={64}
+                        src={myCharacter.character.imageUrl}
+                        width={64}
+                      />
+                    )}
+                    <div className="flex flex-col gap-1">
+                      <p className="font-semibold text-primary">
+                        {myCharacter.character.name}
+                      </p>
+                      {myCharacter.character.summary && (
+                        <p className="text-xs text-foreground-500">
+                          {myCharacter.character.summary}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardBody>
+            </Card>
+          )}
+
           {/* Make a Guess Button */}
           <Card>
             <CardBody className="p-3">
               <Button
                 fullWidth
                 color="success"
-                isDisabled={!isMyTurn}
+                isDisabled={!isMyTurn || !selectedCharacterId}
                 startContent={<Icon icon="solar:target-bold" width={20} />}
                 variant="shadow"
-                onPress={() => setIsGuessModalOpen(true)}
+                onPress={handleOpenGuessModal}
               >
                 {dict.play.guessPanel}
               </Button>
+              {!selectedCharacterId && (
+                <p className="mt-2 text-center text-xs text-default-400">
+                  {dict.play.selectCharacterFirst ||
+                    "Select a character from the grid"}
+                </p>
+              )}
             </CardBody>
           </Card>
 
@@ -425,14 +545,18 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
         </div>
       </div>
 
-      {/* Guess Modal */}
+      {/* Guess Confirmation Modal */}
       <GuessModal
-        characters={characters}
         dict={dict}
-        eliminatedIds={playState.eliminatedCharacterIds}
+        isGuessing={isGuessing}
         isOpen={isGuessModalOpen}
+        selectedCharacter={
+          selectedCharacterId
+            ? characters.find((c) => c.id === selectedCharacterId) || null
+            : null
+        }
         onClose={() => setIsGuessModalOpen(false)}
-        onGuess={handleGuess}
+        onConfirm={handleConfirmGuess}
       />
 
       {/* Answer Modal */}

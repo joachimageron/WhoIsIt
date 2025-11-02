@@ -80,6 +80,7 @@ export class AuthController {
       username: req.user.username,
       avatarUrl: req.user.avatarUrl,
       isGuest: req.user.isGuest,
+      emailVerified: req.user.emailVerified,
     };
   }
 

@@ -4,6 +4,7 @@ import type {
   QuestionResponse,
   CharacterResponseDto,
   AnswerResponse,
+  PlayerCharacterResponse,
 } from "@whois-it/contracts";
 
 import { create } from "zustand";
@@ -14,6 +15,7 @@ export interface GamePlayState {
   questions: QuestionResponse[];
   answers: Map<string, AnswerResponse>; // Maps questionId to answer
   eliminatedCharacterIds: Set<string>;
+  myCharacter: PlayerCharacterResponse | null;
 }
 
 export interface GameState {
@@ -24,6 +26,7 @@ export interface GameState {
   setConnected: (connected: boolean) => void;
   setGameState: (gameState: GameStateResponse | null) => void;
   setCharacters: (characters: CharacterResponseDto[]) => void;
+  setMyCharacter: (myCharacter: PlayerCharacterResponse | null) => void;
   addQuestion: (question: QuestionResponse) => void;
   addAnswer: (answer: AnswerResponse) => void;
   eliminateCharacter: (characterId: string) => void;
@@ -47,6 +50,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            myCharacter: null,
           },
     })),
   setCharacters: (characters) =>
@@ -59,6 +63,20 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            myCharacter: null,
+          },
+    })),
+  setMyCharacter: (myCharacter) =>
+    set((state) => ({
+      playState: state.playState
+        ? { ...state.playState, myCharacter }
+        : {
+            gameState: null,
+            characters: [],
+            questions: [],
+            answers: new Map(),
+            eliminatedCharacterIds: new Set(),
+            myCharacter,
           },
     })),
   addQuestion: (question) =>
@@ -74,6 +92,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [question],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            myCharacter: null,
           },
     })),
   addAnswer: (answer) =>

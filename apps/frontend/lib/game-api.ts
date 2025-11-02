@@ -12,6 +12,7 @@ import type {
   SubmitGuessRequest,
   GuessResponse,
   GameOverResult,
+  PlayerCharacterResponse,
 } from "@whois-it/contracts";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -317,6 +318,31 @@ export const getGameResults = async (
       .catch(() => ({ message: "Failed to get game results" }));
 
     throw new Error(error.message || "Failed to get game results");
+  }
+
+  return response.json();
+};
+
+/**
+ * Get player's assigned character
+ */
+export const getPlayerCharacter = async (
+  roomCode: string,
+  playerId: string,
+): Promise<PlayerCharacterResponse> => {
+  const response = await fetch(
+    `${API_URL}/games/${roomCode}/players/${playerId}/character`,
+    {
+      credentials: "include",
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to get player character" }));
+
+    throw new Error(error.message || "Failed to get player character");
   }
 
   return response.json();

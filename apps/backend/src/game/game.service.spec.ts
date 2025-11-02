@@ -2951,4 +2951,119 @@ describe('GameService', () => {
       );
     });
   });
+
+  describe('getPlayerCharacter', () => {
+    it('should return player assigned character', async () => {
+      const mockCharacter: Character = {
+        id: 'char-123',
+        name: 'Superman',
+        slug: 'superman',
+        imageUrl: 'https://example.com/superman.jpg',
+        summary: 'Man of Steel',
+        metadata: { universe: 'DC' },
+        isActive: true,
+      } as Character;
+
+      const mockSecret: PlayerSecret = {
+        id: 'secret-123',
+        character: mockCharacter,
+        assignedAt: new Date('2024-01-01T00:00:00Z'),
+      } as PlayerSecret;
+
+      const mockPlayer: GamePlayer = {
+        id: 'player-123',
+        username: 'TestPlayer',
+        game: { id: 'game-123' } as Game,
+        secret: mockSecret,
+      } as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+        status: GameStatus.IN_PROGRESS,
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(mockPlayer);
+
+      const result = await service.getPlayerCharacter('ABC12', 'player-123');
+
+      expect(result).toEqual({
+        playerId: 'player-123',
+        character: {
+          id: 'char-123',
+          name: 'Superman',
+          slug: 'superman',
+          imageUrl: 'https://example.com/superman.jpg',
+          summary: 'Man of Steel',
+          metadata: { universe: 'DC' },
+          isActive: true,
+        },
+        assignedAt: '2024-01-01T00:00:00.000Z',
+      });
+    });
+
+    it('should throw NotFoundException if game not found', async () => {
+      mockGameRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.getPlayerCharacter('ABC12', 'player-123'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw NotFoundException if player not found', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.getPlayerCharacter('ABC12', 'player-123'),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if player not in game', async () => {
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+      } as Game;
+
+      const mockPlayer: GamePlayer = {
+        id: 'player-123',
+        username: 'TestPlayer',
+        game: { id: 'different-game-id' } as Game,
+      } as GamePlayer;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(mockPlayer);
+
+      await expect(
+        service.getPlayerCharacter('ABC12', 'player-123'),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw NotFoundException if no character assigned yet', async () => {
+      const mockPlayer: GamePlayer = {
+        id: 'player-123',
+        username: 'TestPlayer',
+        game: { id: 'game-123' } as Game,
+        secret: null,
+      } as unknown as GamePlayer;
+
+      const mockGame: Game = {
+        id: 'game-123',
+        roomCode: 'ABC12',
+      } as Game;
+
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+      mockPlayerRepository.findOne.mockResolvedValue(mockPlayer);
+
+      await expect(
+        service.getPlayerCharacter('ABC12', 'player-123'),
+      ).rejects.toThrow(NotFoundException);
+    });
+  });
 });

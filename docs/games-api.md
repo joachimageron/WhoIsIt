@@ -148,6 +148,47 @@ Start the game. All players must be ready.
 - `400 Bad Request` - Need at least 2 players to start
 - `400 Bad Request` - All players must be ready to start
 
+### Get Player's Assigned Character
+
+Retrieve the character assigned to a specific player in a game.
+
+**Endpoint:** `GET /games/:roomCode/players/:playerId/character`
+
+**Parameters:**
+- `roomCode` (path parameter) - The unique room code
+- `playerId` (path parameter) - The player's unique ID
+
+**Response:**
+
+```json
+{
+  "playerId": "uuid",
+  "character": {
+    "id": "uuid",
+    "name": "Superman",
+    "slug": "superman",
+    "imageUrl": "https://example.com/superman.jpg",
+    "summary": "Man of Steel",
+    "metadata": {
+      "universe": "DC"
+    },
+    "isActive": true
+  },
+  "assignedAt": "2024-01-01T00:05:00.000Z"
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Game not found
+- `404 Not Found` - Player not found
+- `404 Not Found` - No character has been assigned to this player yet
+- `400 Bad Request` - Player is not in this game
+
+**Notes:**
+- Characters are assigned when the game starts
+- Players can only view their own assigned character (frontend enforces this)
+- This endpoint is used by players to know their character so they can answer questions about it
+
 ## Game Status Values
 
 - `lobby` - Game is in the lobby, players can join
@@ -200,6 +241,12 @@ curl -X GET http://localhost:4000/games/ABC12
 curl -X POST http://localhost:4000/games/ABC12/start
 ```
 
+**Get player's assigned character:**
+
+```bash
+curl -X GET http://localhost:4000/games/ABC12/players/player-uuid/character
+```
+
 ### Using fetch (JavaScript/TypeScript)
 
 ```typescript
@@ -234,6 +281,10 @@ const startResponse = await fetch(`http://localhost:4000/games/${roomCode}/start
   method: 'POST',
 });
 const startedGame = await startResponse.json();
+
+// Get player's assigned character
+const characterResponse = await fetch(`http://localhost:4000/games/${roomCode}/players/${playerId}/character`);
+const playerCharacter = await characterResponse.json();
 ```
 
 ## Notes
