@@ -239,8 +239,6 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
     return null;
   }
 
-  console.log("Rendering ProfileForm for user:", user);
-
   return (
     <div className="flex h-full w-full items-center justify-center py-8">
       <div className="w-full max-w-2xl space-y-6">
@@ -299,7 +297,6 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
                 </div>
                 {user.emailVerified !== true && (
                   <Button
-                    
                     isLoading={isResendingVerification}
                     size="sm"
                     variant="flat"

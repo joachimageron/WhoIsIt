@@ -2962,7 +2962,7 @@ describe('GameService', () => {
         summary: 'Man of Steel',
         metadata: { universe: 'DC' },
         isActive: true,
-      } as Character;
+      } as unknown as Character;
 
       const mockSecret: PlayerSecret = {
         id: 'secret-123',
