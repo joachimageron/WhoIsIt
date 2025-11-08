@@ -55,6 +55,7 @@ interface Dictionary {
     nth: string;
     minutes: string;
     seconds: string;
+    roomCodeCopied: string;
     errors: {
       failedToLoad: string;
       failedToCopyRoomCode: string;

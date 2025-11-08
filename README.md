@@ -55,6 +55,7 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
 ## Current Status
 
 **✅ Implemented:**
+
 - Complete authentication system (register, login, email verification, password reset)
 - Character sets API with full CRUD operations
 - Game lobby system (create, join, get lobby state)
@@ -65,6 +66,7 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
 - Comprehensive test coverage (115/115 backend tests passing)
 
 **🚧 In Development (Phase 3):**
+
 - Gameplay core mechanics (questions, answers, guesses, scoring)
 - Game play page UI
 - UI components for game interaction

@@ -1,14 +1,10 @@
 "use client";
 
-import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
-
-import React, { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
-import { addToast } from "@heroui/toast";
 
 import { CharacterGrid } from "./components/character-grid";
 import { QuestionsPanel } from "./components/questions-panel";
@@ -18,10 +14,10 @@ import { GuessModal } from "./components/guess-modal";
 import { TurnTimer } from "./components/turn-timer";
 import { AnswerModal } from "./components/answer-modal";
 
-import * as gameApi from "@/lib/game-api";
-import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
-import { useGameSocket } from "@/hooks/use-game-socket";
+import { useGameInitialization } from "@/hooks/use-game-initialization";
+import { useGameEvents } from "@/hooks/use-game-events";
+import { useGameActions } from "@/hooks/use-game-actions";
 
 interface GamePlayClientProps {
   dict: any;
@@ -30,17 +26,47 @@ interface GamePlayClientProps {
 }
 
 export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
-  const router = useRouter();
+  const { playState, isConnected } = useGameStore();
+
+  // Initialize game and load all necessary data
+  const { isLoading, currentPlayerId, lobby } = useGameInitialization({
+    roomCode,
+    lang,
+    dict,
+  });
+
+  // Set up socket event listeners
   const {
-    socket,
-    joinRoom,
-    leaveRoom,
-    onQuestionAsked,
-    onAnswerSubmitted,
-    onGuessResult,
-    onGameOver,
-  } = useGameSocket();
+    pendingQuestion,
+    setPendingQuestion,
+    isAnswerModalOpen,
+    setIsAnswerModalOpen,
+  } = useGameEvents({
+    currentPlayerId,
+    roomCode,
+    lang,
+    dict,
+  });
+
+  // Set up game action handlers
   const {
+    selectedCharacterId,
+    setSelectedCharacterId,
+    isGuessModalOpen,
+    setIsGuessModalOpen,
+    isGuessing,
+    handleLeaveGame,
+    handleOpenGuessModal,
+    handleConfirmGuess,
+    handleSubmitAnswer,
+  } = useGameActions({
+    roomCode,
+    currentPlayerId,
+    lang,
+    dict,
+    setPendingQuestion,
+    setIsAnswerModalOpen,
+  });
     playState,
     setGameState,
     setCharacters,
