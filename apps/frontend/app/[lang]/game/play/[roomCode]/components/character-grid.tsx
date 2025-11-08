@@ -78,7 +78,7 @@ function CharacterCard({
   return (
     <button
       className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 hover:border-primary p-3 transition-all duration-300 ${
-        isFlipped
+        isFlipped || isEliminated
           ? "scale-95 border-default-200"
           : "scale-100 border-default-300"
       } ${isEliminated ? "cursor-not-allowed" : "cursor-pointer"}`}
@@ -87,7 +87,7 @@ function CharacterCard({
       onClick={onClick}
     >
       {isEliminated && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 transition-all duration-300 animate-in fade-in">
           <Icon
             className="text-danger"
             icon="solar:close-circle-bold"
@@ -119,9 +119,7 @@ function CharacterCard({
 
       <div className=" w-full ">
         <p
-          className={` text-center text-sm font-medium ${
-            isEliminated ? "line-through" : ""
-          }`}
+          className={` text-center text-sm font-medium `}
         >
           {character.name}
         </p>

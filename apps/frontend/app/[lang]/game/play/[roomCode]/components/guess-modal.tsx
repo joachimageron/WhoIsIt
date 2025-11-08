@@ -11,7 +11,6 @@ import {
   ModalFooter,
 } from "@heroui/modal";
 import { Button } from "@heroui/button";
-import { Avatar } from "@heroui/avatar";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 
@@ -55,10 +54,6 @@ export function GuessModal({
     setSelectedCharacterId(null);
     onClose();
   };
-
-  const selectedCharacter = selectedCharacterId
-    ? characters.find((c) => c.id === selectedCharacterId)
-    : null;
 
   return (
     <Modal isOpen={isOpen} size="3xl" onClose={handleClose}>
@@ -112,32 +107,6 @@ export function GuessModal({
                 </button>
               ))}
             </div>
-
-            {/* Selected Character Confirmation */}
-            {selectedCharacter && (
-              <div className="rounded-lg border-2 border-success bg-success-50 p-4">
-                <p className="mb-2 text-sm font-medium text-success-700">
-                  {dict.play.selectedCharacter || "Selected character:"}
-                </p>
-                <div className="flex items-center gap-3">
-                  <Avatar
-                    name={selectedCharacter.name}
-                    size="lg"
-                    src={selectedCharacter.imageUrl || undefined}
-                  />
-                  <div>
-                    <p className="text-lg font-semibold">
-                      {selectedCharacter.name}
-                    </p>
-                    {selectedCharacter.summary && (
-                      <p className="text-sm text-default-500">
-                        {selectedCharacter.summary}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </ModalBody>
         <ModalFooter>
