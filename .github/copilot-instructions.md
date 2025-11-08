@@ -146,7 +146,6 @@ When making changes to this repository, follow these essential guidelines:
 ### Making Code Changes
 
 - **Minimal modifications**: Make the smallest possible changes to achieve the goal. Change as few lines as possible.
-- **Preserve working code**: Never delete or modify working code unless absolutely necessary for the fix or feature.
 - **Test incrementally**: Build and test changes frequently after each modification.
 - **Ignore unrelated issues**: Don't fix unrelated bugs or broken tests. Focus only on your specific task.
 
@@ -179,7 +178,7 @@ When making changes to this repository, follow these essential guidelines:
 
 ### Documentation
 
-- **Update related docs**: If you change functionality, update relevant documentation.
+- **Update related docs**: If you change functionality, update relevant documentation in /docs.
 - **Keep consistency**: Match the style and format of existing documentation.
 - **Inline comments**: Add comments only when they match existing patterns or are necessary for complex logic.
 
