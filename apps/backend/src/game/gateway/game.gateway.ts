@@ -9,7 +9,7 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { GameService } from './game.service';
+import { GameService } from '../services/game.service';
 import type {
   SocketJoinRoomRequest,
   SocketJoinRoomResponse,
@@ -21,7 +21,7 @@ import type {
 import { ConnectionManager } from './connection.manager';
 import { BroadcastService } from './broadcast.service';
 import { LobbyCleanupService } from './lobby-cleanup.service';
-import type { TypedSocket, TypedServer } from './types/gateway.types';
+import type { TypedSocket, TypedServer } from './types';
 
 @WebSocketGateway({
   cors: {

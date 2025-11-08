@@ -6,8 +6,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GamePlayerRole, GameStatus, GameVisibility } from '../database/enums';
-import { CharacterSet, Game, GamePlayer, User } from '../database/entities';
+import {
+  GamePlayerRole,
+  GameStatus,
+  GameVisibility,
+} from '../../database/enums';
+import { CharacterSet, Game, GamePlayer, User } from '../../database/entities';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
