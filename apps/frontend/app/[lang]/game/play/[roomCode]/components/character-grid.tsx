@@ -118,11 +118,7 @@ function CharacterCard({
       />
 
       <div className=" w-full ">
-        <p
-          className={` text-center text-sm font-medium `}
-        >
-          {character.name}
-        </p>
+        <p className={` text-center text-sm font-medium `}>{character.name}</p>
       </div>
     </button>
   );
