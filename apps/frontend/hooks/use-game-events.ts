@@ -28,7 +28,13 @@ export function useGameEvents({
     onGuessResult,
     onGameOver,
   } = useGameSocket();
-  const { setGameState, addQuestion, addAnswer, setConnected } = useGameStore();
+  const {
+    setGameState,
+    addQuestion,
+    addAnswer,
+    setConnected,
+    eliminateCharacter,
+  } = useGameStore();
 
   const [pendingQuestion, setPendingQuestion] =
     useState<QuestionResponse | null>(null);
@@ -112,6 +118,9 @@ export function useGameEvents({
           description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
         });
       } else {
+        // Eliminate the incorrectly guessed character
+        eliminateCharacter(guess.targetCharacterId);
+
         addToast({
           color: "danger",
           title: dict.play.incorrectGuess || "Incorrect guess",
@@ -123,7 +132,7 @@ export function useGameEvents({
     return () => {
       unsubscribeGuessResult();
     };
-  }, [onGuessResult, setGameState, dict]);
+  }, [onGuessResult, setGameState, dict, eliminateCharacter]);
 
   // Listen to game over events
   useEffect(() => {

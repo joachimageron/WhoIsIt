@@ -10,23 +10,18 @@ import Image from "next/image";
 interface CharacterGridProps {
   characters: CharacterResponseDto[];
   eliminatedIds: Set<string>;
+  flippedIds: Set<string>;
   dict: any;
-  selectedCharacterId: string | null;
-  onSelectCharacter: (characterId: string | null) => void;
+  onFlipCharacter: (characterId: string) => void;
 }
 
 export function CharacterGrid({
   characters,
   eliminatedIds,
+  flippedIds,
   dict,
-  selectedCharacterId,
-  onSelectCharacter,
+  onFlipCharacter,
 }: CharacterGridProps) {
-  const activeCharacters = characters.filter((c) => !eliminatedIds.has(c.id));
-  const eliminatedCharacters = characters.filter((c) =>
-    eliminatedIds.has(c.id),
-  );
-
   if (characters.length === 0) {
     return (
       <Card>
@@ -45,51 +40,23 @@ export function CharacterGrid({
         <h2 className="text-lg font-semibold">{dict.play.characterGrid}</h2>
       </CardHeader>
       <CardBody className="gap-4">
-        {/* Active Characters */}
-        {activeCharacters.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-default-600">
-              {dict.play.activeCharacters} ({activeCharacters.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {activeCharacters.map((character) => (
-                <CharacterCard
-                  key={character.id}
-                  character={character}
-                  isEliminated={false}
-                  isSelected={selectedCharacterId === character.id}
-                  onClick={() =>
-                    onSelectCharacter(
-                      selectedCharacterId === character.id
-                        ? null
-                        : character.id,
-                    )
-                  }
-                />
-              ))}
-            </div>
+        {/* All Characters (Active, Flipped, and Eliminated) */}
+        <div>
+          <h3 className="mb-2 text-sm font-medium text-default-600">
+            {dict.play.activeCharacters} ({characters.length})
+          </h3>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
+            {characters.map((character) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                isEliminated={eliminatedIds.has(character.id)}
+                isFlipped={flippedIds.has(character.id)}
+                onClick={() => onFlipCharacter(character.id)}
+              />
+            ))}
           </div>
-        )}
-
-        {/* Eliminated Characters */}
-        {eliminatedCharacters.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-default-400">
-              {dict.play.eliminatedCharacters} ({eliminatedCharacters.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {eliminatedCharacters.map((character) => (
-                <CharacterCard
-                  key={character.id}
-                  character={character}
-                  isEliminated={true}
-                  isSelected={false}
-                  onClick={() => {}}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </CardBody>
     </Card>
   );
@@ -98,31 +65,29 @@ export function CharacterGrid({
 interface CharacterCardProps {
   character: CharacterResponseDto;
   isEliminated: boolean;
-  isSelected: boolean;
+  isFlipped: boolean;
   onClick: () => void;
 }
 
 function CharacterCard({
   character,
   isEliminated,
-  isSelected,
+  isFlipped,
   onClick,
 }: CharacterCardProps) {
   return (
     <button
-      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-3 transition-all ${
-        isEliminated
-          ? "cursor-not-allowed border-default-200 bg-default-50 opacity-50"
-          : isSelected
-            ? "border-primary bg-default-100 hover:bg-default-200"
-            : "border-default-200 bg-default-100 hover:bg-default-200"
-      }`}
+      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 hover:border-primary p-3 transition-all duration-300 ${
+        isFlipped || isEliminated
+          ? "scale-95 border-default-200"
+          : "scale-100 border-default-300"
+      } ${isEliminated ? "cursor-not-allowed" : "cursor-pointer"}`}
       disabled={isEliminated}
       type="button"
       onClick={onClick}
     >
       {isEliminated && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 transition-all duration-300 animate-in fade-in">
           <Icon
             className="text-danger"
             icon="solar:close-circle-bold"
@@ -131,9 +96,22 @@ function CharacterCard({
         </div>
       )}
 
+      {isFlipped && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 transition-all duration-300 animate-in fade-in">
+          <Icon
+            className="text-default-600"
+            icon="solar:eye-closed-bold"
+            width={48}
+          />
+        </div>
+      )}
+
       <Image
         alt={character.name}
-        className={isEliminated ? "opacity-30" : "" + " rounded-xl"}
+        className={
+          (isEliminated || isFlipped ? "opacity-20" : "opacity-100") +
+          " rounded-xl transition-opacity duration-300"
+        }
         height={100}
         src={character.imageUrl ?? ""}
         width={100}
@@ -141,9 +119,7 @@ function CharacterCard({
 
       <div className=" w-full ">
         <p
-          className={` text-center text-sm font-medium ${
-            isEliminated ? "line-through" : ""
-          }`}
+          className={` text-center text-sm font-medium `}
         >
           {character.name}
         </p>

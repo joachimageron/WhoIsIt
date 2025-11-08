@@ -27,11 +27,8 @@ export function useGameActions({
 }: UseGameActionsProps) {
   const router = useRouter();
   const { leaveRoom } = useGameSocket();
-  const { playState } = useGameStore();
+  const { playState, eliminateCharacter } = useGameStore();
 
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    null,
-  );
   const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
   const [isGuessing, setIsGuessing] = useState(false);
 
@@ -48,98 +45,91 @@ export function useGameActions({
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
 
   const handleOpenGuessModal = useCallback(() => {
-    if (!selectedCharacterId) {
-      addToast({
-        color: "warning",
-        title: dict.play.errors.selectCharacter || "Please select a character",
-        description:
-          dict.play.errors.selectCharacterDescription ||
-          "Select a character from the grid before making a guess",
-      });
-
-      return;
-    }
-
     setIsGuessModalOpen(true);
-  }, [selectedCharacterId, dict]);
+  }, []);
 
-  const handleConfirmGuess = useCallback(async () => {
-    if (!selectedCharacterId) {
-      return;
-    }
+  const handleConfirmGuess = useCallback(
+    async (characterId: string) => {
+      if (!characterId) {
+        return;
+      }
 
-    if (!currentPlayerId) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: "Player ID not found",
-      });
-
-      return;
-    }
-
-    if (!playState?.gameState) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: "Game state not found",
-      });
-
-      return;
-    }
-
-    // Find the target player (in a 2-player game, it's the opponent)
-    // In multiplayer games, the user should specify which player they're guessing
-    const otherPlayers = playState.gameState.players.filter(
-      (p) => p.id !== currentPlayerId,
-    );
-
-    let targetPlayerId: string | undefined;
-
-    if (otherPlayers.length === 1) {
-      // In a 2-player game, automatically target the opponent
-      targetPlayerId = otherPlayers[0].id;
-    } else if (otherPlayers.length > 1) {
-      // In multiplayer, we need to ask which player they're guessing
-      // For now, we'll leave it undefined (TODO: add player selection in guess modal)
-      targetPlayerId = undefined;
-    }
-
-    setIsGuessing(true);
-
-    try {
-      const guess = await gameApi.submitGuess(roomCode, {
-        playerId: currentPlayerId,
-        targetPlayerId,
-        targetCharacterId: selectedCharacterId,
-      });
-
-      setIsGuessModalOpen(false);
-      setSelectedCharacterId(null);
-
-      if (guess.isCorrect) {
-        addToast({
-          color: "success",
-          title: dict.play.correctGuess || "Correct guess!",
-          description: `You guessed correctly: ${guess.targetCharacterName}`,
-        });
-      } else {
+      if (!currentPlayerId) {
         addToast({
           color: "danger",
-          title: dict.play.incorrectGuess || "Incorrect guess",
-          description: "Your guess was incorrect. You have been eliminated.",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: "Player ID not found",
         });
+
+        return;
       }
-    } catch (error) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setIsGuessing(false);
-    }
-  }, [selectedCharacterId, currentPlayerId, roomCode, dict, playState]);
+
+      if (!playState?.gameState) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: "Game state not found",
+        });
+
+        return;
+      }
+
+      // Find the target player (in a 2-player game, it's the opponent)
+      // In multiplayer games, the user should specify which player they're guessing
+      const otherPlayers = playState.gameState.players.filter(
+        (p) => p.id !== currentPlayerId,
+      );
+
+      let targetPlayerId: string | undefined;
+
+      if (otherPlayers.length === 1) {
+        // In a 2-player game, automatically target the opponent
+        targetPlayerId = otherPlayers[0].id;
+      } else if (otherPlayers.length > 1) {
+        // In multiplayer, we need to ask which player they're guessing
+        // For now, we'll leave it undefined (TODO: add player selection in guess modal)
+        targetPlayerId = undefined;
+      }
+
+      setIsGuessing(true);
+
+      try {
+        const guess = await gameApi.submitGuess(roomCode, {
+          playerId: currentPlayerId,
+          targetPlayerId,
+          targetCharacterId: characterId,
+        });
+
+        setIsGuessModalOpen(false);
+
+        if (guess.isCorrect) {
+          addToast({
+            color: "success",
+            title: dict.play.correctGuess || "Correct guess!",
+            description: `You guessed correctly: ${guess.targetCharacterName}`,
+          });
+        } else {
+          // Eliminate the incorrectly guessed character
+          eliminateCharacter(guess.targetCharacterId);
+
+          addToast({
+            color: "danger",
+            title: dict.play.incorrectGuess || "Incorrect guess",
+            description: "Your guess was incorrect. You have been eliminated.",
+          });
+        }
+      } catch (error) {
+        addToast({
+          color: "danger",
+          title: dict.play.errors.failedToGuess || "Failed to guess",
+          description: error instanceof Error ? error.message : String(error),
+        });
+      } finally {
+        setIsGuessing(false);
+      }
+    },
+    [currentPlayerId, roomCode, dict, playState, eliminateCharacter],
+  );
 
   const handleSubmitAnswer = useCallback(
     async (
@@ -185,8 +175,6 @@ export function useGameActions({
   );
 
   return {
-    selectedCharacterId,
-    setSelectedCharacterId,
     isGuessModalOpen,
     setIsGuessModalOpen,
     isGuessing,

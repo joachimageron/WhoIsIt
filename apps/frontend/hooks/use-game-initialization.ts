@@ -6,6 +6,7 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/hooks/use-game-socket";
+import { getGuestSession } from "@/lib/guest-session";
 
 interface UseGameInitializationProps {
   roomCode: string;
@@ -35,7 +36,14 @@ export function useGameInitialization({
 
   useEffect(() => {
     const initGame = async () => {
-      if (!user) return;
+      // Check if user is authenticated or has a guest session
+      const guestSession = getGuestSession();
+
+      if (!user && !guestSession) {
+        // No authenticated user and no guest session
+        return;
+      }
+
       try {
         setIsLoading(true);
 
@@ -44,9 +52,12 @@ export function useGameInitialization({
 
         setGameState(gameState);
 
-        // Find current player
+        // Find current player - check both authenticated user and guest username
+        const currentUsername = user?.username || guestSession?.username;
+        const currentUserId = user?.id;
+
         const player = gameState.players.find(
-          (p) => p.username === user?.username || p.userId === user?.id,
+          (p) => p.username === currentUsername || p.userId === currentUserId,
         );
 
         if (player) {

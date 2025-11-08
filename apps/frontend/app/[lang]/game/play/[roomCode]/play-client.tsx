@@ -26,7 +26,7 @@ interface GamePlayClientProps {
 }
 
 export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
-  const { playState, isConnected } = useGameStore();
+  const { playState, isConnected, toggleFlipCharacter } = useGameStore();
 
   // Initialize game and load all necessary data
   const { isLoading, currentPlayerId, lobby } = useGameInitialization({
@@ -50,8 +50,6 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
 
   // Set up game action handlers
   const {
-    selectedCharacterId,
-    setSelectedCharacterId,
     isGuessModalOpen,
     setIsGuessModalOpen,
     isGuessing,
@@ -105,8 +103,8 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
             characters={characters}
             dict={dict}
             eliminatedIds={playState.eliminatedCharacterIds}
-            selectedCharacterId={selectedCharacterId}
-            onSelectCharacter={setSelectedCharacterId}
+            flippedIds={playState.flippedCharacterIds}
+            onFlipCharacter={toggleFlipCharacter}
           />
         </div>
 
@@ -168,19 +166,13 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
               <Button
                 fullWidth
                 color="success"
-                isDisabled={!isMyTurn || !selectedCharacterId}
+                isDisabled={!isMyTurn}
                 startContent={<Icon icon="solar:target-bold" width={20} />}
                 variant="shadow"
                 onPress={handleOpenGuessModal}
               >
                 {dict.play.guessPanel}
               </Button>
-              {!selectedCharacterId && (
-                <p className="mt-2 text-center text-xs text-default-400">
-                  {dict.play.selectCharacterFirst ||
-                    "Select a character from the grid"}
-                </p>
-              )}
             </CardBody>
           </Card>
 
@@ -209,14 +201,12 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
 
       {/* Guess Confirmation Modal */}
       <GuessModal
+        characters={characters}
         dict={dict}
+        eliminatedIds={playState.eliminatedCharacterIds}
+        flippedIds={playState.flippedCharacterIds}
         isGuessing={isGuessing}
         isOpen={isGuessModalOpen}
-        selectedCharacter={
-          selectedCharacterId
-            ? characters.find((c) => c.id === selectedCharacterId) || null
-            : null
-        }
         onClose={() => setIsGuessModalOpen(false)}
         onConfirm={handleConfirmGuess}
       />
