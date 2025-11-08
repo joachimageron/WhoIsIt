@@ -112,18 +112,6 @@ When editing backend socket auth, remember to update `.env` (copy `apps/backend/
 - **CI/CD**: `.github/workflows/ci.yml` runs on push/PR to main/develop. Jobs: lint, test, build.
 - **Test patterns**: Look at `apps/backend/src/auth/auth.controller.spec.ts` or `apps/backend/src/game/game.service.spec.ts` for mocking patterns with TypeORM repositories and NestJS testing utilities.
 
-## Current implementation status (Phase 2 complete)
-
-- ✅ **Authentication system**: Complete with email verification and password reset.
-- ✅ **Character sets API**: Full CRUD with characters.
-- ✅ **Game lobby system**: Create, join, get lobby state, real-time Socket.IO updates.
-- ✅ **Game start**: Start game and assign characters to players.
-- ✅ **CI/CD pipeline**: GitHub Actions workflow.
-- 🚧 **Gameplay mechanics**: Questions, answers, guessing, scoring — NOT YET IMPLEMENTED (planned for Phase 3).
-- 🚧 **Game play page**: UI for actual gameplay — NOT YET IMPLEMENTED.
-
-See `todo.md` for detailed roadmap and priorities.
-
 ## Common pitfalls and troubleshooting
 
 - **Frontend build fails with Google Fonts error**: This is expected in restricted environments (CI). The build is configured to `continue-on-error: true` in CI. Locally with proper network access, it should work.

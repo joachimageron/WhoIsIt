@@ -52,27 +52,6 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
    - Frontend only: `pnpm dev:frontend`
    - Backend only: `pnpm dev:backend`
 
-## Current Status
-
-**✅ Implemented:**
-
-- Complete authentication system (register, login, email verification, password reset)
-- Character sets API with full CRUD operations
-- Game lobby system (create, join, get lobby state)
-- Game start functionality with character assignment
-- Real-time Socket.IO integration with security (authentication, reconnection handling, lobby cleanup)
-- Frontend game pages (create game, join game, lobby with real-time updates)
-- CI/CD pipeline with GitHub Actions
-- Comprehensive test coverage (115/115 backend tests passing)
-
-**🚧 In Development (Phase 3):**
-
-- Gameplay core mechanics (questions, answers, guesses, scoring)
-- Game play page UI
-- UI components for game interaction
-
-See [todo.md](./todo.md) for detailed roadmap and current progress.
-
 ## Tooling highlights
 
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.
