@@ -71,8 +71,7 @@ PORT=4000
 ### Environment Variables Explained
 
 - **Database (DB_*)**: PostgreSQL connection settings
-  - `DB_SYNC=true` enables automatic schema synchronization in development
-  - `DB_SYNC=false` uses migrations system for production (recommended)
+  - `DB_SYNC=false` uses migrations system for production
 - **Email (EMAIL_*)**: SMTP configuration for sending emails (optional for development)
 - **`FRONTEND_URL`**: Used in email templates for links back to the frontend
 - **`JWT_SECRET`**: Secret key for signing JWT tokens (change this in production!)

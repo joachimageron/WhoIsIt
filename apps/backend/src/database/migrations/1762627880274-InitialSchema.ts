@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitialSchema1762626687442 implements MigrationInterface {
-    name = 'InitialSchema1762626687442'
+export class InitialSchema1762627880274 implements MigrationInterface {
+    name = 'InitialSchema1762627880274'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "guesses" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "isCorrect" boolean NOT NULL, "latencyMs" integer, "guessedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "round_id" uuid, "guessed_by_player_id" uuid, "target_player_id" uuid, "target_character_id" uuid, CONSTRAINT "PK_1a19fb88ca0703498ae15592764" PRIMARY KEY ("id"))`);
@@ -27,7 +27,6 @@ export class InitialSchema1762626687442 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "game_invites" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "inviteCode" text NOT NULL, "invitedEmail" text, "expiresAt" TIMESTAMP WITH TIME ZONE, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "game_id" uuid, "accepted_by_player_id" uuid, CONSTRAINT "PK_da52594f85e6135c756a389c800" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "ux_game_invites_code" ON "game_invites" ("inviteCode") `);
         await queryRunner.query(`CREATE TYPE "public"."game_status" AS ENUM('lobby', 'in_progress', 'completed', 'aborted')`);
-        await queryRunner.query(`CREATE TYPE "public"."game_visibility" AS ENUM('public', 'private')`);
         await queryRunner.query(`CREATE TABLE "games" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "roomCode" text NOT NULL, "status" "public"."game_status" NOT NULL DEFAULT 'lobby', "visibility" "public"."game_visibility" NOT NULL DEFAULT 'private', "maxPlayers" integer, "turnTimerSeconds" integer, "ruleConfig" jsonb NOT NULL DEFAULT '{}', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "startedAt" TIMESTAMP WITH TIME ZONE, "endedAt" TIMESTAMP WITH TIME ZONE, "host_user_id" uuid, "character_set_id" uuid, "winner_user_id" uuid, CONSTRAINT "PK_c9b16b62917b5595af982d66337" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "idx_games_status" ON "games" ("status") `);
         await queryRunner.query(`CREATE UNIQUE INDEX "ux_games_room_code" ON "games" ("roomCode") `);
@@ -108,19 +107,18 @@ export class InitialSchema1762626687442 implements MigrationInterface {
         await queryRunner.query(`DROP TYPE "public"."round_state"`);
         await queryRunner.query(`DROP INDEX "public"."ux_games_room_code"`);
         await queryRunner.query(`DROP INDEX "public"."idx_games_status"`);
+        await queryRunner.query(`DROP INDEX "public"."idx_games_status"`);
         await queryRunner.query(`DROP TABLE "games"`);
-        await queryRunner.query(`DROP TYPE "public"."game_visibility"`);
         await queryRunner.query(`DROP TYPE "public"."game_status"`);
+        await queryRunner.query(`DROP TYPE "public"."game_visibility"`);
         await queryRunner.query(`DROP INDEX "public"."ux_game_invites_code"`);
-        await queryRunner.query(`DROP TABLE "game_invites"`);
         await queryRunner.query(`DROP INDEX "public"."idx_users_last_seen"`);
         await queryRunner.query(`DROP TABLE "users"`);
         await queryRunner.query(`DROP TABLE "player_stats"`);
+        await queryRunner.query(`DROP TABLE "player_stats"`);
         await queryRunner.query(`DROP INDEX "public"."ux_character_sets_slug"`);
         await queryRunner.query(`DROP TABLE "character_sets"`);
-        await queryRunner.query(`DROP TYPE "public"."game_visibility"`);
         await queryRunner.query(`DROP TABLE "game_config_snapshots"`);
-        await queryRunner.query(`DROP INDEX "public"."ux_characters_set_slug"`);
         await queryRunner.query(`DROP TABLE "characters"`);
         await queryRunner.query(`DROP TABLE "player_secrets"`);
         await queryRunner.query(`DROP TYPE "public"."player_secret_status"`);
