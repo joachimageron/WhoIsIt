@@ -22,10 +22,9 @@ export function CharacterGrid({
   dict,
   onFlipCharacter,
 }: CharacterGridProps) {
-  const activeCharacters = characters.filter(
-    (c) => !eliminatedIds.has(c.id) && !flippedIds.has(c.id),
+  const activeAndFlippedCharacters = characters.filter(
+    (c) => !eliminatedIds.has(c.id),
   );
-  const flippedCharacters = characters.filter((c) => flippedIds.has(c.id));
   const eliminatedCharacters = characters.filter((c) =>
     eliminatedIds.has(c.id),
   );
@@ -48,39 +47,19 @@ export function CharacterGrid({
         <h2 className="text-lg font-semibold">{dict.play.characterGrid}</h2>
       </CardHeader>
       <CardBody className="gap-4">
-        {/* Active Characters */}
-        {activeCharacters.length > 0 && (
+        {/* Active and Flipped Characters */}
+        {activeAndFlippedCharacters.length > 0 && (
           <div>
             <h3 className="mb-2 text-sm font-medium text-default-600">
-              {dict.play.activeCharacters} ({activeCharacters.length})
+              {dict.play.activeCharacters} ({activeAndFlippedCharacters.length})
             </h3>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {activeCharacters.map((character) => (
+              {activeAndFlippedCharacters.map((character) => (
                 <CharacterCard
                   key={character.id}
                   character={character}
                   isEliminated={false}
-                  isFlipped={false}
-                  onClick={() => onFlipCharacter(character.id)}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Flipped Characters */}
-        {flippedCharacters.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-default-500">
-              {dict.play.flippedCharacters} ({flippedCharacters.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {flippedCharacters.map((character) => (
-                <CharacterCard
-                  key={character.id}
-                  character={character}
-                  isEliminated={false}
-                  isFlipped={true}
+                  isFlipped={flippedIds.has(character.id)}
                   onClick={() => onFlipCharacter(character.id)}
                 />
               ))}
@@ -127,7 +106,9 @@ function CharacterCard({
 }: CharacterCardProps) {
   return (
     <button
-      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-3 transition-all ${
+      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-3 transition-all duration-300 ${
+        isFlipped ? "scale-95" : "scale-100"
+      } ${
         isEliminated
           ? "cursor-not-allowed border-default-200 bg-default-50 opacity-50"
           : isFlipped
@@ -149,7 +130,7 @@ function CharacterCard({
       )}
 
       {isFlipped && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-warning-100/80">
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-warning-100/80 transition-all duration-300 animate-in fade-in">
           <Icon
             className="text-warning-600"
             icon="solar:eye-closed-bold"
@@ -161,7 +142,8 @@ function CharacterCard({
       <Image
         alt={character.name}
         className={
-          (isEliminated || isFlipped ? "opacity-30" : "") + " rounded-xl"
+          (isEliminated || isFlipped ? "opacity-30" : "opacity-100") +
+          " rounded-xl transition-opacity duration-300"
         }
         height={100}
         src={character.imageUrl ?? ""}
