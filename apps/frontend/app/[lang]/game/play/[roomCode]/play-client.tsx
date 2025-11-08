@@ -1,14 +1,10 @@
 "use client";
 
-import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
-
-import React, { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
 import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
-import { addToast } from "@heroui/toast";
 
 import { CharacterGrid } from "./components/character-grid";
 import { QuestionsPanel } from "./components/questions-panel";
@@ -18,10 +14,10 @@ import { GuessModal } from "./components/guess-modal";
 import { TurnTimer } from "./components/turn-timer";
 import { AnswerModal } from "./components/answer-modal";
 
-import * as gameApi from "@/lib/game-api";
-import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
-import { useGameSocket } from "@/hooks/use-game-socket";
+import { useGameInitialization } from "@/hooks/use-game-initialization";
+import { useGameEvents } from "@/hooks/use-game-events";
+import { useGameActions } from "@/hooks/use-game-actions";
 
 interface GamePlayClientProps {
   dict: any;
@@ -30,381 +26,47 @@ interface GamePlayClientProps {
 }
 
 export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
-  const router = useRouter();
+  const { playState, isConnected } = useGameStore();
+
+  // Initialize game and load all necessary data
+  const { isLoading, currentPlayerId, lobby } = useGameInitialization({
+    roomCode,
+    lang,
+    dict,
+  });
+
+  // Set up socket event listeners
   const {
-    socket,
-    joinRoom,
-    leaveRoom,
-    onQuestionAsked,
-    onAnswerSubmitted,
-    onGuessResult,
-    onGameOver,
-  } = useGameSocket();
+    pendingQuestion,
+    setPendingQuestion,
+    isAnswerModalOpen,
+    setIsAnswerModalOpen,
+  } = useGameEvents({
+    currentPlayerId,
+    roomCode,
+    lang,
+    dict,
+  });
+
+  // Set up game action handlers
   const {
-    playState,
-    setGameState,
-    setCharacters,
-    setMyCharacter,
-    addQuestion,
-    addAnswer,
-    isConnected,
-    setConnected,
-  } = useGameStore();
-  const { user } = useAuthStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null);
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    null,
-  );
-  const [isGuessModalOpen, setIsGuessModalOpen] = useState(false);
-  const [isGuessing, setIsGuessing] = useState(false);
-  const [lobby, setLobby] = useState<any>(null);
-  const [pendingQuestion, setPendingQuestion] =
-    useState<QuestionResponse | null>(null);
-  const [isAnswerModalOpen, setIsAnswerModalOpen] = useState(false);
-
-  // Initialize game on mount
-  useEffect(() => {
-    const initGame = async () => {
-      if (!user) return;
-      try {
-        setIsLoading(true);
-
-        // Get game state
-        const gameState = await gameApi.getGameState(roomCode);
-
-        setGameState(gameState);
-
-        // Find current player
-        const player = gameState.players.find(
-          (p) => p.username === user?.username || p.userId === user?.id,
-        );
-
-        if (player) {
-          setCurrentPlayerId(player.id);
-        }
-
-        // Get lobby to retrieve characterSetId and turnTimerSeconds
-        const lobbyData = await gameApi.getLobby(roomCode);
-
-        setLobby(lobbyData);
-
-        // Load characters
-        const characters = await gameApi.getCharacters(
-          lobbyData.characterSetId,
-        );
-
-        setCharacters(characters);
-
-        // Load player's assigned character
-        if (player) {
-          try {
-            const myCharacter = await gameApi.getPlayerCharacter(
-              roomCode,
-              player.id,
-            );
-
-            setMyCharacter(myCharacter);
-          } catch {
-            // Character might not be assigned yet if game hasn't started
-            // Silently ignore this error
-          }
-        }
-
-        // Load existing questions and answers (for reconnection/refresh)
-        const [questions, answers] = await Promise.all([
-          gameApi.getQuestions(roomCode),
-          gameApi.getAnswers(roomCode),
-        ]);
-
-        // Add questions to store
-        questions.forEach((q) => addQuestion(q));
-
-        // Add answers to store
-        answers.forEach((a) => addAnswer(a));
-
-        // Join via Socket.IO for real-time updates
-        const response = await joinRoom({
-          roomCode,
-          playerId: player?.id,
-        });
-
-        if (!response.success) {
-          throw new Error(response.error || dict.play.errors.failedToLoad);
-        }
-      } catch (error) {
-        addToast({
-          color: "danger",
-          title: dict.play.errors.failedToLoad,
-          description: error instanceof Error ? error.message : String(error),
-        });
-        router.push(`/${lang}`);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initGame();
-  }, [roomCode, user]);
-
-  // Listen to socket connection status
-  useEffect(() => {
-    const handleConnect = () => setConnected(true);
-    const handleDisconnect = () => setConnected(false);
-
-    socket.on("connect", handleConnect);
-    socket.on("disconnect", handleDisconnect);
-
-    setConnected(socket.connected);
-
-    return () => {
-      socket.off("connect", handleConnect);
-      socket.off("disconnect", handleDisconnect);
-    };
-  }, [socket, setConnected]);
-
-  // Listen to question asked events
-  useEffect(() => {
-    const unsubscribeQuestionAsked = onQuestionAsked((event) => {
-      addQuestion(event.question);
-      setGameState(event.gameState);
-
-      // Check if this question can be answered by the current player
-      // Case 1: Question is specifically targeted at this player
-      // Case 2: Question has no target, so any player except the asker can answer
-      const canAnswer =
-        (event.question.targetPlayerId &&
-          event.question.targetPlayerId === currentPlayerId) ||
-        (!event.question.targetPlayerId &&
-          event.question.askedByPlayerId !== currentPlayerId);
-
-      if (canAnswer) {
-        setPendingQuestion(event.question);
-        setIsAnswerModalOpen(true);
-      }
-    });
-
-    return () => {
-      unsubscribeQuestionAsked();
-    };
-  }, [onQuestionAsked, addQuestion, setGameState, currentPlayerId]);
-
-  // Listen to answer submitted events
-  useEffect(() => {
-    const unsubscribeAnswerSubmitted = onAnswerSubmitted((event) => {
-      setGameState(event.gameState);
-      addAnswer(event.answer);
-      addToast({
-        color: "success",
-        title: dict.play.answerSubmitted || "Answer submitted",
-        description: `${event.answer.answeredByPlayerUsername} answered the question`,
-      });
-
-      // Clear pending question if it was answered
-      if (pendingQuestion && event.answer.questionId === pendingQuestion.id) {
-        setPendingQuestion(null);
-        setIsAnswerModalOpen(false);
-      }
-    });
-
-    return () => {
-      unsubscribeAnswerSubmitted();
-    };
-  }, [onAnswerSubmitted, setGameState, addAnswer, dict, pendingQuestion]);
-
-  // Listen to guess result events
-  useEffect(() => {
-    const unsubscribeGuessResult = onGuessResult((event) => {
-      setGameState(event.gameState);
-      const { guess } = event;
-
-      if (guess.isCorrect) {
-        addToast({
-          color: "success",
-          title: dict.play.correctGuess || "Correct guess!",
-          description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
-        });
-      } else {
-        addToast({
-          color: "danger",
-          title: dict.play.incorrectGuess || "Incorrect guess",
-          description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
-        });
-      }
-    });
-
-    return () => {
-      unsubscribeGuessResult();
-    };
-  }, [onGuessResult, setGameState, dict]);
-
-  // Listen to game over events
-  useEffect(() => {
-    const unsubscribeGameOver = onGameOver((event) => {
-      addToast({
-        color: "success",
-        title: dict.play.gameOver || "Game Over!",
-        description: event.result.winnerUsername
-          ? `${event.result.winnerUsername} won the game!`
-          : "Game ended",
-      });
-      // Navigate to results page
-      router.push(`/${lang}/game/results/${roomCode}`);
-    });
-
-    return () => {
-      unsubscribeGameOver();
-    };
-  }, [onGameOver, router, lang, roomCode, dict]);
-
-  const handleLeaveGame = useCallback(async () => {
-    try {
-      if (currentPlayerId) {
-        await leaveRoom({ roomCode, playerId: currentPlayerId });
-      }
-    } catch {
-      // Ignore errors when leaving
-    } finally {
-      router.push(`/${lang}`);
-    }
-  }, [roomCode, currentPlayerId, leaveRoom, router, lang]);
-
-  const handleOpenGuessModal = useCallback(() => {
-    if (!selectedCharacterId) {
-      addToast({
-        color: "warning",
-        title: dict.play.errors.selectCharacter || "Please select a character",
-        description:
-          dict.play.errors.selectCharacterDescription ||
-          "Select a character from the grid before making a guess",
-      });
-
-      return;
-    }
-
-    setIsGuessModalOpen(true);
-  }, [selectedCharacterId, dict]);
-
-  const handleConfirmGuess = useCallback(async () => {
-    if (!selectedCharacterId) {
-      return;
-    }
-
-    if (!currentPlayerId) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: "Player ID not found",
-      });
-
-      return;
-    }
-
-    if (!playState?.gameState) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: "Game state not found",
-      });
-
-      return;
-    }
-
-    // Find the target player (in a 2-player game, it's the opponent)
-    // In multiplayer games, the user should specify which player they're guessing
-    const otherPlayers = playState.gameState.players.filter(
-      (p) => p.id !== currentPlayerId,
-    );
-
-    let targetPlayerId: string | undefined;
-
-    if (otherPlayers.length === 1) {
-      // In a 2-player game, automatically target the opponent
-      targetPlayerId = otherPlayers[0].id;
-    } else if (otherPlayers.length > 1) {
-      // In multiplayer, we need to ask which player they're guessing
-      // For now, we'll leave it undefined (TODO: add player selection in guess modal)
-      targetPlayerId = undefined;
-    }
-
-    setIsGuessing(true);
-
-    try {
-      const guess = await gameApi.submitGuess(roomCode, {
-        playerId: currentPlayerId,
-        targetPlayerId,
-        targetCharacterId: selectedCharacterId,
-      });
-
-      setIsGuessModalOpen(false);
-      setSelectedCharacterId(null);
-
-      if (guess.isCorrect) {
-        addToast({
-          color: "success",
-          title: dict.play.correctGuess || "Correct guess!",
-          description: `You guessed correctly: ${guess.targetCharacterName}`,
-        });
-      } else {
-        addToast({
-          color: "danger",
-          title: dict.play.incorrectGuess || "Incorrect guess",
-          description: "Your guess was incorrect. You have been eliminated.",
-        });
-      }
-    } catch (error) {
-      addToast({
-        color: "danger",
-        title: dict.play.errors.failedToGuess || "Failed to guess",
-        description: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setIsGuessing(false);
-    }
-  }, [selectedCharacterId, currentPlayerId, roomCode, dict, playState]);
-
-  const handleSubmitAnswer = useCallback(
-    async (
-      questionId: string,
-      answerValue: AnswerValue,
-      answerText?: string,
-    ) => {
-      if (!currentPlayerId) {
-        addToast({
-          color: "danger",
-          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
-          description: "Player ID not found",
-        });
-
-        return;
-      }
-
-      try {
-        await gameApi.submitAnswer(roomCode, {
-          playerId: currentPlayerId,
-          questionId,
-          answerValue,
-          answerText,
-        });
-
-        addToast({
-          color: "success",
-          title: dict.play.answerSubmitted || "Answer submitted",
-          description: "Your answer has been submitted successfully",
-        });
-
-        setPendingQuestion(null);
-        setIsAnswerModalOpen(false);
-      } catch (error) {
-        addToast({
-          color: "danger",
-          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
-          description: error instanceof Error ? error.message : String(error),
-        });
-      }
-    },
-    [currentPlayerId, roomCode, dict],
-  );
+    selectedCharacterId,
+    setSelectedCharacterId,
+    isGuessModalOpen,
+    setIsGuessModalOpen,
+    isGuessing,
+    handleLeaveGame,
+    handleOpenGuessModal,
+    handleConfirmGuess,
+    handleSubmitAnswer,
+  } = useGameActions({
+    roomCode,
+    currentPlayerId,
+    lang,
+    dict,
+    setPendingQuestion,
+    setIsAnswerModalOpen,
+  });
 
   if (isLoading || !playState || !playState.gameState) {
     return (
