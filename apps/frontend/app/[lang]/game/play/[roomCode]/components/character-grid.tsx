@@ -22,13 +22,6 @@ export function CharacterGrid({
   dict,
   onFlipCharacter,
 }: CharacterGridProps) {
-  const activeAndFlippedCharacters = characters.filter(
-    (c) => !eliminatedIds.has(c.id),
-  );
-  const eliminatedCharacters = characters.filter((c) =>
-    eliminatedIds.has(c.id),
-  );
-
   if (characters.length === 0) {
     return (
       <Card>
@@ -47,45 +40,23 @@ export function CharacterGrid({
         <h2 className="text-lg font-semibold">{dict.play.characterGrid}</h2>
       </CardHeader>
       <CardBody className="gap-4">
-        {/* Active and Flipped Characters */}
-        {activeAndFlippedCharacters.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-default-600">
-              {dict.play.activeCharacters} ({activeAndFlippedCharacters.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {activeAndFlippedCharacters.map((character) => (
-                <CharacterCard
-                  key={character.id}
-                  character={character}
-                  isEliminated={false}
-                  isFlipped={flippedIds.has(character.id)}
-                  onClick={() => onFlipCharacter(character.id)}
-                />
-              ))}
-            </div>
+        {/* All Characters (Active, Flipped, and Eliminated) */}
+        <div>
+          <h3 className="mb-2 text-sm font-medium text-default-600">
+            {dict.play.activeCharacters} ({characters.length})
+          </h3>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
+            {characters.map((character) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                isEliminated={eliminatedIds.has(character.id)}
+                isFlipped={flippedIds.has(character.id)}
+                onClick={() => onFlipCharacter(character.id)}
+              />
+            ))}
           </div>
-        )}
-
-        {/* Eliminated Characters */}
-        {eliminatedCharacters.length > 0 && (
-          <div>
-            <h3 className="mb-2 text-sm font-medium text-default-400">
-              {dict.play.eliminatedCharacters} ({eliminatedCharacters.length})
-            </h3>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
-              {eliminatedCharacters.map((character) => (
-                <CharacterCard
-                  key={character.id}
-                  character={character}
-                  isEliminated={true}
-                  isFlipped={false}
-                  onClick={() => {}}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        </div>
       </CardBody>
     </Card>
   );
