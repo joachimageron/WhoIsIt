@@ -1,12 +1,14 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React, { useEffect, useState } from "react";
 import { Card, CardBody } from "@heroui/card";
 import { Progress } from "@heroui/progress";
 import { Icon } from "@iconify/react";
 
 interface TurnTimerProps {
-  dict: any;
+  dict: Dictionary;
   turnTimerSeconds: number | null;
   isMyTurn: boolean;
 }

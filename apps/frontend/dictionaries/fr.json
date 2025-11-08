@@ -263,7 +263,8 @@
     },
     "flippedCharacters": "Personnages Rabattus",
     "selectCharacterToGuess": "Sélectionnez le personnage que vous voulez deviner :",
-    "selectedCharacter": "Personnage sélectionné :"
+    "selectedCharacter": "Personnage sélectionné :",
+    "gameOver": "Fin de Partie"
   },
   "results": {
     "title": "Fin de Partie",

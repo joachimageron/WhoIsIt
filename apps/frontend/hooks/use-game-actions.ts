@@ -1,4 +1,5 @@
 import type { AnswerValue } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import { useState, useCallback } from "react";
 import { addToast } from "@heroui/toast";
@@ -12,7 +13,7 @@ interface UseGameActionsProps {
   roomCode: string;
   currentPlayerId: string | null;
   lang: string;
-  dict: any;
+  dict: Dictionary;
   setPendingQuestion: (question: any) => void;
   setIsAnswerModalOpen: (isOpen: boolean) => void;
 }

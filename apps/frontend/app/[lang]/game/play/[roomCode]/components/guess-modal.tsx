@@ -1,6 +1,7 @@
 "use client";
 
 import type { CharacterResponseDto } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useState } from "react";
 import {
@@ -15,7 +16,7 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 
 interface GuessModalProps {
-  dict: any;
+  dict: Dictionary;
   isOpen: boolean;
   characters: CharacterResponseDto[];
   eliminatedIds: Set<string>;

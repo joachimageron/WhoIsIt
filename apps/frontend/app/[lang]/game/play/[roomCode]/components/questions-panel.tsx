@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameStateResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -13,7 +14,7 @@ import { addToast } from "@heroui/toast";
 import * as gameApi from "@/lib/game-api";
 
 interface QuestionsPanelProps {
-  dict: any;
+  dict: Dictionary;
   gameState: GameStateResponse;
   isMyTurn: boolean;
   roomCode: string;

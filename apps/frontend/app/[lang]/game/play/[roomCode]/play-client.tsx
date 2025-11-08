@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React from "react";
 import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
@@ -20,7 +22,7 @@ import { useGameEvents } from "@/hooks/use-game-events";
 import { useGameActions } from "@/hooks/use-game-actions";
 
 interface GamePlayClientProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   roomCode: string;
 }

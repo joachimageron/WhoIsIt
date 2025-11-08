@@ -1,4 +1,5 @@
 import type { QuestionResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
@@ -11,7 +12,7 @@ interface UseGameEventsProps {
   currentPlayerId: string | null;
   roomCode: string;
   lang: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export function useGameEvents({

@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameStateResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React from "react";
 import { Card, CardHeader } from "@heroui/card";
@@ -11,7 +12,7 @@ import { Icon } from "@iconify/react";
 import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface GameHeaderProps {
-  dict: any;
+  dict: Dictionary;
   gameState: GameStateResponse;
   isConnected: boolean;
   isMyTurn: boolean;

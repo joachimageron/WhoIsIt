@@ -1,6 +1,7 @@
 "use client";
 
 import type { QuestionResponse, AnswerValue } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/modal";
@@ -10,7 +11,7 @@ import { RadioGroup, Radio } from "@heroui/radio";
 import { Textarea } from "@heroui/input";
 
 interface AnswerModalProps {
-  dict: any;
+  dict: Dictionary;
   question: QuestionResponse | null;
   isOpen: boolean;
   onClose: () => void;

@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -9,7 +11,7 @@ import { Icon } from "@iconify/react";
 import * as authApi from "@/lib/auth-api";
 
 interface VerifyEmailFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   token: string;
 }

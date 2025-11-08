@@ -1,6 +1,7 @@
 "use client";
 
 import type { QuestionResponse, AnswerResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -10,7 +11,7 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Button } from "@heroui/button";
 
 interface QuestionHistoryProps {
-  dict: any;
+  dict: Dictionary;
   questions: QuestionResponse[];
   answers: Map<string, AnswerResponse>;
   currentPlayerId: string | null;
@@ -56,7 +57,7 @@ export function QuestionHistory({
 }
 
 interface QuestionItemProps {
-  dict: any;
+  dict: Dictionary;
   question: QuestionResponse;
   answer?: AnswerResponse;
   currentPlayerId: string | null;

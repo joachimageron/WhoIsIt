@@ -4,6 +4,7 @@ import type {
   CharacterSetResponseDto,
   CreateGameRequest,
 } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,7 +18,7 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 
 interface CreateGameFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 

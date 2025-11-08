@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/dictionaries";
+
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { useRouter } from "next/navigation";
@@ -11,7 +13,7 @@ import { getGuestSession } from "@/lib/guest-session";
 interface UseGameInitializationProps {
   roomCode: string;
   lang: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export function useGameInitialization({

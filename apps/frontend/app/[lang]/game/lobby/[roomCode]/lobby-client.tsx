@@ -1,6 +1,7 @@
 "use client";
 
 import type { GamePlayerResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface LobbyClientProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   roomCode: string;
 }

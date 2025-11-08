@@ -1,6 +1,7 @@
 "use client";
 
 import type { CharacterResponseDto } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -11,7 +12,7 @@ interface CharacterGridProps {
   characters: CharacterResponseDto[];
   eliminatedIds: Set<string>;
   flippedIds: Set<string>;
-  dict: any;
+  dict: Dictionary;
   onFlipCharacter: (characterId: string) => void;
 }
 

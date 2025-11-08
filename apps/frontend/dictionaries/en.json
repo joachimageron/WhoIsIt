@@ -263,7 +263,8 @@
     },
     "flippedCharacters": "Flipped Characters",
     "selectCharacterToGuess": "Select the character you want to guess:",
-    "selectedCharacter": "Selected character:"
+    "selectedCharacter": "Selected character:",
+    "gameOver": "Game Over"
   },
   "results": {
     "title": "Game Over",
