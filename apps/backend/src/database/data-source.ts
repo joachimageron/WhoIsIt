@@ -1,9 +1,6 @@
-import { config } from 'dotenv';
+import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { DATABASE_ENTITIES } from './database.module';
-
-// Load environment variables
-config();
 
 /**
  * TypeORM DataSource configuration for migrations

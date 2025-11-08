@@ -91,9 +91,11 @@ Run this command multiple times to revert multiple migrations.
 2. TypeORM automatically synchronizes the database schema
 3. Test your changes
 4. Before committing, generate a migration:
+
    ```bash
    pnpm migration:generate src/database/migrations/DescriptiveNameOfChanges
    ```
+
 5. Review the generated migration file
 6. Commit both the entity changes and the migration file
 
@@ -102,6 +104,7 @@ Run this command multiple times to revert multiple migrations.
 1. Set `DB_SYNC=false` in your production `.env` file
 2. Deploy your application
 3. Migrations will run automatically on startup, or run manually:
+
    ```bash
    pnpm migration:run
    ```
@@ -157,6 +160,7 @@ DB_NAME=whois_it
 ### Migration generates too many changes
 
 This usually happens when:
+
 - You've made many entity changes without generating migrations
 - The database schema is out of sync with entities
 
