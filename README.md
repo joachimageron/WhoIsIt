@@ -58,6 +58,21 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
 - **Backend**: NestJS 11 with ConfigModule, TypeORM auto-loading entities, Socket.IO gateway support, and PostgreSQL driver.
 - **Package manager**: pnpm workspaces with shared hoisting configured for HeroUI packages.
 
+## Documentation
+
+Comprehensive documentation is available in the [`/docs`](./docs) directory:
+
+- **[Getting Started](./docs/development/getting-started.md)** - Complete setup guide for local development
+- **[Architecture](./docs/architecture/overview.md)** - System design and architectural decisions
+- **[Backend](./docs/backend/README.md)** - NestJS API, database schema, and services
+- **[Frontend](./docs/frontend/README.md)** - Next.js application, components, and state management
+- **[API Reference](./docs/api/rest-api.md)** - REST endpoints and WebSocket events
+- **[Deployment](./docs/deployment/README.md)** - Production deployment guides
+
+See the [Documentation Index](./docs/README.md) for the complete table of contents.
+
 ## Contributing
 
 This repository includes [GitHub Copilot instructions](./.github/copilot-instructions.md) to help developers and AI coding assistants understand the architecture, conventions, and workflows. Review these guidelines before making changes.
+
+For detailed development guidelines, see the [Development Documentation](./docs/development/README.md).
