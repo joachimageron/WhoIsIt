@@ -2,7 +2,7 @@
   "name": "whois-it",
   "private": true,
   "version": "0.1.0",
-  "packageManager": "pnpm@10.18.1",
+  "packageManager": "pnpm@10.20.0",
   "scripts": {
     "dev": "pnpm -r --parallel dev",
     "dev:frontend": "pnpm --filter @whois-it/frontend dev",
@@ -11,7 +11,11 @@
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
     "seed": "pnpm --filter @whois-it/backend seed",
-    "db:reset": "pnpm --filter @whois-it/backend db:reset"
+    "db:reset": "pnpm --filter @whois-it/backend db:reset",
+    "migration:generate": "pnpm --filter @whois-it/backend migration:generate",
+    "migration:run": "pnpm --filter @whois-it/backend migration:run",
+    "migration:revert": "pnpm --filter @whois-it/backend migration:revert",
+    "migration:show": "pnpm --filter @whois-it/backend migration:show"
   },
   "dependencies": {
     "@formatjs/intl-localematcher": "^0.6.2",

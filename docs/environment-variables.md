@@ -71,17 +71,23 @@ PORT=4000
 ### Environment Variables Explained
 
 - **Database (DB_*)**: PostgreSQL connection settings
-  - `DB_SYNC=true` enables automatic schema synchronization (use with caution in production)
+  - `DB_SYNC=false` uses migrations system for production
 - **Email (EMAIL_*)**: SMTP configuration for sending emails (optional for development)
 - **`FRONTEND_URL`**: Used in email templates for links back to the frontend
 - **`JWT_SECRET`**: Secret key for signing JWT tokens (change this in production!)
 - **`PORT`**: The port the backend server will listen on
 
+**Important**: When `DB_SYNC=false`, the application will automatically run pending migrations on startup. See [backend migrations documentation](../apps/backend/README-MIGRATIONS.md) for more details.
+
 ### Important Notes
 
-1. **DB_SYNC**: Set to `false` in production and use proper migrations instead
+1. **DB_SYNC**: 
+   - Set to `true` in development for automatic schema synchronization
+   - Set to `false` in production to use migrations system
+   - When `false`, migrations run automatically on app startup
 2. **JWT_SECRET**: Use a strong, random secret in production
 3. **Email Configuration**: Optional for development; emails will be logged to console if not configured
+4. **Migrations**: See [backend migrations documentation](../apps/backend/README-MIGRATIONS.md) for detailed migration workflow
 
 ## CORS Configuration
 
