@@ -1,6 +1,7 @@
 "use client";
 
 import type { GamePlayerResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface LobbyClientProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   roomCode: string;
 }
@@ -74,12 +75,14 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
         if (response.success && response.lobby) {
           setLobby(response.lobby);
         } else {
-          throw new Error(response.error || dict.lobby.errors.failedToJoin);
+          throw new Error(
+            response.error || dict.game.lobby.errors.failedToJoin,
+          );
         }
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.lobby.errors.failedToJoin,
+          title: dict.game.lobby.errors.failedToJoin,
           description: error instanceof Error ? error.message : String(error),
         });
         router.push(`/${lang}`);
@@ -125,8 +128,8 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       setLobby(event.lobby);
       addToast({
         color: "success",
-        title: dict.lobby.gameStarting,
-        description: dict.lobby.redirectingToGame,
+        title: dict.game.lobby.gameStarting,
+        description: dict.game.lobby.redirectingToGame,
       });
       // Navigate to game page
       router.push(`/${lang}/game/play/${event.roomCode}`);
@@ -165,13 +168,13 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
         setLobby(response.lobby);
       } else {
         throw new Error(
-          response.error || dict.lobby.errors.failedToUpdateReady,
+          response.error || dict.game.lobby.errors.failedToUpdateReady,
         );
       }
     } catch (error) {
       addToast({
         color: "danger",
-        title: dict.lobby.errors.failedToUpdateReady,
+        title: dict.game.lobby.errors.failedToUpdateReady,
         description: error instanceof Error ? error.message : String(error),
       });
     } finally {
@@ -182,7 +185,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     roomCode,
     updatePlayerReady,
     setLobby,
-    dict.lobby.errors.failedToUpdateReady,
+    dict.game.lobby.errors.failedToUpdateReady,
   ]);
 
   const handleStartGame = useCallback(async () => {
@@ -195,13 +198,13 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     } catch (error) {
       addToast({
         color: "danger",
-        title: dict.lobby.errors.failedToStartGame,
+        title: dict.game.lobby.errors.failedToStartGame,
         description: error instanceof Error ? error.message : String(error),
       });
     } finally {
       setIsStarting(false);
     }
-  }, [roomCode, dict.lobby.errors.failedToStartGame]);
+  }, [roomCode, dict.game.lobby.errors.failedToStartGame]);
 
   const handleLeaveLobby = useCallback(async () => {
     try {
@@ -225,7 +228,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
             icon="solar:loader-linear"
             width={48}
           />
-          <p className="text-lg">{dict.lobby.connecting}</p>
+          <p className="text-lg">{dict.game.lobby.connecting}</p>
         </div>
       </div>
     );
@@ -236,7 +239,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
       <Card className="w-full max-w-2xl">
         <CardHeader className="flex flex-col gap-3 pb-4">
           <div className="flex w-full items-center justify-between">
-            <h1 className="text-2xl font-bold">{dict.lobby.title}</h1>
+            <h1 className="text-2xl font-bold">{dict.game.lobby.title}</h1>
             <Chip
               color={isConnected ? "success" : "danger"}
               size="sm"
@@ -252,14 +255,16 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               }
               variant="flat"
             >
-              {isConnected ? dict.lobby.connected : dict.lobby.disconnected}
+              {isConnected
+                ? dict.game.lobby.connected
+                : dict.game.lobby.disconnected}
             </Chip>
           </div>
           <div className="flex w-full items-center justify-between">
             <RoomCodeDisplay
-              copyErrorMessage={dict.lobby.errors.failedToCopyRoomCode}
-              copySuccessMessage={dict.lobby.roomCodeCopied}
-              label={dict.lobby.roomCode}
+              copyErrorMessage={dict.game.lobby.errors.failedToCopyRoomCode}
+              copySuccessMessage={dict.game.lobby.roomCodeCopied}
+              label={dict.game.lobby.roomCode}
               roomCode={lobby.roomCode}
               size="md"
             />
@@ -271,14 +276,14 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                {dict.lobby.players} ({lobby.players.length}
+                {dict.game.lobby.players} ({lobby.players.length}
                 {lobby.maxPlayers ? `/${lobby.maxPlayers}` : ""})
               </h2>
             </div>
 
             {lobby.players.length === 0 ? (
               <p className="text-small text-default-400">
-                {dict.lobby.waitingForPlayers}
+                {dict.game.lobby.waitingForPlayers}
               </p>
             ) : (
               <div className="flex flex-col gap-2">
@@ -319,7 +324,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
                         {player.role === "host" && (
                           <Chip color="primary" size="sm" variant="flat">
-                            {dict.lobby.host}
+                            {dict.game.lobby.host}
                           </Chip>
                         )}
                       </div>
@@ -338,13 +343,13 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               startContent={<Icon icon="solar:check-circle-bold" width={20} />}
               variant="flat"
             >
-              {dict.lobby.allPlayersReady}
+              {dict.game.lobby.allPlayersReady}
             </Chip>
           )}
 
           {!allPlayersReady && (
             <Chip color="default" size="lg" variant="flat">
-              {dict.lobby.notAllPlayersReady}
+              {dict.game.lobby.notAllPlayersReady}
             </Chip>
           )}
 
@@ -358,8 +363,8 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                 onPress={handleToggleReady}
               >
                 {currentPlayer.isReady
-                  ? dict.lobby.toggleNotReady
-                  : dict.lobby.toggleReady}
+                  ? dict.game.lobby.toggleNotReady
+                  : dict.game.lobby.toggleReady}
               </Button>
             )}
 
@@ -371,12 +376,12 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
                 isLoading={isStarting}
                 onPress={handleStartGame}
               >
-                {dict.lobby.startGame}
+                {dict.game.lobby.startGame}
               </Button>
             )}
 
             <Button color="danger" variant="light" onPress={handleLeaveLobby}>
-              {dict.lobby.leaveLobby}
+              {dict.game.lobby.leaveLobby}
             </Button>
           </div>
         </CardBody>

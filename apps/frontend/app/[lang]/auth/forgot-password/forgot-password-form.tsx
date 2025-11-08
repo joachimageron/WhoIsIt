@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React from "react";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -10,7 +12,7 @@ import { Form } from "@heroui/form";
 import * as authApi from "@/lib/auth-api";
 
 interface ForgotPasswordFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 

@@ -1,3 +1,5 @@
+import type { Dictionary } from "@/dictionaries";
+
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
 import { useRouter } from "next/navigation";
@@ -11,7 +13,7 @@ import { getGuestSession } from "@/lib/guest-session";
 interface UseGameInitializationProps {
   roomCode: string;
   lang: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export function useGameInitialization({
@@ -110,12 +112,12 @@ export function useGameInitialization({
         });
 
         if (!response.success) {
-          throw new Error(response.error || dict.play.errors.failedToLoad);
+          throw new Error(response.error || dict.game.play.errors.failedToLoad);
         }
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToLoad,
+          title: dict.game.play.errors.failedToLoad,
           description: error instanceof Error ? error.message : String(error),
         });
         router.push(`/${lang}`);

@@ -1,6 +1,7 @@
 "use client";
 
 import type { QuestionResponse, AnswerResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
@@ -10,7 +11,7 @@ import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Button } from "@heroui/button";
 
 interface QuestionHistoryProps {
-  dict: any;
+  dict: Dictionary;
   questions: QuestionResponse[];
   answers: Map<string, AnswerResponse>;
   currentPlayerId: string | null;
@@ -27,12 +28,14 @@ export function QuestionHistory({
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-lg font-semibold">{dict.play.history}</h2>
+        <h2 className="text-lg font-semibold">
+          {dict.game.play.questions.history}
+        </h2>
       </CardHeader>
       <CardBody>
         {questions.length === 0 ? (
           <p className="text-center text-sm text-default-400">
-            {dict.play.noQuestionsYet}
+            {dict.game.play.questions.noQuestionsYet}
           </p>
         ) : (
           <ScrollShadow className="max-h-[400px]">
@@ -56,7 +59,7 @@ export function QuestionHistory({
 }
 
 interface QuestionItemProps {
-  dict: any;
+  dict: Dictionary;
   question: QuestionResponse;
   answer?: AnswerResponse;
   currentPlayerId: string | null;
@@ -137,7 +140,7 @@ function QuestionItem({
             variant="flat"
             onPress={() => onAnswerQuestion(question)}
           >
-            {dict.play.answerButton || "Answer"}
+            {dict.game.play.answers.answerButton || "Answer"}
           </Button>
         </div>
       ) : null}

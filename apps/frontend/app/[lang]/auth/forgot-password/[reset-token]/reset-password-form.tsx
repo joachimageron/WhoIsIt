@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -12,7 +14,7 @@ import { Form } from "@heroui/form";
 import * as authApi from "@/lib/auth-api";
 
 interface ResetPasswordFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
   token: string;
 }

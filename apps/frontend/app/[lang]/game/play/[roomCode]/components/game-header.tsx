@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameStateResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React from "react";
 import { Card, CardHeader } from "@heroui/card";
@@ -11,7 +12,7 @@ import { Icon } from "@iconify/react";
 import { RoomCodeDisplay } from "@/components/room-code-display";
 
 interface GameHeaderProps {
-  dict: any;
+  dict: Dictionary;
   gameState: GameStateResponse;
   isConnected: boolean;
   isMyTurn: boolean;
@@ -34,7 +35,9 @@ export function GameHeader({
       <CardHeader className="flex flex-col gap-3 pb-3 sm:flex-row sm:justify-between">
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold sm:text-2xl">{dict.play.title}</h1>
+            <h1 className="text-xl font-bold sm:text-2xl">
+              {dict.game.play.title}
+            </h1>
             <Chip
               color={isConnected ? "success" : "danger"}
               size="sm"
@@ -50,15 +53,17 @@ export function GameHeader({
               }
               variant="flat"
             >
-              {isConnected ? dict.lobby.connected : dict.lobby.disconnected}
+              {isConnected
+                ? dict.game.lobby.connected
+                : dict.game.lobby.disconnected}
             </Chip>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <RoomCodeDisplay
-              copyErrorMessage={dict.play.errors.failedToCopyRoomCode}
-              copySuccessMessage={dict.play.roomCodeCopied}
-              label={`${dict.play.roomCode}:`}
+              copyErrorMessage={dict.game.play.errors.failedToCopyRoomCode}
+              copySuccessMessage={dict.game.play.roomCodeCopied}
+              label={`${dict.game.play.roomCode}:`}
               roomCode={roomCode}
               showLabel={true}
               size="sm"
@@ -68,7 +73,7 @@ export function GameHeader({
 
             <div className="flex items-center gap-2">
               <span className="text-sm text-default-500">
-                {dict.play.turn || dict.play.round}:
+                {dict.game.play.turn || dict.game.play.round}:
               </span>
               <span className="font-semibold">{questionCount + 1}</span>
             </div>
@@ -83,11 +88,11 @@ export function GameHeader({
               startContent={<Icon icon="solar:play-bold" width={20} />}
               variant="flat"
             >
-              {dict.play.yourTurn}
+              {dict.game.play.yourTurn}
             </Chip>
           ) : (
             <Chip color="default" size="lg" variant="flat">
-              {dict.play.playerTurn.replace(
+              {dict.game.play.playerTurn.replace(
                 "{player}",
                 gameState.activePlayerUsername || "...",
               )}
@@ -101,7 +106,7 @@ export function GameHeader({
             variant="light"
             onPress={onLeaveGame}
           >
-            {dict.play.abandonGame}
+            {dict.game.play.actions.abandonGame}
           </Button>
         </div>
       </CardHeader>

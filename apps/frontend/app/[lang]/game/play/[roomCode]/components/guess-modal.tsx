@@ -1,6 +1,7 @@
 "use client";
 
 import type { CharacterResponseDto } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useState } from "react";
 import {
@@ -15,7 +16,7 @@ import { Icon } from "@iconify/react";
 import Image from "next/image";
 
 interface GuessModalProps {
-  dict: any;
+  dict: Dictionary;
   isOpen: boolean;
   characters: CharacterResponseDto[];
   eliminatedIds: Set<string>;
@@ -60,13 +61,13 @@ export function GuessModal({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-bold">
-            {dict.play.confirmGuess || "Confirm Your Guess"}
+            {dict.game.play.guess.confirmGuess || "Confirm Your Guess"}
           </h2>
         </ModalHeader>
         <ModalBody>
           <div className="flex flex-col gap-4">
             <p className="text-sm text-default-500">
-              {dict.play.selectCharacterToGuess ||
+              {dict.game.play.characters.selectCharacterToGuess ||
                 "Select the character you want to guess:"}
             </p>
 
@@ -116,7 +117,7 @@ export function GuessModal({
             variant="light"
             onPress={handleClose}
           >
-            {dict.play.cancelGuess || "Cancel"}
+            {dict.game.play.guess.cancelGuess || "Cancel"}
           </Button>
           <Button
             color="success"
@@ -128,8 +129,8 @@ export function GuessModal({
             onPress={handleConfirm}
           >
             {isGuessing
-              ? dict.play.guessing || "Guessing..."
-              : dict.play.confirmButton || "Confirm Guess"}
+              ? dict.game.play.guess.guessing || "Guessing..."
+              : dict.game.play.guess.confirmButton || "Confirm Guess"}
           </Button>
         </ModalFooter>
       </ModalContent>

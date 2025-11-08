@@ -1,4 +1,5 @@
 import type { QuestionResponse } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import { useState, useEffect } from "react";
 import { addToast } from "@heroui/toast";
@@ -11,7 +12,7 @@ interface UseGameEventsProps {
   currentPlayerId: string | null;
   roomCode: string;
   lang: string;
-  dict: any;
+  dict: Dictionary;
 }
 
 export function useGameEvents({
@@ -89,7 +90,7 @@ export function useGameEvents({
       addAnswer(event.answer);
       addToast({
         color: "success",
-        title: dict.play.answerSubmitted || "Answer submitted",
+        title: dict.game.play.answers.answerSubmitted || "Answer submitted",
         description: `${event.answer.answeredByPlayerUsername} answered the question`,
       });
 
@@ -114,7 +115,7 @@ export function useGameEvents({
       if (guess.isCorrect) {
         addToast({
           color: "success",
-          title: dict.play.correctGuess || "Correct guess!",
+          title: dict.game.play.guess.correctGuess || "Correct guess!",
           description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
         });
       } else {
@@ -123,7 +124,7 @@ export function useGameEvents({
 
         addToast({
           color: "danger",
-          title: dict.play.incorrectGuess || "Incorrect guess",
+          title: dict.game.play.guess.incorrectGuess || "Incorrect guess",
           description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
         });
       }
@@ -139,7 +140,7 @@ export function useGameEvents({
     const unsubscribeGameOver = onGameOver((event) => {
       addToast({
         color: "success",
-        title: dict.play.gameOver || "Game Over!",
+        title: dict.game.play.gameOver || "Game Over!",
         description: event.result.winnerUsername
           ? `${event.result.winnerUsername} won the game!`
           : "Game ended",

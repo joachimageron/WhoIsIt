@@ -1,6 +1,7 @@
 "use client";
 
 import type { GameOverResult } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,45 +23,6 @@ import {
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
-
-interface Dictionary {
-  results: {
-    title: string;
-    winner: string;
-    congratulations: string;
-    youWon: string;
-    youLost: string;
-    gameStats: string;
-    playerStats: string;
-    detailedStats: string;
-    you: string;
-    roomCode: string;
-    roomCodeCopied: string;
-    duration: string;
-    rounds: string;
-    placement: string;
-    username: string;
-    score: string;
-    questionsAsked: string;
-    questionsAnswered: string;
-    correctGuesses: string;
-    incorrectGuesses: string;
-    timePlayed: string;
-    newGame: string;
-    backToHome: string;
-    loading: string;
-    first: string;
-    second: string;
-    third: string;
-    nth: string;
-    minutes: string;
-    seconds: string;
-    errors: {
-      failedToLoad: string;
-      failedToCopyRoomCode: string;
-    };
-  };
-}
 
 interface GameResultsClientProps {
   dict: Dictionary;
@@ -85,11 +47,11 @@ export function GameResultsClient({
 
   // Helper function to format placement
   const formatPlacement = (placement: number): string => {
-    if (placement === 1) return dict.results.first;
-    if (placement === 2) return dict.results.second;
-    if (placement === 3) return dict.results.third;
+    if (placement === 1) return dict.game.results.stats.first;
+    if (placement === 2) return dict.game.results.stats.second;
+    if (placement === 3) return dict.game.results.stats.third;
 
-    return dict.results.nth.replace("{n}", placement.toString());
+    return dict.game.results.stats.nth.replace("{n}", placement.toString());
   };
 
   // Helper function to format duration
@@ -98,10 +60,10 @@ export function GameResultsClient({
     const remainingSeconds = seconds % 60;
 
     if (minutes > 0) {
-      return `${dict.results.minutes.replace("{n}", minutes.toString())} ${dict.results.seconds.replace("{n}", remainingSeconds.toString())}`;
+      return `${dict.game.results.stats.minutes.replace("{n}", minutes.toString())} ${dict.game.results.stats.seconds.replace("{n}", remainingSeconds.toString())}`;
     }
 
-    return dict.results.seconds.replace("{n}", seconds.toString());
+    return dict.game.results.stats.seconds.replace("{n}", seconds.toString());
   };
 
   // Load game results on mount
@@ -116,7 +78,7 @@ export function GameResultsClient({
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.results.errors.failedToLoad,
+          title: dict.game.results.errors.failedToLoad,
           description: error instanceof Error ? error.message : String(error),
         });
         router.push(`/${lang}`);
@@ -137,7 +99,9 @@ export function GameResultsClient({
             icon="mdi:loading"
             width={48}
           />
-          <p className="text-lg text-default-600">{dict.results.loading}</p>
+          <p className="text-lg text-default-600">
+            {dict.game.results.loading}
+          </p>
         </div>
       </div>
     );
@@ -151,12 +115,14 @@ export function GameResultsClient({
     <div className="container mx-auto max-w-6xl px-4 py-8">
       {/* Header Section */}
       <div className="mb-8 text-center">
-        <h1 className="mb-4 text-4xl font-bold">{dict.results.title}</h1>
+        <h1 className="mb-4 text-4xl font-bold">{dict.game.results.title}</h1>
       </div>
 
       {/* Game Stats Section */}
       <div className="mb-8">
-        <h2 className="mb-4 text-2xl font-bold">{dict.results.gameStats}</h2>
+        <h2 className="mb-4 text-2xl font-bold">
+          {dict.game.results.stats.gameStats}
+        </h2>
         <Card>
           <CardBody>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -167,9 +133,11 @@ export function GameResultsClient({
                   width={32}
                 />
                 <RoomCodeDisplay
-                  copyErrorMessage={dict.results.errors.failedToCopyRoomCode}
-                  copySuccessMessage={dict.results.roomCodeCopied}
-                  label={dict.results.roomCode}
+                  copyErrorMessage={
+                    dict.game.results.errors.failedToCopyRoomCode
+                  }
+                  copySuccessMessage={dict.game.results.roomCodeCopied}
+                  label={dict.game.results.roomCode}
                   roomCode={results.roomCode}
                   showLabel={true}
                   size="lg"
@@ -179,7 +147,7 @@ export function GameResultsClient({
                 <Icon className="text-primary" icon="mdi:clock" width={32} />
                 <div>
                   <p className="text-sm text-default-600">
-                    {dict.results.duration}
+                    {dict.game.results.stats.duration}
                   </p>
                   <p className="text-lg font-semibold">
                     {formatDuration(results.gameDurationSeconds)}
@@ -190,7 +158,7 @@ export function GameResultsClient({
                 <Icon className="text-primary" icon="mdi:counter" width={32} />
                 <div>
                   <p className="text-sm text-default-600">
-                    {dict.results.rounds}
+                    {dict.game.results.stats.rounds}
                   </p>
                   <p className="text-lg font-semibold">{results.totalRounds}</p>
                 </div>
@@ -202,16 +170,22 @@ export function GameResultsClient({
 
       {/* Player Stats Table */}
       <div className="mb-8">
-        <h2 className="mb-4 text-2xl font-bold">{dict.results.playerStats}</h2>
+        <h2 className="mb-4 text-2xl font-bold">
+          {dict.game.results.stats.playerStats}
+        </h2>
         <Card>
           <CardBody>
             <Table aria-label="Player statistics table">
               <TableHeader>
-                <TableColumn>{dict.results.placement}</TableColumn>
-                <TableColumn>{dict.results.username}</TableColumn>
-                <TableColumn>{dict.results.score}</TableColumn>
-                <TableColumn>{dict.results.questionsAsked}</TableColumn>
-                <TableColumn>{dict.results.correctGuesses}</TableColumn>
+                <TableColumn>{dict.game.results.stats.placement}</TableColumn>
+                <TableColumn>{dict.game.results.stats.username}</TableColumn>
+                <TableColumn>{dict.game.results.stats.score}</TableColumn>
+                <TableColumn>
+                  {dict.game.results.stats.questionsAsked}
+                </TableColumn>
+                <TableColumn>
+                  {dict.game.results.stats.correctGuesses}
+                </TableColumn>
               </TableHeader>
               <TableBody>
                 {results.players
@@ -239,7 +213,7 @@ export function GameResultsClient({
                           </span>
                           {player.playerId === currentPlayer?.playerId && (
                             <Chip color="primary" size="sm" variant="flat">
-                              {dict.results.you}
+                              {dict.game.results.you}
                             </Chip>
                           )}
                         </div>
@@ -271,7 +245,7 @@ export function GameResultsClient({
       {currentPlayer && (
         <div className="mb-8">
           <h2 className="mb-4 text-2xl font-bold">
-            {dict.results.detailedStats}
+            {dict.game.results.stats.detailedStats}
           </h2>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
@@ -283,7 +257,7 @@ export function GameResultsClient({
                     width={32}
                   />
                   <p className="text-sm text-default-600">
-                    {dict.results.questionsAsked}
+                    {dict.game.results.stats.questionsAsked}
                   </p>
                   <p className="text-2xl font-bold">
                     {currentPlayer.questionsAsked}
@@ -300,7 +274,7 @@ export function GameResultsClient({
                     width={32}
                   />
                   <p className="text-sm text-default-600">
-                    {dict.results.questionsAnswered}
+                    {dict.game.results.stats.questionsAnswered}
                   </p>
                   <p className="text-2xl font-bold">
                     {currentPlayer.questionsAnswered}
@@ -317,7 +291,7 @@ export function GameResultsClient({
                     width={32}
                   />
                   <p className="text-sm text-default-600">
-                    {dict.results.correctGuesses}
+                    {dict.game.results.stats.correctGuesses}
                   </p>
                   <p className="text-2xl font-bold text-success">
                     {currentPlayer.correctGuesses}
@@ -334,7 +308,7 @@ export function GameResultsClient({
                     width={32}
                   />
                   <p className="text-sm text-default-600">
-                    {dict.results.incorrectGuesses}
+                    {dict.game.results.stats.incorrectGuesses}
                   </p>
                   <p className="text-2xl font-bold text-danger">
                     {currentPlayer.incorrectGuesses}
@@ -354,7 +328,7 @@ export function GameResultsClient({
           startContent={<Icon icon="mdi:plus-circle" width={24} />}
           onPress={() => router.push(`/${lang}/game/create`)}
         >
-          {dict.results.newGame}
+          {dict.game.results.actions.newGame}
         </Button>
         <Button
           size="lg"
@@ -362,7 +336,7 @@ export function GameResultsClient({
           variant="bordered"
           onPress={() => router.push(`/${lang}`)}
         >
-          {dict.results.backToHome}
+          {dict.game.results.actions.backToHome}
         </Button>
       </div>
     </div>

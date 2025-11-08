@@ -1,6 +1,6 @@
 "use client";
 
-import type { Locale } from "@/dictionaries";
+import type { Dictionary, Locale } from "@/dictionaries";
 
 import {
   Navbar as HeroUINavbar,
@@ -28,7 +28,7 @@ import { useAuth } from "@/lib/hooks/use-auth";
 
 interface NavbarProps {
   lang: Locale;
-  dict: any;
+  dict: Dictionary;
 }
 
 export const Navbar = ({ lang, dict }: NavbarProps) => {

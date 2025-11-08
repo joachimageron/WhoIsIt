@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -12,7 +14,7 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 
 interface JoinFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 

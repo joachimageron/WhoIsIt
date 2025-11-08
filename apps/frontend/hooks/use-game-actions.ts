@@ -1,4 +1,5 @@
 import type { AnswerValue } from "@whois-it/contracts";
+import type { Dictionary } from "@/dictionaries";
 
 import { useState, useCallback } from "react";
 import { addToast } from "@heroui/toast";
@@ -12,7 +13,7 @@ interface UseGameActionsProps {
   roomCode: string;
   currentPlayerId: string | null;
   lang: string;
-  dict: any;
+  dict: Dictionary;
   setPendingQuestion: (question: any) => void;
   setIsAnswerModalOpen: (isOpen: boolean) => void;
 }
@@ -57,7 +58,7 @@ export function useGameActions({
       if (!currentPlayerId) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToGuess || "Failed to guess",
+          title: dict.game.play.errors.failedToGuess || "Failed to guess",
           description: "Player ID not found",
         });
 
@@ -67,7 +68,7 @@ export function useGameActions({
       if (!playState?.gameState) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToGuess || "Failed to guess",
+          title: dict.game.play.errors.failedToGuess || "Failed to guess",
           description: "Game state not found",
         });
 
@@ -105,7 +106,7 @@ export function useGameActions({
         if (guess.isCorrect) {
           addToast({
             color: "success",
-            title: dict.play.correctGuess || "Correct guess!",
+            title: dict.game.play.guess.correctGuess || "Correct guess!",
             description: `You guessed correctly: ${guess.targetCharacterName}`,
           });
         } else {
@@ -114,14 +115,14 @@ export function useGameActions({
 
           addToast({
             color: "danger",
-            title: dict.play.incorrectGuess || "Incorrect guess",
+            title: dict.game.play.guess.incorrectGuess || "Incorrect guess",
             description: "Your guess was incorrect. You have been eliminated.",
           });
         }
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToGuess || "Failed to guess",
+          title: dict.game.play.errors.failedToGuess || "Failed to guess",
           description: error instanceof Error ? error.message : String(error),
         });
       } finally {
@@ -140,7 +141,8 @@ export function useGameActions({
       if (!currentPlayerId) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          title:
+            dict.game.play.errors.failedToAnswer || "Failed to submit answer",
           description: "Player ID not found",
         });
 
@@ -157,7 +159,7 @@ export function useGameActions({
 
         addToast({
           color: "success",
-          title: dict.play.answerSubmitted || "Answer submitted",
+          title: dict.game.play.answers.answerSubmitted || "Answer submitted",
           description: "Your answer has been submitted successfully",
         });
 
@@ -166,7 +168,8 @@ export function useGameActions({
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToAnswer || "Failed to submit answer",
+          title:
+            dict.game.play.errors.failedToAnswer || "Failed to submit answer",
           description: error instanceof Error ? error.message : String(error),
         });
       }

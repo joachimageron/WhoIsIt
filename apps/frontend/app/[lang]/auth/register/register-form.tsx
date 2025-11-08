@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/dictionaries";
+
 import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
@@ -15,7 +17,7 @@ import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
 
 interface RegisterFormProps {
-  dict: any;
+  dict: Dictionary;
   lang: string;
 }
 
