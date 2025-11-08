@@ -7,6 +7,8 @@ import { AuthService } from './auth.service';
 import { User } from '../database/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { EmailService } from '../email/email.service';
+import { AuthTokenService } from './auth-token.service';
+import { AuthProfileService } from './auth-profile.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -26,6 +28,18 @@ describe('AuthService', () => {
     sendPasswordResetEmail: jest.fn(),
   };
 
+  const mockAuthTokenService = {
+    verifyEmail: jest.fn(),
+    resendVerificationEmail: jest.fn(),
+    requestPasswordReset: jest.fn(),
+    resetPassword: jest.fn(),
+  };
+
+  const mockAuthProfileService = {
+    updateProfile: jest.fn(),
+    changePassword: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,6 +55,14 @@ describe('AuthService', () => {
         {
           provide: EmailService,
           useValue: mockEmailService,
+        },
+        {
+          provide: AuthTokenService,
+          useValue: mockAuthTokenService,
+        },
+        {
+          provide: AuthProfileService,
+          useValue: mockAuthProfileService,
         },
       ],
     }).compile();

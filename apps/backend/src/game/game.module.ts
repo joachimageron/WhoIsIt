@@ -16,6 +16,9 @@ import {
 import { GameController } from './game.controller';
 import { GameService } from './game.service';
 import { GameGateway } from './game.gateway';
+import { GameLobbyService } from './game-lobby.service';
+import { GamePlayService } from './game-play.service';
+import { GameStatsService } from './game-stats.service';
 
 @Module({
   imports: [
@@ -34,7 +37,13 @@ import { GameGateway } from './game.gateway';
     ]),
   ],
   controllers: [GameController],
-  providers: [GameService, GameGateway],
+  providers: [
+    GameService,
+    GameLobbyService,
+    GamePlayService,
+    GameStatsService,
+    GameGateway,
+  ],
   exports: [GameService],
 })
 export class GameModule {}
