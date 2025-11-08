@@ -260,7 +260,10 @@
       "selectCharacter": "Veuillez sélectionner un personnage",
       "selectCharacterDescription": "Sélectionnez un personnage dans la grille avant de deviner",
       "enterQuestion": "Veuillez entrer une question"
-    }
+    },
+    "flippedCharacters": "Personnages Rabattus",
+    "selectCharacterToGuess": "Sélectionnez le personnage que vous voulez deviner :",
+    "selectedCharacter": "Personnage sélectionné :"
   },
   "results": {
     "title": "Fin de Partie",

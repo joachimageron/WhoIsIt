@@ -2,7 +2,7 @@
 
 import type { CharacterResponseDto } from "@whois-it/contracts";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalContent,
@@ -13,26 +13,55 @@ import {
 import { Button } from "@heroui/button";
 import { Avatar } from "@heroui/avatar";
 import { Icon } from "@iconify/react";
+import Image from "next/image";
 
 interface GuessModalProps {
   dict: any;
   isOpen: boolean;
-  selectedCharacter: CharacterResponseDto | null;
+  characters: CharacterResponseDto[];
+  eliminatedIds: Set<string>;
+  flippedIds: Set<string>;
   isGuessing: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (characterId: string) => void;
 }
 
 export function GuessModal({
   dict,
   isOpen,
-  selectedCharacter,
+  characters,
+  eliminatedIds,
+  flippedIds,
   isGuessing,
   onClose,
   onConfirm,
 }: GuessModalProps) {
+  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
+    null,
+  );
+
+  const activeCharacters = characters.filter(
+    (c) => !eliminatedIds.has(c.id) && !flippedIds.has(c.id),
+  );
+
+  const handleConfirm = () => {
+    if (selectedCharacterId) {
+      onConfirm(selectedCharacterId);
+      setSelectedCharacterId(null);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedCharacterId(null);
+    onClose();
+  };
+
+  const selectedCharacter = selectedCharacterId
+    ? characters.find((c) => c.id === selectedCharacterId)
+    : null;
+
   return (
-    <Modal isOpen={isOpen} size="md" onClose={onClose}>
+    <Modal isOpen={isOpen} size="3xl" onClose={handleClose}>
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <h2 className="text-xl font-bold">
@@ -40,47 +69,94 @@ export function GuessModal({
           </h2>
         </ModalHeader>
         <ModalBody>
-          {selectedCharacter ? (
-            <div className="flex flex-col items-center gap-4">
-              <p className="text-sm text-default-500">
-                {dict.play.confirmGuessDescription ||
-                  "Are you sure you want to guess this character?"}
-              </p>
-
-              <div className="flex items-center gap-3">
-                <Avatar
-                  name={selectedCharacter.name}
-                  size="lg"
-                  src={selectedCharacter.imageUrl || undefined}
-                />
-                <p className="text-lg font-semibold">
-                  {selectedCharacter.name}
-                </p>
-              </div>
-            </div>
-          ) : (
-            <p className="text-center text-default-400">
-              {dict.play.noCharacterSelected || "No character selected"}
+          <div className="flex flex-col gap-4">
+            <p className="text-sm text-default-500">
+              {dict.play.selectCharacterToGuess ||
+                "Select the character you want to guess:"}
             </p>
-          )}
+
+            {/* Character Selection Grid */}
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+              {activeCharacters.map((character) => (
+                <button
+                  key={character.id}
+                  className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-2 transition-all ${
+                    selectedCharacterId === character.id
+                      ? "border-success bg-success-50"
+                      : "border-default-200 bg-default-100 hover:border-success hover:bg-success-50"
+                  }`}
+                  type="button"
+                  onClick={() => setSelectedCharacterId(character.id)}
+                >
+                  {selectedCharacterId === character.id && (
+                    <div className="absolute -right-1 -top-1 z-10">
+                      <Icon
+                        className="text-success"
+                        icon="solar:check-circle-bold"
+                        width={24}
+                      />
+                    </div>
+                  )}
+
+                  <Image
+                    alt={character.name}
+                    className="rounded-lg"
+                    height={80}
+                    src={character.imageUrl ?? ""}
+                    width={80}
+                  />
+
+                  <p className="w-full text-center text-xs font-medium">
+                    {character.name}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            {/* Selected Character Confirmation */}
+            {selectedCharacter && (
+              <div className="rounded-lg border-2 border-success bg-success-50 p-4">
+                <p className="mb-2 text-sm font-medium text-success-700">
+                  {dict.play.selectedCharacter || "Selected character:"}
+                </p>
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    name={selectedCharacter.name}
+                    size="lg"
+                    src={selectedCharacter.imageUrl || undefined}
+                  />
+                  <div>
+                    <p className="text-lg font-semibold">
+                      {selectedCharacter.name}
+                    </p>
+                    {selectedCharacter.summary && (
+                      <p className="text-sm text-default-500">
+                        {selectedCharacter.summary}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </ModalBody>
         <ModalFooter>
           <Button
             color="default"
             isDisabled={isGuessing}
             variant="light"
-            onPress={onClose}
+            onPress={handleClose}
           >
             {dict.play.cancelGuess || "Cancel"}
           </Button>
           <Button
             color="success"
-            isDisabled={!selectedCharacter || isGuessing}
+            isDisabled={!selectedCharacterId || isGuessing}
             isLoading={isGuessing}
             startContent={
               !isGuessing && <Icon icon="solar:target-bold" width={20} />
             }
-            onPress={onConfirm}
+            onPress={handleConfirm}
           >
             {isGuessing
               ? dict.play.guessing || "Guessing..."

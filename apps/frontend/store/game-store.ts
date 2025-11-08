@@ -15,6 +15,7 @@ export interface GamePlayState {
   questions: QuestionResponse[];
   answers: Map<string, AnswerResponse>; // Maps questionId to answer
   eliminatedCharacterIds: Set<string>;
+  flippedCharacterIds: Set<string>; // Characters that the player has manually flipped down
   myCharacter: PlayerCharacterResponse | null;
 }
 
@@ -30,6 +31,7 @@ export interface GameState {
   addQuestion: (question: QuestionResponse) => void;
   addAnswer: (answer: AnswerResponse) => void;
   eliminateCharacter: (characterId: string) => void;
+  toggleFlipCharacter: (characterId: string) => void;
   resetPlayState: () => void;
   reset: () => void;
 }
@@ -50,6 +52,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            flippedCharacterIds: new Set(),
             myCharacter: null,
           },
     })),
@@ -63,6 +66,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            flippedCharacterIds: new Set(),
             myCharacter: null,
           },
     })),
@@ -76,6 +80,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            flippedCharacterIds: new Set(),
             myCharacter,
           },
     })),
@@ -92,6 +97,7 @@ export const useGameStore = create<GameState>((set) => ({
             questions: [question],
             answers: new Map(),
             eliminatedCharacterIds: new Set(),
+            flippedCharacterIds: new Set(),
             myCharacter: null,
           },
     })),
@@ -120,6 +126,24 @@ export const useGameStore = create<GameState>((set) => ({
         playState: {
           ...state.playState,
           eliminatedCharacterIds: newSet,
+        },
+      };
+    }),
+  toggleFlipCharacter: (characterId) =>
+    set((state) => {
+      if (!state.playState) return state;
+      const newSet = new Set(state.playState.flippedCharacterIds);
+
+      if (newSet.has(characterId)) {
+        newSet.delete(characterId);
+      } else {
+        newSet.add(characterId);
+      }
+
+      return {
+        playState: {
+          ...state.playState,
+          flippedCharacterIds: newSet,
         },
       };
     }),
