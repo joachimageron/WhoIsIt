@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
-import { runSeeds } from './database/seeds';
-import { DATABASE_ENTITIES } from './database/database.module';
+import { runSeeds } from '.';
+import { DATABASE_ENTITIES } from '../database.module';
 
 const dataSource = new DataSource({
   type: 'postgres',
@@ -11,7 +11,7 @@ const dataSource = new DataSource({
   password: process.env.DB_PASSWORD ?? 'postgres',
   database: process.env.DB_NAME ?? 'whois_it',
   entities: DATABASE_ENTITIES,
-  synchronize: false, // We'll handle schema manually
+  synchronize: process.env.DB_SYNC === 'false' ? false : true,
 });
 
 async function main() {
@@ -20,26 +20,13 @@ async function main() {
     await dataSource.initialize();
     console.log('Database connection established');
 
-    // Drop all tables
-    console.log('Dropping database schema...');
-    await dataSource.dropDatabase();
-    console.log('Database schema dropped');
-
-    // Synchronize schema (recreate tables)
-    console.log('Recreating database schema...');
-    await dataSource.synchronize();
-    console.log('Database schema recreated');
-
-    // Run seeds
-    console.log('Running seeds...');
     await runSeeds(dataSource);
 
     await dataSource.destroy();
     console.log('Database connection closed');
-    console.log('✅ Database reset completed successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('Database reset failed:', error);
+    console.error('Seed script failed:', error);
     process.exit(1);
   }
 }

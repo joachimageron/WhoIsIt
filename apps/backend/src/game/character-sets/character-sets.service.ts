@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CharacterSet } from '../database/entities/character-set.entity';
-import { Character } from '../database/entities/character.entity';
+import { CharacterSet } from '../../database/entities/character-set.entity';
+import { Character } from '../../database/entities/character.entity';
 import { CharacterSetResponseDto, CharacterResponseDto } from './dto';
 
 @Injectable()

@@ -3,11 +3,9 @@ import { Logger } from '@nestjs/common';
 import { GameGateway } from '../gateway/game.gateway';
 import { GameService } from '../services/game.service';
 import { ConnectionManager } from '../gateway/connection.manager';
-import { BroadcastService } from '../gateway/broadcast.service';
-import { LobbyCleanupService } from '../gateway/lobby-cleanup.service';
+import { BroadcastService } from '../services/broadcast.service';
+import { LobbyCleanupService } from '../services/lobby-cleanup.service';
 import { User } from '../../database/entities/user.entity';
-import { Game } from '../../database/entities/game.entity';
-import { GameStatus } from '../../database/enums';
 import type { GameLobbyResponse } from '@whois-it/contracts';
 
 describe('GameGateway', () => {
@@ -33,17 +31,10 @@ describe('GameGateway', () => {
     lastSeenAt: new Date(),
   } as User;
 
-  const mockGame: Game = {
-    id: 'game-123',
-    roomCode: 'ABC12',
-    status: GameStatus.LOBBY,
-    createdAt: new Date(),
-  } as Game;
-
   const mockLobbyResponse: GameLobbyResponse = {
     id: 'game-123',
     visibility: 'public',
-    ruleConfig:{},
+    ruleConfig: {},
     roomCode: 'ABC12',
     status: 'lobby',
     characterSetId: 'char-set-1',

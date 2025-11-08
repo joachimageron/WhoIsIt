@@ -4,15 +4,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User } from '../database/entities/user.entity';
-import { RegisterDto } from './dto/register.dto';
-import { AuthResponseDto } from './dto/auth-response.dto';
-import { EmailService } from '../email/email.service';
-import { JwtPayload } from './types/jwt-payload.type';
+import { User } from '../../database/entities/user.entity';
+import { RegisterDto } from '../dto/register.dto';
+import { AuthResponseDto } from '../dto/auth-response.dto';
+import { EmailService } from '../../email/email.service';
+import { JwtPayload } from '../types/jwt-payload.type';
 import { AuthTokenService } from './auth-token.service';
 import { AuthProfileService } from './auth-profile.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateProfileDto } from '../dto/update-profile.dto';
+import { ChangePasswordDto } from '../dto/change-password.dto';
 
 @Injectable()
 export class AuthService {

@@ -3,9 +3,9 @@ import { IoAdapter } from '@nestjs/platform-socket.io';
 import { Server, ServerOptions, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../../auth/auth.service';
-import { User } from '../../database/entities/user.entity';
-import { JwtPayload } from '../../auth/types/jwt-payload.type';
+import { AuthService } from './services/auth.service';
+import { User } from '../database/entities/user.entity';
+import { JwtPayload } from './types/jwt-payload.type';
 
 // Extended socket type with user property
 interface AuthenticatedSocket extends Socket {

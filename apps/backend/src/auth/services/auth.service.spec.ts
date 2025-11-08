@@ -4,9 +4,9 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
-import { User } from '../database/entities/user.entity';
-import { RegisterDto } from './dto/register.dto';
-import { EmailService } from '../email/email.service';
+import { User } from '../../database/entities/user.entity';
+import { RegisterDto } from '../dto/register.dto';
+import { EmailService } from '../../email/email.service';
 import { AuthTokenService } from './auth-token.service';
 import { AuthProfileService } from './auth-profile.service';
 

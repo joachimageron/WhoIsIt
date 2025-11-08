@@ -19,8 +19,8 @@ import type {
   SocketUpdatePlayerReadyResponse,
 } from '@whois-it/contracts';
 import { ConnectionManager } from './connection.manager';
-import { BroadcastService } from './broadcast.service';
-import { LobbyCleanupService } from './lobby-cleanup.service';
+import { BroadcastService } from '../services/broadcast.service';
+import { LobbyCleanupService } from '../services/lobby-cleanup.service';
 import type { TypedSocket, TypedServer } from './types';
 
 @WebSocketGateway({

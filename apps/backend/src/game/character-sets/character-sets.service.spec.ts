@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CharacterSetsService } from './character-sets.service';
-import { CharacterSet } from '../database/entities/character-set.entity';
-import { Character } from '../database/entities/character.entity';
-import { GameVisibility } from '../database/enums';
+import { CharacterSet } from '../../database/entities/character-set.entity';
+import { Character } from '../../database/entities/character.entity';
+import { GameVisibility } from '../../database/enums';
 
 describe('CharacterSetsService', () => {
   let service: CharacterSetsService;

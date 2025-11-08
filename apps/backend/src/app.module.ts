@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
-import { CharacterSetsModule } from './character-sets/character-sets.module';
+import { CharacterSetsModule } from './game/character-sets/character-sets.module';
 
 @Module({
   imports: [

@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { GameService } from '../services/game.service';
+import { GameService } from './game.service';
 import type {
   QuestionResponse,
   GameStateResponse,
   AnswerResponse,
   GuessResponse,
 } from '@whois-it/contracts';
-import type { TypedServer } from './types';
+import type { TypedServer } from '../gateway/types';
 
 @Injectable()
 export class BroadcastService {

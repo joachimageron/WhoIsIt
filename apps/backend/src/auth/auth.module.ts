@@ -3,14 +3,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
+import { AuthService } from './services/auth.service';
 import { AuthController } from './auth.controller';
 import { User } from '../database/entities/user.entity';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailModule } from '../email/email.module';
-import { AuthTokenService } from './auth-token.service';
-import { AuthProfileService } from './auth-profile.service';
+import { AuthTokenService } from './services/auth-token.service';
+import { AuthProfileService } from './services/auth-profile.service';
 
 @Module({
   imports: [

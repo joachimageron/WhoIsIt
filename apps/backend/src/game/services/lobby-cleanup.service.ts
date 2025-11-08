@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { GameService } from '../services/game.service';
-import { ConnectionManager } from './connection.manager';
+import { GameService } from './game.service';
+import { ConnectionManager } from '../gateway/connection.manager';
 import { GameStatus } from '../../database/enums';
-import type { TypedServer } from './types';
+import type { TypedServer } from '../gateway/types';
 
 @Injectable()
 export class LobbyCleanupService implements OnModuleDestroy {
