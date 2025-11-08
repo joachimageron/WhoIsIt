@@ -46,11 +46,43 @@ $ pnpm run test:cov
 # Seed the database with initial data
 $ pnpm run seed
 
-# Reset the database (drop all tables, recreate schema, and run seeds)
+# Reset the database (drop all tables, recreate schema)
 $ pnpm run db:reset
 ```
 
-Note: The `db:reset` command will completely drop and recreate the database schema, then populate it with seed data. Use with caution in production environments.
+**Seed behavior**:
+- With `DB_SYNC=true` (development): Synchronizes schema before seeding
+- With `DB_SYNC=false` (production): Runs migrations before seeding
+- Seeds are idempotent and can be run multiple times safely
+
+**Reset behavior**:
+- Drops all tables and recreates schema from entities
+- Does NOT populate seed data (run `pnpm seed` afterwards)
+- ⚠️ Use with caution - this command is destructive
+
+Note: The seed system now integrates with the migration system. See [Database Seeds README](./src/database/seeds/README.md) for details.
+
+## Database migrations
+
+The backend uses TypeORM migrations to manage database schema changes. See [README-MIGRATIONS.md](./README-MIGRATIONS.md) for complete documentation.
+
+Common commands:
+
+```bash
+# Generate a migration from entity changes
+$ pnpm run migration:generate src/database/migrations/MigrationName
+
+# Run pending migrations
+$ pnpm run migration:run
+
+# Revert the last migration
+$ pnpm run migration:revert
+
+# Show migration status
+$ pnpm run migration:show
+```
+
+**Important**: In production, set `DB_SYNC=false` in your `.env` file to use migrations instead of auto-synchronization.
 
 ## Deployment
 

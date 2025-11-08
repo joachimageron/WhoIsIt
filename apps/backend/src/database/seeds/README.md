@@ -49,12 +49,43 @@ Or using npm:
 npm run seed
 ```
 
-### Seed Behavior
+### Seed Behavior with Migrations
+
+The seed script now integrates with the migration system:
+
+- **When `DB_SYNC=true` (development)**:
+  - Synchronizes schema automatically before seeding
+  - This is the default behavior for local development
+  
+- **When `DB_SYNC=false` (production)**:
+  - Runs pending migrations before seeding
+  - Ensures database schema is up-to-date before inserting data
 
 - Seeds are idempotent - they check if data exists before inserting
 - If users already exist, user seeds are skipped
 - If character sets already exist, character set seeds are skipped
 - This allows you to run seeds multiple times safely
+
+## Database Reset
+
+To completely reset the database (drop all tables and recreate schema):
+
+```bash
+pnpm db:reset
+```
+
+This command will:
+1. Drop all tables in the database
+2. Recreate the schema from entities
+3. Leave the database empty (no seed data)
+
+After resetting, you should run seeds:
+
+```bash
+pnpm db:reset && pnpm seed
+```
+
+**⚠️ Warning**: This command is destructive and will delete all data. Use with caution, especially in production environments.
 
 ## Database Schema
 
