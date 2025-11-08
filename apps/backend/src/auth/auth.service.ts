@@ -1,8 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  BadRequestException,
-  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -14,8 +12,8 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { EmailService } from '../email/email.service';
 import { JwtPayload } from './types/jwt-payload.type';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { ChangePasswordDto } from './dto/change-password.dto';
+import { AuthTokenService } from './auth-token.service';
+import { AuthProfileService } from './auth-profile.service';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +22,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    private readonly authTokenService: AuthTokenService,
+    private readonly authProfileService: AuthProfileService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
@@ -150,220 +150,35 @@ export class AuthService {
     return this.userRepository.findOne({ where: { id: userId } });
   }
 
+  // Delegate token management to AuthTokenService
   async verifyEmail(token: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { verificationToken: token },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Invalid verification token');
-    }
-
-    if (user.emailVerified) {
-      throw new BadRequestException('Email already verified');
-    }
-
-    if (
-      user.verificationTokenExpiresAt &&
-      user.verificationTokenExpiresAt < new Date()
-    ) {
-      throw new BadRequestException(
-        'Verification token expired. Please request a new one.',
-      );
-    }
-
-    user.emailVerified = true;
-    user.verificationToken = null;
-    user.verificationTokenExpiresAt = null;
-
-    await this.userRepository.save(user);
+    return this.authTokenService.verifyEmail(token);
   }
 
   async resendVerificationEmail(email: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (user.emailVerified) {
-      throw new BadRequestException('Email already verified');
-    }
-
-    // Generate new verification token
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const verificationTokenExpiresAt = new Date();
-    verificationTokenExpiresAt.setHours(
-      verificationTokenExpiresAt.getHours() + 24,
-    );
-
-    user.verificationToken = verificationToken;
-    user.verificationTokenExpiresAt = verificationTokenExpiresAt;
-
-    await this.userRepository.save(user);
-
-    // Send verification email
-    await this.emailService.sendVerificationEmail(
-      email,
-      user.username,
-      verificationToken,
-    );
+    return this.authTokenService.resendVerificationEmail(email);
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (!user) {
-      // Don't reveal if user exists or not for security
-      return;
-    }
-
-    // Generate password reset token
-    const passwordResetToken = crypto.randomBytes(32).toString('hex');
-    const passwordResetTokenExpiresAt = new Date();
-    passwordResetTokenExpiresAt.setHours(
-      passwordResetTokenExpiresAt.getHours() + 1,
-    ); // 1 hour expiry
-
-    user.passwordResetToken = passwordResetToken;
-    user.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt;
-
-    await this.userRepository.save(user);
-
-    // Send password reset email
-    await this.emailService.sendPasswordResetEmail(
-      email,
-      user.username,
-      passwordResetToken,
-    );
+    return this.authTokenService.requestPasswordReset(email);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { passwordResetToken: token },
-    });
-
-    if (!user) {
-      throw new BadRequestException('Invalid or expired reset token');
-    }
-
-    if (
-      user.passwordResetTokenExpiresAt &&
-      user.passwordResetTokenExpiresAt < new Date()
-    ) {
-      throw new BadRequestException('Reset token has expired');
-    }
-
-    // Hash new password
-    const passwordHash = await bcrypt.hash(newPassword, 10);
-
-    user.passwordHash = passwordHash;
-    user.passwordResetToken = null;
-    user.passwordResetTokenExpiresAt = null;
-
-    await this.userRepository.save(user);
+    return this.authTokenService.resetPassword(token, newPassword);
   }
 
+  // Delegate profile management to AuthProfileService
   async updateProfile(
     userId: string,
-    updateProfileDto: UpdateProfileDto,
+    updateProfileDto: any,
   ): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    // Check if new username is already taken
-    if (
-      updateProfileDto.username &&
-      updateProfileDto.username !== user.username
-    ) {
-      const existingUser = await this.userRepository.findOne({
-        where: { username: updateProfileDto.username },
-      });
-
-      if (existingUser) {
-        throw new ConflictException('Username already taken');
-      }
-
-      user.username = updateProfileDto.username;
-    }
-
-    // Check if new email is already taken
-    if (updateProfileDto.email && updateProfileDto.email !== user.email) {
-      const existingUser = await this.userRepository.findOne({
-        where: { email: updateProfileDto.email },
-      });
-
-      if (existingUser) {
-        throw new ConflictException('Email already in use');
-      }
-
-      user.email = updateProfileDto.email;
-      user.emailVerified = false; // Require re-verification
-
-      // Generate new verification token
-      const verificationToken = crypto.randomBytes(32).toString('hex');
-      const verificationTokenExpiresAt = new Date();
-      verificationTokenExpiresAt.setHours(
-        verificationTokenExpiresAt.getHours() + 24,
-      );
-
-      user.verificationToken = verificationToken;
-      user.verificationTokenExpiresAt = verificationTokenExpiresAt;
-
-      // Send verification email
-      try {
-        await this.emailService.sendVerificationEmail(
-          updateProfileDto.email,
-          user.username,
-          verificationToken,
-        );
-      } catch (error) {
-        console.error('Failed to send verification email:', error);
-      }
-    }
-
-    // Update avatar URL
-    if (updateProfileDto.avatarUrl !== undefined) {
-      user.avatarUrl = updateProfileDto.avatarUrl;
-    }
-
-    await this.userRepository.save(user);
-
-    return user;
+    return this.authProfileService.updateProfile(userId, updateProfileDto);
   }
 
   async changePassword(
     userId: string,
-    changePasswordDto: ChangePasswordDto,
+    changePasswordDto: any,
   ): Promise<void> {
-    const user = await this.userRepository.findOne({ where: { id: userId } });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (!user.passwordHash) {
-      throw new BadRequestException('Cannot change password for this account');
-    }
-
-    // Verify current password
-    const isPasswordValid = await bcrypt.compare(
-      changePasswordDto.currentPassword,
-      user.passwordHash,
-    );
-
-    if (!isPasswordValid) {
-      throw new BadRequestException('Current password is incorrect');
-    }
-
-    // Hash new password
-    const passwordHash = await bcrypt.hash(changePasswordDto.newPassword, 10);
-
-    user.passwordHash = passwordHash;
-
-    await this.userRepository.save(user);
+    return this.authProfileService.changePassword(userId, changePasswordDto);
   }
 }
