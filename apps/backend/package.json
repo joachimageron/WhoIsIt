@@ -20,7 +20,12 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "seed": "ts-node -r tsconfig-paths/register src/seed.ts",
-    "db:reset": "ts-node -r tsconfig-paths/register src/reset-db.ts"
+    "db:reset": "ts-node -r tsconfig-paths/register src/reset-db.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts",
+    "migration:create": "typeorm-ts-node-commonjs migration:create",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
+    "migration:show": "typeorm-ts-node-commonjs migration:show -d src/database/data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -36,6 +41,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.3",
     "mjml": "^4.16.1",
     "nodemailer": "^7.0.9",
     "passport": "^0.7.0",

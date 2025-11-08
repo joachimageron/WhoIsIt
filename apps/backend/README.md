@@ -52,6 +52,28 @@ $ pnpm run db:reset
 
 Note: The `db:reset` command will completely drop and recreate the database schema, then populate it with seed data. Use with caution in production environments.
 
+## Database migrations
+
+The backend uses TypeORM migrations to manage database schema changes. See [README-MIGRATIONS.md](./README-MIGRATIONS.md) for complete documentation.
+
+Common commands:
+
+```bash
+# Generate a migration from entity changes
+$ pnpm run migration:generate src/database/migrations/MigrationName
+
+# Run pending migrations
+$ pnpm run migration:run
+
+# Revert the last migration
+$ pnpm run migration:revert
+
+# Show migration status
+$ pnpm run migration:show
+```
+
+**Important**: In production, set `DB_SYNC=false` in your `.env` file to use migrations instead of auto-synchronization.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

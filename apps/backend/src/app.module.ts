@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { GameModule } from './game/game.module';
 import { CharacterSetsModule } from './game/character-sets/character-sets.module';
+import { DATABASE_ENTITIES } from './database/database.module';
 
 @Module({
   imports: [
@@ -20,8 +21,11 @@ import { CharacterSetsModule } from './game/character-sets/character-sets.module
       username: process.env.DB_USER ?? 'postgres',
       password: process.env.DB_PASSWORD ?? 'postgres',
       database: process.env.DB_NAME ?? 'whois_it',
+      entities: DATABASE_ENTITIES,
       synchronize: process.env.DB_SYNC === 'false' ? false : true,
-      autoLoadEntities: true,
+      migrations: [__dirname + '/database/migrations/**/*{.ts,.js}'],
+      migrationsRun: process.env.DB_SYNC === 'false' ? true : false,
+      logging: process.env.NODE_ENV === 'development',
     }),
     DatabaseModule,
     AuthModule,
