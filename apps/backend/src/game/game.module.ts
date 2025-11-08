@@ -13,12 +13,15 @@ import {
   Guess,
   PlayerStats,
 } from '../database/entities';
-import { GameController } from './game.controller';
-import { GameService } from './game.service';
-import { GameGateway } from './game.gateway';
-import { GameLobbyService } from './game-lobby.service';
-import { GamePlayService } from './game-play.service';
-import { GameStatsService } from './game-stats.service';
+import { GameController } from './controllers/game.controller';
+import { GameService } from './services/game.service';
+import { GameLobbyService } from './services/game-lobby.service';
+import { GamePlayService } from './services/game-play.service';
+import { GameStatsService } from './services/game-stats.service';
+import { GameGateway } from './gateway/game.gateway';
+import { ConnectionManager } from './gateway/connection.manager';
+import { BroadcastService } from './gateway/broadcast.service';
+import { LobbyCleanupService } from './gateway/lobby-cleanup.service';
 
 @Module({
   imports: [
@@ -43,7 +46,10 @@ import { GameStatsService } from './game-stats.service';
     GamePlayService,
     GameStatsService,
     GameGateway,
+    ConnectionManager,
+    BroadcastService,
+    LobbyCleanupService,
   ],
-  exports: [GameService],
+  exports: [GameService, BroadcastService],
 })
 export class GameModule {}

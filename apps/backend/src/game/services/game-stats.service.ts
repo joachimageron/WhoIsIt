@@ -5,14 +5,18 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GameStatus, RoundState, PlayerSecretStatus } from '../database/enums';
+import {
+  GameStatus,
+  RoundState,
+  PlayerSecretStatus,
+} from '../../database/enums';
 import {
   Game,
   GamePlayer,
   Round,
   PlayerSecret,
   PlayerStats,
-} from '../database/entities';
+} from '../../database/entities';
 import type { GameOverResult, PlayerGameResult } from '@whois-it/contracts';
 import { GameLobbyService } from './game-lobby.service';
 

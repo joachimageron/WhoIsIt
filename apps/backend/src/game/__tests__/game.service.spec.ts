@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { GameService } from './game.service';
-import { GameLobbyService } from './game-lobby.service';
-import { GamePlayService } from './game-play.service';
-import { GameStatsService } from './game-stats.service';
-import { Game } from '../database/entities';
-import { GameStatus } from '../database/enums';
+import { GameService } from '../services/game.service';
+import { GameLobbyService } from '../services/game-lobby.service';
+import { GamePlayService } from '../services/game-play.service';
+import { GameStatsService } from '../services/game-stats.service';
+import { Game } from '../../database/entities';
+import { GameStatus } from '../../database/enums';
 
 describe('GameService', () => {
   let service: GameService;

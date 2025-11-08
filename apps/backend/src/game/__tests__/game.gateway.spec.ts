@@ -1,10 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
-import { GameGateway } from './game.gateway';
-import { GameService } from './game.service';
-import { User } from '../database/entities/user.entity';
-import { Game } from '../database/entities/game.entity';
-import { GameStatus } from '../database/enums';
+import { GameGateway } from '../gateway/game.gateway';
+import { GameService } from '../services/game.service';
+import { ConnectionManager } from '../gateway/connection.manager';
+import { BroadcastService } from '../gateway/broadcast.service';
+import { LobbyCleanupService } from '../gateway/lobby-cleanup.service';
+import { User } from '../../database/entities/user.entity';
+import { Game } from '../../database/entities/game.entity';
+import { GameStatus } from '../../database/enums';
 import type { GameLobbyResponse } from '@whois-it/contracts';
 
 describe('GameGateway', () => {
@@ -86,6 +89,27 @@ describe('GameGateway', () => {
           provide: GameService,
           useValue: mockGameService,
         },
+        ConnectionManager,
+        {
+          provide: BroadcastService,
+          useValue: {
+            setServer: jest.fn(),
+            broadcastLobbyUpdate: jest.fn(),
+            broadcastGameStarted: jest.fn(),
+            broadcastQuestionAsked: jest.fn(),
+            broadcastAnswerSubmitted: jest.fn(),
+            broadcastGuessResult: jest.fn(),
+            broadcastGameOver: jest.fn(),
+          },
+        },
+        {
+          provide: LobbyCleanupService,
+          useValue: {
+            setServer: jest.fn(),
+            startCleanup: jest.fn(),
+            onModuleDestroy: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
@@ -107,8 +131,8 @@ describe('GameGateway', () => {
   });
 
   afterEach(() => {
-    // Clean up the interval if it exists
-    gateway.onModuleDestroy();
+    // Clean up is handled by LobbyCleanupService
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
@@ -120,14 +144,6 @@ describe('GameGateway', () => {
       const loggerSpy = jest.spyOn(Logger.prototype, 'log');
       gateway.afterInit();
       expect(loggerSpy).toHaveBeenCalledWith('WebSocket Gateway initialized');
-    });
-
-    it('should start lobby cleanup task', () => {
-      const loggerSpy = jest.spyOn(Logger.prototype, 'log');
-      gateway.afterInit();
-      expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Started lobby cleanup task'),
-      );
     });
   });
 
@@ -433,34 +449,6 @@ describe('GameGateway', () => {
     });
   });
 
-  describe('broadcastLobbyUpdate', () => {
-    it('should broadcast lobby update to all clients in room', async () => {
-      mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
-
-      await gateway.broadcastLobbyUpdate('ABC12');
-
-      expect(mockGameService.getLobbyByRoomCode).toHaveBeenCalledWith('ABC12');
-      expect(gateway.server.to).toHaveBeenCalledWith('ABC12');
-      expect(gateway.server.emit).toHaveBeenCalledWith(
-        'lobbyUpdate',
-        mockLobbyResponse,
-      );
-    });
-
-    it('should handle errors gracefully', async () => {
-      const error = new Error('Lobby not found');
-      mockGameService.getLobbyByRoomCode.mockRejectedValue(error);
-      const loggerSpy = jest.spyOn(Logger.prototype, 'error');
-
-      await gateway.broadcastLobbyUpdate('INVALID');
-
-      expect(loggerSpy).toHaveBeenCalledWith(
-        'Error broadcasting lobby update:',
-        error,
-      );
-    });
-  });
-
   describe('getConnectedUsersCount', () => {
     it('should return number of connected users', () => {
       expect(gateway.getConnectedUsersCount()).toBe(0);
@@ -498,73 +486,6 @@ describe('GameGateway', () => {
 
       // Should count only non-default rooms (ABC12 and XYZ34)
       expect(gateway.getActiveRoomsCount()).toBe(2);
-    });
-  });
-
-  describe('onModuleDestroy', () => {
-    it('should clean up cleanup interval', () => {
-      const loggerSpy = jest.spyOn(Logger.prototype, 'log');
-
-      gateway.afterInit(); // Start the interval
-      gateway.onModuleDestroy();
-
-      expect(loggerSpy).toHaveBeenCalledWith('Stopped lobby cleanup task');
-    });
-  });
-
-  describe('cleanup mechanism', () => {
-    it('should identify inactive lobbies', async () => {
-      // This is a more complex integration-style test
-      const oldGame = {
-        ...mockGame,
-        createdAt: new Date(Date.now() - 35 * 60 * 1000), // 35 minutes ago
-        status: GameStatus.LOBBY,
-      };
-
-      mockGameService.getGameByRoomCode.mockResolvedValue(oldGame);
-
-      const loggerSpy = jest.spyOn(Logger.prototype, 'log');
-
-      // Mock rooms without active connections
-      const mockRooms = new Map();
-      mockRooms.set('ABC12', new Set()); // Empty room
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      gateway.server.sockets.adapter.rooms = mockRooms;
-
-      // Manually trigger cleanup
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      await (gateway as any).cleanupAbandonedLobbies();
-
-      // Should log that it's cleaning up the abandoned lobby
-      expect(loggerSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Found 1 potentially inactive lobbies'),
-      );
-    });
-
-    it('should not cleanup active games', async () => {
-      const activeGame = {
-        ...mockGame,
-        createdAt: new Date(Date.now() - 35 * 60 * 1000),
-        status: GameStatus.IN_PROGRESS, // Not a lobby
-      };
-
-      mockGameService.getGameByRoomCode.mockResolvedValue(activeGame);
-
-      const loggerSpy = jest.spyOn(Logger.prototype, 'log');
-
-      const mockRooms = new Map();
-      mockRooms.set('ABC12', new Set());
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      gateway.server.sockets.adapter.rooms = mockRooms;
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      await (gateway as any).cleanupAbandonedLobbies();
-
-      // Should not log cleanup for in-progress games
-      expect(loggerSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining('Cleaning up abandoned lobby'),
-      );
     });
   });
 });

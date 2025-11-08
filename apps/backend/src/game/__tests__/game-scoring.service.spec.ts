@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { GameService } from './game.service';
-import { GameLobbyService } from './game-lobby.service';
-import { GamePlayService } from './game-play.service';
-import { GameStatsService } from './game-stats.service';
+import { GameService } from '../services/game.service';
+import { GameLobbyService } from '../services/game-lobby.service';
+import { GamePlayService } from '../services/game-play.service';
+import { GameStatsService } from '../services/game-stats.service';
 import {
   CharacterSet,
   Game,
@@ -16,13 +16,13 @@ import {
   Answer,
   Guess,
   PlayerStats,
-} from '../database/entities';
+} from '../../database/entities';
 import {
   GameStatus,
   PlayerSecretStatus,
   AnswerValue,
   RoundState,
-} from '../database/enums';
+} from '../../database/enums';
 
 describe('GameService - Scoring and Game End', () => {
   let service: GameService;
