@@ -78,3 +78,7 @@ See [todo.md](./todo.md) for detailed roadmap and current progress.
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.
 - **Backend**: NestJS 11 with ConfigModule, TypeORM auto-loading entities, Socket.IO gateway support, and PostgreSQL driver.
 - **Package manager**: pnpm workspaces with shared hoisting configured for HeroUI packages.
+
+## Contributing
+
+This repository includes [GitHub Copilot instructions](./.github/copilot-instructions.md) to help developers and AI coding assistants understand the architecture, conventions, and workflows. Review these guidelines before making changes.

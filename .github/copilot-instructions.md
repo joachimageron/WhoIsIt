@@ -1,3 +1,12 @@
+# GitHub Copilot Instructions for WhoIsIt Repository
+
+> **Purpose**: These instructions help GitHub Copilot coding agents understand this repository's architecture, conventions, and workflows to provide better assistance and make more accurate code changes.
+
+## How to use these instructions
+
+- **For developers**: These guidelines help Copilot provide context-aware suggestions and completions.
+- **For Copilot coding agents**: Follow these instructions when making code changes, debugging issues, or suggesting improvements.
+
 ## Quick orientation — what this repo is
 
 - **Monorepo**: PNPM workspace with Next.js frontend (`apps/frontend`) + NestJS backend (`apps/backend`). Types shared via `packages/contracts` (important — use these types everywhere).
@@ -127,3 +136,69 @@ See `todo.md` for detailed roadmap and priorities.
 - **Locale routing confusion**: Remember all routes need `[lang]` prefix. Middleware auto-redirects if missing. Check `middleware.ts` for locale detection logic.
 
 If anything here is unclear or you'd like additional examples (small code snippets or tests), tell me which section to expand and I'll iterate.
+
+---
+
+## Guidelines for Copilot Coding Agents
+
+When making changes to this repository, follow these essential guidelines:
+
+### Making Code Changes
+
+- **Minimal modifications**: Make the smallest possible changes to achieve the goal. Change as few lines as possible.
+- **Preserve working code**: Never delete or modify working code unless absolutely necessary for the fix or feature.
+- **Test incrementally**: Build and test changes frequently after each modification.
+- **Ignore unrelated issues**: Don't fix unrelated bugs or broken tests. Focus only on your specific task.
+
+### Before Making Changes
+
+1. **Understand the codebase**: Explore relevant files and understand the existing architecture.
+2. **Check existing tests**: Run `pnpm test` and `pnpm lint` to understand the baseline.
+3. **Identify test patterns**: Look at existing tests in `apps/backend/src/**/*.spec.ts` to understand the testing approach.
+
+### During Development
+
+1. **Lint early and often**: Run `pnpm lint` after making changes.
+2. **Build frequently**: Use `pnpm build` to catch compilation errors early.
+3. **Test thoroughly**: Run relevant tests with `pnpm test` or workspace-specific commands.
+4. **Use existing tools**: Prefer ecosystem tools (npm scripts, package managers) over manual changes.
+
+### Security and Quality
+
+- **Security scanning**: Always validate changes don't introduce security vulnerabilities.
+- **Dependency checks**: When adding dependencies, verify they don't have known vulnerabilities.
+- **Code review**: Request code reviews before finalizing changes using the code_review tool.
+- **Type safety**: Maintain TypeScript type safety. Use types from `@whois-it/contracts` for shared interfaces.
+
+### Committing Changes
+
+- **Report progress frequently**: Use the report_progress tool to commit and push changes.
+- **Meaningful commits**: Write clear, concise commit messages describing what changed.
+- **Review before commit**: Always review the files that will be committed.
+- **Use .gitignore**: Exclude build artifacts, dependencies (node_modules, dist), and temporary files.
+
+### Documentation
+
+- **Update related docs**: If you change functionality, update relevant documentation.
+- **Keep consistency**: Match the style and format of existing documentation.
+- **Inline comments**: Add comments only when they match existing patterns or are necessary for complex logic.
+
+### Troubleshooting Failed Changes
+
+If tests or builds fail:
+1. Read error messages carefully
+2. Check if the failure is related to your changes
+3. Review the specific section in this document related to the error
+4. Use the troubleshooting section above for common issues
+5. Don't attempt to fix unrelated failures unless explicitly asked
+
+### Key Reminders
+
+- ✅ Always use types from `packages/contracts` for cross-cutting changes
+- ✅ Socket.IO events must use acknowledgement callbacks
+- ✅ Room codes are uppercase on the server
+- ✅ All frontend routes require `[lang]` prefix
+- ✅ Guest sessions are supported alongside authenticated users
+- ✅ Backend tests are required; frontend tests are not yet set up
+- ⚠️ Frontend builds may fail in restricted environments (Google Fonts) - this is expected
+- ⚠️ Don't use `DB_SYNC=true` in production - use migrations instead
