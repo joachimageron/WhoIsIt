@@ -20,15 +20,15 @@ import type {
   GameOverResult,
   PlayerCharacterResponse,
 } from '@whois-it/contracts';
-import { GameService } from './game.service';
-import { GameGateway } from './game.gateway';
-import { AnswerValue } from '../database/enums';
+import { GameService } from '../services/game.service';
+import { BroadcastService } from '../gateway/broadcast.service';
+import { AnswerValue } from '../../database/enums';
 
 @Controller('games')
 export class GameController {
   constructor(
     private readonly gameService: GameService,
-    private readonly gameGateway: GameGateway,
+    private readonly broadcastService: BroadcastService,
   ) {}
 
   @Post()
@@ -110,7 +110,7 @@ export class GameController {
     const result = await this.gameService.startGame(roomCode);
 
     // Broadcast gameStarted event to all players in the room
-    await this.gameGateway.broadcastGameStarted(roomCode);
+    await this.broadcastService.broadcastGameStarted(roomCode);
 
     return result;
   }
@@ -143,7 +143,7 @@ export class GameController {
     const gameState = await this.gameService.getGameState(roomCode);
 
     // Broadcast questionAsked event to all players in the room
-    this.gameGateway.broadcastQuestionAsked(roomCode, question, gameState);
+    this.broadcastService.broadcastQuestionAsked(roomCode, question, gameState);
 
     return question;
   }
@@ -220,7 +220,7 @@ export class GameController {
     const gameState = await this.gameService.getGameState(roomCode);
 
     // Broadcast answerSubmitted event to all players in the room
-    this.gameGateway.broadcastAnswerSubmitted(roomCode, answer, gameState);
+    this.broadcastService.broadcastAnswerSubmitted(roomCode, answer, gameState);
 
     return answer;
   }
@@ -256,11 +256,11 @@ export class GameController {
     const gameState = await this.gameService.getGameState(roomCode);
 
     // Broadcast guessResult event to all players in the room
-    this.gameGateway.broadcastGuessResult(roomCode, guess, gameState);
+    this.broadcastService.broadcastGuessResult(roomCode, guess, gameState);
 
     // Check if game has ended and broadcast gameOver if so
     if (gameState.status === 'completed') {
-      await this.gameGateway.broadcastGameOver(roomCode);
+      await this.broadcastService.broadcastGameOver(roomCode);
     }
 
     return guess;
