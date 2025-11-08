@@ -67,7 +67,9 @@ export function AnswerModal({
         <ModalHeader className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Icon icon="solar:question-circle-bold" width={24} />
-            <span>{dict.play.answerQuestion || "Answer Question"}</span>
+            <span>
+              {dict.game.play.answers.answerQuestion || "Answer Question"}
+            </span>
           </div>
         </ModalHeader>
         <ModalBody className="pb-6">
@@ -85,7 +87,7 @@ export function AnswerModal({
           {/* Answer Input */}
           <RadioGroup
             isDisabled={isSubmitting}
-            label={dict.play.yourAnswer || "Your Answer"}
+            label={dict.game.play.answers.yourAnswer || "Your Answer"}
             value={answerValue}
             onValueChange={(value) => setAnswerValue(value as AnswerValue)}
           >
@@ -96,7 +98,7 @@ export function AnswerModal({
                   icon="solar:check-circle-bold"
                   width={20}
                 />
-                <span>{dict.play.yes || "Yes"}</span>
+                <span>{dict.game.play.answers.yes || "Yes"}</span>
               </div>
             </Radio>
             <Radio value="no">
@@ -106,7 +108,7 @@ export function AnswerModal({
                   icon="solar:close-circle-bold"
                   width={20}
                 />
-                <span>{dict.play.no || "No"}</span>
+                <span>{dict.game.play.answers.no || "No"}</span>
               </div>
             </Radio>
             <Radio value="unsure">
@@ -116,7 +118,7 @@ export function AnswerModal({
                   icon="solar:question-circle-bold"
                   width={20}
                 />
-                <span>{dict.play.unsure || "Unsure"}</span>
+                <span>{dict.game.play.answers.unsure || "Unsure"}</span>
               </div>
             </Radio>
           </RadioGroup>
@@ -124,11 +126,14 @@ export function AnswerModal({
           {/* Optional Text Answer for Boolean Questions */}
           <Textarea
             isDisabled={isSubmitting}
-            label={dict.play.optionalDetails || "Optional Details (Optional)"}
+            label={
+              dict.game.play.answers.optionalDetails ||
+              "Optional Details (Optional)"
+            }
             maxRows={3}
             minRows={2}
             placeholder={
-              dict.play.optionalDetailsPlaceholder ||
+              dict.game.play.answers.optionalDetailsPlaceholder ||
               "Add any additional details..."
             }
             value={answerText}
@@ -139,7 +144,7 @@ export function AnswerModal({
           {/* Action Buttons */}
           <div className="flex justify-end gap-2">
             <Button isDisabled={isSubmitting} variant="flat" onPress={onClose}>
-              {dict.play.cancel || "Cancel"}
+              {dict.game.play.answers.cancel || "Cancel"}
             </Button>
             <Button
               color="primary"
@@ -152,8 +157,8 @@ export function AnswerModal({
               onPress={handleSubmit}
             >
               {isSubmitting
-                ? dict.play.submitting || "Submitting..."
-                : dict.play.submitAnswer || "Submit Answer"}
+                ? dict.game.play.answers.submitting || "Submitting..."
+                : dict.game.play.answers.submitAnswer || "Submit Answer"}
             </Button>
           </div>
         </ModalBody>

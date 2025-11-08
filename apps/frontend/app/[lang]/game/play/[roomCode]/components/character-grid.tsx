@@ -28,7 +28,7 @@ export function CharacterGrid({
       <Card>
         <CardBody>
           <p className="text-center text-default-400">
-            {dict.play.noCharactersYet}
+            {dict.game.play.characters.noCharactersYet}
           </p>
         </CardBody>
       </Card>
@@ -38,13 +38,15 @@ export function CharacterGrid({
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-lg font-semibold">{dict.play.characterGrid}</h2>
+        <h2 className="text-lg font-semibold">
+          {dict.game.play.characters.characterGrid}
+        </h2>
       </CardHeader>
       <CardBody className="gap-4">
         {/* All Characters (Active, Flipped, and Eliminated) */}
         <div>
           <h3 className="mb-2 text-sm font-medium text-default-600">
-            {dict.play.activeCharacters} ({characters.length})
+            {dict.game.play.characters.activeCharacters} ({characters.length})
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-6">
             {characters.map((character) => (

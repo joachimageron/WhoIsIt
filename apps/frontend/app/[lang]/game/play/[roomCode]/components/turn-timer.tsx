@@ -74,7 +74,7 @@ export function TurnTimer({
               icon="solar:clock-circle-bold"
               width={20}
             />
-            <span className="text-sm font-medium">{dict.play.timer}</span>
+            <span className="text-sm font-medium">{dict.game.play.timer}</span>
           </div>
           <span
             className={`text-lg font-bold ${

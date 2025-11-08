@@ -112,12 +112,12 @@ export function useGameInitialization({
         });
 
         if (!response.success) {
-          throw new Error(response.error || dict.play.errors.failedToLoad);
+          throw new Error(response.error || dict.game.play.errors.failedToLoad);
         }
       } catch (error) {
         addToast({
           color: "danger",
-          title: dict.play.errors.failedToLoad,
+          title: dict.game.play.errors.failedToLoad,
           description: error instanceof Error ? error.message : String(error),
         });
         router.push(`/${lang}`);

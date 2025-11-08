@@ -77,7 +77,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
             icon="solar:loader-linear"
             width={48}
           />
-          <p className="text-lg">{dict.play.loadingGame}</p>
+          <p className="text-lg">{dict.game.play.loadingGame}</p>
         </div>
       </div>
     );
@@ -133,7 +133,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
                       width={20}
                     />
                     <h3 className="text-sm font-semibold">
-                      {dict.play.yourCharacter || "Your Character"}
+                      {dict.game.play.yourCharacter || "Your Character"}
                     </h3>
                   </div>
                   <div className="flex items-center gap-3 rounded-lg bg-content2 p-3">
@@ -173,7 +173,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
                 variant="shadow"
                 onPress={handleOpenGuessModal}
               >
-                {dict.play.guessPanel}
+                {dict.game.play.guess.guessPanel}
               </Button>
             </CardBody>
           </Card>

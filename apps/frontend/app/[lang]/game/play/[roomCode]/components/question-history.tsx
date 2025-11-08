@@ -28,12 +28,14 @@ export function QuestionHistory({
   return (
     <Card>
       <CardHeader>
-        <h2 className="text-lg font-semibold">{dict.play.history}</h2>
+        <h2 className="text-lg font-semibold">
+          {dict.game.play.questions.history}
+        </h2>
       </CardHeader>
       <CardBody>
         {questions.length === 0 ? (
           <p className="text-center text-sm text-default-400">
-            {dict.play.noQuestionsYet}
+            {dict.game.play.questions.noQuestionsYet}
           </p>
         ) : (
           <ScrollShadow className="max-h-[400px]">
@@ -138,7 +140,7 @@ function QuestionItem({
             variant="flat"
             onPress={() => onAnswerQuestion(question)}
           >
-            {dict.play.answerButton || "Answer"}
+            {dict.game.play.answers.answerButton || "Answer"}
           </Button>
         </div>
       ) : null}

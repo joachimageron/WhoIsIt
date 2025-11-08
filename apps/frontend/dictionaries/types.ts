@@ -3,6 +3,22 @@
  * This provides type safety for all translation keys
  */
 export interface Dictionary {
+  // Common translations
+  common: {
+    search: string;
+    language: string;
+    yes: string;
+    no: string;
+    cancel: string;
+    loading: string;
+    submitting: string;
+    creating: string;
+    updating: string;
+    connecting: string;
+    connected: string;
+    disconnected: string;
+  };
+
   // Navigation
   nav: {
     home: string;
@@ -13,6 +29,11 @@ export interface Dictionary {
     settings: string;
     profile: string;
     logout: string;
+  };
+
+  // Footer
+  footer: {
+    poweredBy: string;
   };
 
   // Home page
@@ -35,42 +56,6 @@ export interface Dictionary {
   auth: {
     signedInAs: string;
     logOut: string;
-    profile: {
-      title: string;
-      username: string;
-      usernamePlaceholder: string;
-      email: string;
-      emailPlaceholder: string;
-      avatarUrl: string;
-      avatarUrlPlaceholder: string;
-      currentPassword: string;
-      currentPasswordPlaceholder: string;
-      newPassword: string;
-      newPasswordPlaceholder: string;
-      confirmPassword: string;
-      confirmPasswordPlaceholder: string;
-      updateProfile: string;
-      changePassword: string;
-      updating: string;
-      changing: string;
-      updateSuccess: string;
-      passwordChangeSuccess: string;
-      updateFailed: string;
-      passwordChangeFailed: string;
-      invalidEmail: string;
-      invalidUsername: string;
-      invalidAvatarUrl: string;
-      passwordsNoMatch: string;
-      passwordTooShort: string;
-      fillAllFields: string;
-      emailVerificationRequired: string;
-      emailVerified: string;
-      emailNotVerified: string;
-      resendVerification: string;
-      resendingVerification: string;
-      verificationEmailSent: string;
-      verificationEmailFailed: string;
-    };
     login: {
       title: string;
       emailOrUsername: string;
@@ -140,17 +125,42 @@ export interface Dictionary {
       failedMessage: string;
       goToLogin: string;
     };
-  };
-
-  // Footer
-  footer: {
-    poweredBy: string;
-  };
-
-  // Common/shared translations
-  common: {
-    search: string;
-    language: string;
+    profile: {
+      title: string;
+      username: string;
+      usernamePlaceholder: string;
+      email: string;
+      emailPlaceholder: string;
+      avatarUrl: string;
+      avatarUrlPlaceholder: string;
+      currentPassword: string;
+      currentPasswordPlaceholder: string;
+      newPassword: string;
+      newPasswordPlaceholder: string;
+      confirmPassword: string;
+      confirmPasswordPlaceholder: string;
+      updateProfile: string;
+      changePassword: string;
+      updating: string;
+      changing: string;
+      updateSuccess: string;
+      passwordChangeSuccess: string;
+      updateFailed: string;
+      passwordChangeFailed: string;
+      invalidEmail: string;
+      invalidUsername: string;
+      invalidAvatarUrl: string;
+      passwordsNoMatch: string;
+      passwordTooShort: string;
+      fillAllFields: string;
+      emailVerificationRequired: string;
+      emailVerified: string;
+      emailNotVerified: string;
+      resendVerification: string;
+      resendingVerification: string;
+      verificationEmailSent: string;
+      verificationEmailFailed: string;
+    };
   };
 
   // Game management
@@ -181,151 +191,159 @@ export interface Dictionary {
       joinFailed: string;
       joining: string;
     };
-  };
-
-  // Lobby
-  lobby: {
-    title: string;
-    roomCode: string;
-    copyRoomCode: string;
-    roomCodeCopied: string;
-    host: string;
-    players: string;
-    waitingForPlayers: string;
-    readyStatus: string;
-    notReadyStatus: string;
-    toggleReady: string;
-    toggleNotReady: string;
-    startGame: string;
-    leaveLobby: string;
-    connected: string;
-    disconnected: string;
-    connecting: string;
-    allPlayersReady: string;
-    notAllPlayersReady: string;
-    waitingForHost: string;
-    gameStarting: string;
-    redirectingToGame: string;
-    errors: {
-      failedToJoin: string;
-      failedToUpdateReady: string;
-      failedToStartGame: string;
-      failedToCopyRoomCode: string;
+    lobby: {
+      title: string;
+      roomCode: string;
+      copyRoomCode: string;
+      roomCodeCopied: string;
+      host: string;
+      players: string;
+      waitingForPlayers: string;
+      readyStatus: string;
+      notReadyStatus: string;
+      toggleReady: string;
+      toggleNotReady: string;
+      startGame: string;
+      leaveLobby: string;
+      connected: string;
       disconnected: string;
-      roomNotFound: string;
+      connecting: string;
+      allPlayersReady: string;
+      notAllPlayersReady: string;
+      waitingForHost: string;
+      gameStarting: string;
+      redirectingToGame: string;
+      errors: {
+        failedToJoin: string;
+        failedToUpdateReady: string;
+        failedToStartGame: string;
+        failedToCopyRoomCode: string;
+        disconnected: string;
+        roomNotFound: string;
+      };
     };
-  };
-
-  // Gameplay
-  play: {
-    title: string;
-    roomCode: string;
-    roomCodeCopied: string;
-    round: string;
-    turn: string;
-    yourTurn: string;
-    playerTurn: string;
-    waitingForTurn: string;
-    characterGrid: string;
-    activeCharacters: string;
-    eliminatedCharacters: string;
-    noCharactersYet: string;
-    questionsPanel: string;
-    questionPlaceholder: string;
-    selectPlayer: string;
-    askButton: string;
-    asking: string;
-    answerButton: string;
-    history: string;
-    noQuestionsYet: string;
-    askedBy: string;
-    to: string;
-    answered: string;
-    guessPanel: string;
-    guessDescription: string;
-    selectCharacter: string;
-    guessButton: string;
-    guessing: string;
-    cancelGuess: string;
-    timer: string;
-    abandonGame: string;
-    confirmAbandon: string;
-    yes: string;
-    no: string;
-    unsure: string;
-    connecting: string;
-    loadingGame: string;
-    yourCharacter: string;
-    confirmGuess: string;
-    confirmGuessDescription: string;
-    confirmButton: string;
-    noCharacterSelected: string;
-    selectCharacterFirst: string;
-    correctGuess: string;
-    incorrectGuess: string;
-    answerSubmitted: string;
-    answerQuestion: string;
-    yourAnswer: string;
-    optionalDetails: string;
-    optionalDetailsPlaceholder: string;
-    submitAnswer: string;
-    submitting: string;
-    cancel: string;
-    gameOver: string;
-    errors: {
-      failedToLoad: string;
-      failedToAskQuestion: string;
-      failedToGuess: string;
-      failedToAnswer: string;
-      failedToCopyRoomCode: string;
-      notYourTurn: string;
-      selectCharacter: string;
-      selectCharacterDescription: string;
-      enterQuestion: string;
+    play: {
+      title: string;
+      roomCode: string;
+      roomCodeCopied: string;
+      round: string;
+      turn: string;
+      yourTurn: string;
+      playerTurn: string;
+      waitingForTurn: string;
+      yourCharacter: string;
+      timer: string;
+      connecting: string;
+      loadingGame: string;
+      characters: {
+        characterGrid: string;
+        activeCharacters: string;
+        eliminatedCharacters: string;
+        flippedCharacters: string;
+        noCharactersYet: string;
+        noCharacterSelected: string;
+        selectCharacterFirst: string;
+        selectCharacterToGuess: string;
+        selectedCharacter: string;
+      };
+      questions: {
+        questionsPanel: string;
+        questionPlaceholder: string;
+        selectPlayer: string;
+        askButton: string;
+        asking: string;
+        history: string;
+        noQuestionsYet: string;
+        askedBy: string;
+        to: string;
+        answered: string;
+        enterQuestion: string;
+      };
+      answers: {
+        answerButton: string;
+        answerQuestion: string;
+        yourAnswer: string;
+        optionalDetails: string;
+        optionalDetailsPlaceholder: string;
+        submitAnswer: string;
+        submitting: string;
+        cancel: string;
+        yes: string;
+        no: string;
+        unsure: string;
+        answerSubmitted: string;
+      };
+      guess: {
+        guessPanel: string;
+        guessDescription: string;
+        selectCharacter: string;
+        guessButton: string;
+        guessing: string;
+        cancelGuess: string;
+        confirmGuess: string;
+        confirmGuessDescription: string;
+        confirmButton: string;
+        correctGuess: string;
+        incorrectGuess: string;
+      };
+      actions: {
+        abandonGame: string;
+        confirmAbandon: string;
+      };
+      gameOver: string;
+      errors: {
+        failedToLoad: string;
+        failedToAskQuestion: string;
+        failedToGuess: string;
+        failedToAnswer: string;
+        failedToCopyRoomCode: string;
+        notYourTurn: string;
+        selectCharacter: string;
+        selectCharacterDescription: string;
+      };
     };
-    flippedCharacters: string;
-    selectCharacterToGuess: string;
-    selectedCharacter: string;
-  };
-
-  // Game results
-  results: {
-    title: string;
-    winner: string;
-    congratulations: string;
-    youWon: string;
-    youLost: string;
-    gameStats: string;
-    playerStats: string;
-    detailedStats: string;
-    you: string;
-    roomCode: string;
-    roomCodeCopied: string;
-    duration: string;
-    rounds: string;
-    placement: string;
-    username: string;
-    score: string;
-    questionsAsked: string;
-    questionsAnswered: string;
-    correctGuesses: string;
-    incorrectGuesses: string;
-    totalGuesses: string;
-    timePlayed: string;
-    newGame: string;
-    backToHome: string;
-    viewCharacterSet: string;
-    loading: string;
-    first: string;
-    second: string;
-    third: string;
-    nth: string;
-    minutes: string;
-    seconds: string;
-    errors: {
-      failedToLoad: string;
-      failedToCopyRoomCode: string;
-      gameNotCompleted: string;
+    results: {
+      title: string;
+      winner: string;
+      congratulations: string;
+      youWon: string;
+      youLost: string;
+      you: string;
+      roomCode: string;
+      roomCodeCopied: string;
+      loading: string;
+      stats: {
+        gameStats: string;
+        playerStats: string;
+        detailedStats: string;
+        duration: string;
+        rounds: string;
+        placement: string;
+        username: string;
+        score: string;
+        questionsAsked: string;
+        questionsAnswered: string;
+        correctGuesses: string;
+        incorrectGuesses: string;
+        totalGuesses: string;
+        timePlayed: string;
+        first: string;
+        second: string;
+        third: string;
+        nth: string;
+        minutes: string;
+        seconds: string;
+      };
+      actions: {
+        newGame: string;
+        backToHome: string;
+        viewCharacterSet: string;
+      };
+      errors: {
+        failedToLoad: string;
+        failedToCopyRoomCode: string;
+        gameNotCompleted: string;
+      };
     };
   };
 }
