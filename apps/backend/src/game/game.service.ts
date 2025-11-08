@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GameStatus } from '../database/enums';
-import { Game, Guess, Round } from '../database/entities';
+import { Game, Guess } from '../database/entities';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
@@ -51,7 +48,8 @@ export class GameService {
   }
 
   async getGameByRoomCode(roomCode: string): Promise<Game | null> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
     return this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
@@ -72,7 +70,8 @@ export class GameService {
 
   // Start game logic
   async startGame(roomCode: string): Promise<GameLobbyResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
@@ -146,7 +145,8 @@ export class GameService {
     roomCode: string,
     request: SubmitGuessRequest,
   ): Promise<GuessResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     // Get the game first
     const game = await this.gameRepository.findOne({
@@ -187,11 +187,8 @@ export class GameService {
 
     if (guess) {
       // Handle guess result (scoring, elimination)
-      const shouldCheckGameEnd = await this.gamePlayService.handleGuessResult(
-        guess,
-        game,
-        currentRound,
-      );
+      const shouldCheckGameEnd =
+        await this.gamePlayService.handleGuessResult(guess);
 
       if (shouldCheckGameEnd) {
         // Check if game should end

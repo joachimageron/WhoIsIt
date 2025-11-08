@@ -1,7 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-} from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +11,8 @@ import { EmailService } from '../email/email.service';
 import { JwtPayload } from './types/jwt-payload.type';
 import { AuthTokenService } from './auth-token.service';
 import { AuthProfileService } from './auth-profile.service';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class AuthService {
@@ -170,14 +169,14 @@ export class AuthService {
   // Delegate profile management to AuthProfileService
   async updateProfile(
     userId: string,
-    updateProfileDto: any,
+    updateProfileDto: UpdateProfileDto,
   ): Promise<User> {
     return this.authProfileService.updateProfile(userId, updateProfileDto);
   }
 
   async changePassword(
     userId: string,
-    changePasswordDto: any,
+    changePasswordDto: ChangePasswordDto,
   ): Promise<void> {
     return this.authProfileService.changePassword(userId, changePasswordDto);
   }

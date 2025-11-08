@@ -5,11 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  GameStatus,
-  RoundState,
-  PlayerSecretStatus,
-} from '../database/enums';
+import { GameStatus, RoundState, PlayerSecretStatus } from '../database/enums';
 import {
   Game,
   GamePlayer,
@@ -17,10 +13,7 @@ import {
   PlayerSecret,
   PlayerStats,
 } from '../database/entities';
-import type {
-  GameOverResult,
-  PlayerGameResult,
-} from '@whois-it/contracts';
+import type { GameOverResult, PlayerGameResult } from '@whois-it/contracts';
 import { GameLobbyService } from './game-lobby.service';
 
 @Injectable()
@@ -239,7 +232,8 @@ export class GameStatsService {
    * Get game over result with all player statistics
    */
   async getGameOverResult(roomCode: string): Promise<GameOverResult> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {

@@ -151,7 +151,8 @@ export class GamePlayService {
    * Get the current game state for a room
    */
   async getGameState(roomCode: string): Promise<GameStateResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
@@ -199,7 +200,8 @@ export class GamePlayService {
     roomCode: string,
     request: AskQuestionRequest,
   ): Promise<QuestionResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -301,7 +303,8 @@ export class GamePlayService {
    * Get all questions for a game
    */
   async getQuestions(roomCode: string): Promise<QuestionResponse[]> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
@@ -338,7 +341,8 @@ export class GamePlayService {
    * Get all answers for a game
    */
   async getAnswers(roomCode: string): Promise<AnswerResponse[]> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
@@ -402,7 +406,8 @@ export class GamePlayService {
     roomCode: string,
     request: SubmitAnswerRequest,
   ): Promise<AnswerResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -601,10 +606,7 @@ export class GamePlayService {
   /**
    * Advance to the next player's turn
    */
-  async advanceToNextTurn(
-    currentRound: Round,
-    game: Game,
-  ): Promise<void> {
+  async advanceToNextTurn(currentRound: Round, game: Game): Promise<void> {
     const nextPlayer = this.getNextPlayer(currentRound, game);
 
     // Update the round state
@@ -639,7 +641,8 @@ export class GamePlayService {
     roomCode: string,
     request: SubmitGuessRequest,
   ): Promise<GuessResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -754,11 +757,7 @@ export class GamePlayService {
    * Handle game logic after a guess (scoring, elimination, game end)
    * This is called by GameStatsService after creating the guess
    */
-  async handleGuessResult(
-    guess: Guess,
-    game: Game,
-    currentRound: Round,
-  ): Promise<boolean> {
+  async handleGuessResult(guess: Guess): Promise<boolean> {
     const guessingPlayer = guess.guessedBy;
     const targetPlayer = guess.targetPlayer;
 
@@ -821,7 +820,8 @@ export class GamePlayService {
     roomCode: string,
     playerId: string,
   ): Promise<PlayerCharacterResponse> {
-    const normalizedRoomCode = this.gameLobbyService.normalizeRoomCode(roomCode);
+    const normalizedRoomCode =
+      this.gameLobbyService.normalizeRoomCode(roomCode);
 
     // Get the game to verify it exists and is in progress
     const game = await this.gameRepository.findOne({

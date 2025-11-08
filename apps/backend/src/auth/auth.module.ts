@@ -27,7 +27,13 @@ import { AuthProfileService } from './auth-profile.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthTokenService, AuthProfileService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    AuthTokenService,
+    AuthProfileService,
+    LocalStrategy,
+    JwtStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
