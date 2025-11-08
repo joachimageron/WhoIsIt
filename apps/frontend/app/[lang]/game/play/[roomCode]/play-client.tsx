@@ -48,6 +48,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     addQuestion,
     addAnswer,
     toggleFlipCharacter,
+    eliminateCharacter,
     isConnected,
     setConnected,
   } = useGameStore();
@@ -223,10 +224,13 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
           description: `${guess.guessedByPlayerUsername} guessed correctly: ${guess.targetCharacterName}`,
         });
       } else {
+        // Eliminate the incorrectly guessed character
+        eliminateCharacter(guess.targetCharacterId);
+
         addToast({
           color: "danger",
           title: dict.play.incorrectGuess || "Incorrect guess",
-          description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
+          description: `${guess.guessedByPlayerUsername} made an incorrect guess: ${guess.targetCharacterName}`,
         });
       }
     });
@@ -234,7 +238,7 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
     return () => {
       unsubscribeGuessResult();
     };
-  }, [onGuessResult, setGameState, dict]);
+  }, [onGuessResult, setGameState, eliminateCharacter, dict]);
 
   // Listen to game over events
   useEffect(() => {
@@ -332,10 +336,13 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
             description: `You guessed correctly: ${guess.targetCharacterName}`,
           });
         } else {
+          // Eliminate the incorrectly guessed character
+          eliminateCharacter(guess.targetCharacterId);
+
           addToast({
             color: "danger",
             title: dict.play.incorrectGuess || "Incorrect guess",
-            description: "Your guess was incorrect. You have been eliminated.",
+            description: `Your guess was incorrect: ${guess.targetCharacterName}`,
           });
         }
       } catch (error) {

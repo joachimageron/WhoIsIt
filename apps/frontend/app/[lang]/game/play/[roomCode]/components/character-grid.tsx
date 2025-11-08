@@ -107,12 +107,10 @@ function CharacterCard({
   return (
     <button
       className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 hover:border-primary p-3 transition-all duration-300 ${
-        isFlipped ? "scale-95 border-default-200" : "scale-100 border-default-300"
-      } ${
-        isEliminated
-          ? "cursor-not-allowed"
-          : "cursor-pointer"
-      }`}
+        isFlipped
+          ? "scale-95 border-default-200"
+          : "scale-100 border-default-300"
+      } ${isEliminated ? "cursor-not-allowed" : "cursor-pointer"}`}
       disabled={isEliminated}
       type="button"
       onClick={onClick}
