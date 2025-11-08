@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
-import { runSeeds } from '.';
 import { DATABASE_ENTITIES } from '../database.module';
 
 const dataSource = new DataSource({
@@ -24,15 +23,6 @@ async function main() {
     console.log('Dropping database schema...');
     await dataSource.dropDatabase();
     console.log('Database schema dropped');
-
-    // Synchronize schema (recreate tables)
-    console.log('Recreating database schema...');
-    await dataSource.synchronize();
-    console.log('Database schema recreated');
-
-    // Run seeds
-    console.log('Running seeds...');
-    await runSeeds(dataSource);
 
     await dataSource.destroy();
     console.log('Database connection closed');
