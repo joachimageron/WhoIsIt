@@ -106,14 +106,12 @@ function CharacterCard({
 }: CharacterCardProps) {
   return (
     <button
-      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-3 transition-all duration-300 ${
-        isFlipped ? "scale-95" : "scale-100"
+      className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 hover:border-primary p-3 transition-all duration-300 ${
+        isFlipped ? "scale-95 border-default-200" : "scale-100 border-default-300"
       } ${
         isEliminated
-          ? "cursor-not-allowed border-default-200 bg-default-50 opacity-50"
-          : isFlipped
-            ? "cursor-pointer border-warning-300 bg-warning-50 hover:bg-warning-100"
-            : "cursor-pointer border-default-200 bg-default-100 hover:border-primary hover:bg-default-200"
+          ? "cursor-not-allowed"
+          : "cursor-pointer"
       }`}
       disabled={isEliminated}
       type="button"
@@ -130,9 +128,9 @@ function CharacterCard({
       )}
 
       {isFlipped && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-warning-100/80 transition-all duration-300 animate-in fade-in">
+        <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 transition-all duration-300 animate-in fade-in">
           <Icon
-            className="text-warning-600"
+            className="text-default-600"
             icon="solar:eye-closed-bold"
             width={48}
           />
@@ -142,7 +140,7 @@ function CharacterCard({
       <Image
         alt={character.name}
         className={
-          (isEliminated || isFlipped ? "opacity-30" : "opacity-100") +
+          (isEliminated || isFlipped ? "opacity-20" : "opacity-100") +
           " rounded-xl transition-opacity duration-300"
         }
         height={100}

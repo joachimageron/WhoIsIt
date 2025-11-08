@@ -35,6 +35,7 @@ interface Dictionary {
     detailedStats: string;
     you: string;
     roomCode: string;
+    roomCodeCopied: string;
     duration: string;
     rounds: string;
     placement: string;
@@ -56,6 +57,7 @@ interface Dictionary {
     seconds: string;
     errors: {
       failedToLoad: string;
+      failedToCopyRoomCode: string;
     };
   };
 }
