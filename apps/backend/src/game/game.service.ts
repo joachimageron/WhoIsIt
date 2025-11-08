@@ -1,8 +1,8 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GameStatus } from '../../database/enums';
-import { Game, Guess } from '../../database/entities';
+import { GameStatus } from '../database/enums';
+import { Game, Guess } from '../database/entities';
 import type {
   CreateGameRequest,
   GameLobbyResponse,

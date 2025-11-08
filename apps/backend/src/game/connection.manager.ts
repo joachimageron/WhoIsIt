@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { ConnectedUser, TypedSocket } from './types';
+import type { ConnectedUser, TypedSocket } from './types/gateway.types';
 
 @Injectable()
 export class ConnectionManager {

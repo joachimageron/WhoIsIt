@@ -20,9 +20,9 @@ import type {
   GameOverResult,
   PlayerCharacterResponse,
 } from '@whois-it/contracts';
-import { GameService } from '../services/game.service';
-import { BroadcastService } from '../gateway/broadcast.service';
-import { AnswerValue } from '../../database/enums';
+import { GameService } from './game.service';
+import { BroadcastService } from './broadcast.service';
+import { AnswerValue } from '../database/enums';
 
 @Controller('games')
 export class GameController {

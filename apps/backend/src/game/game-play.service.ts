@@ -11,7 +11,7 @@ import {
   RoundState,
   PlayerSecretStatus,
   AnswerValue,
-} from '../../database/enums';
+} from '../database/enums';
 import {
   Game,
   GamePlayer,
@@ -21,7 +21,7 @@ import {
   Question,
   Answer,
   Guess,
-} from '../../database/entities';
+} from '../database/entities';
 import type {
   AskQuestionRequest,
   QuestionResponse,

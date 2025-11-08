@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from '@nestjs/common';
-import { GameGateway } from '../gateway/game.gateway';
-import { GameService } from '../services/game.service';
-import { ConnectionManager } from '../gateway/connection.manager';
-import { BroadcastService } from '../gateway/broadcast.service';
-import { LobbyCleanupService } from '../gateway/lobby-cleanup.service';
-import { User } from '../../database/entities/user.entity';
-import { Game } from '../../database/entities/game.entity';
-import { GameStatus } from '../../database/enums';
+import { GameGateway } from './game.gateway';
+import { GameService } from './game.service';
+import { ConnectionManager } from './connection.manager';
+import { BroadcastService } from './broadcast.service';
+import { LobbyCleanupService } from './lobby-cleanup.service';
+import { User } from '../database/entities/user.entity';
+import { Game } from '../database/entities/game.entity';
+import { GameStatus } from '../database/enums';
 import type { GameLobbyResponse } from '@whois-it/contracts';
 
 describe('GameGateway', () => {
