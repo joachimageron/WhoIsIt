@@ -16,34 +16,27 @@ Complete database schema documentation with:
 - Indexes and query optimization
 - Migration strategies
 
-### Authentication (Coming Soon)
-
+### [Authentication](./authentication.md) ✅
 JWT-based authentication system with:
+- **User registration and login**
+- **Email verification workflow**
+- **Password reset functionality**
+- **Guest session support**
+- **WebSocket authentication adapter**
+- **Guards and route protection**
+- **Passport strategies (JWT, Local)**
+- **Security best practices**
 
-- User registration and login
-- Email verification
-- Password reset workflow
-- Guest session support
-- WebSocket authentication
-
-### Game Mechanics (Coming Soon)
-
-Core gameplay logic including:
-
-- Game creation and lobby management
-- Turn-based gameplay
-- Question and answer system
-- Guessing and scoring
-- Game completion and results
-
-### WebSocket Implementation (Coming Soon)
-
+### [WebSocket Implementation](./websockets.md) ✅
 Real-time communication with Socket.IO:
-
-- Custom auth adapter
-- Room-based broadcasting
-- Event patterns and acknowledgements
-- Connection management
+- **Custom auth adapter with JWT**
+- **GameGateway with event handlers**
+- **ConnectionManager for tracking**
+- **BroadcastService for messaging**
+- **Room-based broadcasting patterns**
+- **Type-safe Socket.IO setup**
+- **Error handling and logging**
+- **Testing strategies**
 
 ### API Endpoints
 

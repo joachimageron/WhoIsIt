@@ -27,15 +27,16 @@ Day-to-day development practices:
 - Pull request guidelines
 - Issue tracking
 
-### Testing Guide (Coming Soon)
-
+### [Testing Guide](./testing.md) ✅
 Testing strategies and examples:
-
-- Unit testing with Jest
-- Integration testing
-- E2E testing (future)
-- Mocking patterns
-- Test coverage goals
+- **Unit testing with Jest**
+- **Integration testing patterns**
+- **Service and controller testing**
+- **DTO validation testing**
+- **Mocking strategies**
+- **Test coverage goals**
+- **Debugging tests**
+- **Best practices**
 
 ### Debugging Guide (Coming Soon)
 

@@ -6,14 +6,15 @@ This section contains guides for deploying WhoIsIt to production environments, i
 
 ## Contents
 
-### Environment Configuration (Coming Soon)
-
+### [Environment Configuration](./environment.md) ✅
 Production environment setup:
-
-- Environment variables for frontend and backend
-- Security considerations
-- Secrets management
-- Multi-environment configuration
+- **All backend environment variables**
+- **All frontend environment variables**
+- **Platform-specific configurations**
+- **Security best practices**
+- **Secrets management**
+- **Multi-environment setup**
+- **Validation and troubleshooting**
 
 ### Database Migrations (Coming Soon)
 
