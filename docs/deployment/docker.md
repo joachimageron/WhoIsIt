@@ -15,6 +15,24 @@ docker-compose --version
 
 ## Quick Start
 
+### Using the Helper Script (Recommended)
+
+The repository includes a helper script to make Docker management easier:
+
+```bash
+# Make the script executable (first time only)
+chmod +x docker.sh
+
+# Start in development mode with hot-reload
+./docker.sh dev
+
+# Start in standard mode
+./docker.sh start
+
+# View all available commands
+./docker.sh help
+```
+
 ### Development Mode (with hot-reload)
 
 For local development with hot-reload:
