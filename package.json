@@ -14,7 +14,7 @@
     "test:cov": "pnpm -r test:cov",
     "test:frontend": "pnpm --filter @whois-it/frontend test",
     "test:frontend:watch": "pnpm --filter @whois-it/frontend test:watch",
-    "test:frontend:cov": "pnpm --filter @whois-it/frontend test:coverage",
+    "test:frontend:cov": "pnpm --filter @whois-it/frontend test:cov",
     "test:backend": "pnpm --filter @whois-it/backend test",
     "test:backend:watch": "pnpm --filter @whois-it/backend test:watch",
     "test:backend:cov": "pnpm --filter @whois-it/backend test:cov",

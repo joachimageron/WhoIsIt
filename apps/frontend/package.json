@@ -9,7 +9,7 @@
     "lint": "eslint --fix && echo 'Lint completed successfully!'",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:cov": "jest --coverage"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.24",
