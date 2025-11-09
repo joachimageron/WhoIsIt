@@ -37,6 +37,16 @@ Deploying to production:
 - Environment-specific configurations
 - Health checks and monitoring
 
+### [Docker Setup](./docker.md)
+
+Complete Docker and Docker Compose guide:
+
+- Quick start with Docker
+- Development mode with hot-reload
+- Production-ready configurations
+- Common commands and troubleshooting
+- CI/CD integration
+
 ### [CI/CD Pipeline](./cicd)
 
 Automated deployment workflows:
