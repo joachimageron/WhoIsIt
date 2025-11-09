@@ -1,5 +1,7 @@
 # Testing Setup - Frontend
 
+> **Note**: This documentation is located in `/docs/frontend/testing.md` as part of the main project documentation.
+
 This document describes the testing setup for the frontend application.
 
 ## Overview
