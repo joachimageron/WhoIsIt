@@ -6,7 +6,7 @@ This section contains guides for deploying WhoIsIt to production environments, i
 
 ## Contents
 
-### [Environment Configuration](./environment.md) ✅
+### [Environment Configuration](./environment.md)
 Production environment setup:
 - **All backend environment variables**
 - **All frontend environment variables**

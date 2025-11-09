@@ -6,7 +6,7 @@ This section contains guides and best practices for developing WhoIsIt, includin
 
 ## Contents
 
-### [Getting Started Guide](./getting-started.md) ✅
+### [Getting Started Guide](./getting-started.md)
 
 Complete setup instructions:
 
@@ -27,7 +27,7 @@ Day-to-day development practices:
 - Pull request guidelines
 - Issue tracking
 
-### [Testing Guide](./testing.md) ✅
+### [Testing Guide](./testing.md)
 Testing strategies and examples:
 - **Unit testing with Jest**
 - **Integration testing patterns**

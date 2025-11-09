@@ -6,7 +6,7 @@ This section contains comprehensive documentation for the WhoIsIt API, including
 
 ## Contents
 
-### [REST API Reference](./rest-api.md) ✅
+### [REST API Reference](./rest-api.md)
 
 Complete HTTP endpoint documentation:
 
@@ -18,7 +18,7 @@ Complete HTTP endpoint documentation:
 - **Error codes** and handling
 - **Testing with cURL and Postman**
 
-### [Socket.IO Events](./socket-events.md) ✅
+### [Socket.IO Events](./socket-events.md)
 Real-time WebSocket event documentation:
 
 - **Client → Server events**: joinRoom, leaveRoom, updatePlayerReady
