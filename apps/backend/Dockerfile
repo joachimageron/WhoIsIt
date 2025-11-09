@@ -1,10 +1,10 @@
 # ============================================
 # Stage 1: Builder
 # ============================================
-FROM node:20-alpine AS builder
+FROM node:25-alpine AS builder
 
 # Install pnpm
-RUN npm install -g pnpm@10.20.0
+RUN npm install -g pnpm
 
 WORKDIR /app
 
@@ -27,10 +27,10 @@ RUN pnpm build
 # ============================================
 # Stage 2: Production
 # ============================================
-FROM node:20-alpine AS production
+FROM node:25-alpine AS production
 
 # Install pnpm
-RUN npm install -g pnpm@10.20.0
+RUN npm install -g pnpm
 
 WORKDIR /app
 

@@ -39,4 +39,6 @@ docker-compose.override.yml
 *.tsbuildinfo
 next-env.d.ts
 
+.pnpm-store/
+
 docs/.obsidian/*
