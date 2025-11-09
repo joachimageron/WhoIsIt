@@ -17,38 +17,15 @@ Complete setup instructions:
 - **Running the apps**: Development servers
 - **Common issues**: Troubleshooting guide
 
-### [Development Workflow](./workflow)
+### 💻 [Development](./development/)
 
-Day-to-day development practices:
+Developer guides, workflows, and best practices.
 
-- Git workflow and branching strategy
-- Code review process
-- Commit message conventions
-- Pull request guidelines
-- Issue tracking
-
-### [Testing Guide](./testing.md)
-
-Testing strategies and examples:
-
-- **Unit testing with Jest**
-- **Integration testing patterns**
-- **Service and controller testing**
-- **DTO validation testing**
-- **Mocking strategies**
-- **Test coverage goals**
-- **Debugging tests**
-- **Best practices**
-
-### [Debugging Guide](./debugging)
-
-Debugging tools and techniques:
-
-- VS Code debugger setup
-- Chrome DevTools for frontend
-- NestJS debugging
-- Database query debugging
-- WebSocket debugging
+- [Getting Started](./development/getting-started.md) - Setup and installation
+- [Development Workflow](./development/workflow.md) - Day-to-day development
+- [Testing Guide](./development/testing.md) - Testing strategies and examples
+- [Testing Coverage Strategy](./development/testing-coverage-strategy.md) - Coverage requirements and exclusions
+- [Debugging](./development/debugging.md) - Debugging tools and techniques
 
 ## Quick Reference
 

@@ -70,6 +70,35 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
    - Frontend only: `pnpm dev:frontend`
    - Backend only: `pnpm dev:backend`
 
+5. **Run tests**
+
+   ```bash
+   # Run all tests (frontend + backend)
+   pnpm test
+
+   # Backend tests
+   pnpm test:backend           # Run all backend tests
+   pnpm test:backend:watch     # Watch mode
+   pnpm test:backend:cov       # With coverage report
+   pnpm test:backend:e2e       # E2E tests only
+   pnpm test:backend:debug     # Debug mode
+
+   # Frontend tests
+   pnpm test:frontend          # Run all frontend tests
+   pnpm test:frontend:watch    # Watch mode
+   pnpm test:frontend:cov      # With coverage report
+
+   # All tests in watch mode (parallel)
+   pnpm test:watch
+
+   # All tests with coverage
+   pnpm test:cov
+   ```
+
+   For detailed testing strategies, see:
+   - [Backend Testing Coverage Strategy](./docs/development/testing-coverage-strategy.md)
+   - [Frontend Testing Coverage Strategy](./docs/frontend/testing-coverage-strategy.md)
+
 ## Tooling highlights
 
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.

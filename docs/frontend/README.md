@@ -47,7 +47,7 @@ Multi-language support:
 
 Jest and React Testing Library setup:
 
-- [Testing Documentation](./testing.md) - Complete testing guide
+- [Testing Coverage Strategy](./testing-coverage-strategy.md) - Frontend test coverage requirements and strategy
 - Unit and integration tests for components
 - Test patterns and best practices
 - Coverage reporting
@@ -498,7 +498,7 @@ pnpm dev:frontend  # --turbopack flag automatic
 - Debug configurations
 - TypeScript IntelliSense
 
-### Testing
+### Testingg
 
 Currently no tests set up. Future additions:
 

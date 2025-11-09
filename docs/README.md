@@ -29,11 +29,12 @@ NestJS backend API, game logic, and database documentation.
 
 Next.js application structure and client-side implementation.
 
-- [Application Structure](./frontend/structure.md) - App Router and file organization
+- [Application Structure](./frontend/application-structure.md) - App Router and file organization
 - [State Management](./frontend/state-management.md) - Zustand stores and patterns
 - [UI Components](./frontend/ui-components.md) - HeroUI components and theming
-- [Internationalization](./frontend/i18n.md) - Multi-language support
+- [Internationalization](./frontend/internationalization.md) - Multi-language support
 - [Real-time Client](./frontend/realtime.md) - Socket.IO client implementation
+- [Testing Coverage Strategy](./frontend/testing-coverage-strategy.md) - Frontend test coverage requirements
 
 ### 🔌 [API](./api/)
 
@@ -50,6 +51,7 @@ Developer guides, workflows, and best practices.
 - [Getting Started](./development/getting-started.md) - Setup and installation
 - [Development Workflow](./development/workflow.md) - Day-to-day development
 - [Testing Guide](./development/testing.md) - Testing strategies and examples
+- [Testing Coverage Strategy](./development/testing-coverage-strategy.md) - Coverage requirements and exclusions
 - [Debugging](./development/debugging.md) - Debugging tools and techniques
 
 ### 🚀 [Deployment](./deployment/)

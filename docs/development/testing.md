@@ -8,7 +8,7 @@ WhoIsIt uses **Jest** as the testing framework for unit and integration tests. T
 
 ### Test Pyramid
 
-```
+```text
         ┌─────────────┐
         │  E2E Tests  │  ← Few, slow, high confidence
         │   (Future)  │
@@ -38,6 +38,7 @@ WhoIsIt uses **Jest** as the testing framework for unit and integration tests. T
 **Location**: `apps/backend/src/**/*.spec.ts`
 
 **Naming Convention**:
+
 - `service-name.service.spec.ts` - Service tests
 - `controller-name.controller.spec.ts` - Controller tests
 - `dto-name.dto.spec.ts` - DTO validation tests
@@ -67,6 +68,7 @@ pnpm --filter @whois-it/backend test --testNamePattern="should register"
 ### Test Configuration
 
 **`jest.config.js`**:
+
 ```javascript
 module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
@@ -90,7 +92,6 @@ module.exports = {
 ### Testing Services
 
 Services contain business logic and should have high test coverage.
-
 **Example: AuthService**
 
 ```typescript
@@ -306,7 +307,6 @@ describe('AuthService', () => {
 ### Testing Controllers
 
 Controllers are thin wrappers around services and should focus on testing HTTP-specific logic.
-
 **Example: GameController**
 
 ```typescript
@@ -424,7 +424,6 @@ describe('GameController', () => {
 ### Testing DTOs
 
 DTOs use class-validator decorators and should be tested for validation.
-
 **Example: RegisterDto**
 
 ```typescript
@@ -500,7 +499,6 @@ describe('RegisterDto', () => {
 ### Testing API Endpoints
 
 Integration tests verify the entire request/response cycle.
-
 **Example: E2E Auth Test**
 
 ```typescript
@@ -666,6 +664,7 @@ jest.mock('bcrypt', () => ({
 **Backend**: 162/162 tests passing
 
 **Coverage Goals**:
+
 - Services: 90%+
 - Controllers: 100%
 - DTOs: 100%
@@ -681,7 +680,7 @@ Opens coverage report in `coverage/lcov-report/index.html`.
 
 ### Coverage Reports
 
-```
+```text
 File                | % Stmts | % Branch | % Funcs | % Lines
 --------------------|---------|----------|---------|--------
 All files           |   85.23 |    78.45 |   88.12 |   86.34
@@ -858,6 +857,7 @@ pnpm test:debug
 ### VS Code Debugging
 
 **`.vscode/launch.json`**:
+
 ```json
 {
   "type": "node",
@@ -1015,19 +1015,31 @@ afterAll(async () => {
 ### Flaky Tests
 
 Causes:
+
 - Race conditions
 - Shared state
 - External dependencies
 - Timing issues
 
 Solutions:
+
 - Use `beforeEach` for fresh state
 - Mock external services
 - Use `waitFor` for async updates
 - Avoid `setTimeout` in tests
 
+## Testing Coverage Strategy
+
+For a comprehensive guide on which files require testing and which don't, see the [Testing Coverage Strategy](./testing-coverage-strategy.md) document. This includes:
+
+- Files excluded from coverage requirements (config, types, migrations)
+- Complex services better tested via integration/E2E tests
+- Coverage goals by file type
+- Testing decision tree
+
 ## Related Documentation
 
+- [Testing Coverage Strategy](./testing-coverage-strategy.md) - Coverage requirements and exclusions
 - [Development Workflow](./workflow.md)
 - [Debugging Guide](./debugging.md)
 - [Backend Documentation](../backend/README.md)
