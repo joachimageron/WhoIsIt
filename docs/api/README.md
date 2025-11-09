@@ -7,7 +7,9 @@ This section contains comprehensive documentation for the WhoIsIt API, including
 ## Contents
 
 ### [REST API Reference](./rest-api.md) ✅
+
 Complete HTTP endpoint documentation:
+
 - **Authentication**: Register, login, logout, password reset
 - **Game Management**: Create, join, lobby, start game
 - **Gameplay**: Questions, answers, guesses
@@ -17,7 +19,9 @@ Complete HTTP endpoint documentation:
 - **Testing with cURL and Postman**
 
 ### Socket.IO Events (Coming Soon)
+
 Real-time WebSocket event documentation:
+
 - **Client → Server events**: joinRoom, leaveRoom, updatePlayerReady
 - **Server → Client events**: lobbyUpdate, playerJoined, gameStarted
 - **Event payloads** and acknowledgements
@@ -25,7 +29,9 @@ Real-time WebSocket event documentation:
 - **Room patterns**
 
 ### Shared Types (Coming Soon)
+
 TypeScript type contracts from `@whois-it/contracts`:
+
 - Request/Response DTOs
 - Game state types
 - Socket.IO event types
@@ -53,6 +59,7 @@ WebSocket: wss://api.whoisit.com
 **Cookie Name**: `access_token`
 
 **Request Example**:
+
 ```typescript
 fetch('http://localhost:4000/auth/profile', {
   credentials: 'include',  // Include cookies
@@ -60,6 +67,7 @@ fetch('http://localhost:4000/auth/profile', {
 ```
 
 **Socket.IO Connection**:
+
 ```typescript
 const socket = io('http://localhost:4000', {
   withCredentials: true,  // Include cookies
@@ -69,6 +77,7 @@ const socket = io('http://localhost:4000', {
 ### Common Response Formats
 
 **Success**:
+
 ```json
 {
   "data": { ... },
@@ -77,6 +86,7 @@ const socket = io('http://localhost:4000', {
 ```
 
 **Error**:
+
 ```json
 {
   "statusCode": 400,
@@ -102,7 +112,7 @@ const socket = io('http://localhost:4000', {
 
 ### Authentication Endpoints
 
-```
+```text
 POST   /auth/register          # Create account
 POST   /auth/login             # Login
 GET    /auth/profile           # Get current user
@@ -114,7 +124,7 @@ POST   /auth/reset-password    # Reset password
 
 ### Game Endpoints
 
-```
+```text
 POST   /games                  # Create game
 POST   /games/:roomCode/join   # Join game
 GET    /games/:roomCode        # Get lobby state
@@ -124,7 +134,7 @@ GET    /games/:roomCode/players/:playerId/character  # Get secret
 
 ### Gameplay Endpoints
 
-```
+```text
 POST   /games/:roomCode/questions            # Ask question
 POST   /games/:roomCode/questions/:id/answer # Submit answer
 POST   /games/:roomCode/guesses              # Make guess
@@ -132,7 +142,7 @@ POST   /games/:roomCode/guesses              # Make guess
 
 ### Character Set Endpoints
 
-```
+```text
 GET    /character-sets         # List all sets
 GET    /character-sets/:id     # Get set with characters
 ```
@@ -203,6 +213,7 @@ export interface ClientToServerEvents {
 ### Using cURL
 
 **Register**:
+
 ```bash
 curl -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
@@ -211,6 +222,7 @@ curl -X POST http://localhost:4000/auth/register \
 ```
 
 **Create Game**:
+
 ```bash
 curl -X POST http://localhost:4000/games \
   -H "Content-Type: application/json" \
@@ -250,24 +262,28 @@ socket.on('lobbyUpdate', (lobby) => {
 ## API Design Principles
 
 ### RESTful Design
+
 - Resources identified by URLs
 - HTTP methods for actions (GET, POST, PUT, DELETE)
 - Stateless requests (state in token)
 - Standard status codes
 
 ### WebSocket Patterns
+
 - Event-driven communication
 - Acknowledgement callbacks for request-response
 - Broadcast events for updates
 - Room-based targeting
 
 ### Type Safety
+
 - Shared TypeScript types
 - Compile-time validation
 - Runtime validation (class-validator)
 - Auto-completion in IDEs
 
 ### Error Handling
+
 - Consistent error format
 - Descriptive error messages
 - Appropriate status codes
@@ -278,7 +294,8 @@ socket.on('lobbyUpdate', (lobby) => {
 **Current**: No rate limiting implemented
 
 **Recommended for Production**:
-```
+
+```text
 /auth/login       - 5 requests per minute
 /auth/register    - 3 requests per hour
 /games            - 30 requests per minute
@@ -303,25 +320,29 @@ app.enableCors({
 **Current Version**: v1 (implicit)
 
 **Future Versioning Strategy**:
+
 - URL-based: `/api/v2/games`
 - Header-based: `Accept: application/vnd.whoisit.v2+json`
 - Maintain backward compatibility
 
 ## Security Considerations
 
-### Authentication
+### Authenticationn
+
 - JWT tokens in HTTP-only cookies (XSS protection)
 - Secure flag in production (HTTPS only)
 - SameSite attribute (CSRF protection)
 - Short expiration times
 
 ### Input Validation
+
 - All inputs validated with class-validator
 - SQL injection prevention (parameterized queries)
 - XSS prevention (React escaping)
 - File upload restrictions
 
-### Rate Limiting
+### Rate Limitingg
+
 - Implement in production
 - Protect against brute force
 - DDoS mitigation
@@ -329,12 +350,14 @@ app.enableCors({
 ## Performance Tips
 
 ### REST API
+
 - Use pagination for lists
 - Implement caching (Redis)
 - Optimize database queries
 - Use HTTP compression
 
 ### WebSocket
+
 - Minimize payload sizes
 - Use rooms for targeted broadcasts
 - Implement reconnection logic
@@ -343,12 +366,14 @@ app.enableCors({
 ## Monitoring
 
 ### Metrics to Track
+
 - Request latency
 - Error rates
 - WebSocket connections
 - Database query performance
 
 ### Logging
+
 - Request/response logs
 - Error logs with stack traces
 - WebSocket event logs
@@ -357,6 +382,7 @@ app.enableCors({
 ## Documentation Tools
 
 ### Future Enhancements
+
 - **Swagger/OpenAPI**: Auto-generated REST API docs
 - **AsyncAPI**: WebSocket event documentation
 - **Postman Collection**: Importable API collection
@@ -374,6 +400,7 @@ app.enableCors({
 ### Complete Game Flow
 
 1. **Register/Login**
+
    ```typescript
    const response = await fetch('/auth/login', {
      method: 'POST',
@@ -383,6 +410,7 @@ app.enableCors({
    ```
 
 2. **Create Game**
+
    ```typescript
    const game = await fetch('/games', {
      method: 'POST',
@@ -393,6 +421,7 @@ app.enableCors({
    ```
 
 3. **Connect WebSocket**
+
    ```typescript
    const socket = io('http://localhost:4000', {
      withCredentials: true,
@@ -406,6 +435,7 @@ app.enableCors({
    ```
 
 4. **Listen for Updates**
+
    ```typescript
    socket.on('lobbyUpdate', (lobby) => {
      updateUI(lobby);

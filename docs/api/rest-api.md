@@ -2,7 +2,7 @@
 
 ## Base URL
 
-```
+```text
 Development: http://localhost:4000
 Production: [Your production URL]
 ```
@@ -12,16 +12,19 @@ Production: [Your production URL]
 Most endpoints use **JWT tokens** stored in **HTTP-only cookies**.
 
 ### Cookie Name
-```
+
+```text
 access_token
 ```
 
 ### Token Format
-```
+
+```text
 Bearer <JWT_TOKEN>
 ```
 
 ### Authenticated Requests
+
 Cookies are automatically sent with requests when using `credentials: 'include'` in fetch:
 
 ```typescript
@@ -33,6 +36,7 @@ fetch('http://localhost:4000/auth/profile', {
 ## Response Format
 
 ### Success Response
+
 ```json
 {
   "data": { ... },
@@ -41,6 +45,7 @@ fetch('http://localhost:4000/auth/profile', {
 ```
 
 ### Error Response
+
 ```json
 {
   "statusCode": 400,
@@ -58,6 +63,7 @@ Create a new user account.
 **POST** `/auth/register`
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -68,6 +74,7 @@ Create a new user account.
 ```
 
 **Response** (200):
+
 ```json
 {
   "user": {
@@ -82,12 +89,14 @@ Create a new user account.
 ```
 
 **Errors**:
+
 - `400`: Email already exists
 - `400`: Username already taken
 - `400`: Invalid email format
 - `400`: Password too weak
 
 **Side Effects**:
+
 - Sets `access_token` cookie
 - Sends verification email (if email service configured)
 
@@ -100,6 +109,7 @@ Authenticate an existing user.
 **POST** `/auth/login`
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com",
@@ -108,6 +118,7 @@ Authenticate an existing user.
 ```
 
 **Response** (200):
+
 ```json
 {
   "user": {
@@ -122,10 +133,12 @@ Authenticate an existing user.
 ```
 
 **Errors**:
+
 - `401`: Invalid credentials
 - `400`: Missing email or password
 
 **Side Effects**:
+
 - Sets `access_token` cookie
 - Updates `lastSeenAt` timestamp
 
@@ -140,6 +153,7 @@ Get current user's profile.
 **Authentication**: Required (JWT in cookie)
 
 **Response** (200):
+
 ```json
 {
   "id": "uuid",
@@ -152,6 +166,7 @@ Get current user's profile.
 ```
 
 **Errors**:
+
 - `401`: Unauthorized (no valid token)
 
 ---
@@ -165,6 +180,7 @@ Logout current user.
 **Authentication**: Required (JWT in cookie)
 
 **Response** (200):
+
 ```json
 {
   "message": "Logged out successfully"
@@ -172,6 +188,7 @@ Logout current user.
 ```
 
 **Side Effects**:
+
 - Clears `access_token` cookie
 
 ---
@@ -183,6 +200,7 @@ Verify user's email address.
 **POST** `/auth/verify-email`
 
 **Request Body**:
+
 ```json
 {
   "token": "verification-token-from-email"
@@ -190,6 +208,7 @@ Verify user's email address.
 ```
 
 **Response** (200):
+
 ```json
 {
   "message": "Email verified successfully"
@@ -197,6 +216,7 @@ Verify user's email address.
 ```
 
 **Errors**:
+
 - `400`: Invalid or expired token
 
 ---
@@ -208,6 +228,7 @@ Request password reset email.
 **POST** `/auth/forgot-password`
 
 **Request Body**:
+
 ```json
 {
   "email": "user@example.com"
@@ -215,6 +236,7 @@ Request password reset email.
 ```
 
 **Response** (200):
+
 ```json
 {
   "message": "Password reset email sent"
@@ -222,9 +244,11 @@ Request password reset email.
 ```
 
 **Errors**:
+
 - `404`: User not found
 
 **Side Effects**:
+
 - Sends password reset email
 - Generates reset token (valid 1 hour)
 
@@ -237,6 +261,7 @@ Reset password using token from email.
 **POST** `/auth/reset-password`
 
 **Request Body**:
+
 ```json
 {
   "token": "reset-token-from-email",
@@ -245,6 +270,7 @@ Reset password using token from email.
 ```
 
 **Response** (200):
+
 ```json
 {
   "message": "Password reset successfully"
@@ -252,6 +278,7 @@ Reset password using token from email.
 ```
 
 **Errors**:
+
 - `400`: Invalid or expired token
 - `400`: Password too weak
 
@@ -268,6 +295,7 @@ Create a new game lobby.
 **Authentication**: Optional (guest users allowed)
 
 **Request Body**:
+
 ```json
 {
   "characterSetId": "uuid",
@@ -281,6 +309,7 @@ Create a new game lobby.
 ```
 
 **Response** (201):
+
 ```json
 {
   "id": "uuid",
@@ -307,6 +336,7 @@ Create a new game lobby.
 ```
 
 **Errors**:
+
 - `400`: Invalid character set ID
 - `400`: Missing hostUsername
 - `400`: Invalid maxPlayers value
@@ -322,9 +352,11 @@ Join an existing game by room code.
 **Authentication**: Optional (guest users allowed)
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 
 **Request Body**:
+
 ```json
 {
   "username": "Player 2",      // Required if no userId
@@ -334,6 +366,7 @@ Join an existing game by room code.
 ```
 
 **Response** (200):
+
 ```json
 {
   "id": "uuid",
@@ -357,6 +390,7 @@ Join an existing game by room code.
 ```
 
 **Errors**:
+
 - `404`: Game not found
 - `400`: Game is full
 - `400`: Game already started
@@ -373,9 +407,11 @@ Get current lobby state.
 **Authentication**: Not required
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 
 **Response** (200):
+
 ```json
 {
   "id": "uuid",
@@ -389,6 +425,7 @@ Get current lobby state.
 ```
 
 **Errors**:
+
 - `404`: Game not found
 
 ---
@@ -402,9 +439,11 @@ Start the game (host only via WebSocket broadcast).
 **Authentication**: Optional
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 
 **Response** (200):
+
 ```json
 {
   "id": "uuid",
@@ -416,12 +455,14 @@ Start the game (host only via WebSocket broadcast).
 ```
 
 **Errors**:
+
 - `404`: Game not found
 - `400`: Game already started
 - `400`: Not enough players (minimum 2)
 - `400`: Not all players ready
 
 **Side Effects**:
+
 - Broadcasts `gameStarted` event to all players via WebSocket
 - Assigns secret characters to players
 - Creates first round
@@ -437,10 +478,12 @@ Get the secret character assigned to a player (only visible to that player).
 **Authentication**: Not required (player ID serves as authentication)
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 - `playerId` (string): Player UUID
 
 **Response** (200):
+
 ```json
 {
   "playerId": "uuid",
@@ -458,6 +501,7 @@ Get the secret character assigned to a player (only visible to that player).
 ```
 
 **Errors**:
+
 - `404`: Game not found
 - `404`: Player not found
 - `400`: Game not started yet
@@ -473,9 +517,11 @@ Ask a question during gameplay.
 **Authentication**: Not required
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 
 **Request Body**:
+
 ```json
 {
   "playerId": "uuid",
@@ -485,6 +531,7 @@ Ask a question during gameplay.
 ```
 
 **Response** (201):
+
 ```json
 {
   "id": "uuid",
@@ -500,11 +547,13 @@ Ask a question during gameplay.
 ```
 
 **Errors**:
+
 - `404`: Game not found
 - `400`: Not player's turn
 - `400`: Game not in progress
 
 **Side Effects**:
+
 - Broadcasts `questionAsked` event via WebSocket
 
 ---
@@ -518,10 +567,12 @@ Submit an answer to a question.
 **Authentication**: Not required
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 - `questionId` (string): Question UUID
 
 **Request Body**:
+
 ```json
 {
   "playerId": "uuid",
@@ -531,6 +582,7 @@ Submit an answer to a question.
 ```
 
 **Response** (201):
+
 ```json
 {
   "id": "uuid",
@@ -545,11 +597,13 @@ Submit an answer to a question.
 ```
 
 **Errors**:
+
 - `404`: Question not found
 - `400`: Invalid answer value
 - `400`: Already answered
 
 **Side Effects**:
+
 - Broadcasts `answerSubmitted` event via WebSocket
 
 ---
@@ -563,9 +617,11 @@ Submit a guess about a character.
 **Authentication**: Not required
 
 **URL Parameters**:
+
 - `roomCode` (string): 6-character room code
 
 **Request Body**:
+
 ```json
 {
   "playerId": "uuid",
@@ -575,6 +631,7 @@ Submit a guess about a character.
 ```
 
 **Response** (201):
+
 ```json
 {
   "id": "uuid",
@@ -593,11 +650,13 @@ Submit a guess about a character.
 ```
 
 **Errors**:
+
 - `404`: Game not found
 - `400`: Not player's turn
 - `400`: Invalid character ID
 
 **Side Effects**:
+
 - Broadcasts `guessResult` event via WebSocket
 - May trigger `gameOver` event if winning guess
 
@@ -614,9 +673,11 @@ Get all available character sets.
 **Authentication**: Not required
 
 **Query Parameters**:
+
 - `visibility` (optional): Filter by visibility ("public" | "private")
 
 **Response** (200):
+
 ```json
 [
   {
@@ -642,9 +703,11 @@ Get a specific character set with all characters.
 **Authentication**: Not required
 
 **URL Parameters**:
+
 - `id` (string): Character set UUID
 
 **Response** (200):
+
 ```json
 {
   "id": "uuid",
@@ -670,6 +733,7 @@ Get a specific character set with all characters.
 ```
 
 **Errors**:
+
 - `404`: Character set not found
 
 ---
@@ -716,7 +780,8 @@ app.enableCors({
 
 ## Testing with cURL
 
-### Register
+### Registerr
+
 ```bash
 curl -X POST http://localhost:4000/auth/register \
   -H "Content-Type: application/json" \
@@ -724,7 +789,8 @@ curl -X POST http://localhost:4000/auth/register \
   -c cookies.txt
 ```
 
-### Login
+### Loginn
+
 ```bash
 curl -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
@@ -733,12 +799,14 @@ curl -X POST http://localhost:4000/auth/login \
 ```
 
 ### Get Profile (with cookie)
+
 ```bash
 curl http://localhost:4000/auth/profile \
   -b cookies.txt
 ```
 
-### Create Game
+### Create Gamee
+
 ```bash
 curl -X POST http://localhost:4000/games \
   -H "Content-Type: application/json" \
@@ -758,6 +826,7 @@ curl -X POST http://localhost:4000/games \
 ---
 
 **Related Documentation**:
+
 - [Socket.IO Events](./socket-events.md)
 - [Shared Types](./types.md)
 - [Backend Architecture](../backend/README.md)

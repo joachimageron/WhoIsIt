@@ -6,7 +6,7 @@ WhoIsIt is a real-time multiplayer guessing game built on a modern full-stack ar
 
 ## High-Level Architecture
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────┐
 │                        Client Layer                              │
 │  ┌────────────────────────────────────────────────────────┐     │
@@ -60,6 +60,7 @@ The frontend is a server-rendered React application with real-time capabilities:
 - **Routing**: File-based routing with `[lang]` dynamic segments
 
 **Key Features**:
+
 - Server-side rendering (SSR) for SEO and performance
 - Mobile-first responsive design
 - Real-time game updates without polling
@@ -78,6 +79,7 @@ The backend provides both REST API and WebSocket endpoints:
 - **Email**: Nodemailer with MJML templates
 
 **Architecture Pattern**: Modular architecture with:
+
 - **Controllers**: Handle HTTP requests and responses
 - **Services**: Contain business logic
 - **Gateways**: Handle WebSocket connections and events
@@ -91,13 +93,14 @@ Type-safe contracts shared between frontend and backend:
 
 - **Location**: `packages/contracts`
 - **Purpose**: Single source of truth for API types
-- **Contents**: 
+- **Contents**:
   - REST API request/response types
   - Socket.IO event types
   - Shared enums and constants
   - Game state types
 
 **Benefits**:
+
 - Compile-time type checking
 - Consistent API contracts
 - Refactoring safety
@@ -108,6 +111,7 @@ Type-safe contracts shared between frontend and backend:
 ### REST API (Synchronous)
 
 Used for:
+
 - User authentication (login, register, password reset)
 - Creating and joining games
 - Fetching game state and lobby information
@@ -115,6 +119,7 @@ Used for:
 - Starting games
 
 **Pattern**: Standard HTTP request/response
+
 - Client sends HTTP request with JSON body
 - Server validates, processes, and returns JSON response
 - JWT token in HTTP-only cookie for auth
@@ -122,6 +127,7 @@ Used for:
 ### WebSocket (Real-time)
 
 Used for:
+
 - Real-time lobby updates
 - Player join/leave notifications
 - Game start events
@@ -130,6 +136,7 @@ Used for:
 - Game over notifications
 
 **Pattern**: Socket.IO with acknowledgement callbacks
+
 - Client emits event with payload and callback
 - Server processes and returns success/error via callback
 - Server broadcasts events to all connected clients in room
@@ -138,6 +145,7 @@ Used for:
 ## Authentication Flow
 
 ### Authenticated Users
+
 1. User registers or logs in via REST API
 2. Server generates JWT token
 3. Token stored in HTTP-only cookie
@@ -146,6 +154,7 @@ Used for:
 6. WebSocket adapter extracts token from cookie
 
 ### Guest Sessions
+
 1. Frontend generates guest session ID
 2. Stored in localStorage and cookie
 3. Middleware allows access to game routes
@@ -155,7 +164,8 @@ Used for:
 ## Data Flow Example: Game Lobby
 
 ### 1. Initial Load (REST)
-```
+
+```text
 Frontend                  Backend                 Database
    |                         |                        |
    |--GET /games/:code------>|                        |
@@ -166,7 +176,8 @@ Frontend                  Backend                 Database
 ```
 
 ### 2. Join Room (WebSocket)
-```
+
+```text
 Frontend                  Backend                 Database
    |                         |                        |
    |--emit joinRoom--------->|                        |
@@ -180,7 +191,8 @@ Frontend                  Backend                 Database
 ```
 
 ### 3. Update Ready State (WebSocket)
-```
+
+```text
 Frontend                  Backend                 Database
    |                         |                        |
    |--emit updateReady------>|                        |
@@ -196,6 +208,7 @@ Frontend                  Backend                 Database
 ## Scalability Considerations
 
 ### Current Architecture
+
 - **Single Server**: Both REST and WebSocket on same process
 - **In-Memory Rooms**: Socket.IO rooms stored in memory
 - **Database Connection Pool**: TypeORM connection pooling
@@ -204,12 +217,14 @@ Frontend                  Backend                 Database
 ### Future Scaling Options
 
 **Horizontal Scaling**:
+
 1. **Redis Adapter**: Use Redis for Socket.IO room state
 2. **Session Store**: Move to Redis for distributed sessions
 3. **Load Balancer**: Sticky sessions for WebSocket connections
 4. **Microservices**: Separate game engine from auth service
 
 **Vertical Scaling**:
+
 1. **Database**: PostgreSQL read replicas
 2. **Caching**: Redis for frequently accessed data
 3. **CDN**: Static assets served from CDN
@@ -217,18 +232,21 @@ Frontend                  Backend                 Database
 ## Security Architecture
 
 ### Authentication
+
 - JWT tokens with secure signing
 - HTTP-only cookies prevent XSS attacks
 - Short expiration times (configurable)
 - Refresh token pattern (future enhancement)
 
 ### Authorization
+
 - Route-level protection via middleware
 - Method-level guards in backend
 - WebSocket auth adapter validates connections
 - Role-based access control (host vs player)
 
 ### Data Protection
+
 - Password hashing with bcrypt
 - SQL injection prevention via parameterized queries
 - XSS prevention via React's built-in escaping
@@ -238,12 +256,14 @@ Frontend                  Backend                 Database
 ## Error Handling
 
 ### Frontend
+
 - Try-catch blocks for async operations
 - Toast notifications for user errors
 - Error boundaries for React component errors
 - Connection state monitoring for Socket.IO
 
 ### Backend
+
 - Global exception filters
 - Custom exception classes
 - Validation pipes for input validation
@@ -253,16 +273,19 @@ Frontend                  Backend                 Database
 ## Monitoring and Observability
 
 ### Logging
+
 - **Frontend**: Browser console (development)
 - **Backend**: Console logging with configurable levels
 - **Database**: TypeORM query logging (development)
 
 ### Health Checks
+
 - Backend health endpoint
 - Database connection monitoring
 - Socket.IO connection state
 
 ### Future Enhancements
+
 - Application Performance Monitoring (APM)
 - Centralized logging (e.g., ELK stack)
 - Metrics collection (e.g., Prometheus)
@@ -271,7 +294,8 @@ Frontend                  Backend                 Database
 ## Development Architecture
 
 ### Monorepo Structure
-```
+
+```text
 WhoIsIt/
 ├── apps/
 │   ├── frontend/         # Next.js application
@@ -283,8 +307,9 @@ WhoIsIt/
 ```
 
 ### Build System
+
 - **Package Manager**: PNPM with workspaces
-- **Build Tool**: 
+- **Build Tool**:
   - Frontend: Turbopack (Next.js 15)
   - Backend: TypeScript compiler + Nest CLI
 - **Linting**: ESLint with workspace-level config
@@ -292,14 +317,16 @@ WhoIsIt/
 - **CI/CD**: GitHub Actions
 
 ### Development Workflow
+
 1. Install dependencies: `pnpm install`
 2. Start both apps: `pnpm dev`
-3. Frontend: http://localhost:3000
-4. Backend: http://localhost:4000
+3. Frontend: <http://localhost:3000>
+4. Backend: <http://localhost:4000>
 
 ## Technology Choices
 
 ### Why NestJS?
+
 - **TypeScript-first**: Type safety throughout
 - **Modular**: Clear separation of concerns
 - **Scalable**: Enterprise-ready architecture
@@ -308,6 +335,7 @@ WhoIsIt/
 - **Testing**: Jest integration for unit/e2e tests
 
 ### Why Next.js?
+
 - **SSR/SSG**: SEO-friendly and fast initial loads
 - **App Router**: Modern routing with layouts
 - **TypeScript**: Full type support
@@ -316,6 +344,7 @@ WhoIsIt/
 - **Developer Experience**: Hot reload, error overlay
 
 ### Why Socket.IO?
+
 - **Reliability**: Automatic reconnection
 - **Fallbacks**: WebSocket with polling fallback
 - **Room Support**: Built-in room management
@@ -324,6 +353,7 @@ WhoIsIt/
 - **Adapters**: Redis adapter for scaling
 
 ### Why PostgreSQL?
+
 - **ACID Compliance**: Data integrity for game state
 - **JSON Support**: Flexible metadata storage
 - **Performance**: Excellent query performance
@@ -331,6 +361,7 @@ WhoIsIt/
 - **TypeORM Support**: First-class ORM integration
 
 ### Why PNPM?
+
 - **Disk Space**: Efficient storage with hard links
 - **Speed**: Faster than npm/yarn
 - **Strict**: Better dependency resolution
@@ -339,9 +370,11 @@ WhoIsIt/
 ## Architectural Decisions
 
 ### Monorepo vs Multi-repo
+
 **Decision**: Monorepo with PNPM workspaces
 
 **Rationale**:
+
 - Shared types between frontend/backend
 - Atomic commits across multiple packages
 - Simplified dependency management
@@ -349,9 +382,11 @@ WhoIsIt/
 - Easier refactoring
 
 ### REST + WebSocket vs GraphQL + Subscriptions
+
 **Decision**: REST for queries, WebSocket for real-time
 
 **Rationale**:
+
 - REST simpler for CRUD operations
 - WebSocket natural fit for game events
 - No GraphQL learning curve
@@ -359,9 +394,11 @@ WhoIsIt/
 - Socket.IO maturity and reliability
 
 ### TypeORM vs Prisma
+
 **Decision**: TypeORM with Active Record pattern
 
 **Rationale**:
+
 - NestJS first-class support
 - Decorator-based entities
 - Active Record pattern simplicity
@@ -369,9 +406,11 @@ WhoIsIt/
 - Extensive PostgreSQL feature support
 
 ### Zustand vs Redux vs Context
+
 **Decision**: Zustand for state management
 
 **Rationale**:
+
 - Minimal boilerplate
 - TypeScript-friendly
 - No provider wrapping
@@ -381,6 +420,7 @@ WhoIsIt/
 ## Performance Considerations
 
 ### Frontend Optimizations
+
 - Server-side rendering for initial load
 - Code splitting by route
 - Image optimization via Next.js
@@ -388,6 +428,7 @@ WhoIsIt/
 - Lazy loading for modals and drawers
 
 ### Backend Optimizations
+
 - Connection pooling for database
 - Query optimization with indexes
 - Eager vs lazy loading strategy
@@ -395,6 +436,7 @@ WhoIsIt/
 - Caching for character sets
 
 ### Real-time Optimizations
+
 - WebSocket over polling
 - Room-based broadcasting
 - Minimal payload sizes
@@ -412,6 +454,7 @@ Future enhancements can include horizontal scaling with Redis, microservices sep
 ---
 
 **Related Documentation**:
+
 - [Monorepo Structure](./monorepo.md)
 - [Technology Stack Details](./tech-stack.md)
 - [Design Patterns](./patterns.md)

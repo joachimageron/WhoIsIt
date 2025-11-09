@@ -7,7 +7,9 @@ This section contains comprehensive documentation for the WhoIsIt backend, built
 ## Contents
 
 ### [Database Schema](./database.md)
+
 Complete database schema documentation with:
+
 - **15 entities** covering users, games, characters, and gameplay
 - Entity relationships and diagrams
 - Database enums and types
@@ -15,7 +17,9 @@ Complete database schema documentation with:
 - Migration strategies
 
 ### Authentication (Coming Soon)
+
 JWT-based authentication system with:
+
 - User registration and login
 - Email verification
 - Password reset workflow
@@ -23,7 +27,9 @@ JWT-based authentication system with:
 - WebSocket authentication
 
 ### Game Mechanics (Coming Soon)
+
 Core gameplay logic including:
+
 - Game creation and lobby management
 - Turn-based gameplay
 - Question and answer system
@@ -31,19 +37,23 @@ Core gameplay logic including:
 - Game completion and results
 
 ### WebSocket Implementation (Coming Soon)
+
 Real-time communication with Socket.IO:
+
 - Custom auth adapter
 - Room-based broadcasting
 - Event patterns and acknowledgements
 - Connection management
 
 ### API Endpoints
+
 See [REST API Reference](../api/rest-api.md) for complete endpoint documentation.
 
 ## Quick Links
 
 ### Project Structure
-```
+
+```text
 apps/backend/
 ├── src/
 │   ├── auth/           # Authentication module
@@ -55,6 +65,7 @@ apps/backend/
 ```
 
 ### Key Technologies
+
 - **NestJS 11**: Progressive Node.js framework
 - **TypeORM**: Object-Relational Mapper
 - **PostgreSQL**: Primary database
@@ -112,7 +123,7 @@ EMAIL_PASSWORD=your-app-password
 
 The backend follows NestJS modular architecture:
 
-```
+```text
 AppModule
 ├── ConfigModule (global)
 ├── TypeOrmModule (global)
@@ -171,6 +182,7 @@ export class GameService {
 ## Testing
 
 ### Unit Tests
+
 ```bash
 # Run all tests
 pnpm --filter @whois-it/backend test
@@ -183,11 +195,13 @@ pnpm --filter @whois-it/backend test:cov
 ```
 
 ### Current Test Status
+
 - **162/162** tests passing
 - Controllers, services, and integration tests
 - Mock repositories and dependencies
 
 ### E2E Tests
+
 ```bash
 pnpm --filter @whois-it/backend test:e2e
 ```
@@ -195,19 +209,25 @@ pnpm --filter @whois-it/backend test:e2e
 ## Development Tips
 
 ### Hot Reload
+
 The backend watches for file changes and automatically recompiles:
+
 ```bash
 pnpm dev:backend  # Starts with --watch flag
 ```
 
 ### Debugging
+
 Use VS Code debugger:
+
 1. Set breakpoints in code
 2. Run "Debug NestJS" configuration
 3. Inspect variables and call stack
 
 ### Database Queries
+
 Enable query logging in development:
+
 ```typescript
 // In app.module.ts
 TypeOrmModule.forRoot({
@@ -235,12 +255,14 @@ nest generate service feature
 ## API Documentation
 
 For complete API endpoint documentation, see:
+
 - [REST API Reference](../api/rest-api.md)
 - [Socket.IO Events](../api/socket-events.md) (Coming Soon)
 
 ## Common Patterns
 
 ### Controller Pattern
+
 ```typescript
 @Controller('games')
 export class GameController {
@@ -254,6 +276,7 @@ export class GameController {
 ```
 
 ### Service Pattern
+
 ```typescript
 @Injectable()
 export class GameService {
@@ -264,6 +287,7 @@ export class GameService {
 ```
 
 ### Gateway Pattern (WebSocket)
+
 ```typescript
 @WebSocketGateway()
 export class GameGateway {
@@ -277,17 +301,20 @@ export class GameGateway {
 ## Performance Considerations
 
 ### Query Optimization
+
 - Use eager loading for relations
 - Implement pagination
 - Add indexes on frequently queried columns
 - Use QueryBuilder for complex queries
 
 ### Caching (Future)
+
 - Redis for session storage
 - Cache frequently accessed data
 - Invalidate on updates
 
 ### Horizontal Scaling (Future)
+
 - Redis adapter for Socket.IO
 - Load balancer with sticky sessions
 - Database connection pooling
@@ -295,6 +322,7 @@ export class GameGateway {
 ## Troubleshooting
 
 ### Database Connection Issues
+
 ```bash
 # Check PostgreSQL is running
 psql -U postgres -d whois_it
@@ -304,6 +332,7 @@ psql -U postgres -d whois_it
 ```
 
 ### TypeORM Sync Issues
+
 ```bash
 # Reset database (development only!)
 pnpm db:reset
@@ -314,6 +343,7 @@ pnpm migration:run
 ```
 
 ### Port Already in Use
+
 ```bash
 # Find process on port 4000
 lsof -i :4000  # Mac/Linux
@@ -333,6 +363,7 @@ kill -9 <PID>
 ---
 
 **Related Documentation**:
+
 - [Architecture Overview](../architecture/overview.md)
 - [Technology Stack](../architecture/tech-stack.md)
 - [Frontend Documentation](../frontend/README.md)

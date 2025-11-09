@@ -6,7 +6,7 @@ WhoIsIt uses **PostgreSQL** as its primary database with **TypeORM** as the ORM.
 
 ## Entity Relationship Diagram
 
-```
+```text
 ┌─────────────┐
 │    User     │◄────┐
 └──────┬──────┘     │
@@ -126,11 +126,13 @@ export class User {
 ```
 
 **Indexes**:
+
 - `email` (unique)
 - `username` (unique)
 - `lastSeenAt` (for activity queries)
 
 **Key Features**:
+
 - **Guest Support**: `isGuest` flag for anonymous players
 - **Email Verification**: Token-based verification workflow
 - **Password Reset**: Secure token-based reset
@@ -214,6 +216,7 @@ export class Game {
 ```
 
 **Enums**:
+
 ```typescript
 enum GameStatus {
   LOBBY = 'lobby',           // Waiting for players
@@ -229,10 +232,12 @@ enum GameVisibility {
 ```
 
 **Indexes**:
+
 - `roomCode` (unique)
 - `status` (for filtering active games)
 
 **Key Features**:
+
 - **Room Code**: Unique 6-character code for joining
 - **Flexible Rules**: JSONB column for custom configurations
 - **Time Tracking**: Creation, start, and end timestamps
@@ -326,6 +331,7 @@ export class GamePlayer {
 ```
 
 **Enums**:
+
 ```typescript
 enum GamePlayerRole {
   HOST = 'host',           // Game host
@@ -335,9 +341,11 @@ enum GamePlayerRole {
 ```
 
 **Indexes**:
+
 - `game_id` (for game lookups)
 
 **Key Features**:
+
 - **Guest Support**: Nullable user relationship
 - **Reconnection**: Token-based reconnection support
 - **Score Tracking**: Real-time score updates
@@ -398,9 +406,11 @@ export class CharacterSet {
 ```
 
 **Indexes**:
+
 - `slug` (unique)
 
 **Key Features**:
+
 - **Default Sets**: System-provided character sets
 - **Custom Sets**: User-created sets
 - **Visibility**: Public for sharing, private for personal use
@@ -456,9 +466,11 @@ export class Character {
 ```
 
 **Indexes**:
+
 - `(set_id, slug)` (unique composite)
 
 **Key Features**:
+
 - **Rich Metadata**: JSONB for character attributes
 - **Image Support**: Character portraits
 - **Active Status**: Enable/disable characters
@@ -511,6 +523,7 @@ export class Round {
 ```
 
 **Enums**:
+
 ```typescript
 enum RoundState {
   AWAITING_QUESTION = 'awaiting_question',
@@ -594,6 +607,7 @@ export class Answer {
 ```
 
 **Enums**:
+
 ```typescript
 enum AnswerValue {
   YES = 'yes',
@@ -711,6 +725,7 @@ export class PlayerPanel {
 ```
 
 **Enums**:
+
 ```typescript
 enum PlayerPanelStatus {
   UNKNOWN = 'unknown',         // No information yet
@@ -754,6 +769,7 @@ export class GameEvent {
 ```
 
 **Enums**:
+
 ```typescript
 enum GameEventType {
   PLAYER_JOINED = 'player_joined',
@@ -876,6 +892,7 @@ export class GameConfigSnapshot {
 ## Database Schema Summary
 
 ### Entity Count
+
 - **15 entities** total
 - **Core**: User, Game, GamePlayer, Character, CharacterSet
 - **Gameplay**: Round, Question, Answer, Guess
@@ -883,12 +900,14 @@ export class GameConfigSnapshot {
 - **Statistics**: PlayerStats, GameConfigSnapshot
 
 ### Relationship Patterns
+
 - **One-to-Many**: User → Games, CharacterSet → Characters
 - **Many-to-One**: Game → User (host), GamePlayer → User
 - **One-to-One**: PlayerSecret → GamePlayer, Question → Answer
 - **Self-Referencing**: None
 
 ### Data Types Used
+
 - **UUID**: All primary keys
 - **Text**: Strings (email, username, room codes)
 - **Integer**: Counts, scores, timers
@@ -898,6 +917,7 @@ export class GameConfigSnapshot {
 - **Timestamptz**: All timestamps with timezone
 
 ### Indexes
+
 - **Unique Constraints**: Email, username, room code, slug
 - **Foreign Keys**: All relationships indexed
 - **Query Optimization**: Status, lastSeenAt, game_id
@@ -905,12 +925,14 @@ export class GameConfigSnapshot {
 ## Migration Strategy
 
 ### Development
+
 ```bash
 # Sync mode (automatic schema updates)
 DB_SYNC=true pnpm dev:backend
 ```
 
 ### Production
+
 ```bash
 # Generate migration
 pnpm migration:generate MigrationName
@@ -923,6 +945,7 @@ pnpm migration:revert
 ```
 
 ### Seeding
+
 ```bash
 # Seed database with demo data
 pnpm seed
@@ -934,6 +957,7 @@ pnpm db:reset
 ## Query Optimization Tips
 
 ### Use Relations Wisely
+
 ```typescript
 // ❌ N+1 Problem
 const games = await gameRepository.find();
@@ -948,6 +972,7 @@ const games = await gameRepository.find({
 ```
 
 ### Use QueryBuilder for Complex Queries
+
 ```typescript
 const games = await gameRepository
   .createQueryBuilder('game')
@@ -961,6 +986,7 @@ const games = await gameRepository
 ```
 
 ### Use Indexes
+
 ```typescript
 // Indexed query (fast)
 await gameRepository.findOne({
@@ -976,6 +1002,7 @@ await gameRepository.findOne({
 ## Conclusion
 
 The WhoIsIt database schema is designed for:
+
 - **Real-time gameplay** with efficient queries
 - **Event sourcing** through GameEvent logging
 - **Flexibility** with JSONB metadata columns
@@ -987,6 +1014,7 @@ The schema supports both authenticated and guest users, public and private games
 ---
 
 **Related Documentation**:
+
 - [Authentication](./authentication.md)
 - [Game Mechanics](./game-mechanics.md)
 - [API Endpoints](./api-endpoints.md)

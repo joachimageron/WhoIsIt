@@ -11,6 +11,7 @@ WhoIsIt follows established design patterns and coding conventions to ensure mai
 **Purpose**: Organize code into cohesive feature modules
 
 **Structure**:
+
 ```typescript
 @Module({
   imports: [TypeOrmModule.forFeature([Game, GamePlayer])],
@@ -22,12 +23,14 @@ export class GameModule {}
 ```
 
 **Conventions**:
+
 - One module per feature (AuthModule, GameModule, etc.)
 - Import related modules and TypeORM repositories
 - Export services that other modules need
 - Keep modules focused and cohesive
 
 **Benefits**:
+
 - Clear feature boundaries
 - Dependency injection scope
 - Lazy loading potential
@@ -38,6 +41,7 @@ export class GameModule {}
 **Purpose**: Handle HTTP requests and delegate to services
 
 **Structure**:
+
 ```typescript
 @Controller('games')
 export class GameController {
@@ -60,6 +64,7 @@ export class GameController {
 ```
 
 **Conventions**:
+
 - Controllers handle HTTP only (no business logic)
 - Use DTOs for request validation
 - Use guards for authentication
@@ -67,6 +72,7 @@ export class GameController {
 - Use proper HTTP status codes
 
 **Benefits**:
+
 - Thin controllers (testable)
 - Clear API surface
 - Automatic validation
@@ -77,6 +83,7 @@ export class GameController {
 **Purpose**: Contain business logic and orchestration
 
 **Structure**:
+
 ```typescript
 @Injectable()
 export class GameService {
@@ -107,6 +114,7 @@ export class GameService {
 ```
 
 **Conventions**:
+
 - Services contain business logic
 - Inject repositories and other services
 - Throw domain exceptions
@@ -114,7 +122,8 @@ export class GameService {
 - Use transactions for multi-step operations
 
 **Service Decomposition Pattern**:
-```
+
+```text
 GameService (Orchestrator)
 ├── GameLobbyService (Lobby management)
 ├── GamePlayService (Gameplay logic)
@@ -123,6 +132,7 @@ GameService (Orchestrator)
 ```
 
 **Benefits**:
+
 - Single Responsibility Principle
 - Easy to test
 - Reusable logic
@@ -133,6 +143,7 @@ GameService (Orchestrator)
 **Purpose**: Abstract database operations
 
 **TypeORM Repositories**:
+
 ```typescript
 @Injectable()
 export class GameLobbyService {
@@ -153,12 +164,14 @@ export class GameLobbyService {
 ```
 
 **Conventions**:
+
 - Use TypeORM Repository for queries
 - Define relations in findOne/findMany
 - Use QueryBuilder for complex queries
 - Avoid N+1 queries (eager load when needed)
 
 **Benefits**:
+
 - Abstracted database operations
 - Type-safe queries
 - Relationship loading
@@ -169,6 +182,7 @@ export class GameLobbyService {
 **Purpose**: Protect routes with authentication/authorization
 
 **Structure**:
+
 ```typescript
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {}
@@ -183,6 +197,7 @@ export class OptionalJwtAuthGuard extends AuthGuard('jwt') {
 ```
 
 **Usage**:
+
 ```typescript
 @UseGuards(JwtAuthGuard)  // Required auth
 @Get('profile')
@@ -199,12 +214,14 @@ getPublic(@Req() req) {
 ```
 
 **Conventions**:
+
 - Guards return true/false or throw
 - Attach user to request
 - Use Passport strategies
 - Guards are composable
 
 **Benefits**:
+
 - Declarative security
 - Reusable guards
 - Request-level user access
@@ -215,6 +232,7 @@ getPublic(@Req() req) {
 **Purpose**: Handle WebSocket connections and events
 
 **Structure**:
+
 ```typescript
 @WebSocketGateway({
   cors: { origin: process.env.FRONTEND_ORIGIN, credentials: true },
@@ -246,6 +264,7 @@ export class GameGateway {
 ```
 
 **Conventions**:
+
 - Gateways handle WebSocket only
 - Use `@SubscribeMessage` for events
 - Return acknowledgement responses
@@ -253,6 +272,7 @@ export class GameGateway {
 - Delegate business logic to services
 
 **Custom Auth Adapter Pattern**:
+
 ```typescript
 export class WsAuthAdapter extends IoAdapter {
   createIOServer(port: number, options?: any): any {
@@ -278,6 +298,7 @@ export class WsAuthAdapter extends IoAdapter {
 ```
 
 **Benefits**:
+
 - Real-time communication
 - Room-based broadcasting
 - Authenticated sockets
@@ -288,6 +309,7 @@ export class WsAuthAdapter extends IoAdapter {
 **Purpose**: Validate and transform request data
 
 **Structure**:
+
 ```typescript
 export class CreateGameDto {
   @IsUUID()
@@ -311,12 +333,14 @@ export class CreateGameDto {
 ```
 
 **Conventions**:
+
 - One DTO per request type
 - Use class-validator decorators
 - Make optional fields explicit
 - Transform to domain models in service
 
 **Response DTOs**:
+
 ```typescript
 export function toGameLobbyResponse(game: Game): GameLobbyResponse {
   return {
@@ -330,6 +354,7 @@ export function toGameLobbyResponse(game: Game): GameLobbyResponse {
 ```
 
 **Benefits**:
+
 - Automatic validation
 - Type safety
 - Clear API contracts
@@ -340,6 +365,7 @@ export function toGameLobbyResponse(game: Game): GameLobbyResponse {
 **Purpose**: Define database schema with TypeORM
 
 **Structure**:
+
 ```typescript
 @Entity('games')
 export class Game {
@@ -376,6 +402,7 @@ export class Game {
 ```
 
 **Conventions**:
+
 - Use `@Entity` with table name
 - UUID primary keys
 - Explicit column names for foreign keys
@@ -383,6 +410,7 @@ export class Game {
 - Define relationships bidirectionally
 
 **Benefits**:
+
 - Type-safe database operations
 - Automatic migration generation
 - Relationship loading
@@ -395,6 +423,7 @@ export class Game {
 **Purpose**: Define routes with file-based routing
 
 **Structure** (`app/[lang]/game/create/page.tsx`):
+
 ```typescript
 import { Metadata } from 'next';
 import CreateGameClient from './create-game-client';
@@ -410,6 +439,7 @@ export default function CreateGamePage() {
 ```
 
 **Conventions**:
+
 - Server Components by default
 - Export metadata for SEO
 - Delegate to Client Components for interactivity
@@ -417,6 +447,7 @@ export default function CreateGamePage() {
 - Use `[lang]` for i18n
 
 **Benefits**:
+
 - Automatic routing
 - Server-side rendering
 - Type-safe navigation
@@ -427,6 +458,7 @@ export default function CreateGamePage() {
 **Purpose**: Interactive components with state
 
 **Structure**:
+
 ```typescript
 'use client';
 
@@ -455,6 +487,7 @@ export default function CreateGameClient() {
 ```
 
 **Conventions**:
+
 - Use `'use client'` directive
 - Hooks for state and effects
 - Event handlers for interactions
@@ -462,6 +495,7 @@ export default function CreateGameClient() {
 - HeroUI components for UI
 
 **Benefits**:
+
 - Client-side interactivity
 - React hooks
 - Real-time updates
@@ -472,6 +506,7 @@ export default function CreateGameClient() {
 **Purpose**: Reusable stateful logic
 
 **Structure** (`hooks/use-game-socket.ts`):
+
 ```typescript
 import { useEffect, useCallback, useRef } from 'react';
 import { getSocket, disconnectSocket } from '@/lib/socket';
@@ -507,6 +542,7 @@ export const useGameSocket = () => {
 ```
 
 **Conventions**:
+
 - Prefix with `use`
 - Return object with methods/values
 - Use `useCallback` for functions
@@ -514,6 +550,7 @@ export const useGameSocket = () => {
 - Return cleanup functions
 
 **Benefits**:
+
 - Reusable logic
 - Testable
 - Type-safe
@@ -524,6 +561,7 @@ export const useGameSocket = () => {
 **Purpose**: Global state management
 
 **Structure** (`store/game-store.ts`):
+
 ```typescript
 import { create } from 'zustand';
 
@@ -555,6 +593,7 @@ export const useGameStore = create<GameStore>((set) => ({
 ```
 
 **Conventions**:
+
 - Define interface for type safety
 - Separate state from actions
 - Use descriptive action names
@@ -562,6 +601,7 @@ export const useGameStore = create<GameStore>((set) => ({
 - Keep stores focused
 
 **Benefits**:
+
 - Global state
 - No providers needed
 - TypeScript support
@@ -572,6 +612,7 @@ export const useGameStore = create<GameStore>((set) => ({
 **Purpose**: Centralized API communication
 
 **Structure** (`lib/game-api.ts`):
+
 ```typescript
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -607,6 +648,7 @@ export async function joinGame(roomCode: string, data: JoinGameRequest) {
 ```
 
 **Conventions**:
+
 - One file per API domain
 - Export async functions
 - Use fetch with credentials
@@ -614,6 +656,7 @@ export async function joinGame(roomCode: string, data: JoinGameRequest) {
 - Type request/response
 
 **Benefits**:
+
 - Centralized API logic
 - Easy to mock for testing
 - Consistent error handling
@@ -624,6 +667,7 @@ export async function joinGame(roomCode: string, data: JoinGameRequest) {
 **Purpose**: Build complex UIs from simple components
 
 **Structure**:
+
 ```typescript
 export default function GameLobby({ roomCode }) {
   return (
@@ -644,12 +688,14 @@ export default function GameLobby({ roomCode }) {
 ```
 
 **Conventions**:
+
 - Small, focused components
 - Props for configuration
 - Composition over inheritance
 - HeroUI components as building blocks
 
 **Benefits**:
+
 - Reusable components
 - Easy to test
 - Clear component hierarchy
@@ -662,12 +708,14 @@ export default function GameLobby({ roomCode }) {
 **Purpose**: Define types before implementation
 
 **Process**:
+
 1. Define types in `packages/contracts`
 2. Implement backend controller/service
 3. Implement frontend API client
 4. Both sides use same types
 
 **Example** (`packages/contracts/index.d.ts`):
+
 ```typescript
 export type CreateGameRequest = {
   characterSetId: string;
@@ -685,6 +733,7 @@ export type GameLobbyResponse = {
 ```
 
 **Benefits**:
+
 - Type safety
 - Clear API contracts
 - Refactoring safety
@@ -693,6 +742,7 @@ export type GameLobbyResponse = {
 ### Error Handling Pattern
 
 **Backend**:
+
 ```typescript
 // Throw domain exceptions
 if (!game) {
@@ -705,6 +755,7 @@ if (game.status !== GameStatus.LOBBY) {
 ```
 
 **Frontend**:
+
 ```typescript
 // Try-catch with user feedback
 try {
@@ -717,6 +768,7 @@ try {
 ```
 
 **WebSocket**:
+
 ```typescript
 // Acknowledgement with success flag
 return {
@@ -734,6 +786,7 @@ return {
 ### Validation Pattern
 
 **Backend Validation**:
+
 ```typescript
 @Post()
 async create(@Body() dto: CreateGameDto) {
@@ -743,6 +796,7 @@ async create(@Body() dto: CreateGameDto) {
 ```
 
 **Frontend Validation**:
+
 ```typescript
 const handleSubmit = async (data: FormData) => {
   // Client-side validation
@@ -759,6 +813,7 @@ const handleSubmit = async (data: FormData) => {
 ### Normalization Pattern
 
 **Room Code Normalization**:
+
 ```typescript
 // Backend
 function normalizeRoomCode(code: string): string {
@@ -772,6 +827,7 @@ const game = await this.gameRepository.findOne({
 ```
 
 **Benefits**:
+
 - Consistent data
 - Case-insensitive lookups
 - Prevent duplicate rooms
@@ -781,17 +837,20 @@ const game = await this.gameRepository.findOne({
 ### Naming Conventions
 
 **TypeScript/JavaScript**:
+
 - `camelCase` for variables and functions
 - `PascalCase` for classes and components
 - `UPPER_CASE` for constants
 - Descriptive names (no abbreviations)
 
 **Files**:
+
 - `kebab-case.ts` for files
 - `PascalCase.tsx` for React components
 - `.service.ts`, `.controller.ts` suffixes
 
 **Database**:
+
 - `snake_case` for table and column names
 - Plural table names (`users`, `games`)
 - Singular entity names (`User`, `Game`)
@@ -799,6 +858,7 @@ const game = await this.gameRepository.findOne({
 ### Code Organization
 
 **Import Order**:
+
 1. External packages
 2. Workspace packages
 3. Internal modules
@@ -819,6 +879,7 @@ import type { GameStatus } from './types';
 ```
 
 **File Organization**:
+
 - Related files in same directory
 - Index files for clean imports
 - Separate concerns (logic vs UI)
@@ -826,17 +887,20 @@ import type { GameStatus } from './types';
 ### Comment Conventions
 
 **When to Comment**:
+
 - Complex business logic
 - Non-obvious algorithms
 - Public API methods
 - Workarounds or hacks
 
 **When NOT to Comment**:
+
 - Obvious code
 - Self-explanatory function names
 - TypeScript types (self-documenting)
 
 **JSDoc for Public APIs**:
+
 ```typescript
 /**
  * Creates a new game lobby
@@ -852,6 +916,7 @@ async createGame(request: CreateGameRequest): Promise<GameLobbyResponse> {
 ### TypeScript Conventions
 
 **Use Explicit Types**:
+
 ```typescript
 // ✅ Good
 function getUser(id: string): Promise<User | null> {
@@ -865,6 +930,7 @@ function getUser(id) {
 ```
 
 **Prefer Interfaces for Objects**:
+
 ```typescript
 interface GameState {
   roomCode: string;
@@ -874,6 +940,7 @@ interface GameState {
 ```
 
 **Use Type for Unions/Primitives**:
+
 ```typescript
 type GameStatus = 'lobby' | 'in_progress' | 'completed';
 type UserId = string;
@@ -884,6 +951,7 @@ type UserId = string;
 ### Unit Test Pattern
 
 **Structure**:
+
 ```typescript
 describe('GameService', () => {
   let service: GameService;
@@ -921,6 +989,7 @@ describe('GameService', () => {
 ```
 
 **Conventions**:
+
 - One test file per source file
 - Describe blocks for grouping
 - BeforeEach for setup
@@ -941,6 +1010,7 @@ These patterns ensure the codebase remains maintainable, testable, and scalable 
 ---
 
 **Related Documentation**:
+
 - [System Architecture Overview](./overview.md)
 - [Technology Stack](./tech-stack.md)
 - [Backend Documentation](../backend/README.md)

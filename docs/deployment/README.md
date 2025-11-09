@@ -7,21 +7,27 @@ This section contains guides for deploying WhoIsIt to production environments, i
 ## Contents
 
 ### Environment Configuration (Coming Soon)
+
 Production environment setup:
+
 - Environment variables for frontend and backend
 - Security considerations
 - Secrets management
 - Multi-environment configuration
 
 ### Database Migrations (Coming Soon)
+
 Managing database schema changes:
+
 - Creating migrations
 - Running migrations in production
 - Rolling back migrations
 - Migration best practices
 
 ### Production Deployment (Coming Soon)
+
 Deploying to production:
+
 - Docker containerization
 - Cloud platform options (Vercel, Railway, AWS)
 - Database hosting (PostgreSQL)
@@ -29,7 +35,9 @@ Deploying to production:
 - Health checks and monitoring
 
 ### CI/CD Pipeline (Coming Soon)
+
 Automated deployment workflows:
+
 - GitHub Actions configuration
 - Automated testing
 - Build and deployment
@@ -85,16 +93,19 @@ Automated deployment workflows:
 ### Frontend (Next.js)
 
 **Vercel** (Recommended)
+
 - Native Next.js support
 - Automatic deployments
 - Edge functions
 - Free tier available
+
 ```bash
 # Deploy with Vercel CLI
 vercel --prod
 ```
 
 **Alternatives**:
+
 - Netlify
 - AWS Amplify
 - Railway
@@ -103,12 +114,14 @@ vercel --prod
 ### Backend (NestJS)
 
 **Railway** (Recommended for full-stack)
+
 - PostgreSQL included
 - Automatic deployments from GitHub
 - Environment variables management
 - Affordable pricing
 
 **Alternatives**:
+
 - Heroku
 - AWS Elastic Beanstalk
 - Google Cloud Run
@@ -118,11 +131,13 @@ vercel --prod
 ### Database (PostgreSQL)
 
 **Included with Backend Platform**:
+
 - Railway (included)
 - Heroku Postgres
 - AWS RDS
 
 **Managed Database Services**:
+
 - Supabase
 - Neon
 - PlanetScale (MySQL alternative)
@@ -178,6 +193,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ```
 
 **⚠️ Security Notes**:
+
 1. **Never commit `.env` files** to version control
 2. Use platform-specific secret management
 3. Rotate secrets regularly
@@ -187,6 +203,7 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 ## Database Migration Strategy
 
 ### Development
+
 ```bash
 # Auto-sync (convenient but not safe for production)
 DB_SYNC=true pnpm dev:backend
@@ -194,32 +211,37 @@ DB_SYNC=true pnpm dev:backend
 
 ### Production
 
-**Step 1: Generate Migration**
+#### Step 1: Generate Migration
+
 ```bash
 # After making entity changes
 pnpm migration:generate DescriptiveMigrationName
 ```
 
-**Step 2: Review Migration**
+#### Step 2: Review Migration
+
 ```bash
 # Check generated migration in apps/backend/src/database/migrations/
 # Verify SQL statements are correct
 ```
 
-**Step 3: Test Locally**
+#### Step 3: Test Locally
+
 ```bash
 # Test migration on local database
 DB_SYNC=false pnpm migration:run
 ```
 
-**Step 4: Run in Production**
+#### Step 4: Run in Production
+
 ```bash
 # SSH to production or use platform CLI
 npm run migration:run
 # Or run as part of deployment script
 ```
 
-**Step 5: Rollback (if needed)**
+#### Step 5: Rollback (if needed)
+
 ```bash
 npm run migration:revert
 ```
@@ -459,21 +481,25 @@ async databaseHealth() {
 ### Recommended Tools
 
 **Error Tracking**:
+
 - Sentry
 - Rollbar
 - Bugsnag
 
 **Application Monitoring**:
+
 - New Relic
 - DataDog
 - AppDynamics
 
 **Log Management**:
+
 - Logtail
 - Papertrail
 - LogDNA
 
 **Uptime Monitoring**:
+
 - UptimeRobot
 - Pingdom
 - StatusCake
@@ -501,6 +527,7 @@ Sentry.init({
 ## Performance Optimization
 
 ### Backend
+
 - Enable HTTP compression
 - Implement caching (Redis)
 - Optimize database queries
@@ -508,6 +535,7 @@ Sentry.init({
 - Enable CDN for static assets
 
 ### Frontend
+
 - Enable Next.js image optimization
 - Use CDN for assets
 - Implement code splitting
@@ -515,6 +543,7 @@ Sentry.init({
 - Optimize bundle size
 
 ### Database
+
 - Add appropriate indexes
 - Implement query caching
 - Use read replicas
@@ -544,6 +573,7 @@ Sentry.init({
 ### Database Backups
 
 **Automated Daily Backups**:
+
 ```bash
 # PostgreSQL backup script
 pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME | \
@@ -554,6 +584,7 @@ aws s3 cp backup-*.sql.gz s3://your-backup-bucket/
 ```
 
 **Retention Policy**:
+
 - Daily backups: Keep 7 days
 - Weekly backups: Keep 4 weeks
 - Monthly backups: Keep 12 months
@@ -563,17 +594,20 @@ aws s3 cp backup-*.sql.gz s3://your-backup-bucket/
 ### Horizontal Scaling
 
 **Backend**:
+
 - Multiple backend instances behind load balancer
 - Redis for session storage
 - Redis adapter for Socket.IO
 - Sticky sessions for WebSocket
 
 **Database**:
+
 - Read replicas for scaling reads
 - Connection pooling
 - Query optimization
 
 **Frontend**:
+
 - CDN for static assets
 - Edge functions for API routes
 

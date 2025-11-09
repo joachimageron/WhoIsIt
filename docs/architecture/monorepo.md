@@ -6,7 +6,7 @@ WhoIsIt uses a **PNPM workspace-based monorepo** to manage multiple related pack
 
 ## Directory Structure
 
-```
+```text
 WhoIsIt/
 ├── .github/                      # GitHub-specific files
 │   ├── workflows/               # CI/CD workflows
@@ -97,6 +97,7 @@ WhoIsIt/
 ```
 
 **Key Features**:
+
 - `private: true` - Prevents accidental publishing
 - `packageManager` - Enforces PNPM version
 - Workspace-level scripts run across all packages
@@ -120,6 +121,7 @@ onlyBuiltDependencies:
 ```
 
 **Purpose**:
+
 - Defines workspace package locations
 - `onlyBuiltDependencies` optimizes hoisting for packages with native binaries
 - Ensures HeroUI packages build correctly
@@ -127,11 +129,13 @@ onlyBuiltDependencies:
 ## Package Naming Convention
 
 ### Package Names
+
 - `@whois-it/frontend` - Next.js frontend app
 - `@whois-it/backend` - NestJS backend app
 - `@whois-it/contracts` - Shared type definitions
 
 **Convention**: `@whois-it/<package-name>`
+
 - Scoped to organization
 - Prevents naming conflicts
 - Clear ownership
@@ -141,6 +145,7 @@ onlyBuiltDependencies:
 ### Types of Dependencies
 
 1. **Workspace Dependencies**
+
    ```json
    {
      "dependencies": {
@@ -148,11 +153,13 @@ onlyBuiltDependencies:
      }
    }
    ```
+
    - Uses `workspace:*` protocol
    - Always resolves to local package
    - Enables type sharing
 
 2. **External Dependencies**
+
    ```json
    {
      "dependencies": {
@@ -161,11 +168,13 @@ onlyBuiltDependencies:
      }
    }
    ```
+
    - Standard npm packages
    - Installed via PNPM
    - Shared when possible
 
 3. **Dev Dependencies**
+
    ```json
    {
      "devDependencies": {
@@ -174,6 +183,7 @@ onlyBuiltDependencies:
      }
    }
    ```
+
    - Build-time only
    - Not included in production bundles
 
@@ -181,7 +191,7 @@ onlyBuiltDependencies:
 
 PNPM uses a **content-addressable store** with **symlinks**:
 
-```
+```text
 node_modules/
 ├── .pnpm/                    # Actual package storage
 │   ├── next@15.3.1/
@@ -191,6 +201,7 @@ node_modules/
 ```
 
 **Benefits**:
+
 - Disk space efficiency (single copy per version)
 - Fast installation (hard links)
 - Strict dependency resolution (no phantom dependencies)
@@ -208,6 +219,7 @@ onlyBuiltDependencies:
 ```
 
 These packages:
+
 - Have native binaries
 - Need to be built during installation
 - Must be hoisted to workspace root
@@ -221,6 +233,7 @@ These packages:
 **Entry Point**: `app/[lang]/page.tsx`
 
 **Key Directories**:
+
 - `app/[lang]/` - App Router pages with i18n
 - `components/` - Reusable UI components
 - `store/` - Zustand state management
@@ -230,6 +243,7 @@ These packages:
 **Build Output**: `.next/` (gitignored)
 
 **Scripts**:
+
 ```bash
 pnpm --filter @whois-it/frontend dev     # Development server
 pnpm --filter @whois-it/frontend build   # Production build
@@ -244,6 +258,7 @@ pnpm --filter @whois-it/frontend lint    # Lint code
 **Entry Point**: `src/main.ts`
 
 **Key Directories**:
+
 - `src/auth/` - Authentication module
 - `src/game/` - Game logic module
 - `src/database/` - Database entities and config
@@ -253,6 +268,7 @@ pnpm --filter @whois-it/frontend lint    # Lint code
 **Build Output**: `dist/` (gitignored)
 
 **Scripts**:
+
 ```bash
 pnpm --filter @whois-it/backend start:dev  # Development mode
 pnpm --filter @whois-it/backend build      # Production build
@@ -269,6 +285,7 @@ pnpm --filter @whois-it/backend seed       # Seed database
 **Purpose**: Share types between frontend and backend
 
 **Contents**:
+
 ```typescript
 // index.d.ts
 export type GameStatus = "lobby" | "in_progress" | "completed";
@@ -279,16 +296,19 @@ export interface ClientToServerEvents { ... }
 ```
 
 **Usage in Frontend**:
+
 ```typescript
 import type { GameLobbyResponse } from "@whois-it/contracts";
 ```
 
 **Usage in Backend**:
+
 ```typescript
 import type { CreateGameRequest } from "@whois-it/contracts";
 ```
 
 **Benefits**:
+
 - Single source of truth
 - Type safety across apps
 - Refactoring safety
@@ -299,6 +319,7 @@ import type { CreateGameRequest } from "@whois-it/contracts";
 ### Running Scripts
 
 **Parallel Execution** (all workspaces):
+
 ```bash
 pnpm -r --parallel dev    # Run dev in all packages concurrently
 pnpm -r build             # Build all packages sequentially
@@ -306,12 +327,14 @@ pnpm -r test              # Test all packages
 ```
 
 **Filtered Execution** (specific workspace):
+
 ```bash
 pnpm --filter @whois-it/frontend dev    # Run frontend only
 pnpm --filter @whois-it/backend test    # Test backend only
 ```
 
 **Root-Level Shortcuts** (defined in root `package.json`):
+
 ```bash
 pnpm dev              # Start both frontend and backend
 pnpm build            # Build all workspaces
@@ -363,7 +386,7 @@ node_modules/
 
 Each application has its own `.env` file:
 
-```
+```text
 apps/
 ├── frontend/
 │   ├── .env           # Frontend environment variables
@@ -374,12 +397,14 @@ apps/
 ```
 
 **Frontend `.env`**:
+
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:4000
 NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
 ```
 
 **Backend `.env`**:
+
 ```bash
 PORT=4000
 DB_HOST=localhost
@@ -401,6 +426,7 @@ JWT_SECRET=your-secret-key
 ### Versioning Strategy
 
 Currently using **fixed versions** across workspace:
+
 - All packages at `0.1.0`
 - Pre-release stage
 - Breaking changes allowed
@@ -408,6 +434,7 @@ Currently using **fixed versions** across workspace:
 ### Future Versioning
 
 For production:
+
 - Semantic versioning (semver)
 - Independent package versions
 - Changelog generation
@@ -443,7 +470,7 @@ For production:
 
 ### Content-Addressable Storage
 
-```
+```text
 ~/.pnpm-store/
 └── v3/
     └── files/
@@ -453,6 +480,7 @@ For production:
 ```
 
 **Benefits**:
+
 - Single global store
 - Hard links to projects
 - Disk space savings
@@ -474,6 +502,7 @@ This prevents "phantom dependencies" common in npm/yarn.
 ### Peer Dependency Resolution
 
 PNPM resolves peer dependencies automatically:
+
 - Creates multiple instances if needed
 - Warns about missing peers
 - Better than npm's flat structure
@@ -483,18 +512,21 @@ PNPM resolves peer dependencies automatically:
 ### Adding Dependencies
 
 **Workspace Dependency**:
+
 ```bash
 cd apps/frontend
 pnpm add @whois-it/contracts@workspace:*
 ```
 
 **External Dependency**:
+
 ```bash
 cd apps/frontend
 pnpm add socket.io-client
 ```
 
 **Root-Level Dependency** (shared config):
+
 ```bash
 pnpm add -w eslint  # -w = workspace root
 ```
@@ -517,6 +549,7 @@ pnpm update --recursive   # Update in all workspaces
 ### Running Commands
 
 **Best Practice**: Use filters for specific packages
+
 ```bash
 # ✅ Good - explicit
 pnpm --filter @whois-it/frontend dev
@@ -532,6 +565,7 @@ cd apps/frontend && pnpm dev
 If migrating from separate repositories:
 
 1. **Preserve Git History**:
+
    ```bash
    git subtree add --prefix=apps/frontend frontend-repo main
    ```
@@ -543,6 +577,7 @@ If migrating from separate repositories:
 ### To Micro-frontends
 
 If scaling to micro-frontends:
+
 1. Keep shared packages in monorepo
 2. Deploy apps independently
 3. Use module federation or similar
@@ -562,6 +597,7 @@ The combination of PNPM workspaces and TypeScript creates a type-safe, efficient
 ---
 
 **Related Documentation**:
+
 - [System Architecture Overview](./overview.md)
 - [Technology Stack](./tech-stack.md)
 - [Development Workflow](../development/workflow.md)

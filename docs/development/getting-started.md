@@ -9,7 +9,7 @@ This guide will help you set up the WhoIsIt development environment on your loca
 ### Required Software
 
 1. **Node.js** (v18 or higher)
-   - Download: https://nodejs.org/
+   - Download: <https://nodejs.org/>
    - Verify: `node --version`
 
 2. **PNPM** (v10.20.0 or higher)
@@ -17,17 +17,17 @@ This guide will help you set up the WhoIsIt development environment on your loca
    - Verify: `pnpm --version`
 
 3. **PostgreSQL** (v12 or higher)
-   - Download: https://www.postgresql.org/download/
+   - Download: <https://www.postgresql.org/download/>
    - Verify: `psql --version`
 
 ### Optional Software
 
-4. **Git** (for version control)
-   - Download: https://git-scm.com/
+1. **Git** (for version control)
+   - Download: <https://git-scm.com/>
    - Verify: `git --version`
 
-5. **VS Code** (recommended IDE)
-   - Download: https://code.visualstudio.com/
+2. **VS Code** (recommended IDE)
+   - Download: <https://code.visualstudio.com/>
    - Extensions:
      - ESLint
      - Prettier
@@ -49,6 +49,7 @@ pnpm install
 ```
 
 This will:
+
 - Install all dependencies for frontend, backend, and packages
 - Set up workspace links between packages
 - Take 2-5 minutes depending on your internet speed
@@ -58,6 +59,7 @@ This will:
 #### Option A: Local PostgreSQL
 
 1. **Create Database**:
+
    ```bash
    # Connect to PostgreSQL
    psql -U postgres
@@ -70,6 +72,7 @@ This will:
    ```
 
 2. **Verify Connection**:
+
    ```bash
    psql -U postgres -d whois_it -c "SELECT version();"
    ```
@@ -121,6 +124,7 @@ FRONTEND_URL=http://localhost:3000
 **⚠️ Important**: Change `JWT_SECRET` to a secure random string!
 
 Generate a secure secret:
+
 ```bash
 # On Unix/Mac/Linux
 openssl rand -base64 32
@@ -155,7 +159,8 @@ pnpm seed
 ```
 
 This will create:
-- 2 demo users (testuser@example.com / Test User)
+
+- 2 demo users (<testuser@example.com> / Test User)
 - 1 character set ("Classic Characters")
 - 24 characters in the set
 
@@ -173,20 +178,22 @@ This runs both frontend and backend in parallel.
 #### Option B: Start Individually
 
 **Terminal 1 - Backend**:
+
 ```bash
 pnpm dev:backend
 ```
 
 **Terminal 2 - Frontend**:
+
 ```bash
 pnpm dev:frontend
 ```
 
 ### 8. Access the Application
 
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:4000
-- **API Health Check**: http://localhost:4000/
+- **Frontend**: <http://localhost:3000>
+- **Backend API**: <http://localhost:4000>
+- **API Health Check**: <http://localhost:4000/>
 
 ## Development Workflow
 
@@ -219,10 +226,10 @@ pnpm db:reset           # Reset database (WARNING: Deletes all data!)
 
 ### Making Code Changes
 
-1. **Frontend Changes**: 
+1. **Frontend Changes**:
    - Edit files in `apps/frontend/`
    - Hot reload is automatic (Turbopack)
-   - See changes at http://localhost:3000
+   - See changes at <http://localhost:3000>
 
 2. **Backend Changes**:
    - Edit files in `apps/backend/src/`
@@ -236,7 +243,7 @@ pnpm db:reset           # Reset database (WARNING: Deletes all data!)
 
 ### Creating a New Game
 
-1. Navigate to http://localhost:3000
+1. Navigate to <http://localhost:3000>
 2. Click "Create Game"
 3. Select "Classic Characters"
 4. Click "Create Game"
@@ -246,7 +253,7 @@ pnpm db:reset           # Reset database (WARNING: Deletes all data!)
 
 **Demo Users** (created by seed script):
 
-```
+```text
 Email: testuser@example.com
 Password: password123
 
@@ -258,7 +265,7 @@ Or create a new account via the registration page.
 
 ## Project Structure Quick Reference
 
-```
+```text
 WhoIsIt/
 ├── apps/
 │   ├── frontend/          # Next.js app (port 3000)
@@ -290,6 +297,7 @@ npm install -g pnpm@10.20.0
 ### Issue: PostgreSQL connection failed
 
 **Check if PostgreSQL is running**:
+
 ```bash
 # On Mac
 brew services list
@@ -302,6 +310,7 @@ sudo systemctl status postgresql
 ```
 
 **Verify credentials in `.env`**:
+
 ```bash
 # Test connection
 psql -h localhost -U postgres -d whois_it
@@ -310,6 +319,7 @@ psql -h localhost -U postgres -d whois_it
 ### Issue: Port already in use
 
 **Frontend (3000)**:
+
 ```bash
 # Find process using port 3000
 lsof -i :3000  # Mac/Linux
@@ -321,6 +331,7 @@ taskkill /PID <PID> /F  # Windows
 ```
 
 **Backend (4000)**:
+
 ```bash
 # Find process using port 4000
 lsof -i :4000  # Mac/Linux
@@ -382,11 +393,13 @@ This is expected in restricted network environments. The error is allowed to fai
 ### Debugging
 
 **Frontend**:
+
 - Use Chrome DevTools
 - React DevTools extension
 - Console logs in browser
 
 **Backend**:
+
 - Use VS Code debugger
 - NestJS built-in logger
 - Database query logs (enabled in development)
@@ -394,6 +407,7 @@ This is expected in restricted network environments. The error is allowed to fai
 ### Database Inspection
 
 **Using psql**:
+
 ```bash
 psql -U postgres -d whois_it
 
@@ -411,17 +425,20 @@ SELECT * FROM users;
 ```
 
 **Using GUI Tools**:
-- pgAdmin: https://www.pgadmin.org/
-- DBeaver: https://dbeaver.io/
-- TablePlus: https://tableplus.com/
+
+- pgAdmin: <https://www.pgadmin.org/>
+- DBeaver: <https://dbeaver.io/>
+- TablePlus: <https://tableplus.com/>
 
 ### Environment Variables
 
 **Frontend**:
+
 - Must start with `NEXT_PUBLIC_` to be exposed to browser
 - Available in both server and client components
 
 **Backend**:
+
 - All environment variables are server-side only
 - Access via `ConfigService` or `process.env`
 
@@ -471,4 +488,4 @@ If you encounter issues:
 
 ---
 
-**Welcome to WhoIsIt development! 🎮**
+Welcome to WhoIsIt development! 🎮

@@ -7,21 +7,27 @@ This section contains comprehensive documentation for the WhoIsIt frontend, buil
 ## Contents
 
 ### Application Structure (Coming Soon)
+
 Next.js App Router architecture with:
+
 - File-based routing with `[lang]` segments
 - Server and Client Components
 - Layout system and composition
 - Middleware for auth and i18n
 
 ### State Management (Coming Soon)
+
 Zustand store patterns:
+
 - Auth store (user authentication)
 - Game store (lobby and game state)
 - Store design patterns
 - DevTools integration
 
 ### UI Components (Coming Soon)
+
 HeroUI component library:
+
 - Component catalog and usage
 - Theme customization
 - Dark mode support
@@ -29,14 +35,18 @@ HeroUI component library:
 - Custom components
 
 ### Internationalization (Coming Soon)
+
 Multi-language support:
+
 - English and French locales
 - Dictionary structure
 - Locale detection and routing
 - Translation patterns
 
 ### Real-time Communication (Coming Soon)
+
 Socket.IO client integration:
+
 - Connection management
 - Event handlers and listeners
 - Custom hooks (`useGameSocket`)
@@ -45,7 +55,8 @@ Socket.IO client integration:
 ## Quick Links
 
 ### Project Structure
-```
+
+```text
 apps/frontend/
 ├── app/                  # Next.js App Router
 │   └── [lang]/          # Internationalized routes
@@ -69,6 +80,7 @@ apps/frontend/
 ```
 
 ### Key Technologies
+
 - **Next.js 15**: React meta-framework with App Router
 - **React 18**: UI library with Server Components
 - **TypeScript 5**: Type-safe JavaScript
@@ -114,7 +126,7 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
 
 Next.js 15 uses the App Router with React Server Components:
 
-```
+```text
 app/
 └── [lang]/              # Dynamic segment for locale (en, fr)
     ├── layout.tsx       # Root layout with providers
@@ -148,6 +160,7 @@ app/
 ### Component Pattern
 
 **Server Component** (default):
+
 ```typescript
 // app/[lang]/game/create/page.tsx
 import { Metadata } from 'next';
@@ -162,6 +175,7 @@ export default function CreateGamePage() {
 ```
 
 **Client Component** (with `'use client'`):
+
 ```typescript
 // app/[lang]/game/create/create-form.tsx
 'use client';
@@ -185,6 +199,7 @@ export default function CreateGameClient() {
 Zustand stores for global state:
 
 **Auth Store**:
+
 ```typescript
 // store/auth-store.ts
 import { create } from 'zustand';
@@ -205,6 +220,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
 ```
 
 **Usage in Components**:
+
 ```typescript
 'use client';
 
@@ -224,6 +240,7 @@ export default function ProfilePage() {
 ### API Communication
 
 **REST API Client**:
+
 ```typescript
 // lib/game-api.ts
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -245,6 +262,7 @@ export async function createGame(data: CreateGameRequest) {
 ```
 
 **WebSocket Client**:
+
 ```typescript
 // lib/socket.ts
 import { io } from 'socket.io-client';
@@ -261,6 +279,7 @@ export function getSocket() {
 ### Custom Hooks
 
 **useGameSocket Hook**:
+
 ```typescript
 // hooks/use-game-socket.ts
 'use client';
@@ -349,6 +368,7 @@ export default function MyComponent() {
 ### File-based Routing
 
 Routes are created by file structure:
+
 - `/app/[lang]/page.tsx` → `/:lang`
 - `/app/[lang]/game/create/page.tsx` → `/:lang/game/create`
 - `/app/[lang]/game/lobby/[roomCode]/page.tsx` → `/:lang/game/lobby/:roomCode`
@@ -398,6 +418,7 @@ export function middleware(request: NextRequest) {
 ## Internationalization
 
 ### Supported Locales
+
 - English (`en`) - Default
 - French (`fr`)
 
@@ -444,6 +465,7 @@ export default async function Page({ params }) {
 ### Hot Reload with Turbopack
 
 Next.js 15 uses Turbopack by default:
+
 ```bash
 pnpm dev:frontend  # --turbopack flag automatic
 ```
@@ -455,12 +477,14 @@ pnpm dev:frontend  # --turbopack flag automatic
 ### Debugging
 
 **Browser DevTools**:
+
 - React DevTools extension
 - Zustand DevTools integration
 - Network tab for API calls
 - WebSocket inspector
 
 **VS Code**:
+
 - Breakpoints in code
 - Debug configurations
 - TypeScript IntelliSense
@@ -468,6 +492,7 @@ pnpm dev:frontend  # --turbopack flag automatic
 ### Testing
 
 Currently no tests set up. Future additions:
+
 - Jest for unit tests
 - Testing Library for components
 - Playwright for E2E tests
@@ -519,6 +544,7 @@ export default function MyComponent() {
 ### Data Fetching
 
 **Server Component**:
+
 ```typescript
 // Fetch on server (no loading state needed)
 export default async function Page() {
@@ -530,6 +556,7 @@ export default async function Page() {
 ```
 
 **Client Component**:
+
 ```typescript
 'use client';
 
@@ -551,13 +578,16 @@ export default function MyComponent() {
 ## Performance Optimization
 
 ### Server Components
+
 - Render on server by default
 - Reduce client-side JavaScript
 - Fetch data server-side
 
 ### Code Splitting
+
 - Automatic route-based splitting
 - Dynamic imports for large components
+
 ```typescript
 const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
   loading: () => <Spinner />,
@@ -565,6 +595,7 @@ const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
 ```
 
 ### Image Optimization
+
 ```typescript
 import Image from 'next/image';
 
@@ -580,17 +611,20 @@ import Image from 'next/image';
 ## Troubleshooting
 
 ### Hydration Errors
+
 - Ensure server and client render same HTML
 - Check for browser-only APIs in Server Components
 - Use `'use client'` for interactive components
 
 ### Module Not Found
+
 ```bash
 rm -rf .next node_modules
 pnpm install
 ```
 
 ### TypeScript Errors
+
 - Restart TypeScript server in VS Code
 - Check `tsconfig.json` configuration
 - Ensure types are installed
@@ -605,6 +639,7 @@ pnpm install
 ---
 
 **Related Documentation**:
+
 - [Architecture Overview](../architecture/overview.md)
 - [Technology Stack](../architecture/tech-stack.md)
 - [Backend Documentation](../backend/README.md)

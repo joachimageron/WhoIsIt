@@ -7,7 +7,9 @@ This section contains guides and best practices for developing WhoIsIt, includin
 ## Contents
 
 ### [Getting Started Guide](./getting-started.md) ✅
+
 Complete setup instructions:
+
 - **Prerequisites**: Node.js, PNPM, PostgreSQL
 - **Installation steps**: Clone, install, configure
 - **Database setup**: Create database and seed data
@@ -16,7 +18,9 @@ Complete setup instructions:
 - **Common issues**: Troubleshooting guide
 
 ### Development Workflow (Coming Soon)
+
 Day-to-day development practices:
+
 - Git workflow and branching strategy
 - Code review process
 - Commit message conventions
@@ -24,7 +28,9 @@ Day-to-day development practices:
 - Issue tracking
 
 ### Testing Guide (Coming Soon)
+
 Testing strategies and examples:
+
 - Unit testing with Jest
 - Integration testing
 - E2E testing (future)
@@ -32,7 +38,9 @@ Testing strategies and examples:
 - Test coverage goals
 
 ### Debugging Guide (Coming Soon)
+
 Debugging tools and techniques:
+
 - VS Code debugger setup
 - Chrome DevTools for frontend
 - NestJS debugging
@@ -75,7 +83,7 @@ pnpm migration:revert   # Revert last migration
 
 ### Directory Structure
 
-```
+```text
 WhoIsIt/
 ├── .github/            # GitHub workflows and configs
 │   └── workflows/      # CI/CD pipelines
@@ -90,15 +98,15 @@ WhoIsIt/
 
 ### Development Ports
 
-- **Frontend**: http://localhost:3000
-- **Backend**: http://localhost:4000
+- **Frontend**: <http://localhost:3000>
+- **Backend**: <http://localhost:4000>
 - **PostgreSQL**: localhost:5432
 
 ## Development Workflow
 
 ### Git Branching Strategy
 
-```
+```text
 main            # Production-ready code
 ├── develop     # Development branch
     ├── feature/add-xxx    # Feature branches
@@ -116,7 +124,7 @@ main            # Production-ready code
 
 ### Commit Message Format
 
-```
+```text
 type(scope): subject
 
 body
@@ -125,6 +133,7 @@ footer
 ```
 
 **Types**:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -134,7 +143,8 @@ footer
 - `chore`: Maintenance
 
 **Example**:
-```
+
+```text
 feat(game): add player ready status
 
 - Add isReady field to GamePlayer entity
@@ -245,6 +255,7 @@ describe('GameService', () => {
 ### Backend Debugging
 
 **VS Code Launch Configuration**:
+
 ```json
 {
   "type": "node",
@@ -259,6 +270,7 @@ describe('GameService', () => {
 ```
 
 **Console Logging**:
+
 ```typescript
 // Use NestJS Logger
 import { Logger } from '@nestjs/common';
@@ -277,11 +289,13 @@ export class GameService {
 ### Frontend Debugging
 
 **React DevTools**:
+
 - Install React DevTools extension
 - Inspect component props and state
 - Track component renders
 
 **Browser DevTools**:
+
 - Network tab for API calls
 - Console for logs
 - Sources tab for breakpoints
@@ -289,6 +303,7 @@ export class GameService {
 ### Database Debugging
 
 **Enable Query Logging**:
+
 ```typescript
 // app.module.ts
 TypeOrmModule.forRoot({
@@ -298,6 +313,7 @@ TypeOrmModule.forRoot({
 ```
 
 **psql Commands**:
+
 ```bash
 # Connect to database
 psql -U postgres -d whois_it
@@ -324,6 +340,7 @@ SELECT * FROM pg_stat_activity;
 ### Error Handling
 
 **Backend**:
+
 ```typescript
 try {
   await this.gameService.createGame(dto);
@@ -334,6 +351,7 @@ try {
 ```
 
 **Frontend**:
+
 ```typescript
 try {
   await createGame(data);
@@ -437,10 +455,12 @@ pnpm install
 ### Hot reload not working
 
 1. Check file watcher limits (Linux):
+
    ```bash
    echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf
    sudo sysctl -p
    ```
+
 2. Restart development server
 
 ### Database connection issues
@@ -493,18 +513,22 @@ this.logger.log(`Operation took ${Date.now() - start}ms`);
 ## Learning Resources
 
 ### Next.js
+
 - [Official Documentation](https://nextjs.org/docs)
 - [Learn Next.js](https://nextjs.org/learn)
 
 ### NestJS
+
 - [Official Documentation](https://docs.nestjs.com/)
 - [NestJS Courses](https://courses.nestjs.com/)
 
-### TypeScript
+### TypeScriptt
+
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)
 
 ### PostgreSQL
+
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
 - [SQL Tutorial](https://www.postgresqltutorial.com/)
 
@@ -527,4 +551,4 @@ this.logger.log(`Operation took ${Date.now() - start}ms`);
 
 ---
 
-**Happy Coding! 🚀**
+Happy Coding! 🚀
