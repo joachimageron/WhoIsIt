@@ -6,6 +6,7 @@ import _import from "eslint-plugin-import";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import jsxA11Y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-plugin-prettier";
+import nextPlugin from "@next/eslint-plugin-next";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
 import path from "node:path";
@@ -48,7 +49,6 @@ export default defineConfig([globalIgnores([
         "plugin:prettier/recommended",
         "plugin:react-hooks/recommended",
         "plugin:jsx-a11y/recommended",
-        "plugin:@next/next/recommended",
     )),
 
     plugins: {
@@ -58,6 +58,7 @@ export default defineConfig([globalIgnores([
         "@typescript-eslint": typescriptEslint,
         "jsx-a11y": fixupPluginRules(jsxA11Y),
         prettier: fixupPluginRules(prettier),
+        "@next/next": fixupPluginRules(nextPlugin),
     },
 
     languageOptions: {
@@ -97,6 +98,10 @@ export default defineConfig([globalIgnores([
         "no-unused-vars": "off",
         "unused-imports/no-unused-vars": "off",
         "unused-imports/no-unused-imports": "warn",
+
+        // Next.js plugin rules
+        "@next/next/no-html-link-for-pages": "error",
+        "@next/next/no-img-element": "warn",
 
         "@typescript-eslint/no-unused-vars": ["warn", {
             args: "after-used",

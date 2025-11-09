@@ -14,15 +14,16 @@ COPY apps/backend/package.json ./apps/backend/
 COPY packages/contracts/package.json ./packages/contracts/
 
 # Install dependencies
+ENV CI=true
 RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY apps/backend ./apps/backend
 COPY packages/contracts ./packages/contracts
 
-# Build backend
-WORKDIR /app/apps/backend
-RUN pnpm build
+# Build backend - run from root to access workspace context
+RUN pnpm --filter @whois-it/backend... install --frozen-lockfile && \
+  pnpm --filter @whois-it/backend build
 
 # ============================================
 # Stage 2: Production

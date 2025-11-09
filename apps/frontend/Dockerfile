@@ -14,22 +14,23 @@ COPY apps/frontend/package.json ./apps/frontend/
 COPY packages/contracts/package.json ./packages/contracts/
 
 # Install dependencies
+ENV CI=true
 RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY apps/frontend ./apps/frontend
 COPY packages/contracts ./packages/contracts
 
-# Build frontend
-WORKDIR /app/apps/frontend
-
 # Set build-time environment variables
 ARG NEXT_PUBLIC_API_URL=http://localhost:4000
 ARG NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+ENV DOCKER_BUILD=true
 
-RUN pnpm build
+# Build frontend - run from root to access workspace context
+RUN pnpm --filter @whois-it/frontend... install --frozen-lockfile && \
+  pnpm --filter @whois-it/frontend build
 
 # ============================================
 # Stage 2: Production
