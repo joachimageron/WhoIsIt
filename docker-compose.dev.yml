@@ -33,7 +33,6 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: whois_it
-      DB_SYNC: "true"
       # Authentication
       JWT_SECRET: development-secret-key-change-in-production
       JWT_EXPIRATION: 7d
