@@ -43,6 +43,15 @@ Multi-language support:
 - Locale detection and routing
 - Translation patterns
 
+### Testing
+
+Jest and React Testing Library setup:
+
+- [Testing Documentation](./testing.md) - Complete testing guide
+- Unit and integration tests for components
+- Test patterns and best practices
+- Coverage reporting
+
 ### Real-time Communication (Coming Soon)
 
 Socket.IO client integration:
