@@ -52,33 +52,27 @@ Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js
    - Frontend only: `pnpm dev:frontend`
    - Backend only: `pnpm dev:backend`
 
-## Current Status
-
-**✅ Implemented:**
-
-- Complete authentication system (register, login, email verification, password reset)
-- Character sets API with full CRUD operations
-- Game lobby system (create, join, get lobby state)
-- Game start functionality with character assignment
-- Real-time Socket.IO integration with security (authentication, reconnection handling, lobby cleanup)
-- Frontend game pages (create game, join game, lobby with real-time updates)
-- CI/CD pipeline with GitHub Actions
-- Comprehensive test coverage (115/115 backend tests passing)
-
-**🚧 In Development (Phase 3):**
-
-- Gameplay core mechanics (questions, answers, guesses, scoring)
-- Game play page UI
-- UI components for game interaction
-
-See [todo.md](./todo.md) for detailed roadmap and current progress.
-
 ## Tooling highlights
 
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.
 - **Backend**: NestJS 11 with ConfigModule, TypeORM auto-loading entities, Socket.IO gateway support, and PostgreSQL driver.
 - **Package manager**: pnpm workspaces with shared hoisting configured for HeroUI packages.
 
+## Documentation
+
+Comprehensive documentation is available in the [`/docs`](./docs) directory:
+
+- **[Getting Started](./docs/development/getting-started.md)** - Complete setup guide for local development
+- **[Architecture](./docs/architecture/overview.md)** - System design and architectural decisions
+- **[Backend](./docs/backend/README.md)** - NestJS API, database schema, and services
+- **[Frontend](./docs/frontend/README.md)** - Next.js application, components, and state management
+- **[API Reference](./docs/api/rest-api.md)** - REST endpoints and WebSocket events
+- **[Deployment](./docs/deployment/README.md)** - Production deployment guides
+
+See the [Documentation Index](./docs/README.md) for the complete table of contents.
+
 ## Contributing
 
 This repository includes [GitHub Copilot instructions](./.github/copilot-instructions.md) to help developers and AI coding assistants understand the architecture, conventions, and workflows. Review these guidelines before making changes.
+
+For detailed development guidelines, see the [Development Documentation](./docs/development/README.md).

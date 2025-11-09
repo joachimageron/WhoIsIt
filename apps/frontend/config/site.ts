@@ -63,7 +63,6 @@ export const siteConfig = {
   links: {
     github: "https://github.com/agero/WhoIsIt",
     twitter: "https://twitter.com",
-    docs: "https://github.com/agero/WhoIsIt/blob/main/README.md",
     discord: "https://discord.gg",
     sponsor: "https://github.com/sponsors",
   },
