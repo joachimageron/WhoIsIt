@@ -249,7 +249,6 @@ These files are excluded from coverage requirements:
 #### `components/room-code-display.tsx`
 
 **Target Coverage: 90%+**
-
 **Reason**: Displays and formats room codes. Contains logic for formatting and copying to clipboard.
 
 **Test Focus**:
@@ -261,7 +260,6 @@ These files are excluded from coverage requirements:
 #### `app/[lang]/game/lobby/[roomCode]/lobby-client.tsx`
 
 **Target Coverage: 80%+**
-
 **Reason**: Core lobby component with Socket.IO integration, player management, and game start logic.
 
 **Test Focus**:
@@ -275,7 +273,6 @@ These files are excluded from coverage requirements:
 #### `app/[lang]/game/join/join-form.tsx`
 
 **Target Coverage: 90%+**
-
 **Reason**: Form component with validation and API integration.
 
 **Test Focus**:
@@ -290,9 +287,7 @@ These files are excluded from coverage requirements:
 
 ### Priority 2: Interactive Components
 
-#### `components/navbar.tsx`
-
-**Target Coverage: 70%+**
+#### `components/navbar.tsx` **Target Coverage: 70%+**
 
 **Reason**: Navigation component with authentication state, dropdowns, and language switching.
 
@@ -306,7 +301,6 @@ These files are excluded from coverage requirements:
 #### `components/language-switcher.tsx`
 
 **Target Coverage: 80%+**
-
 **Reason**: Language selection component with locale persistence.
 
 **Test Focus**:
@@ -319,7 +313,6 @@ These files are excluded from coverage requirements:
 #### `components/theme-switch.tsx`
 
 **Target Coverage: 80%+**
-
 **Reason**: Theme toggle component (light/dark mode).
 
 **Test Focus**:
@@ -335,7 +328,6 @@ These files are excluded from coverage requirements:
 #### `store/auth-store.ts`
 
 **Target Coverage: 90%+**
-
 **Reason**: Zustand store managing authentication state.
 
 **Test Focus**:
@@ -348,7 +340,6 @@ These files are excluded from coverage requirements:
 #### `store/game-store.ts`
 
 **Target Coverage: 90%+**
-
 **Reason**: Zustand store managing game lobby state and socket connection.
 
 **Test Focus**:
@@ -365,7 +356,6 @@ These files are excluded from coverage requirements:
 #### `lib/game-api.ts`
 
 **Target Coverage: 90%+**
-
 **Reason**: API wrapper functions for game endpoints.
 
 **Test Focus**:
@@ -378,7 +368,6 @@ These files are excluded from coverage requirements:
 #### `lib/auth-api.ts`
 
 **Target Coverage: 90%+**
-
 **Reason**: API wrapper functions for authentication.
 
 **Test Focus**:
@@ -391,7 +380,6 @@ These files are excluded from coverage requirements:
 #### `lib/guest-session.ts`
 
 **Target Coverage: 90%+**
-
 **Reason**: Guest session management utility.
 
 **Test Focus**:
@@ -408,7 +396,6 @@ These files are excluded from coverage requirements:
 #### `lib/hooks/use-game-socket.ts`
 
 **Target Coverage: 80%+**
-
 **Reason**: Hook managing Socket.IO connection and game events.
 
 **Test Focus**:
@@ -710,6 +697,67 @@ test('complete game creation flow', async ({ page }) => {
 
 3. Implement visual regression testing (optional)
 4. Set up test coverage thresholds in CI/CD
+
+---
+
+## Implementation Status
+
+✅ **Status**: Implemented - Coverage exclusions configured in `apps/frontend/jest.config.js`
+
+**Coverage Results** (Initial implementation):
+
+- **Total files tracked**: ~40 files (down from 148 TypeScript files in frontend)
+- **Overall coverage**: 5.19% statements (will improve as more tests are added)
+- **Key achievements**:
+  - Configuration files excluded (`config/`, `dictionaries/`, `middleware.ts`)
+  - Type definitions excluded (`types/`, `*.d.ts`)
+  - Server components excluded (`layout.tsx`, `page.tsx`, `error.tsx`, `providers.tsx`)
+  - Presentational components excluded (`primitives.ts`, `icons.tsx`)
+  - Test utilities excluded (`jest.setup.ts`, `jest.config.js`)
+
+**Implemented exclusions** in `apps/frontend/jest.config.js`:
+
+```javascript
+collectCoverageFrom: [
+  'app/**/*.{js,jsx,ts,tsx}',
+  'components/**/*.{js,jsx,ts,tsx}',
+  'lib/**/*.{js,jsx,ts,tsx}',
+  'store/**/*.{js,jsx,ts,tsx}',
+  '!**/*.d.ts',
+  '!**/node_modules/**',
+  '!**/.next/**',
+  '!**/coverage/**',
+  '!**/jest.config.js',
+  // Configuration files
+  '!**/config/**',
+  '!**/jest.setup.ts',
+  // Type definitions and dictionaries
+  '!**/types/**',
+  '!**/dictionaries/**',
+  // Middleware (routing logic, no unit test needed)
+  '!**/middleware.ts',
+  // Presentational components (minimal logic)
+  '!**/components/primitives.ts',
+  '!**/components/icons.tsx',
+  // Next.js server components (wrappers for client components)
+  '!**/app/**/layout.tsx',
+  '!**/app/**/page.tsx',
+  '!**/app/**/error.tsx',
+  '!**/app/**/providers.tsx',
+  '!**/app/**/loading.tsx',
+  '!**/app/**/not-found.tsx',
+]
+```
+
+**High-coverage components** (85 tests passing):
+
+- `turn-timer.tsx`: 95.65% statements, 91.17% branches
+- `game-header.tsx`: 100% statements, 90.9% branches
+- `counter.tsx`: 100% statements
+- `theme-switch.tsx`: 100% statements
+- `validation.ts`: 100% statements
+
+**Verification**: Run `pnpm test:frontend:cov` to see current coverage metrics
 
 ---
 

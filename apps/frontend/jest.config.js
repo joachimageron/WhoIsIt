@@ -26,6 +26,24 @@ const customJestConfig = {
     '!**/.next/**',
     '!**/coverage/**',
     '!**/jest.config.js',
+    // Configuration files
+    '!**/config/**',
+    '!**/jest.setup.ts',
+    // Type definitions and dictionaries
+    '!**/types/**',
+    '!**/dictionaries/**',
+    // Middleware (routing logic, no unit test needed)
+    '!**/middleware.ts',
+    // Presentational components (minimal logic)
+    '!**/components/primitives.ts',
+    '!**/components/icons.tsx',
+    // Next.js server components (wrappers for client components)
+    '!**/app/**/layout.tsx',
+    '!**/app/**/page.tsx',
+    '!**/app/**/error.tsx',
+    '!**/app/**/providers.tsx',
+    '!**/app/**/loading.tsx',
+    '!**/app/**/not-found.tsx',
   ],
   coverageDirectory: 'coverage',
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
