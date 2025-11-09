@@ -16,13 +16,15 @@ Complete HTTP endpoint documentation:
 - **Error codes** and handling
 - **Testing with cURL and Postman**
 
-### Socket.IO Events (Coming Soon)
+### [Socket.IO Events](./socket-events.md) ✅
 Real-time WebSocket event documentation:
 - **Client → Server events**: joinRoom, leaveRoom, updatePlayerReady
 - **Server → Client events**: lobbyUpdate, playerJoined, gameStarted
 - **Event payloads** and acknowledgements
-- **Connection management**
-- **Room patterns**
+- **Connection management and tracking**
+- **Room patterns and broadcasting**
+- **Error handling and debugging**
+- **Testing WebSocket events**
 
 ### Shared Types (Coming Soon)
 TypeScript type contracts from `@whois-it/contracts`:
