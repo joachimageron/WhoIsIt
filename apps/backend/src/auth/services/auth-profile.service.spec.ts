@@ -85,7 +85,7 @@ describe('AuthProfileService', () => {
         .mockResolvedValueOnce(null); // Second call for checking username uniqueness
       userRepository.save.mockResolvedValue({ ...user, username: 'newusername' } as User);
 
-      const result = await service.updateProfile('user-123', updateDto);
+      await service.updateProfile('user-123', updateDto);
 
       expect(userRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'user-123' },
