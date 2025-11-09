@@ -15,7 +15,7 @@ Next.js App Router architecture with:
 - Layout system and composition
 - Middleware for auth and i18n
 
-### State Management (Coming Soon)
+### State Management
 
 Zustand store patterns:
 
@@ -194,7 +194,7 @@ export default function CreateGameClient() {
 }
 ```
 
-### State Management
+### State Managementt
 
 Zustand stores for global state:
 

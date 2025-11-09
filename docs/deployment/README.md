@@ -7,7 +7,9 @@ This section contains guides for deploying WhoIsIt to production environments, i
 ## Contents
 
 ### [Environment Configuration](./environment.md)
+
 Production environment setup:
+
 - **All backend environment variables**
 - **All frontend environment variables**
 - **Platform-specific configurations**
@@ -16,7 +18,7 @@ Production environment setup:
 - **Multi-environment setup**
 - **Validation and troubleshooting**
 
-### Database Migrations (Coming Soon)
+### [Database Migrations](./migrations)
 
 Managing database schema changes:
 
@@ -25,7 +27,7 @@ Managing database schema changes:
 - Rolling back migrations
 - Migration best practices
 
-### Production Deployment (Coming Soon)
+### [Production Deployment](./production)
 
 Deploying to production:
 
@@ -35,7 +37,7 @@ Deploying to production:
 - Environment-specific configurations
 - Health checks and monitoring
 
-### CI/CD Pipeline (Coming Soon)
+### [CI/CD Pipeline](./cicd)
 
 Automated deployment workflows:
 

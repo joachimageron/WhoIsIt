@@ -17,7 +17,7 @@ Complete setup instructions:
 - **Running the apps**: Development servers
 - **Common issues**: Troubleshooting guide
 
-### Development Workflow (Coming Soon)
+### [Development Workflow](./workflow)
 
 Day-to-day development practices:
 
@@ -28,7 +28,9 @@ Day-to-day development practices:
 - Issue tracking
 
 ### [Testing Guide](./testing.md)
+
 Testing strategies and examples:
+
 - **Unit testing with Jest**
 - **Integration testing patterns**
 - **Service and controller testing**
@@ -38,7 +40,7 @@ Testing strategies and examples:
 - **Debugging tests**
 - **Best practices**
 
-### Debugging Guide (Coming Soon)
+### [Debugging Guide](./debugging)
 
 Debugging tools and techniques:
 

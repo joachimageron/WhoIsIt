@@ -19,6 +19,7 @@ Complete HTTP endpoint documentation:
 - **Testing with cURL and Postman**
 
 ### [Socket.IO Events](./socket-events.md)
+
 Real-time WebSocket event documentation:
 
 - **Client → Server events**: joinRoom, leaveRoom, updatePlayerReady
@@ -29,7 +30,7 @@ Real-time WebSocket event documentation:
 - **Error handling and debugging**
 - **Testing WebSocket events**
 
-### Shared Types (Coming Soon)
+### [Shared Types](./types)
 
 TypeScript type contracts from `@whois-it/contracts`:
 

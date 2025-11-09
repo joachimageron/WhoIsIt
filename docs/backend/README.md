@@ -17,7 +17,9 @@ Complete database schema documentation with:
 - Migration strategies
 
 ### [Authentication](./authentication.md)
+
 JWT-based authentication system with:
+
 - **User registration and login**
 - **Email verification workflow**
 - **Password reset functionality**
@@ -28,7 +30,9 @@ JWT-based authentication system with:
 - **Security best practices**
 
 ### [WebSocket Implementation](./websockets.md)
+
 Real-time communication with Socket.IO:
+
 - **Custom auth adapter with JWT**
 - **GameGateway with event handlers**
 - **ConnectionManager for tracking**
