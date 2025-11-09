@@ -17,9 +17,9 @@ import { TurnTimer } from "./components/turn-timer";
 import { AnswerModal } from "./components/answer-modal";
 
 import { useGameStore } from "@/store/game-store";
-import { useGameInitialization } from "@/hooks/use-game-initialization";
-import { useGameEvents } from "@/hooks/use-game-events";
-import { useGameActions } from "@/hooks/use-game-actions";
+import { useGameInitialization } from "@/lib/hooks/use-game-initialization";
+import { useGameEvents } from "@/lib/hooks/use-game-events";
+import { useGameActions } from "@/lib/hooks/use-game-actions";
 
 interface GamePlayClientProps {
   dict: Dictionary;

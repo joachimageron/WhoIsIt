@@ -6,7 +6,7 @@ import { addToast } from "@heroui/toast";
 import { useRouter } from "next/navigation";
 
 import { useGameStore } from "@/store/game-store";
-import { useGameSocket } from "@/hooks/use-game-socket";
+import { useGameSocket } from "@/lib/hooks/use-game-socket";
 
 interface UseGameEventsProps {
   currentPlayerId: string | null;

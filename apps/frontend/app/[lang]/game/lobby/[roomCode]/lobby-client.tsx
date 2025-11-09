@@ -14,7 +14,7 @@ import { addToast } from "@heroui/toast";
 import { Avatar } from "@heroui/avatar";
 import { Badge } from "@heroui/badge";
 
-import { useGameSocket } from "@/hooks/use-game-socket";
+import { useGameSocket } from "@/lib/hooks/use-game-socket";
 import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";

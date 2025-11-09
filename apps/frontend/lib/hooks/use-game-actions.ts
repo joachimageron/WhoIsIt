@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 
 import * as gameApi from "@/lib/game-api";
 import { useGameStore } from "@/store/game-store";
-import { useGameSocket } from "@/hooks/use-game-socket";
+import { useGameSocket } from "@/lib/hooks/use-game-socket";
 
 interface UseGameActionsProps {
   roomCode: string;
