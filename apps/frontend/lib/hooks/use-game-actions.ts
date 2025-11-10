@@ -112,12 +112,7 @@ export function useGameActions({
         } else {
           // Eliminate the incorrectly guessed character
           eliminateCharacter(guess.targetCharacterId);
-
-          addToast({
-            color: "danger",
-            title: dict.game.play.guess.incorrectGuess || "Incorrect guess",
-            description: "Your guess was incorrect. You have been eliminated.",
-          });
+          
         }
       } catch (error) {
         addToast({
@@ -155,12 +150,6 @@ export function useGameActions({
           questionId,
           answerValue,
           answerText,
-        });
-
-        addToast({
-          color: "success",
-          title: dict.game.play.answers.answerSubmitted || "Answer submitted",
-          description: "Your answer has been submitted successfully",
         });
 
         setPendingQuestion(null);
