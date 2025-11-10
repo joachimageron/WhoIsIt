@@ -337,7 +337,7 @@ socket.on('gameStarted', (event) => {
 **Triggered By**:
 - Host calls `POST /games/:roomCode/start` endpoint
 - All players must be ready
-- Minimum 2 players required
+- Minimum 1 player required
 
 **Side Effects**:
 - Secret characters assigned to players
