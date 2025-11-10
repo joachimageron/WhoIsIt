@@ -63,6 +63,15 @@ Production deployment and operations documentation.
 - [Production Deployment](./deployment/production.md) - Deployment procedures
 - [CI/CD Pipeline](./deployment/cicd.md) - Automated workflows
 
+### 🔒 [Security](./security/)
+
+Security audit, recommendations, and best practices.
+
+- [Current Security State](./security/current-state.md) - Comprehensive security audit
+- [Security Recommendations](./security/recommendations.md) - Detailed action plan with implementation
+- [Best Practices Guide](./security/best-practices.md) - Secure development guidelines
+- [Security README](./security/README.md) - Overview and quick start
+
 ## Quick Links
 
 - [Main README](../README.md) - Project overview and quick start
