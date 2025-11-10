@@ -58,6 +58,7 @@ store/
 ### Persistence Strategy
 
 **Synchronous Persistence (localStorage):**
+
 - ✅ Fast, immediate writes
 - ✅ Works offline
 - ✅ Simple implementation
@@ -65,10 +66,12 @@ store/
 - ✅ Guest sessions already use localStorage
 
 **What's persisted:**
+
 - **Auth Store**: User profile, authentication status
 - **Game Store**: Player choices (eliminated/flipped characters)
 
 **What's NOT persisted:**
+
 - Real-time server state (lobby, game state, characters)
 - Connection states (socket status)
 - Transient UI state (loading, errors)
@@ -458,6 +461,7 @@ export const useAuthStore = create<AuthState>()(
 ```
 
 **What's persisted:**
+
 - ✅ `user` - User profile data
 - ✅ `isAuthenticated` - Authentication status
 - ✅ `isGuest` - Guest user flag
@@ -549,6 +553,7 @@ export const useGameStore = create<GameState>()(
 ```
 
 **What's persisted:**
+
 - ✅ `eliminatedCharacterIds` - Characters player marked as eliminated
 - ✅ `flippedCharacterIds` - Characters player manually flipped down
 - ❌ `lobby` - Real-time lobby state (comes from server)
@@ -560,6 +565,7 @@ export const useGameStore = create<GameState>()(
 - ❌ `myCharacter` - Assigned character (comes from server)
 
 **Why selective persistence?**
+
 - Player choices should persist across page reloads during a game
 - Server state should always be fetched fresh to stay synchronized
 - Connection state is transient and should not be persisted

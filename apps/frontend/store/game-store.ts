@@ -99,13 +99,10 @@ export const useGameStore = create<GameState>()(
               },
         })),
       addQuestion: (question) =>
-        set((state) => ({
-          playState: state.playState
-            ? {
-                ...state.playState,
-                questions: [...state.playState.questions, question],
-              }
-            : {
+        set((state) => {
+          if (!state.playState) {
+            return {
+              playState: {
                 gameState: null,
                 characters: [],
                 questions: [question],
@@ -114,7 +111,24 @@ export const useGameStore = create<GameState>()(
                 flippedCharacterIds: new Set(),
                 myCharacter: null,
               },
-        })),
+            };
+          }
+
+          const questionExists = state.playState.questions.some(
+            (q) => q.id === question.id,
+          );
+
+          if (questionExists) {
+            return state;
+          }
+
+          return {
+            playState: {
+              ...state.playState,
+              questions: [...state.playState.questions, question],
+            },
+          };
+        }),
       addAnswer: (answer) =>
         set((state) => {
           if (!state.playState) return state;
