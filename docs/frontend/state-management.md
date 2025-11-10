@@ -4,6 +4,8 @@
 
 WhoIsIt uses **Zustand** for global state management. Zustand is a lightweight, unopinionated state management library that provides a simple API without the boilerplate of Redux.
 
+**✨ State Persistence**: Both stores use Zustand's persist middleware to save state to localStorage, ensuring user sessions and gameplay choices survive page reloads. See [Middleware → Persist Middleware](#persist-middleware) for implementation details.
+
 ## Why Zustand?
 
 ### Advantages
@@ -15,6 +17,7 @@ WhoIsIt uses **Zustand** for global state management. Zustand is a lightweight, 
 - ✅ **No context wrapping** - Direct store access
 - ✅ **Devtools support** - Redux DevTools integration
 - ✅ **Middleware** - Persist, immer, devtools
+- ✅ **SSR compatible** - Works with Next.js server-side rendering
 
 ### Comparison to Alternatives
 
@@ -43,9 +46,32 @@ WhoIsIt uses **Zustand** for global state management. Zustand is a lightweight, 
 
 ```docs
 store/
-├── game-store.ts    # Game state (lobby, gameplay)
-└── auth-store.ts    # Authentication state
+├── game-store.ts                        # Game state (lobby, gameplay)
+├── auth-store.ts                        # Authentication state
+└── __tests__/
+    ├── game-store.test.ts               # Game store unit tests
+    ├── game-store-persistence.test.ts   # Game store persistence tests
+    ├── auth-store.test.ts               # Auth store unit tests
+    └── auth-store-persistence.test.ts   # Auth store persistence tests
 ```
+
+### Persistence Strategy
+
+**Synchronous Persistence (localStorage):**
+- ✅ Fast, immediate writes
+- ✅ Works offline
+- ✅ Simple implementation
+- ✅ Suitable for small state sizes
+- ✅ Guest sessions already use localStorage
+
+**What's persisted:**
+- **Auth Store**: User profile, authentication status
+- **Game Store**: Player choices (eliminated/flipped characters)
+
+**What's NOT persisted:**
+- Real-time server state (lobby, game state, characters)
+- Connection states (socket status)
+- Transient UI state (loading, errors)
 
 ## Game Store
 
@@ -392,24 +418,166 @@ useThemeStore();  // UI theme
 
 ### Persist Middleware
 
-Save state to localStorage:
+**WhoIsIt uses persist middleware to maintain state across page reloads.** Both stores are configured with persistence:
+
+#### Auth Store Persistence
+
+The auth store persists user authentication state to maintain login sessions:
 
 ```typescript
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      setUser: (user) => set({ user }),
+      isAuthenticated: false,
+      isGuest: false,
+      isLoading: false,
+      error: null,
+      setUser: (user) => set({ 
+        user,
+        isAuthenticated: !!user && !user.isGuest,
+        isGuest: !!user?.isGuest,
+      }),
+      // ... other actions
     }),
     {
-      name: 'auth-storage', // localStorage key
-      partialize: (state) => ({ user: state.user }), // Only persist user
+      name: 'whoisit-auth-storage', // localStorage key
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+        isGuest: state.isGuest,
+        // Don't persist loading and error states
+      }),
     }
   )
 );
+```
+
+**What's persisted:**
+- ✅ `user` - User profile data
+- ✅ `isAuthenticated` - Authentication status
+- ✅ `isGuest` - Guest user flag
+- ❌ `isLoading` - Transient loading state
+- ❌ `error` - Transient error messages
+
+#### Game Store Persistence
+
+The game store selectively persists only player choices, not real-time game state:
+
+```typescript
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+
+// Type for serialized state (arrays instead of Sets for JSON)
+type SerializedGamePlayState = {
+  gameState: null;
+  characters: [];
+  questions: [];
+  answers: [];
+  eliminatedCharacterIds: string[];
+  flippedCharacterIds: string[];
+  myCharacter: null;
+};
+
+export const useGameStore = create<GameState>()(
+  persist(
+    (set) => ({
+      lobby: null,
+      isConnected: false,
+      playState: null,
+      // ... actions
+    }),
+    {
+      name: 'whoisit-game-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state): { playState: SerializedGamePlayState | null } => {
+        if (!state.playState) {
+          return { playState: null };
+        }
+
+        // Convert Sets to arrays for JSON serialization
+        return {
+          playState: {
+            gameState: null,
+            characters: [],
+            questions: [],
+            answers: [],
+            eliminatedCharacterIds: Array.from(
+              state.playState.eliminatedCharacterIds
+            ),
+            flippedCharacterIds: Array.from(
+              state.playState.flippedCharacterIds
+            ),
+            myCharacter: null,
+          },
+        };
+      },
+      merge: (persistedState, currentState) => {
+        // Custom merge to restore arrays as Sets
+        const persisted = persistedState as {
+          playState: SerializedGamePlayState | null;
+        };
+
+        if (!persisted.playState) {
+          return currentState;
+        }
+
+        return {
+          ...currentState,
+          playState: {
+            gameState: null,
+            characters: [],
+            questions: [],
+            answers: new Map(),
+            eliminatedCharacterIds: new Set(
+              persisted.playState.eliminatedCharacterIds
+            ),
+            flippedCharacterIds: new Set(
+              persisted.playState.flippedCharacterIds
+            ),
+            myCharacter: null,
+          },
+        };
+      },
+    }
+  )
+);
+```
+
+**What's persisted:**
+- ✅ `eliminatedCharacterIds` - Characters player marked as eliminated
+- ✅ `flippedCharacterIds` - Characters player manually flipped down
+- ❌ `lobby` - Real-time lobby state (comes from server)
+- ❌ `isConnected` - Socket connection state
+- ❌ `gameState` - Server-managed game state
+- ❌ `characters` - Character data (comes from server)
+- ❌ `questions` - Question history (comes from server)
+- ❌ `answers` - Answer history (comes from server)
+- ❌ `myCharacter` - Assigned character (comes from server)
+
+**Why selective persistence?**
+- Player choices should persist across page reloads during a game
+- Server state should always be fetched fresh to stay synchronized
+- Connection state is transient and should not be persisted
+- Reduces localStorage size and prevents stale data issues
+
+#### Handling Map and Set Serialization
+
+Since `Map` and `Set` cannot be directly serialized to JSON, we use custom `partialize` and `merge` functions:
+
+1. **partialize**: Converts Sets to arrays before storing
+2. **merge**: Converts arrays back to Sets when hydrating
+
+```typescript
+// Example: Converting Set to Array
+eliminatedCharacterIds: Array.from(state.playState.eliminatedCharacterIds)
+
+// Example: Converting Array back to Set
+eliminatedCharacterIds: new Set(persisted.playState.eliminatedCharacterIds)
 ```
 
 ### DevTools Middleware
@@ -446,6 +614,30 @@ export const useGameStore = create<GameState>()(
         state.playState?.questions.push(question);
       }),
   }))
+);
+```
+
+### Combining Middleware
+
+You can combine multiple middleware:
+
+```typescript
+import { create } from 'zustand';
+import { persist, devtools } from 'zustand/middleware';
+
+export const useAuthStore = create<AuthState>()(
+  devtools(
+    persist(
+      (set) => ({
+        user: null,
+        setUser: (user) => set({ user }),
+      }),
+      {
+        name: 'auth-storage',
+      }
+    ),
+    { name: 'AuthStore' }
+  )
 );
 ```
 
