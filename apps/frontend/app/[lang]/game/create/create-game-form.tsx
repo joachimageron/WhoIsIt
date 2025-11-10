@@ -31,7 +31,6 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
   );
   const [loadingCharacterSets, setLoadingCharacterSets] = useState(true);
   const [selectedCharacterSet, setSelectedCharacterSet] = useState("");
-  const [maxPlayers, setMaxPlayers] = useState("");
   const [turnTimer, setTurnTimer] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -96,9 +95,6 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
       };
 
       // Add optional fields
-      if (maxPlayers && parseInt(maxPlayers) > 0) {
-        gameData.maxPlayers = parseInt(maxPlayers);
-      }
       if (turnTimer && parseInt(turnTimer) > 0) {
         gameData.turnTimerSeconds = parseInt(turnTimer);
       }
@@ -146,6 +142,10 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
         <p className="pb-4 text-left text-3xl font-semibold">
           {dict.game.create.title}
         </p>
+        <p className="text-sm text-default-500">
+          {dict.game.create.twoPlayerInfo ||
+            "This game is played with exactly 2 players"}
+        </p>
         <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Select
             isRequired
@@ -160,16 +160,6 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
               <SelectItem key={set.id}>{set.name}</SelectItem>
             ))}
           </Select>
-          <Input
-            label={dict.game.create.maxPlayers}
-            labelPlacement="outside"
-            min="2"
-            placeholder={dict.game.create.maxPlayersPlaceholder}
-            type="number"
-            value={maxPlayers}
-            variant="bordered"
-            onChange={(e) => setMaxPlayers(e.target.value)}
-          />
           <Input
             label={dict.game.create.turnTimer}
             labelPlacement="outside"
