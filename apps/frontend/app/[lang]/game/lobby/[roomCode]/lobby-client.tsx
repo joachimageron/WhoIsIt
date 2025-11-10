@@ -372,7 +372,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               <Button
                 className="flex-1"
                 color="primary"
-                isDisabled={!allPlayersReady || lobby.players.length < 2}
+                isDisabled={!allPlayersReady || lobby.players.length < 1}
                 isLoading={isStarting}
                 onPress={handleStartGame}
               >

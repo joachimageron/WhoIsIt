@@ -75,8 +75,7 @@ export function useGameActions({
         return;
       }
 
-      // Find the target player (in a 2-player game, it's the opponent)
-      // In multiplayer games, the user should specify which player they're guessing
+      // Determine target player based on number of opponents
       const otherPlayers = playState.gameState.players.filter(
         (p) => p.id !== currentPlayerId,
       );
@@ -84,10 +83,10 @@ export function useGameActions({
       let targetPlayerId: string | undefined;
 
       if (otherPlayers.length === 1) {
-        // In a 2-player game, automatically target the opponent
+        // With only one opponent, automatically target them
         targetPlayerId = otherPlayers[0].id;
       } else if (otherPlayers.length > 1) {
-        // In multiplayer, we need to ask which player they're guessing
+        // With multiple opponents, player selection is needed
         // For now, we'll leave it undefined (TODO: add player selection in guess modal)
         targetPlayerId = undefined;
       }

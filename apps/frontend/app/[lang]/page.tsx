@@ -88,8 +88,8 @@ export default async function Home({
               </h3>
               <p className="text-default-600">
                 {lang === "fr"
-                  ? "Posez des questions pour éliminer les personnages et trouver celui de votre adversaire"
-                  : "Ask questions to eliminate characters and find your opponent's mystery character"}
+                  ? "Posez des questions pour éliminer les personnages et trouver ceux de vos adversaires"
+                  : "Ask questions to eliminate characters and find your opponents' mystery characters"}
               </p>
             </CardBody>
           </Card>
@@ -102,8 +102,8 @@ export default async function Home({
               </h3>
               <p className="text-default-600">
                 {lang === "fr"
-                  ? "Soyez le premier à deviner le personnage mystère de votre adversaire"
-                  : "Be the first to guess your opponent's mystery character"}
+                  ? "Soyez le premier à deviner les personnages mystères de vos adversaires"
+                  : "Be the first to guess your opponents' mystery characters"}
               </p>
             </CardBody>
           </Card>
