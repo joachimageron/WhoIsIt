@@ -20,7 +20,7 @@ interface JoinFormProps {
 
 export function JoinForm({ dict, lang }: JoinFormProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, setGuestUser } = useAuthStore();
   const [roomCode, setRoomCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,15 +52,23 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
 
     try {
       // Join the game with user info if authenticated, or as guest
-      const joinData = user
-        ? {
-            username: user.username,
-            userId: user.id,
-            avatarUrl: user.avatarUrl || undefined,
-          }
-        : {
-            username: `Guest-${Math.random().toString(36).substring(2, 7)}`, // Guest players with random suffix
-          };
+      let joinData;
+
+      if (user) {
+        joinData = {
+          username: user.username,
+          userId: user.id,
+          avatarUrl: user.avatarUrl || undefined,
+        };
+      } else {
+        // Create a guest user session
+        const guestUsername = `Guest-${Math.random().toString(36).substring(2, 7)}`;
+
+        setGuestUser(guestUsername);
+        joinData = {
+          username: guestUsername,
+        };
+      }
 
       await gameApi.joinGame(trimmedCode, joinData);
 
