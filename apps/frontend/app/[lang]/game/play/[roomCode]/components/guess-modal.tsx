@@ -40,10 +40,6 @@ export function GuessModal({
     null,
   );
 
-  const activeCharacters = characters.filter(
-    (c) => !eliminatedIds.has(c.id) && !flippedIds.has(c.id),
-  );
-
   const handleConfirm = () => {
     if (selectedCharacterId) {
       onConfirm(selectedCharacterId);
@@ -73,40 +69,71 @@ export function GuessModal({
 
             {/* Character Selection Grid */}
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-              {activeCharacters.map((character) => (
-                <button
-                  key={character.id}
-                  className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-2 transition-all ${
-                    selectedCharacterId === character.id
-                      ? "border-success bg-success-50"
-                      : "border-default-200 bg-default-100 hover:border-success hover:bg-success-50"
-                  }`}
-                  type="button"
-                  onClick={() => setSelectedCharacterId(character.id)}
-                >
-                  {selectedCharacterId === character.id && (
-                    <div className="absolute -right-1 -top-1 z-10">
-                      <Icon
-                        className="text-success"
-                        icon="solar:check-circle-bold"
-                        width={24}
-                      />
-                    </div>
-                  )}
+              {characters.map((character) => {
+                const isEliminated = eliminatedIds.has(character.id);
+                const isFlipped = flippedIds.has(character.id);
+                const isDisabled = isEliminated || isFlipped;
 
-                  <Image
-                    alt={character.name}
-                    className="rounded-lg"
-                    height={80}
-                    src={character.imageUrl ?? ""}
-                    width={80}
-                  />
+                return (
+                  <button
+                    key={character.id}
+                    className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-2 transition-all ${
+                      selectedCharacterId === character.id
+                        ? "border-success bg-success-50"
+                        : isDisabled
+                          ? "border-default-200 bg-default-100 cursor-not-allowed"
+                          : "border-default-200 bg-default-100 hover:border-success hover:bg-success-50"
+                    }`}
+                    disabled={isDisabled}
+                    type="button"
+                    onClick={() =>
+                      !isDisabled && setSelectedCharacterId(character.id)
+                    }
+                  >
+                    {selectedCharacterId === character.id && !isDisabled && (
+                      <div className="absolute -right-1 -top-1 z-10">
+                        <Icon
+                          className="text-success"
+                          icon="solar:check-circle-bold"
+                          width={24}
+                        />
+                      </div>
+                    )}
 
-                  <p className="w-full text-center text-xs font-medium">
-                    {character.name}
-                  </p>
-                </button>
-              ))}
+                    {isEliminated && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 z-10">
+                        <Icon
+                          className="text-danger"
+                          icon="solar:close-circle-bold"
+                          width={32}
+                        />
+                      </div>
+                    )}
+
+                    {isFlipped && !isEliminated && (
+                      <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-default-100/90 z-10">
+                        <Icon
+                          className="text-default-600"
+                          icon="solar:eye-closed-bold"
+                          width={32}
+                        />
+                      </div>
+                    )}
+
+                    <Image
+                      alt={character.name}
+                      className={`rounded-lg ${isDisabled ? "opacity-20" : "opacity-100"}`}
+                      height={80}
+                      src={character.imageUrl ?? ""}
+                      width={80}
+                    />
+
+                    <p className="w-full text-center text-xs font-medium">
+                      {character.name}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </ModalBody>

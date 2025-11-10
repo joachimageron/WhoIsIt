@@ -97,27 +97,37 @@ describe("GuessModal", () => {
     expect(screen.getByText("Charlie")).toBeInTheDocument();
   });
 
-  it("filters out eliminated characters", () => {
+  it("displays eliminated characters with visual indicator", () => {
     const eliminatedIds = new Set(["char-2"]);
 
     render(<GuessModal {...defaultProps} eliminatedIds={eliminatedIds} />);
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
-    expect(screen.queryByText("Bob")).not.toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
     expect(screen.getByText("Charlie")).toBeInTheDocument();
+
+    // Bob's button should be disabled
+    const bobButton = screen.getByRole("button", { name: /Bob/i });
+
+    expect(bobButton).toBeDisabled();
   });
 
-  it("filters out flipped characters", () => {
+  it("displays flipped characters with visual indicator", () => {
     const flippedIds = new Set(["char-3"]);
 
     render(<GuessModal {...defaultProps} flippedIds={flippedIds} />);
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
     expect(screen.getByText("Bob")).toBeInTheDocument();
-    expect(screen.queryByText("Charlie")).not.toBeInTheDocument();
+    expect(screen.getByText("Charlie")).toBeInTheDocument();
+
+    // Charlie's button should be disabled
+    const charlieButton = screen.getByRole("button", { name: /Charlie/i });
+
+    expect(charlieButton).toBeDisabled();
   });
 
-  it("filters out both eliminated and flipped characters", () => {
+  it("displays both eliminated and flipped characters with visual indicators", () => {
     const eliminatedIds = new Set(["char-1"]);
     const flippedIds = new Set(["char-2"]);
 
@@ -129,9 +139,16 @@ describe("GuessModal", () => {
       />,
     );
 
-    expect(screen.queryByText("Alice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Bob")).not.toBeInTheDocument();
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
     expect(screen.getByText("Charlie")).toBeInTheDocument();
+
+    // Alice and Bob's buttons should be disabled
+    const aliceButton = screen.getByRole("button", { name: /Alice/i });
+    const bobButton = screen.getByRole("button", { name: /Bob/i });
+
+    expect(aliceButton).toBeDisabled();
+    expect(bobButton).toBeDisabled();
   });
 
   it("allows selecting a character", async () => {
@@ -277,13 +294,57 @@ describe("GuessModal", () => {
     expect(images[2]).toHaveAttribute("alt", "Charlie");
   });
 
-  it("renders empty grid when all characters are eliminated", () => {
+  it("displays all characters even when all are eliminated", () => {
     const eliminatedIds = new Set(["char-1", "char-2", "char-3"]);
 
     render(<GuessModal {...defaultProps} eliminatedIds={eliminatedIds} />);
 
-    expect(screen.queryByText("Alice")).not.toBeInTheDocument();
-    expect(screen.queryByText("Bob")).not.toBeInTheDocument();
-    expect(screen.queryByText("Charlie")).not.toBeInTheDocument();
+    // All characters should still be visible
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    expect(screen.getByText("Bob")).toBeInTheDocument();
+    expect(screen.getByText("Charlie")).toBeInTheDocument();
+
+    // All buttons should be disabled
+    const aliceButton = screen.getByRole("button", { name: /Alice/i });
+    const bobButton = screen.getByRole("button", { name: /Bob/i });
+    const charlieButton = screen.getByRole("button", { name: /Charlie/i });
+
+    expect(aliceButton).toBeDisabled();
+    expect(bobButton).toBeDisabled();
+    expect(charlieButton).toBeDisabled();
+  });
+
+  it("prevents selecting eliminated characters", async () => {
+    const user = userEvent.setup();
+    const eliminatedIds = new Set(["char-1"]);
+
+    render(<GuessModal {...defaultProps} eliminatedIds={eliminatedIds} />);
+
+    const aliceButton = screen.getByRole("button", { name: /Alice/i });
+
+    // Try to click the disabled button
+    await user.click(aliceButton);
+
+    // Confirm button should still be disabled (no selection made)
+    const confirmButton = screen.getByText("Confirm Guess");
+
+    expect(confirmButton).toBeDisabled();
+  });
+
+  it("prevents selecting flipped characters", async () => {
+    const user = userEvent.setup();
+    const flippedIds = new Set(["char-2"]);
+
+    render(<GuessModal {...defaultProps} flippedIds={flippedIds} />);
+
+    const bobButton = screen.getByRole("button", { name: /Bob/i });
+
+    // Try to click the disabled button
+    await user.click(bobButton);
+
+    // Confirm button should still be disabled (no selection made)
+    const confirmButton = screen.getByText("Confirm Guess");
+
+    expect(confirmButton).toBeDisabled();
   });
 });
