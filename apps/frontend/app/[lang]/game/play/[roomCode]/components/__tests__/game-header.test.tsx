@@ -50,10 +50,11 @@ describe("GameHeader", () => {
     roomCode: "ABC123",
     status: "in_progress",
     currentRoundNumber: 1,
+    currentRoundState: "awaiting_question",
     activePlayerId: "2",
     activePlayerUsername: "PlayerTwo",
     players: [],
-    currentRoundState: "in_progress",
+
   };
 
   const defaultProps = {

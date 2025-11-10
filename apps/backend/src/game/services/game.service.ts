@@ -153,7 +153,7 @@ export class GameService {
       where: { roomCode: normalizedRoomCode },
       relations: {
         players: true,
-        rounds: true,
+        rounds: { activePlayer: true },
       },
       order: {
         rounds: { roundNumber: 'DESC' },
@@ -201,6 +201,9 @@ export class GameService {
           // Continue to next turn if game hasn't ended
           await this.gamePlayService.advanceToNextTurn(currentRound, game);
         }
+      } else {
+        // If we don't need to check game end, still advance to next turn
+        await this.gamePlayService.advanceToNextTurn(currentRound, game);
       }
     }
 
