@@ -31,10 +31,10 @@ export class Question {
   @ManyToOne(
     () => GamePlayer,
     (player: GamePlayer) => player.targetedQuestions,
-    { nullable: true, onDelete: 'SET NULL' },
+    { nullable: false, onDelete: 'CASCADE' },
   )
   @JoinColumn({ name: 'target_player_id' })
-  targetPlayer?: GamePlayer | null;
+  targetPlayer!: GamePlayer;
 
   @Column({ type: 'text' })
   questionText!: string;
