@@ -18,25 +18,27 @@ describe('BroadcastService', () => {
   let mockServer: any;
 
   const mockLobbyResponse: GameLobbyResponse = {
+    id: 'game1',
     roomCode: 'ABC12',
     status: 'lobby',
     visibility: 'public',
-    maxPlayers: 4,
-    currentPlayers: 2,
+    characterSetId: 'charset1',
+    ruleConfig: {},
+    createdAt: new Date().toISOString(),
     players: [
       {
         id: 'player1',
         username: 'Host',
-        isHost: true,
+        role: 'host',
         isReady: true,
-        avatarUrl: null,
+        joinedAt: new Date().toISOString(),
       },
       {
         id: 'player2',
         username: 'Player2',
-        isHost: false,
+        role: 'player',
         isReady: false,
-        avatarUrl: null,
+        joinedAt: new Date().toISOString(),
       },
     ],
   };

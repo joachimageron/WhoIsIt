@@ -38,7 +38,6 @@ describe('GameGateway', () => {
     roomCode: 'ABC12',
     status: 'lobby',
     characterSetId: 'char-set-1',
-    maxPlayers: 4,
     turnTimerSeconds: 60,
     players: [
       {

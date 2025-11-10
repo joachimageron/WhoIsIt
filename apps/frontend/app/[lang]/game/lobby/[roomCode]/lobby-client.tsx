@@ -276,8 +276,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                {dict.game.lobby.players} ({lobby.players.length}
-                {lobby.maxPlayers ? `/${lobby.maxPlayers}` : ""})
+                {dict.game.lobby.players} ({lobby.players.length}/2)
               </h2>
             </div>
 

@@ -25,18 +25,20 @@ describe('GameController', () => {
   let broadcastService: jest.Mocked<BroadcastService>;
 
   const mockGameLobbyResponse: GameLobbyResponse = {
+    id: 'game1',
     roomCode: 'ABC12',
     status: 'lobby',
     visibility: 'public',
-    maxPlayers: 4,
-    currentPlayers: 1,
+    characterSetId: 'charset1',
+    ruleConfig: {},
+    createdAt: new Date().toISOString(),
     players: [
       {
         id: 'player1',
         username: 'TestHost',
-        isHost: true,
+        role: 'host',
         isReady: false,
-        avatarUrl: null,
+        joinedAt: new Date().toISOString(),
       },
     ],
   };
@@ -151,7 +153,6 @@ describe('GameController', () => {
         hostUsername: 'TestHost',
         hostUserId: undefined,
         visibility: 'public',
-        maxPlayers: 4,
       };
 
       gameService.createGame.mockResolvedValue(mockGameLobbyResponse);
@@ -172,7 +173,6 @@ describe('GameController', () => {
         hostUsername: '  TestHost  ',
         hostUserId: undefined,
         visibility: 'public',
-        maxPlayers: 4,
       };
 
       gameService.createGame.mockResolvedValue(mockGameLobbyResponse);
@@ -190,7 +190,6 @@ describe('GameController', () => {
       const createRequest: any = {
         hostUsername: 'TestHost',
         visibility: 'public',
-        maxPlayers: 4,
       };
 
       await expect(controller.create(createRequest)).rejects.toThrow(

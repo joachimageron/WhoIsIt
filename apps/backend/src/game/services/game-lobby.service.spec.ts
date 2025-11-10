@@ -44,7 +44,6 @@ describe('GameLobbyService', () => {
     visibility: GameVisibility.PRIVATE,
     characterSet: mockCharacterSet,
     host: mockUser,
-    maxPlayers: 8,
     turnTimerSeconds: 60,
     ruleConfig: {},
     createdAt: new Date('2024-01-01'),
@@ -118,7 +117,6 @@ describe('GameLobbyService', () => {
         hostUserId: 'user-1',
         hostUsername: 'testuser',
         visibility: 'private' as const,
-        maxPlayers: 8,
         turnTimerSeconds: 60,
         ruleConfig: {},
       };
@@ -312,7 +310,7 @@ describe('GameLobbyService', () => {
       const request = {
         characterSetId: 'char-set-1',
         hostUsername: 'testuser',
-        maxPlayers: Infinity,
+        turnTimerSeconds: Infinity,
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -485,7 +483,6 @@ describe('GameLobbyService', () => {
 
       const fullGame = {
         ...mockGame,
-        maxPlayers: 2,
         players: [
           {
             id: 'player-1',
