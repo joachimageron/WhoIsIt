@@ -5,9 +5,11 @@ Ce dossier contient la documentation complète relative à la sécurité de l'ap
 ## 📋 Documents Disponibles
 
 ### 1. [État Actuel de la Sécurité](./current-state.md)
-**Audit complet de l'état de sécurité actuel de l'application**
+
+**Audit complet de l'état de sécurité actuel de l'application** >
 
 Contient:
+
 - Résumé exécutif avec score global
 - Analyse détaillée par composant (Backend, Frontend, Infrastructure, Base de données)
 - Points forts et vulnérabilités identifiées
@@ -16,15 +18,18 @@ Contient:
 - Score de sécurité par catégorie
 
 **À consulter pour:**
+
 - Comprendre l'état de sécurité actuel
 - Identifier les zones à risque
 - Prioriser les actions de sécurisation
 - Préparer un déploiement en production
 
 ### 2. [Recommandations de Sécurité](./recommendations.md)
-**Plan d'action détaillé pour améliorer la sécurité**
+
+**Plan d'action détaillé pour améliorer la sécurité** >
 
 Contient:
+
 - Actions prioritaires avant production
 - 17 recommandations détaillées avec implémentation
 - Code d'exemple pour chaque correction
@@ -33,15 +38,18 @@ Contient:
 - Estimation des temps et difficultés
 
 **À consulter pour:**
+
 - Planifier les corrections de sécurité
 - Implémenter les solutions recommandées
 - Préparer un déploiement production sécurisé
 - Estimer l'effort nécessaire
 
 ### 3. [Guide des Bonnes Pratiques](./best-practices.md)
-**Guide de référence pour le développement sécurisé**
+
+**Guide de référence pour le développement sécurisé** >
 
 Contient:
+
 - Principes de développement sécurisé
 - Patterns et anti-patterns
 - Exemples de code sécurisé
@@ -50,6 +58,7 @@ Contient:
 - Ressources de formation
 
 **À consulter pour:**
+
 - Développer de nouvelles fonctionnalités
 - Effectuer des revues de code
 - Former les nouveaux développeurs
@@ -60,16 +69,19 @@ Contient:
 ## 🎯 Par Où Commencer?
 
 ### Je suis développeur
+
 1. Lire le [Guide des Bonnes Pratiques](./best-practices.md)
 2. Consulter la [Checklist du Développeur](./best-practices.md#checklist-du-développeur)
 3. Appliquer les patterns de sécurité dans votre code
 
 ### Je suis responsable technique / DevOps
+
 1. Lire l'[État Actuel](./current-state.md) pour comprendre les risques
 2. Consulter les [Recommandations](./recommendations.md) pour planifier les actions
 3. Suivre la [Roadmap de Mise en Œuvre](./recommendations.md#roadmap-de-mise-en-œuvre)
 
 ### Je prépare un déploiement production
+
 1. Lire la section [Vulnérabilités Critiques](./current-state.md#vulnérabilités-identifiées)
 2. Suivre la [Checklist de Production](./recommendations.md#checklist-de-production)
 3. Implémenter les [Actions Prioritaires](./recommendations.md#actions-prioritaires)
@@ -79,9 +91,11 @@ Contient:
 ## ⚠️ Avertissements Importants
 
 ### Avant Production
+
 **L'application NE DOIT PAS être déployée en production** sans avoir corrigé au minimum:
 
 🔴 **Critiques (Obligatoires):**
+
 1. Secret JWT faible par défaut
 2. Credentials DB par défaut
 3. Secrets exposés dans Docker
@@ -95,7 +109,9 @@ Contient:
 Voir [Recommandations - Actions Prioritaires](./recommendations.md#actions-prioritaires)
 
 ### Conformité
+
 L'application présente actuellement des non-conformités avec:
+
 - OWASP Top 10 (A02: Cryptographic Failures, A05: Security Misconfiguration)
 - RGPD (chiffrement des données personnelles)
 - Bonnes pratiques DevSecOps (CI/CD security)
@@ -124,16 +140,19 @@ L'application présente actuellement des non-conformités avec:
 ## 🔄 Maintenance de la Documentation
 
 ### Fréquence de Révision
+
 - **État Actuel:** Après chaque modification de sécurité majeure
 - **Recommandations:** Mensuelle ou après découverte de nouvelles vulnérabilités
 - **Bonnes Pratiques:** Revue trimestrielle pour mises à jour
 
 ### Historique des Audits
+
 | Date | Version | Auditeur | Changements Majeurs |
 |------|---------|----------|---------------------|
 | Nov 2024 | v0.1.0 | Initial | Premier audit complet |
 
 ### Prochains Audits Planifiés
+
 - **Décembre 2024:** Vérification post-corrections critiques
 - **Février 2025:** Audit complet avant release production
 - **Trimestriel:** Audits de maintenance
@@ -143,6 +162,7 @@ L'application présente actuellement des non-conformités avec:
 ## 📚 Ressources Complémentaires
 
 ### Documentation Projet
+
 - [README Principal](../../README.md)
 - [Architecture](../architecture/overview.md)
 - [Backend Documentation](../backend/README.md)
@@ -150,11 +170,13 @@ L'application présente actuellement des non-conformités avec:
 - [Deployment](../deployment/README.md)
 
 ### Standards de Sécurité
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)
 - [CWE Top 25](https://cwe.mitre.org/top25/)
 
 ### Outils de Sécurité
+
 - [Snyk](https://snyk.io/) - Scan de vulnérabilités
 - [OWASP ZAP](https://www.zaproxy.org/) - Tests de pénétration
 - [Trivy](https://trivy.dev/) - Scan de containers
@@ -165,15 +187,18 @@ L'application présente actuellement des non-conformités avec:
 ## 🆘 Support et Contact
 
 ### En cas de Découverte de Vulnérabilité
-**NE PAS créer d'issue publique GitHub**
+
+**NE PAS créer d'issue publique GitHub** >
 
 À la place:
+
 1. Contacter l'équipe de sécurité via email sécurisé
 2. Fournir les détails de la vulnérabilité
 3. Attendre confirmation de réception (24-48h)
 4. Coordonner la divulgation responsable
 
 ### Questions sur la Sécurité
+
 - Ouvrir une discussion GitHub (pour questions générales)
 - Consulter les issues labelées `security`
 - Se référer aux [bonnes pratiques](./best-practices.md)
@@ -183,6 +208,7 @@ L'application présente actuellement des non-conformités avec:
 ## 📝 Changelog
 
 ### Version 1.0.0 (Novembre 2024)
+
 - ✅ Création de la documentation de sécurité
 - ✅ Audit complet de l'application
 - ✅ Identification de 17 vulnérabilités/améliorations

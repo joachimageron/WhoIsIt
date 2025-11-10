@@ -1043,10 +1043,12 @@ res.cookie('access_token', result.accessToken, {
 ```
 
 **Avantages:**
+
 - Simple à implémenter
 - Protection CSRF forte
 
 **Inconvénients:**
+
 - Cookie pas envoyé lors de navigation depuis site externe
 - Peut affecter l'UX (utilisateur doit se reconnecter)
 
@@ -1083,6 +1085,7 @@ app.use((req, res, next) => {
 ```
 
 Frontend:
+
 ```typescript
 // apps/frontend/lib/api-client.ts
 async function apiRequest(url: string, options: RequestInit = {}) {
@@ -1225,6 +1228,7 @@ Sentry.init({
 ## Roadmap de Mise en Œuvre
 
 ### Phase 1: Corrections Critiques (Semaine 1)
+
 **Temps estimé:** 3-5 jours
 
 - [ ] Jour 1: Sécurisation JWT et DB credentials
@@ -1234,6 +1238,7 @@ Sentry.init({
 - [ ] Jour 5: Containers non-root + tests
 
 ### Phase 2: Améliorations Élevées (Semaine 2-3)
+
 **Temps estimé:** 5-7 jours
 
 - [ ] Politique de mots de passe renforcée
@@ -1242,6 +1247,7 @@ Sentry.init({
 - [ ] Tests et documentation
 
 ### Phase 3: Optimisations Moyennes (Semaine 4-5)
+
 **Temps estimé:** 5-8 jours
 
 - [ ] Rotation des tokens JWT
@@ -1250,6 +1256,7 @@ Sentry.init({
 - [ ] Monitoring de sécurité
 
 ### Phase 4: Améliorations Continues (Ongoing)
+
 **Temps estimé:** Continu
 
 - [ ] Tests de pénétration réguliers
@@ -1264,6 +1271,7 @@ Sentry.init({
 ### Avant Déploiement
 
 #### Configuration
+
 - [ ] JWT_SECRET unique et fort (32+ caractères)
 - [ ] DB_PASSWORD fort (16+ caractères)
 - [ ] Toutes les variables d'environnement requises définies
@@ -1271,6 +1279,7 @@ Sentry.init({
 - [ ] Docker secrets ou Vault configuré
 
 #### Sécurité
+
 - [ ] Audit des dépendances effectué (`pnpm audit`)
 - [ ] Aucune vulnérabilité critique ou élevée
 - [ ] Tokens hashés en base de données
@@ -1280,6 +1289,7 @@ Sentry.init({
 - [ ] Containers non-root
 
 #### Infrastructure
+
 - [ ] Backup automatique configuré et testé
 - [ ] Restauration testée
 - [ ] Logs centralisés
@@ -1289,12 +1299,14 @@ Sentry.init({
 - [ ] Pare-feu configuré
 
 #### Tests
+
 - [ ] Tests de sécurité passés
 - [ ] Tests de charge effectués
 - [ ] Plan de reprise après sinistre documenté
 - [ ] Procédures d'incident documentées
 
 #### Documentation
+
 - [ ] Documentation de sécurité à jour
 - [ ] Runbook opérationnel
 - [ ] Contacts d'urgence définis
@@ -1312,19 +1324,22 @@ Sentry.init({
 
 ## Ressources Complémentaires
 
-### Documentation
+### Documentation >
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [NestJS Security Best Practices](https://docs.nestjs.com/security/helmet)
 - [Next.js Security Headers](https://nextjs.org/docs/advanced-features/security-headers)
 - [PostgreSQL Security](https://www.postgresql.org/docs/current/security.html)
 
 ### Outils
+
 - [Snyk](https://snyk.io/) - Vulnerability scanning
 - [OWASP ZAP](https://www.zaproxy.org/) - Security testing
 - [Trivy](https://trivy.dev/) - Container scanning
 - [CSP Evaluator](https://csp-evaluator.withgoogle.com/) - CSP validation
 
 ### Formation
+
 - [OWASP Web Security Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security)
 
@@ -1333,6 +1348,7 @@ Sentry.init({
 ## Support
 
 Pour toute question concernant ces recommandations ou leur implémentation, consulter:
+
 - [Document d'état actuel](./current-state.md)
 - [Guide des bonnes pratiques](./best-practices.md)
 - Issues GitHub du projet

@@ -649,6 +649,7 @@ export class SecurityAlertService {
    - Vérifier les métriques anormales
 
 2. **Containment**
+
    ```bash
    # Isoler le système compromis
    docker stop whoisit-backend
@@ -658,6 +659,7 @@ export class SecurityAlertService {
    ```
 
 3. **Investigation**
+
    ```bash
    # Examiner les logs
    docker logs whoisit-backend --since 1h > incident-logs.txt
@@ -850,17 +852,20 @@ export class GamesService {
 ### Ressources Recommandées
 
 **Documentation:**
+
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)
 - [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/)
 - [NestJS Security](https://docs.nestjs.com/security/authentication)
 - [Next.js Security](https://nextjs.org/docs/advanced-features/security-headers)
 
 **Outils de Test:**
+
 - Burp Suite / ZAP pour tests de pénétration
 - Postman pour tests API
 - npm audit / Snyk pour vulnérabilités
 
 **Veille Sécurité:**
+
 - [CVE Database](https://cve.mitre.org/)
 - [Node Security](https://github.com/nodejs/security-wg)
 - [NestJS Security Advisories](https://github.com/nestjs/nest/security)
@@ -868,6 +873,7 @@ export class GamesService {
 ### Entraînement
 
 **Exercices pratiques:**
+
 - [HackTheBox](https://www.hackthebox.com/)
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security)
 - [OWASP WebGoat](https://owasp.org/www-project-webgoat/)

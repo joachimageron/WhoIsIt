@@ -3,6 +3,7 @@
 Ce document présente un audit détaillé des mesures de sécurité actuellement en place dans l'application WhoIsIt.
 
 ## Date de l'audit
+
 **Date:** Novembre 2024  
 **Version:** 0.1.0
 
@@ -25,6 +26,7 @@ Ce document présente un audit détaillé des mesures de sécurité actuellement
 L'application WhoIsIt présente un **niveau de sécurité satisfaisant** avec plusieurs mesures de protection déjà en place. Cependant, des améliorations importantes sont nécessaires pour un environnement de production.
 
 **Évaluation globale:** 🟡 **Moyen/Bon**
+
 - ✅ Authentification JWT robuste
 - ✅ Validation des données entrantes
 - ✅ Protection contre le brute-force (rate limiting)
@@ -38,9 +40,10 @@ L'application WhoIsIt présente un **niveau de sécurité satisfaisant** avec pl
 
 ### 1. Authentification et Autorisation
 
-#### ✅ Points Forts
+#### Points Forts - Authentification
 
-**JWT (JSON Web Tokens)**
+##### JWT (JSON Web Tokens)
+
 - Implémentation avec `@nestjs/jwt` et `passport-jwt`
 - Tokens stockés dans des cookies HTTP-only
 - Expiration configurée à 7 jours
@@ -57,7 +60,8 @@ jwtFromRequest: ExtractJwt.fromExtractors([
 ])
 ```
 
-**Hachage des mots de passe**
+##### Hachage des mots de passe
+
 - Utilisation de bcrypt avec un coût de 10 rounds
 - Mots de passe jamais stockés en clair
 - Vérification sécurisée avec `bcrypt.compare()`
@@ -67,12 +71,13 @@ jwtFromRequest: ExtractJwt.fromExtractors([
 const passwordHash = await bcrypt.hash(password, 10);
 ```
 
-**Gestion des sessions**
+##### Gestion des sessions
+
 - Support des utilisateurs authentifiés et invités
 - Tracking de la dernière activité (`lastSeenAt`)
 - Déconnexion côté serveur (suppression du cookie)
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Authentification
 
 1. **Secret JWT par défaut faible**
    - Valeur de fallback: `'dev-secret-change-in-production'`
@@ -90,9 +95,10 @@ const passwordHash = await bcrypt.hash(password, 10);
 
 ### 2. Validation des Données
 
-#### ✅ Points Forts
+#### Points Forts - Validation
 
-**ValidationPipe Global**
+##### ValidationPipe Global
+
 ```typescript
 // Source: apps/backend/src/main.ts
 app.useGlobalPipes(
@@ -104,7 +110,8 @@ app.useGlobalPipes(
 );
 ```
 
-**DTOs avec class-validator**
+##### DTOs avec class-validator
+
 - Validation stricte sur tous les endpoints
 - Contraintes de longueur minimale pour les mots de passe (6 caractères)
 - Validation des emails
@@ -129,7 +136,7 @@ export class RegisterDto {
 }
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Validation
 
 1. **Contraintes de mot de passe faibles**
    - Minimum 6 caractères seulement
@@ -143,9 +150,10 @@ export class RegisterDto {
 
 ### 3. Protection contre les Attaques
 
-#### ✅ Points Forts
+#### Points Forts - Protection
 
-**Rate Limiting Global**
+##### Rate Limiting Global
+
 ```typescript
 // Source: apps/backend/src/app.module.ts
 ThrottlerModule.forRoot([
@@ -156,7 +164,8 @@ ThrottlerModule.forRoot([
 ])
 ```
 
-**Rate Limiting Spécifique par Endpoint**
+##### Rate Limiting Spécifique par Endpoint
+
 - Login: 5 tentatives/minute
 - Register: 3 tentatives/minute
 - Forgot password: 3 tentatives/minute
@@ -168,13 +177,15 @@ ThrottlerModule.forRoot([
 @Post('login')
 ```
 
-**Headers de Sécurité avec Helmet**
+##### Headers de Sécurité avec Helmet
+
 ```typescript
 // Source: apps/backend/src/main.ts
 app.use(helmet());
 ```
 
 Helmet active automatiquement:
+
 - `X-DNS-Prefetch-Control`
 - `X-Frame-Options: SAMEORIGIN`
 - `X-Content-Type-Options: nosniff`
@@ -182,7 +193,8 @@ Helmet active automatiquement:
 - `X-Download-Options: noopen`
 - `X-Permitted-Cross-Domain-Policies`
 
-**CORS Configuré**
+##### CORS Configuré
+
 ```typescript
 // Source: apps/backend/src/main.ts
 app.enableCors({
@@ -191,7 +203,7 @@ app.enableCors({
 })
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Protection
 
 1. **Pas de protection CSRF explicite**
    - Cookies SameSite=Lax (pas Strict)
@@ -210,9 +222,10 @@ app.enableCors({
 
 ### 4. WebSocket Security
 
-#### ✅ Points Forts
+#### Points Forts - WebSocket
 
-**Authentification des Connexions WebSocket**
+##### Authentification des Connexions WebSocket
+
 ```typescript
 // Source: apps/backend/src/auth/ws-auth.adapter.ts
 server.use(async (socket: AuthenticatedSocket, next) => {
@@ -226,7 +239,7 @@ server.use(async (socket: AuthenticatedSocket, next) => {
 - Logging des échecs d'authentification
 - CORS configuré sur le gateway
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - WebSocket
 
 1. **Pas de limitation du nombre de connexions simultanées**
    - Un utilisateur peut ouvrir un nombre illimité de connexions WebSocket
@@ -239,9 +252,10 @@ server.use(async (socket: AuthenticatedSocket, next) => {
 
 ### 5. Gestion des Emails
 
-#### ✅ Points Forts
+#### Points Forts - Emails
 
-**Emails Transactionnels Sécurisés**
+##### Emails Transactionnels Sécurisés
+
 - Templates MJML pour les emails
 - Tokens de vérification générés avec `crypto.randomBytes(32)`
 - Expiration des tokens (24h pour vérification, temps limité pour reset)
@@ -256,7 +270,7 @@ verificationTokenExpiresAt.setHours(
 );
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Emails
 
 1. **Stockage des credentials email en environnement**
    - Pas de rotation automatique
@@ -273,9 +287,10 @@ verificationTokenExpiresAt.setHours(
 
 ### 1. Gestion de l'Authentification
 
-#### ✅ Points Forts
+#### Points Forts - Auth Frontend
 
-**Cookies HTTP-Only**
+##### Cookies HTTP-Only
+
 - Tokens JWT stockés dans des cookies HTTP-only
 - Protection contre les attaques XSS (JavaScript ne peut pas lire le token)
 - SameSite=Lax pour protection CSRF basique
@@ -290,14 +305,15 @@ res.cookie('access_token', result.accessToken, {
 });
 ```
 
-**Middleware de Protection des Routes**
+##### Middleware de Protection des Routes
+
 ```typescript
 // Source: apps/frontend/middleware.ts
 const protectedGameRoutes = ["/game/create"];
 // Vérification de l'authentification avant accès
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Auth Frontend
 
 1. **Stockage dans localStorage**
    - Certaines données de session dans localStorage (invités)
@@ -310,9 +326,10 @@ const protectedGameRoutes = ["/game/create"];
 
 ### 2. Configuration Next.js
 
-#### ✅ Points Forts
+#### Points Forts - Next.js
 
-**Variables d'Environnement Publiques**
+##### Variables d'Environnement Publiques
+
 - Variables `NEXT_PUBLIC_*` explicitement définies
 - Pas de fuites de secrets backend côté client
 
@@ -322,11 +339,12 @@ NEXT_PUBLIC_API_URL=http://localhost:4000
 NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
 ```
 
-**Internationalization Sécurisée**
+##### Internationalization Sécurisée
+
 - Pas de vulnérabilités d'injection dans les traductions
 - Utilisation de `intl-messageformat`
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Next.js
 
 1. **Pas de Content Security Policy**
    - Next.js peut être configuré avec des headers CSP
@@ -343,9 +361,10 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
 
 ### 1. Docker Configuration
 
-#### ✅ Points Forts
+#### Points Forts - Docker
 
-**Multi-stage Builds**
+##### Multi-stage Builds
+
 ```dockerfile
 # Source: apps/backend/Dockerfile
 FROM node:25-alpine AS builder
@@ -355,34 +374,30 @@ FROM node:25-alpine AS production
 # Production stage - only production dependencies
 ```
 
-**Images Optimisées**
+##### Images Optimisées
+
 - Utilisation de `node:25-alpine` (petite surface d'attaque)
 - Installation des dépendances de production uniquement en prod
 - Séparation des stages builder/production
 
-**Health Checks**
+##### Health Checks
+
 ```dockerfile
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:4000/health'...)"
 ```
 
-**Network Isolation**
+##### Network Isolation
+
 - Réseau Docker bridge dédié: `whoisit-network`
 - Services isolés les uns des autres
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Docker
 
 1. **Images Node non-root**
    - Containers s'exécutent en tant que root
    - **Recommandation:** Utiliser un utilisateur non-root
    - **Impact:** Moyen
-
-```dockerfile
-# Recommandé:
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-USER nextjs
-```
 
 2. **Pas de scan de vulnérabilités dans les images**
    - Pas d'intégration avec Trivy, Snyk, ou similaire
@@ -395,9 +410,10 @@ USER nextjs
 
 ### 2. Variables d'Environnement
 
-#### ✅ Points Forts
+#### Points Forts - Variables d'Environnement
 
-**Fichiers .env.example**
+##### Fichiers .env.example
+
 - Templates fournis avec documentation
 - Warnings de sécurité dans les commentaires
 - Pas de valeurs réelles committées
@@ -408,7 +424,8 @@ USER nextjs
 JWT_SECRET=change-this-to-a-very-secure-random-key-in-production
 ```
 
-**.gitignore Configuré**
+##### .gitignore Configuré
+
 ```gitignore
 # Source: .gitignore
 .env
@@ -417,7 +434,7 @@ JWT_SECRET=change-this-to-a-very-secure-random-key-in-production
 .env.production
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - Variables d'Environnement
 
 1. **Pas de validation des variables d'environnement au démarrage**
    - Application démarre même avec des valeurs manquantes ou invalides
@@ -425,16 +442,19 @@ JWT_SECRET=change-this-to-a-very-secure-random-key-in-production
    - **Impact:** Moyen
 
 2. **Valeurs par défaut faibles**
+
    ```typescript
    password: process.env.DB_PASSWORD ?? 'postgres',
    ```
+
    - **Impact:** Élevé si oublié en production
 
 ### 3. CI/CD
 
-#### ✅ Points Forts
+#### Points Forts - CI/CD
 
-**Pipeline GitHub Actions**
+##### Pipeline GitHub Actions
+
 ```yaml
 # Source: .github/workflows/ci.yml
 - Lint
@@ -442,13 +462,14 @@ JWT_SECRET=change-this-to-a-very-secure-random-key-in-production
 - Build
 ```
 
-**Permissions Minimales**
+##### Permissions Minimales
+
 ```yaml
 permissions:
   contents: read
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - CI/CD
 
 1. **Pas d'audit de sécurité automatisé**
    - Pas de `npm audit` ou `pnpm audit`
@@ -470,34 +491,39 @@ permissions:
 
 ### 1. Configuration PostgreSQL
 
-#### ✅ Points Forts
+#### Points Forts - PostgreSQL
 
-**Migrations Gérées**
+##### Migrations Gérées
+
 ```typescript
 // Source: apps/backend/src/app.module.ts
 synchronize: false,     // Pas de sync auto en prod
 migrationsRun: true,    // Migrations automatiques
 ```
 
-**ORM TypeORM**
+##### ORM TypeORM
+
 - Utilisation exclusive de TypeORM pour les requêtes
 - Pas de SQL brut détecté dans le code applicatif
 - Protection contre les injections SQL
 
-**Index de Performance**
+##### Index de Performance
+
 ```typescript
 // Source: apps/backend/src/database/entities/user.entity.ts
 @Index('idx_users_last_seen', ['lastSeenAt'])
 ```
 
-#### ⚠️ Points à Améliorer
+#### Points à Améliorer - PostgreSQL
 
 1. **Credentials par défaut**
+
    ```yaml
    # docker-compose.yml
    POSTGRES_USER: ${DB_USER:-postgres}
    POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
    ```
+
    - Valeurs par défaut faibles
    - **Impact:** Critique en production
 
@@ -517,13 +543,15 @@ migrationsRun: true,    // Migrations automatiques
 
 ### 2. Gestion des Secrets
 
-#### ⚠️ Points Critiques
+#### Points Critiques - Secrets
 
 1. **Tokens stockés en clair**
+
    ```typescript
    verificationToken?: string | null;
    passwordResetToken?: string | null;
    ```
+
    - Tokens de vérification stockés sans hash
    - Si la DB est compromise, tous les tokens sont exposés
    - **Impact:** Élevé
@@ -586,63 +614,63 @@ migrationsRun: true,    // Migrations automatiques
 
 ### 🟠 Élevées (à corriger rapidement)
 
-4. **Pas d'audit automatique des dépendances**
+1. **Pas d'audit automatique des dépendances**
    - Risque: Vulnérabilités non détectées (Log4j, etc.)
    - Solution: Intégrer `pnpm audit` dans CI/CD
 
-5. **Tokens de vérification stockés en clair**
+2. **Tokens de vérification stockés en clair**
    - Fichier: `apps/backend/src/database/entities/user.entity.ts`
    - Risque: Compromission en cas de fuite DB
    - Solution: Hasher les tokens avant stockage
 
-6. **Pas de sauvegarde DB automatique**
+3. **Pas de sauvegarde DB automatique**
    - Risque: Perte de données en cas de défaillance
    - Solution: Stratégie de backup automatisée
 
-7. **Containers Docker en root**
+4. **Containers Docker en root**
    - Risque: Élévation de privilèges en cas de compromission
    - Solution: Utilisateurs non-root dans les Dockerfiles
 
 ### 🟡 Moyennes (à corriger à moyen terme)
 
-8. **Politique de mots de passe faible**
+1. **Politique de mots de passe faible**
    - Minimum 6 caractères sans complexité
    - Solution: 8+ caractères + complexité obligatoire
 
-9. **Pas de CSP**
+2. **Pas de CSP**
    - Risque: XSS non mitigées
    - Solution: Implémenter Content-Security-Policy
 
-10. **Pas de protection CSRF explicite**
+3. **Pas de protection CSRF explicite**
     - SameSite=Lax insuffisant
     - Solution: Tokens CSRF ou SameSite=Strict
 
-11. **Stockage localStorage pour invités**
+4. **Stockage localStorage pour invités**
     - Vulnérable aux XSS
     - Solution: Cookies HTTP-only également pour invités
 
-12. **Pas de rotation des tokens JWT**
+5. **Pas de rotation des tokens JWT**
     - Tokens valides 7 jours
     - Solution: Refresh tokens + rotation automatique
 
-13. **Pas de limitation des connexions WebSocket**
+6. **Pas de limitation des connexions WebSocket**
     - Risque: DoS par utilisateur malveillant
     - Solution: Limite par utilisateur/IP
 
 ### 🟢 Faibles (améliorations recommandées)
 
-14. **Pas de monitoring de sécurité**
-    - Solution: Logs centralisés + alertes
+1. **Pas de monitoring de sécurité**
+   - Solution: Logs centralisés + alertes
 
-15. **Pas de tests de sécurité automatisés**
-    - Solution: Tests de pénétration dans CI/CD
+2. **Pas de tests de sécurité automatisés**
+   - Solution: Tests de pénétration dans CI/CD
 
-16. **Pas de détection des mots de passe communs**
-    - Solution: Bibliothèque comme `zxcvbn`
+3. **Pas de détection des mots de passe communs**
+   - Solution: Bibliothèque comme `zxcvbn`
 
-17. **Pas de rate limiting distribué**
-    - Problème si plusieurs instances backend
-    - Solution: Redis pour rate limiting partagé
+4. **Pas de rate limiting distribué**
+   - Problème si plusieurs instances backend
+   - Solution: Redis pour rate limiting partagé
 
 ---
 
@@ -680,6 +708,7 @@ migrationsRun: true,    // Migrations automatiques
 | A10: SSRF | 🟢 N/A | Pas de requêtes sortantes utilisateur |
 
 ### Légende
+
 - 🟢 Protégé / Conforme
 - 🟡 Partiellement protégé
 - 🟠 Vulnérable / Non conforme
@@ -690,12 +719,14 @@ migrationsRun: true,    // Migrations automatiques
 ## Conclusion
 
 L'application WhoIsIt dispose d'**une base de sécurité solide** pour un projet en développement, avec notamment:
+
 - Une authentification JWT robuste
 - Une validation stricte des données
 - Des protections contre le brute-force
 - Une utilisation sécurisée de l'ORM
 
 Cependant, **plusieurs améliorations critiques sont nécessaires avant un déploiement en production**, notamment:
+
 - Gestion sécurisée des secrets
 - Audit automatique des dépendances
 - Content Security Policy

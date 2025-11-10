@@ -79,6 +79,7 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 ## 📋 Plan d'Action Recommandé
 
 ### Phase 1: Corrections Critiques (Semaine 1) - 3-5 jours
+
 - [ ] Sécuriser JWT et DB credentials
 - [ ] Implémenter Docker secrets
 - [ ] Activer audit automatique dépendances
@@ -87,17 +88,20 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 - [ ] Containers non-root
 
 ### Phase 2: Améliorations Élevées (Semaine 2-3) - 5-7 jours
+
 - [ ] Renforcer politique mots de passe (8+ chars, complexité)
 - [ ] Implémenter Content Security Policy
 - [ ] Renforcer protection CSRF
 - [ ] Tests de sécurité
 
 ### Phase 3: Optimisations Moyennes (Semaine 4-5) - 5-8 jours
+
 - [ ] Rotation tokens JWT
 - [ ] Limitation connexions WebSocket
 - [ ] Monitoring et alertes
 
 ### Phase 4: Améliorations Continues (Ongoing)
+
 - [ ] Tests de pénétration réguliers
 - [ ] Formation équipe
 - [ ] Documentation à jour
@@ -128,12 +132,14 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 ### Impact Financier Potentiel
 
 **Si compromission en production:**
+
 - Vol de données: Amendes RGPD jusqu'à 4% CA
 - Perte de réputation: Perte clients/utilisateurs
 - Temps d'arrêt: Perte de revenus
 - Remédiation: Coûts techniques + légaux
 
 **Estimation:**
+
 - PME: 50k€ - 500k€
 - Startup: 10k€ - 100k€
 - Entreprise: 500k€ - 5M€+
@@ -147,6 +153,7 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 ## 🎓 Recommandations de Formation
 
 ### Pour l'Équipe
+
 1. OWASP Top 10 (4h)
 2. Secure Coding Practices (8h)
 3. NestJS Security (4h)
@@ -157,21 +164,25 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 ## 📞 Prochaines Étapes
 
 ### Immédiat (Cette Semaine)
+
 1. Revue de ce résumé avec l'équipe technique
 2. Priorisation des vulnérabilités critiques
 3. Planification Sprint de sécurisation
 
 ### Court Terme (2-4 Semaines)
+
 1. Implémentation Phase 1 + 2
 2. Tests de sécurité
 3. Documentation mise à jour
 
 ### Moyen Terme (1-3 Mois)
+
 1. Implémentation Phase 3
 2. Audit externe
 3. Tests de pénétration
 
 ### Long Terme (Continu)
+
 1. Monitoring et alertes
 2. Formation continue
 3. Audits réguliers
@@ -179,6 +190,7 @@ L'application WhoIsIt présente une base de sécurité solide avec plusieurs bon
 ## 📚 Documentation Complète
 
 Pour plus de détails, consulter:
+
 - [État Actuel de la Sécurité](./current-state.md) - Audit détaillé (20 pages)
 - [Recommandations](./recommendations.md) - Plan d'action (29 pages)
 - [Best Practices](./best-practices.md) - Guide développeur (21 pages)
@@ -187,6 +199,7 @@ Pour plus de détails, consulter:
 ## ✉️ Contact
 
 Pour questions ou clarifications:
+
 - Créer une issue GitHub (label: `security`)
 - Consulter la documentation complète
 - Contacter l'équipe de développement
