@@ -98,18 +98,19 @@ describe("game-api", () => {
   describe("createGame", () => {
     const createData: CreateGameRequest = {
       characterSetId: "set-1",
-      maxPlayers: 4,
       turnTimerSeconds: 60,
     };
 
     it("successfully creates a game", async () => {
       const mockLobby = {
+        id: "game-1",
         roomCode: "TEST123",
-        hostId: "user-1",
-        maxPlayers: 4,
-        players: [],
+        status: "lobby",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        players: [],
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -149,12 +150,22 @@ describe("game-api", () => {
 
     it("successfully joins a game", async () => {
       const mockLobby = {
+        id: "game-1",
         roomCode: "TEST123",
-        hostId: "user-1",
-        maxPlayers: 4,
-        players: [{ id: "player-1", username: "player2" }],
+        status: "lobby",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        players: [
+          {
+            id: "player-1",
+            username: "player2",
+            role: "player",
+            isReady: false,
+            joinedAt: new Date().toISOString(),
+          },
+        ],
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -190,12 +201,14 @@ describe("game-api", () => {
   describe("getLobby", () => {
     it("successfully fetches lobby details", async () => {
       const mockLobby = {
+        id: "game-1",
         roomCode: "TEST123",
-        hostId: "user-1",
-        maxPlayers: 4,
-        players: [],
+        status: "lobby",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        players: [],
       };
 
       mockFetch.mockResolvedValueOnce({
@@ -226,12 +239,15 @@ describe("game-api", () => {
   describe("startGame", () => {
     it("successfully starts a game", async () => {
       const mockLobby = {
+        id: "game-1",
         roomCode: "TEST123",
-        hostId: "user-1",
-        maxPlayers: 4,
-        players: [],
+        status: "in_progress",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: true,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        startedAt: new Date().toISOString(),
+        players: [],
       };
 
       mockFetch.mockResolvedValueOnce({

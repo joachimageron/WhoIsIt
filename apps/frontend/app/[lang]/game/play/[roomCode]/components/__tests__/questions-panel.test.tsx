@@ -84,7 +84,7 @@ describe("QuestionsPanel", () => {
       description: "",
       isDefault: false,
     },
-    settings: { maxPlayers: 4, roundTimeLimit: null },
+    settings: { roundTimeLimit: null },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };

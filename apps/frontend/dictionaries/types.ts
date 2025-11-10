@@ -169,8 +169,6 @@ export interface Dictionary {
       title: string;
       characterSet: string;
       characterSetPlaceholder: string;
-      maxPlayers: string;
-      maxPlayersPlaceholder: string;
       turnTimer: string;
       turnTimerPlaceholder: string;
       createButton: string;

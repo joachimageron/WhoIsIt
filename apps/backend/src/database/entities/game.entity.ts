@@ -59,9 +59,6 @@ export class Game {
   visibility!: GameVisibility;
 
   @Column({ type: 'int', nullable: true })
-  maxPlayers?: number | null;
-
-  @Column({ type: 'int', nullable: true })
   turnTimerSeconds?: number | null;
 
   @Column({ type: 'jsonb', default: () => "'{}'" })

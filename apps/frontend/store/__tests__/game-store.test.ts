@@ -36,12 +36,14 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const lobby: GameLobbyResponse = {
+        id: "game-1",
         roomCode: "TEST123",
-        players: [],
-        hostId: "host-1",
-        maxPlayers: 4,
+        status: "lobby",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        players: [],
       } as GameLobbyResponse;
 
       act(() => {
@@ -55,12 +57,14 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const lobby: GameLobbyResponse = {
+        id: "game-1",
         roomCode: "TEST123",
-        players: [],
-        hostId: "host-1",
-        maxPlayers: 4,
+        status: "lobby",
+        visibility: "private",
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: new Date().toISOString(),
+        players: [],
       } as GameLobbyResponse;
 
       act(() => {

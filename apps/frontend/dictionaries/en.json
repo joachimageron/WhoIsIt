@@ -152,8 +152,6 @@
       "title": "Create Game",
       "characterSet": "Character Set",
       "characterSetPlaceholder": "Select a character set",
-      "maxPlayers": "Maximum Players",
-      "maxPlayersPlaceholder": "Enter max players (optional)",
       "turnTimer": "Turn Timer (seconds)",
       "turnTimerPlaceholder": "Enter turn timer in seconds (optional)",
       "createButton": "Create Game",

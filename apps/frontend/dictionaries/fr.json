@@ -152,8 +152,6 @@
       "title": "Créer une partie",
       "characterSet": "Jeu de personnages",
       "characterSetPlaceholder": "Sélectionnez un jeu de personnages",
-      "maxPlayers": "Nombre maximum de joueurs",
-      "maxPlayersPlaceholder": "Entrez le nombre maximum de joueurs (optionnel)",
       "turnTimer": "Temps par tour (secondes)",
       "turnTimerPlaceholder": "Entrez le temps par tour en secondes (optionnel)",
       "createButton": "Créer la partie",
