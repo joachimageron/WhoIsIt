@@ -282,13 +282,6 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               </h2>
             </div>
 
-            {!hasExactlyTwoPlayers && (
-              <p className="text-small text-warning">
-                {dict.game.lobby.needTwoPlayers ||
-                  "Exactly 2 players are required to start the game"}
-              </p>
-            )}
-
             {lobby.players.length === 0 ? (
               <p className="text-small text-default-400">
                 {dict.game.lobby.waitingForPlayers}

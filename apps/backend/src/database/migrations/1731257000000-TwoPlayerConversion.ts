@@ -11,6 +11,10 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
     );
 
     // Drop the old enum and create a new one without spectator
+    // First, drop the default value that depends on the enum
+    await queryRunner.query(
+      `ALTER TABLE game_players ALTER COLUMN role DROP DEFAULT`,
+    );
     await queryRunner.query(
       `ALTER TABLE game_players ALTER COLUMN role TYPE text`,
     );
@@ -20,6 +24,10 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE game_players ALTER COLUMN role TYPE "public"."game_player_role" USING role::"public"."game_player_role"`,
+    );
+    // Restore the default value
+    await queryRunner.query(
+      `ALTER TABLE game_players ALTER COLUMN role SET DEFAULT 'player'`,
     );
 
     // Step 2: Set default values for nullable target_player_id columns before making them NOT NULL
@@ -32,10 +40,15 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
         INNER JOIN rounds r ON r.game_id = gp.game_id
         WHERE r.id = q.round_id
           AND gp.id != q.asked_by_player_id
-          AND gp.left_at IS NULL
+          AND gp."leftAt" IS NULL
         LIMIT 1
       )
       WHERE target_player_id IS NULL
+    `);
+
+    // Delete questions that still have NULL target_player_id (orphaned questions)
+    await queryRunner.query(`
+      DELETE FROM questions WHERE target_player_id IS NULL
     `);
 
     // For guesses: set target_player_id to the other player in the game
@@ -47,10 +60,15 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
         INNER JOIN rounds r ON r.game_id = gp.game_id
         WHERE r.id = g.round_id
           AND gp.id != g.guessed_by_player_id
-          AND gp.left_at IS NULL
+          AND gp."leftAt" IS NULL
         LIMIT 1
       )
       WHERE target_player_id IS NULL
+    `);
+
+    // Delete guesses that still have NULL target_player_id (orphaned guesses)
+    await queryRunner.query(`
+      DELETE FROM guesses WHERE target_player_id IS NULL
     `);
 
     // Step 3: Make target_player_id columns NOT NULL
@@ -88,6 +106,10 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
     );
 
     // Step 4: Restore spectator role to enum
+    // Drop the default value first
+    await queryRunner.query(
+      `ALTER TABLE game_players ALTER COLUMN role DROP DEFAULT`,
+    );
     await queryRunner.query(
       `ALTER TABLE game_players ALTER COLUMN role TYPE text`,
     );
@@ -97,6 +119,10 @@ export class TwoPlayerConversion1731257000000 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE game_players ALTER COLUMN role TYPE "public"."game_player_role" USING role::"public"."game_player_role"`,
+    );
+    // Restore the default value
+    await queryRunner.query(
+      `ALTER TABLE game_players ALTER COLUMN role SET DEFAULT 'player'`,
     );
   }
 }

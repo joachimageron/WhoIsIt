@@ -181,7 +181,7 @@
       "host": "Host",
       "players": "Players",
       "waitingForPlayers": "Waiting for players to join...",
-      "needTwoPlayers": "Exactly 2 players are required to start the game",
+      "needTwoPlayers": "2 players are required to start the game",
       "readyStatus": "Ready",
       "notReadyStatus": "Not Ready",
       "toggleReady": "Toggle Ready",

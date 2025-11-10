@@ -184,7 +184,7 @@ export class GameService {
     });
 
     if (guess) {
-      // Handle guess result (scoring, elimination)
+      // Handle guess result
       const shouldCheckGameEnd =
         await this.gamePlayService.handleGuessResult(guess);
 

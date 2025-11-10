@@ -35,6 +35,9 @@ export function QuestionsPanel({
   const targetPlayerId = otherPlayer?.id || "";
   const [isAsking, setIsAsking] = useState(false);
 
+  console.log("gameState.players:", gameState.players);
+
+  console.log("targetPlayerId:", targetPlayerId);
   const handleAskQuestion = async () => {
     if (!question.trim()) {
       addToast({
@@ -113,13 +116,6 @@ export function QuestionsPanel({
         </h2>
       </CardHeader>
       <CardBody className="gap-3">
-        {/* In a 2-player game, we automatically target the opponent */}
-        {otherPlayers.length > 0 && (
-          <p className="text-sm text-default-500">
-            {dict.game.play.questions.to}{" "}
-            <strong>{otherPlayer?.username}</strong>
-          </p>
-        )}
 
         {/* Question Input */}
         <Textarea

@@ -181,7 +181,7 @@
       "host": "Hôte",
       "players": "Joueurs",
       "waitingForPlayers": "En attente de joueurs...",
-      "needTwoPlayers": "Exactement 2 joueurs sont requis pour démarrer la partie",
+      "needTwoPlayers": "2 joueurs sont requis pour démarrer la partie",
       "readyStatus": "Prêt",
       "notReadyStatus": "Pas Prêt",
       "toggleReady": "Basculer Prêt",

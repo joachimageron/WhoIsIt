@@ -125,7 +125,7 @@ export function useGameEvents({
         addToast({
           color: "danger",
           title: dict.game.play.guess.incorrectGuess || "Incorrect guess",
-          description: `${guess.guessedByPlayerUsername} guessed incorrectly and is eliminated`,
+          description: `${guess.guessedByPlayerUsername} guessed incorrectly`,
         });
       }
     });

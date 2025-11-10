@@ -772,13 +772,6 @@ export class GamePlayService {
 
       // Return true to indicate we need to check for game end
       return true;
-    } else if (!guess.isCorrect && targetPlayer) {
-      // Incorrect guess - eliminate the guessing player
-      guessingPlayer.leftAt = new Date();
-      await this.playerRepository.save(guessingPlayer);
-
-      // Return true to indicate we need to check for game end
-      return true;
     }
 
     return false;
