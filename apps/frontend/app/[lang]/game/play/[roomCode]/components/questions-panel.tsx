@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { Select, SelectItem } from "@heroui/select";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 
@@ -29,11 +28,16 @@ export function QuestionsPanel({
   currentPlayerId,
 }: QuestionsPanelProps) {
   const [question, setQuestion] = useState("");
-  const [targetPlayerId, setTargetPlayerId] = useState<string>(
-    gameState.players.filter((p) => p.id !== currentPlayerId)[0]?.id || "",
-  );
+  // In a 2-player game, always target the opponent
+  const otherPlayer = gameState.players.filter(
+    (p) => p.id !== currentPlayerId,
+  )[0];
+  const targetPlayerId = otherPlayer?.id || "";
   const [isAsking, setIsAsking] = useState(false);
 
+  console.log("gameState.players:", gameState.players);
+
+  console.log("targetPlayerId:", targetPlayerId);
   const handleAskQuestion = async () => {
     if (!question.trim()) {
       addToast({
@@ -62,16 +66,26 @@ export function QuestionsPanel({
       return;
     }
 
+    if (!targetPlayerId) {
+      addToast({
+        color: "danger",
+        title: dict.game.play.errors.failedToAskQuestion,
+        description: "Could not find opponent player",
+      });
+
+      return;
+    }
+
     setIsAsking(true);
 
     try {
       await gameApi.askQuestion(roomCode, {
         playerId: currentPlayerId,
-        targetPlayerId: targetPlayerId || undefined,
+        targetPlayerId: targetPlayerId,
         questionText: question.trim(),
       });
 
-      // Clear question text only, keep target player selected
+      // Clear question text
       setQuestion("");
 
       addToast({
@@ -102,26 +116,6 @@ export function QuestionsPanel({
         </h2>
       </CardHeader>
       <CardBody className="gap-3">
-        {/* Target Player Selection (optional) */}
-        {otherPlayers.length > 0 && (
-          <Select
-            isDisabled={!isMyTurn || isAsking}
-            label={dict.game.play.questions.selectPlayer}
-            placeholder={dict.game.play.questions.selectPlayer}
-            selectedKeys={targetPlayerId ? [targetPlayerId] : []}
-            size="sm"
-            variant="bordered"
-            onSelectionChange={(keys) => {
-              const selected = Array.from(keys)[0];
-
-              setTargetPlayerId(selected ? String(selected) : "");
-            }}
-          >
-            {otherPlayers.map((player) => (
-              <SelectItem key={player.id}>{player.username}</SelectItem>
-            ))}
-          </Select>
-        )}
 
         {/* Question Input */}
         <Textarea

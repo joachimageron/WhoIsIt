@@ -73,7 +73,6 @@ type CreateGameRequest = {
   hostUsername?: string;
   hostUserId?: string;
   visibility?: GameVisibility;
-  maxPlayers?: number | null;
   turnTimerSeconds?: number | null;
   ruleConfig?: Record<string, unknown>;
 };
@@ -113,7 +112,6 @@ type GameLobbyResponse = {
   visibility: GameVisibility;
   hostUserId?: string;
   characterSetId: string;
-  maxPlayers?: number;
   turnTimerSeconds?: number;
   ruleConfig: Record<string, unknown>;
   createdAt: string;

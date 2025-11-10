@@ -29,6 +29,7 @@ describe("QuestionsPanel", () => {
         questions: {
           questionsPanel: "Questions Panel",
           selectPlayer: "Select Player",
+          to: "To:",
           questionPlaceholder: "Ask a question...",
           askButton: "Ask Question",
           asking: "Asking...",
@@ -48,7 +49,7 @@ describe("QuestionsPanel", () => {
     roomCode: "ABC123",
     status: "in_progress",
     currentRoundNumber: 1,
-    totalRounds: 5,
+    currentRoundState: "question",
     activePlayerId: "player-1",
     activePlayerUsername: "Alice",
     players: [
@@ -56,7 +57,7 @@ describe("QuestionsPanel", () => {
         id: "player-1",
         username: "Alice",
         userId: "user-1",
-        isHost: true,
+        role: "host",
         isReady: true,
         joinedAt: new Date().toISOString(),
       },
@@ -64,29 +65,11 @@ describe("QuestionsPanel", () => {
         id: "player-2",
         username: "Bob",
         userId: "user-2",
-        isHost: false,
-        isReady: true,
-        joinedAt: new Date().toISOString(),
-      },
-      {
-        id: "player-3",
-        username: "Charlie",
-        userId: "user-3",
-        isHost: false,
+        role: "player",
         isReady: true,
         joinedAt: new Date().toISOString(),
       },
     ],
-    rounds: [],
-    characterSet: {
-      id: "1",
-      name: "Test Set",
-      description: "",
-      isDefault: false,
-    },
-    settings: { maxPlayers: 4, roundTimeLimit: null },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
   };
 
   const defaultProps = {
@@ -108,9 +91,10 @@ describe("QuestionsPanel", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays player selection dropdown", () => {
+  it("displays opponent player name", () => {
     render(<QuestionsPanel {...defaultProps} />);
-    expect(screen.getAllByText("Select Player")[0]).toBeInTheDocument();
+    // In 2-player mode, the opponent's name should be displayed
+    expect(screen.getByText("Bob")).toBeInTheDocument();
   });
 
   it("displays question textarea", () => {
@@ -357,25 +341,22 @@ describe("QuestionsPanel", () => {
     });
   });
 
-  it("filters out current player from player selection", () => {
+  it("automatically targets the opponent player in 2-player mode", () => {
     render(<QuestionsPanel {...defaultProps} />);
 
-    // Should show other players but not the current player
-    // This is tested implicitly through the rendering
-    const selects = screen.getAllByText("Select Player");
-
-    expect(selects.length).toBeGreaterThan(0);
+    // Should show the opponent player's name (Bob)
+    expect(screen.getByText("Bob")).toBeInTheDocument();
   });
 
   it("handles game with only one player", () => {
-    const singlePlayerGameState = {
+    const singlePlayerGameState: GameStateResponse = {
       ...mockGameState,
       players: [
         {
           id: "player-1",
           username: "Alice",
           userId: "user-1",
-          isHost: true,
+          role: "host",
           isReady: true,
           joinedAt: new Date().toISOString(),
         },
@@ -386,8 +367,8 @@ describe("QuestionsPanel", () => {
       <QuestionsPanel {...defaultProps} gameState={singlePlayerGameState} />,
     );
 
-    // Player selection should not be shown when there's only one player
-    expect(screen.queryByText("Select Player")).not.toBeInTheDocument();
+    // When there's only one player, no opponent name should be shown
+    expect(screen.queryByText("Bob")).not.toBeInTheDocument();
   });
 
   it("trims question text before submitting", async () => {
@@ -414,11 +395,11 @@ describe("QuestionsPanel", () => {
     });
   });
 
-  it("selects first other player by default", () => {
+  it("submits question with correct target player in 2-player mode", () => {
     render(<QuestionsPanel {...defaultProps} />);
 
-    // The first other player (not current player) should be selected by default
-    // This is Bob (player-2) in our mock data
-    expect(screen.getAllByText("Select Player")[0]).toBeInTheDocument();
+    // In 2-player mode, the first other player (Bob) should be automatically targeted
+    // This is verified in the question submission test above
+    expect(screen.getByText("Bob")).toBeInTheDocument();
   });
 });

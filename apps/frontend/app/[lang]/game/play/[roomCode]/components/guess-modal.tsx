@@ -66,8 +66,7 @@ export function GuessModal({
           </p>
         </ModalHeader>
         <ModalBody>
-          <ScrollShadow className="h-[70vh]" hideScrollBar size={0}>
-
+          <ScrollShadow hideScrollBar className="h-[70vh]" size={0}>
             {/* Character Selection Grid */}
 
             <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
@@ -79,12 +78,13 @@ export function GuessModal({
                 return (
                   <button
                     key={character.id}
-                    className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-2 transition-all duration-300 ${selectedCharacterId === character.id
-                      ? "border-success bg-success-50 scale-100"
-                      : isDisabled
-                        ? "scale-95 border-default-200 cursor-not-allowed"
-                        : "scale-100 border-default-300 hover:border-success"
-                      }`}
+                    className={`group relative flex flex-col items-center gap-2 rounded-lg border-2 p-2 transition-all duration-300 ${
+                      selectedCharacterId === character.id
+                        ? "border-success bg-success-50 scale-100"
+                        : isDisabled
+                          ? "scale-95 border-default-200 cursor-not-allowed"
+                          : "scale-100 border-default-300 hover:border-success"
+                    }`}
                     disabled={isDisabled}
                     type="button"
                     onClick={() =>
@@ -139,8 +139,6 @@ export function GuessModal({
               })}
             </div>
           </ScrollShadow>
-
-
         </ModalBody>
         <ModalFooter>
           <Button

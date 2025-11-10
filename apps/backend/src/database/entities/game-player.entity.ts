@@ -53,9 +53,6 @@ export class GamePlayer {
   })
   role!: GamePlayerRole;
 
-  @Column({ type: 'int', nullable: true })
-  seatOrder?: number | null;
-
   @Column({ type: 'boolean', default: false })
   isReady!: boolean;
 

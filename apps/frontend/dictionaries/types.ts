@@ -169,8 +169,7 @@ export interface Dictionary {
       title: string;
       characterSet: string;
       characterSetPlaceholder: string;
-      maxPlayers: string;
-      maxPlayersPlaceholder: string;
+      twoPlayerInfo: string;
       turnTimer: string;
       turnTimerPlaceholder: string;
       createButton: string;
@@ -199,6 +198,7 @@ export interface Dictionary {
       host: string;
       players: string;
       waitingForPlayers: string;
+      needTwoPlayers: string;
       readyStatus: string;
       notReadyStatus: string;
       toggleReady: string;

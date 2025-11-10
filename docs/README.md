@@ -1,6 +1,6 @@
 # WhoIsIt Documentation
 
-Welcome to the comprehensive documentation for the WhoIsIt project - a real-time multiplayer guessing game built as a modern monorepo application.
+Welcome to the comprehensive documentation for the WhoIsIt project - a real-time 2-player guessing game built as a modern monorepo application.
 
 ## Documentation Structure
 
@@ -80,7 +80,7 @@ Security audit, recommendations, and best practices.
 
 ## About WhoIsIt
 
-WhoIsIt is a real-time multiplayer guessing game where players try to identify mystery characters by asking yes/no questions. The project demonstrates:
+WhoIsIt is a real-time 2-player guessing game where players try to identify mystery characters by asking yes/no questions. The project demonstrates:
 
 - **Modern Full-Stack Architecture**: PNPM monorepo with TypeScript throughout
 - **Real-Time Communication**: Socket.IO for instant game updates

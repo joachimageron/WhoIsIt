@@ -50,7 +50,9 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
   );
   const isHost = currentPlayer?.role === "host";
   const allPlayersReady =
-    lobby?.players.every((p) => p.isReady) && (lobby?.players.length ?? 0) > 0;
+    lobby?.players.every((p) => p.isReady) &&
+    (lobby?.players.length ?? 0) === 2;
+  const hasExactlyTwoPlayers = (lobby?.players.length ?? 0) === 2;
 
   // Join room on mount
   useEffect(() => {
@@ -276,8 +278,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">
-                {dict.game.lobby.players} ({lobby.players.length}
-                {lobby.maxPlayers ? `/${lobby.maxPlayers}` : ""})
+                {dict.game.lobby.players} ({lobby.players.length}/2)
               </h2>
             </div>
 
@@ -372,7 +373,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               <Button
                 className="flex-1"
                 color="primary"
-                isDisabled={!allPlayersReady || lobby.players.length < 2}
+                isDisabled={!allPlayersReady || !hasExactlyTwoPlayers}
                 isLoading={isStarting}
                 onPress={handleStartGame}
               >

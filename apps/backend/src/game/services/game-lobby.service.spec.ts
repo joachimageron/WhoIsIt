@@ -44,7 +44,6 @@ describe('GameLobbyService', () => {
     visibility: GameVisibility.PRIVATE,
     characterSet: mockCharacterSet,
     host: mockUser,
-    maxPlayers: 8,
     turnTimerSeconds: 60,
     ruleConfig: {},
     createdAt: new Date('2024-01-01'),
@@ -118,7 +117,6 @@ describe('GameLobbyService', () => {
         hostUserId: 'user-1',
         hostUsername: 'testuser',
         visibility: 'private' as const,
-        maxPlayers: 8,
         turnTimerSeconds: 60,
         ruleConfig: {},
       };
@@ -308,11 +306,11 @@ describe('GameLobbyService', () => {
       );
     });
 
-    it('should validate numeric fields are finite', async () => {
+    it('should validate turnTimerSeconds is finite', async () => {
       const request = {
         characterSetId: 'char-set-1',
         hostUsername: 'testuser',
-        maxPlayers: Infinity,
+        turnTimerSeconds: Infinity,
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -480,12 +478,11 @@ describe('GameLobbyService', () => {
       );
     });
 
-    it('should throw BadRequestException if game is full', async () => {
+    it('should throw BadRequestException if game is full (2 players)', async () => {
       const request = { username: 'newplayer' };
 
       const fullGame = {
         ...mockGame,
-        maxPlayers: 2,
         players: [
           {
             id: 'player-1',
@@ -504,7 +501,7 @@ describe('GameLobbyService', () => {
         BadRequestException,
       );
       await expect(service.joinGame('ABC12', request)).rejects.toThrow(
-        'Game is full',
+        'Game is full (maximum 2 players)',
       );
     });
 

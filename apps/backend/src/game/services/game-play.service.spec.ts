@@ -1010,12 +1010,17 @@ describe('GamePlayService', () => {
 
   describe('getQuestions', () => {
     it('should return questions with proper mapping', async () => {
+      const mockTargetPlayer = {
+        id: 'player-2',
+        username: 'player2',
+      } as GamePlayer;
+
       const mockQuestions = [
         {
           id: 'question-1',
           questionText: 'Question 1?',
           askedBy: mockPlayer,
-          targetPlayer: null,
+          targetPlayer: mockTargetPlayer,
           round: mockRound,
           askedAt: new Date(),
         } as Question,
@@ -1023,7 +1028,7 @@ describe('GamePlayService', () => {
           id: 'question-2',
           questionText: 'Question 2?',
           askedBy: mockPlayer,
-          targetPlayer: { id: 'player-2', username: 'player2' } as GamePlayer,
+          targetPlayer: mockTargetPlayer,
           round: mockRound,
           askedAt: new Date(),
         } as Question,
@@ -1040,7 +1045,9 @@ describe('GamePlayService', () => {
 
       expect(result).toHaveLength(2);
       expect(result[0].questionText).toBe('Question 1?');
+      expect(result[0].targetPlayerId).toBe('player-2');
       expect(result[1].questionText).toBe('Question 2?');
+      expect(result[1].targetPlayerId).toBe('player-2');
     });
 
     it('should return empty array if no questions found', async () => {

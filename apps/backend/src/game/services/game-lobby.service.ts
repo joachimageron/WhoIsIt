@@ -71,7 +71,6 @@ export class GameLobbyService {
       host: hostUser ?? undefined,
       status: GameStatus.LOBBY,
       visibility: this.resolveVisibility(request.visibility),
-      maxPlayers: this.normalizeOptionalNumber(request.maxPlayers),
       turnTimerSeconds: this.normalizeOptionalNumber(request.turnTimerSeconds),
       ruleConfig: request.ruleConfig ?? {},
     });
@@ -180,13 +179,10 @@ export class GameLobbyService {
       return this.mapToLobbyResponse(refreshedGame);
     }
 
-    // Check if game is full (only count active players)
+    // Check if game is full (strictly 2 players for this game)
     const activePlayers = game.players?.filter((p) => !p.leftAt) ?? [];
-    if (
-      typeof game.maxPlayers === 'number' &&
-      activePlayers.length >= game.maxPlayers
-    ) {
-      throw new BadRequestException('Game is full');
+    if (activePlayers.length >= 2) {
+      throw new BadRequestException('Game is full (maximum 2 players)');
     }
 
     // Create new player
@@ -314,8 +310,6 @@ export class GameLobbyService {
       visibility: game.visibility,
       hostUserId: game.host?.id,
       characterSetId: game.characterSet.id,
-      maxPlayers:
-        typeof game.maxPlayers === 'number' ? game.maxPlayers : undefined,
       turnTimerSeconds:
         typeof game.turnTimerSeconds === 'number'
           ? game.turnTimerSeconds

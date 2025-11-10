@@ -255,21 +255,18 @@ export class GamePlayService {
       throw new NotFoundException('Player not found');
     }
 
-    // Get the target player if specified
-    let targetPlayer: GamePlayer | null = null;
-    if (request.targetPlayerId) {
-      targetPlayer = await this.playerRepository.findOne({
-        where: { id: request.targetPlayerId },
-        relations: { game: true },
-      });
+    // Get the target player (required in 2-player game)
+    const targetPlayer = await this.playerRepository.findOne({
+      where: { id: request.targetPlayerId },
+      relations: { game: true },
+    });
 
-      if (!targetPlayer) {
-        throw new NotFoundException('Target player not found');
-      }
+    if (!targetPlayer) {
+      throw new NotFoundException('Target player not found');
+    }
 
-      if (targetPlayer.game.id !== game.id) {
-        throw new BadRequestException('Target player is not in this game');
-      }
+    if (targetPlayer.game.id !== game.id) {
+      throw new BadRequestException('Target player is not in this game');
     }
 
     // Create the question
@@ -336,9 +333,14 @@ export class GamePlayService {
             new Date(a.askedAt).getTime() - new Date(b.askedAt).getTime(),
         ) ?? [];
 
-    return questions.map((q) =>
-      this.mapToQuestionResponse(q, q.askedBy, q.targetPlayer ?? null),
-    );
+    return questions.map((q) => {
+      if (!q.targetPlayer) {
+        throw new InternalServerErrorException(
+          'Question missing required target player',
+        );
+      }
+      return this.mapToQuestionResponse(q, q.askedBy, q.targetPlayer);
+    });
   }
 
   /**
@@ -388,7 +390,7 @@ export class GamePlayService {
   private mapToQuestionResponse(
     question: Question,
     askedByPlayer: GamePlayer,
-    targetPlayer: GamePlayer | null,
+    targetPlayer: GamePlayer,
   ): QuestionResponse {
     return {
       id: question.id,
@@ -396,8 +398,8 @@ export class GamePlayService {
       roundNumber: question.round.roundNumber,
       askedByPlayerId: askedByPlayer.id,
       askedByPlayerUsername: askedByPlayer.username,
-      targetPlayerId: targetPlayer?.id,
-      targetPlayerUsername: targetPlayer?.username,
+      targetPlayerId: targetPlayer.id,
+      targetPlayerUsername: targetPlayer.username,
       questionText: question.questionText,
       askedAt: question.askedAt?.toISOString?.() ?? new Date().toISOString(),
     };
@@ -687,28 +689,25 @@ export class GamePlayService {
       throw new BadRequestException('Player is not in this game');
     }
 
-    // Get the target player if specified
-    let targetPlayer: GamePlayer | null = null;
-    if (request.targetPlayerId) {
-      targetPlayer = await this.playerRepository.findOne({
-        where: { id: request.targetPlayerId },
-        relations: {
-          game: true,
-          secret: { character: true },
-        },
-      });
+    // Get the target player (required in 2-player game)
+    const targetPlayer = await this.playerRepository.findOne({
+      where: { id: request.targetPlayerId },
+      relations: {
+        game: true,
+        secret: { character: true },
+      },
+    });
 
-      if (!targetPlayer) {
-        throw new NotFoundException('Target player not found');
-      }
+    if (!targetPlayer) {
+      throw new NotFoundException('Target player not found');
+    }
 
-      if (targetPlayer.game.id !== game.id) {
-        throw new BadRequestException('Target player is not in this game');
-      }
+    if (targetPlayer.game.id !== game.id) {
+      throw new BadRequestException('Target player is not in this game');
+    }
 
-      if (targetPlayer.id === guessingPlayer.id) {
-        throw new BadRequestException('Cannot guess your own character');
-      }
+    if (targetPlayer.id === guessingPlayer.id) {
+      throw new BadRequestException('Cannot guess your own character');
     }
 
     // Get the target character
@@ -721,16 +720,13 @@ export class GamePlayService {
     }
 
     // Determine if the guess is correct
-    let isCorrect = false;
-    if (targetPlayer) {
-      // If guessing a specific player's character
-      if (!targetPlayer.secret || !targetPlayer.secret.character) {
-        throw new InternalServerErrorException(
-          'Target player does not have a secret character assigned',
-        );
-      }
-      isCorrect = targetPlayer.secret.character.id === targetCharacter.id;
+    // If guessing a specific player's character
+    if (!targetPlayer.secret || !targetPlayer.secret.character) {
+      throw new InternalServerErrorException(
+        'Target player does not have a secret character assigned',
+      );
     }
+    const isCorrect = targetPlayer.secret.character.id === targetCharacter.id;
 
     // Create the guess
     const guess = this.guessRepository.create({
@@ -776,13 +772,6 @@ export class GamePlayService {
 
       // Return true to indicate we need to check for game end
       return true;
-    } else if (!guess.isCorrect && targetPlayer) {
-      // Incorrect guess - eliminate the guessing player
-      guessingPlayer.leftAt = new Date();
-      await this.playerRepository.save(guessingPlayer);
-
-      // Return true to indicate we need to check for game end
-      return true;
     }
 
     return false;
@@ -794,7 +783,7 @@ export class GamePlayService {
   private mapToGuessResponse(
     guess: Guess,
     guessingPlayer: GamePlayer,
-    targetPlayer: GamePlayer | null,
+    targetPlayer: GamePlayer,
     targetCharacter: Character,
     round: Round,
   ): GuessResponse {
@@ -804,8 +793,8 @@ export class GamePlayService {
       roundNumber: round.roundNumber,
       guessedByPlayerId: guessingPlayer.id,
       guessedByPlayerUsername: guessingPlayer.username,
-      targetPlayerId: targetPlayer?.id,
-      targetPlayerUsername: targetPlayer?.username,
+      targetPlayerId: targetPlayer.id,
+      targetPlayerUsername: targetPlayer.username,
       targetCharacterId: targetCharacter.id,
       targetCharacterName: targetCharacter.name,
       isCorrect: guess.isCorrect,

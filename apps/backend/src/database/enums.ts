@@ -13,7 +13,6 @@ export enum GameVisibility {
 export enum GamePlayerRole {
   HOST = 'host',
   PLAYER = 'player',
-  SPECTATOR = 'spectator',
 }
 
 export enum PlayerSecretStatus {

@@ -2,7 +2,7 @@
 
 ## Introduction
 
-WhoIsIt is a real-time multiplayer guessing game built on a modern full-stack architecture. The system follows a **monorepo** pattern with clear separation between frontend, backend, and shared contracts, enabling type-safe communication and efficient development workflows.
+WhoIsIt is a real-time 2-player guessing game built on a modern full-stack architecture. The system follows a **monorepo** pattern with clear separation between frontend, backend, and shared contracts, enabling type-safe communication and efficient development workflows.
 
 ## High-Level Architecture
 
