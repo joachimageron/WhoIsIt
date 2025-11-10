@@ -72,7 +72,7 @@ importers:
         specifier: ^1.4.7
         version: 1.4.7
       helmet:
-        specifier: ^8.0.0
+        specifier: ^8.1.0
         version: 8.1.0
       mjml:
         specifier: ^4.16.1
