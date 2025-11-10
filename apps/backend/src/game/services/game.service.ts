@@ -153,7 +153,7 @@ export class GameService {
       where: { roomCode: normalizedRoomCode },
       relations: {
         players: true,
-        rounds: true,
+        rounds: { activePlayer: true },
       },
       order: {
         rounds: { roundNumber: 'DESC' },
