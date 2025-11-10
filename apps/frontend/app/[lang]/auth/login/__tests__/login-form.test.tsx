@@ -1,8 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { Dictionary } from "@/dictionaries";
 
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
 import { LoginForm } from "../login-form";
+
 import * as authApi from "@/lib/auth-api";
 import { useAuthStore } from "@/store/auth-store";
 
@@ -23,6 +25,7 @@ jest.mock("@heroui/toast", () => ({
 
 // Mock next/navigation
 const mockPush = jest.fn();
+
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
@@ -72,7 +75,9 @@ describe("LoginForm", () => {
 
       expect(screen.getByLabelText("Email or Username")).toBeInTheDocument();
       expect(screen.getByLabelText("Password")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /log in/i }),
+      ).toBeInTheDocument();
     });
 
     it("renders links with correct locale", () => {
@@ -81,7 +86,9 @@ describe("LoginForm", () => {
       const forgotPasswordLink = container.querySelector(
         'a[href="/fr/auth/forgot-password"]',
       );
-      const registerLink = container.querySelector('a[href="/fr/auth/register"]');
+      const registerLink = container.querySelector(
+        'a[href="/fr/auth/register"]',
+      );
 
       expect(forgotPasswordLink).toBeInTheDocument();
       expect(registerLink).toBeInTheDocument();
@@ -127,6 +134,7 @@ describe("LoginForm", () => {
 
     it("calls login API with valid credentials", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.login.mockResolvedValueOnce({
         id: "user-1",
         email: "test@example.com",

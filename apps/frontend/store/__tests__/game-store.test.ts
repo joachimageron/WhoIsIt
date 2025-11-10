@@ -1,4 +1,3 @@
-import { renderHook, act } from "@testing-library/react";
 import type {
   GameLobbyResponse,
   GameStateResponse,
@@ -7,6 +6,8 @@ import type {
   AnswerResponse,
   PlayerCharacterResponse,
 } from "@whois-it/contracts";
+
+import { renderHook, act } from "@testing-library/react";
 
 import { useGameStore } from "../game-store";
 
@@ -160,7 +161,11 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const characters: CharacterResponseDto[] = [
-        { id: "char-1", name: "Alice", imageUrl: "url1" } as CharacterResponseDto,
+        {
+          id: "char-1",
+          name: "Alice",
+          imageUrl: "url1",
+        } as CharacterResponseDto,
         { id: "char-2", name: "Bob", imageUrl: "url2" } as CharacterResponseDto,
       ];
 
@@ -176,7 +181,11 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const characters1: CharacterResponseDto[] = [
-        { id: "char-1", name: "Alice", imageUrl: "url1" } as CharacterResponseDto,
+        {
+          id: "char-1",
+          name: "Alice",
+          imageUrl: "url1",
+        } as CharacterResponseDto,
       ];
 
       act(() => {
@@ -393,7 +402,9 @@ describe("useGameStore", () => {
       });
 
       expect(result.current.playState?.eliminatedCharacterIds.size).toBe(1);
-      expect(result.current.playState?.eliminatedCharacterIds.has("char-1")).toBe(true);
+      expect(
+        result.current.playState?.eliminatedCharacterIds.has("char-1"),
+      ).toBe(true);
     });
 
     it("handles multiple eliminations", () => {
@@ -414,9 +425,15 @@ describe("useGameStore", () => {
       });
 
       expect(result.current.playState?.eliminatedCharacterIds.size).toBe(3);
-      expect(result.current.playState?.eliminatedCharacterIds.has("char-1")).toBe(true);
-      expect(result.current.playState?.eliminatedCharacterIds.has("char-2")).toBe(true);
-      expect(result.current.playState?.eliminatedCharacterIds.has("char-3")).toBe(true);
+      expect(
+        result.current.playState?.eliminatedCharacterIds.has("char-1"),
+      ).toBe(true);
+      expect(
+        result.current.playState?.eliminatedCharacterIds.has("char-2"),
+      ).toBe(true);
+      expect(
+        result.current.playState?.eliminatedCharacterIds.has("char-3"),
+      ).toBe(true);
     });
   });
 
@@ -447,7 +464,9 @@ describe("useGameStore", () => {
       });
 
       expect(result.current.playState?.flippedCharacterIds.size).toBe(1);
-      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(true);
+      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(
+        true,
+      );
     });
 
     it("removes character from flipped set when present", () => {
@@ -465,14 +484,18 @@ describe("useGameStore", () => {
         result.current.toggleFlipCharacter("char-1");
       });
 
-      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(true);
+      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(
+        true,
+      );
 
       act(() => {
         result.current.toggleFlipCharacter("char-1");
       });
 
       expect(result.current.playState?.flippedCharacterIds.size).toBe(0);
-      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(false);
+      expect(result.current.playState?.flippedCharacterIds.has("char-1")).toBe(
+        false,
+      );
     });
 
     it("handles multiple toggles", () => {
@@ -498,7 +521,9 @@ describe("useGameStore", () => {
       });
 
       expect(result.current.playState?.flippedCharacterIds.size).toBe(1);
-      expect(result.current.playState?.flippedCharacterIds.has("char-2")).toBe(true);
+      expect(result.current.playState?.flippedCharacterIds.has("char-2")).toBe(
+        true,
+      );
     });
   });
 

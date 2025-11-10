@@ -1,8 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { Dictionary } from "@/dictionaries";
 
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+
 import { ForgotPasswordForm } from "../forgot-password-form";
+
 import * as authApi from "@/lib/auth-api";
 
 // Mock auth API
@@ -55,7 +57,9 @@ describe("ForgotPasswordForm", () => {
         screen.getByText("Enter your email to receive a reset link"),
       ).toBeInTheDocument();
       expect(screen.getByLabelText("Email")).toBeInTheDocument();
-      expect(screen.getByRole("button", { name: /send reset link/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /send reset link/i }),
+      ).toBeInTheDocument();
       expect(screen.getByText("Back to login")).toBeInTheDocument();
     });
 
@@ -102,6 +106,7 @@ describe("ForgotPasswordForm", () => {
   describe("form submission", () => {
     it("calls forgotPassword API with email", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.forgotPassword.mockResolvedValueOnce();
 
       render(<ForgotPasswordForm dict={mockDict} lang="en" />);
@@ -123,6 +128,7 @@ describe("ForgotPasswordForm", () => {
 
     it("shows success toast on successful submission", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.forgotPassword.mockResolvedValueOnce();
 
       render(<ForgotPasswordForm dict={mockDict} lang="en" />);
@@ -146,6 +152,7 @@ describe("ForgotPasswordForm", () => {
 
     it("shows error message on API failure", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.forgotPassword.mockRejectedValueOnce(
         new Error("Email not found"),
       );
@@ -167,6 +174,7 @@ describe("ForgotPasswordForm", () => {
 
     it("shows default error message for non-Error exceptions", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.forgotPassword.mockRejectedValueOnce("Unknown error");
 
       render(<ForgotPasswordForm dict={mockDict} lang="en" />);
@@ -191,6 +199,7 @@ describe("ForgotPasswordForm", () => {
     it("disables input and shows loading on submit button during submission", async () => {
       const user = userEvent.setup();
       let resolvePromise: any;
+
       mockAuthApi.forgotPassword.mockReturnValueOnce(
         new Promise((resolve) => {
           resolvePromise = resolve;
@@ -223,6 +232,7 @@ describe("ForgotPasswordForm", () => {
 
     it("clears error on new submission", async () => {
       const user = userEvent.setup();
+
       mockAuthApi.forgotPassword
         .mockRejectedValueOnce(new Error("First error"))
         .mockResolvedValueOnce();

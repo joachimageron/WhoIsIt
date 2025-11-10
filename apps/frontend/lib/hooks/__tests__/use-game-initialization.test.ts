@@ -1,7 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
 import type { Dictionary } from "@/dictionaries";
 
+import { renderHook, waitFor } from "@testing-library/react";
+
 import { useGameInitialization } from "../use-game-initialization";
+
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
@@ -24,8 +26,12 @@ jest.mock("@heroui/toast", () => ({
 }));
 
 const mockGameApi = gameApi as jest.Mocked<typeof gameApi>;
-const mockUseAuthStore = useAuthStore as jest.MockedFunction<typeof useAuthStore>;
-const mockUseGameStore = useGameStore as jest.MockedFunction<typeof useGameStore>;
+const mockUseAuthStore = useAuthStore as jest.MockedFunction<
+  typeof useAuthStore
+>;
+const mockUseGameStore = useGameStore as jest.MockedFunction<
+  typeof useGameStore
+>;
 const mockUseGameSocket = useGameSocket as jest.MockedFunction<
   typeof useGameSocket
 >;
@@ -181,7 +187,9 @@ describe("useGameInitialization", () => {
       mockGameApi.getGameState.mockResolvedValueOnce(mockGameState as any);
       mockGameApi.getLobby.mockResolvedValueOnce(mockLobby as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({ id: "char-1" } as any);
+      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
+        id: "char-1",
+      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({ success: true });
@@ -286,7 +294,9 @@ describe("useGameInitialization", () => {
         characterSetId: "set-1",
       } as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({ id: "char-1" } as any);
+      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
+        id: "char-1",
+      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({
@@ -335,7 +345,9 @@ describe("useGameInitialization", () => {
         characterSetId: "set-1",
       } as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({ id: "char-1" } as any);
+      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
+        id: "char-1",
+      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce(mockQuestions as any);
       mockGameApi.getAnswers.mockResolvedValueOnce(mockAnswers as any);
       mockJoinRoom.mockResolvedValueOnce({ success: true });
@@ -362,7 +374,7 @@ describe("useGameInitialization", () => {
 
       // Loading should stay true initially but return early
       expect(result.current.isLoading).toBe(true);
-      
+
       // Should not call API methods
       expect(mockGameApi.getGameState).not.toHaveBeenCalled();
       expect(mockJoinRoom).not.toHaveBeenCalled();

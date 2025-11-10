@@ -1,7 +1,8 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 
 import { useGameAccess } from "../use-game-access";
 import { useAuth } from "../use-auth";
+
 import { useAuthStore } from "@/store/auth-store";
 
 // Mock useAuth hook
@@ -12,7 +13,9 @@ const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 jest.mock("@/store/auth-store", () => ({
   useAuthStore: jest.fn(),
 }));
-const mockUseAuthStore = useAuthStore as jest.MockedFunction<typeof useAuthStore>;
+const mockUseAuthStore = useAuthStore as jest.MockedFunction<
+  typeof useAuthStore
+>;
 
 // Mock guest-session
 jest.mock("@/lib/guest-session", () => ({

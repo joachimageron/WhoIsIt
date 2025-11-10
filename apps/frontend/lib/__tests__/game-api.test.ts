@@ -1,4 +1,3 @@
-import * as gameApi from "../game-api";
 import type {
   CreateGameRequest,
   JoinGameRequest,
@@ -6,6 +5,8 @@ import type {
   SubmitAnswerRequest,
   SubmitGuessRequest,
 } from "@whois-it/contracts";
+
+import * as gameApi from "../game-api";
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -163,17 +164,14 @@ describe("game-api", () => {
 
       const result = await gameApi.joinGame("TEST123", joinData);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${API_URL}/games/TEST123/join`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(joinData),
+      expect(mockFetch).toHaveBeenCalledWith(`${API_URL}/games/TEST123/join`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(joinData),
+      });
       expect(result).toEqual(mockLobby);
     });
 
@@ -243,13 +241,10 @@ describe("game-api", () => {
 
       const result = await gameApi.startGame("TEST123");
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${API_URL}/games/TEST123/start`,
-        {
-          method: "POST",
-          credentials: "include",
-        },
-      );
+      expect(mockFetch).toHaveBeenCalledWith(`${API_URL}/games/TEST123/start`, {
+        method: "POST",
+        credentials: "include",
+      });
       expect(result).toEqual(mockLobby);
     });
 
@@ -282,12 +277,9 @@ describe("game-api", () => {
 
       const result = await gameApi.getGameState("TEST123");
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${API_URL}/games/TEST123/state`,
-        {
-          credentials: "include",
-        },
-      );
+      expect(mockFetch).toHaveBeenCalledWith(`${API_URL}/games/TEST123/state`, {
+        credentials: "include",
+      });
       expect(result).toEqual(mockState);
     });
 
@@ -461,9 +453,9 @@ describe("game-api", () => {
         json: async () => ({ message: "Question already answered" }),
       } as Response);
 
-      await expect(
-        gameApi.submitAnswer("TEST123", answerData),
-      ).rejects.toThrow("Question already answered");
+      await expect(gameApi.submitAnswer("TEST123", answerData)).rejects.toThrow(
+        "Question already answered",
+      );
     });
   });
 

@@ -4,7 +4,6 @@ import {
   clearGuestSession,
   hasValidGuestSession,
   updateGuestUsername,
-  type GuestSession,
 } from "../guest-session";
 
 // Mock localStorage
@@ -32,6 +31,7 @@ Object.defineProperty(global, "localStorage", {
 
 // Mock crypto.randomUUID for consistent testing
 const mockUUID = "123e4567-e89b-12d3-a456-426614174000";
+
 Object.defineProperty(global, "crypto", {
   value: {
     randomUUID: jest.fn(() => mockUUID),
@@ -62,9 +62,11 @@ describe("guest-session", () => {
       const session = createGuestSession(username);
 
       const stored = localStorage.getItem("whoisit_guest_session");
+
       expect(stored).toBeDefined();
 
       const parsed = JSON.parse(stored!);
+
       expect(parsed.username).toBe(username);
       expect(parsed.id).toBe(session.id);
     });
@@ -77,13 +79,17 @@ describe("guest-session", () => {
       const expectedExpiration = now + 24 * 60 * 60 * 1000;
       const tolerance = 1000; // 1 second tolerance for test execution time
 
-      expect(session.expiresAt).toBeGreaterThanOrEqual(expectedExpiration - tolerance);
-      expect(session.expiresAt).toBeLessThanOrEqual(expectedExpiration + tolerance);
+      expect(session.expiresAt).toBeGreaterThanOrEqual(
+        expectedExpiration - tolerance,
+      );
+      expect(session.expiresAt).toBeLessThanOrEqual(
+        expectedExpiration + tolerance,
+      );
     });
 
     it("generates unique guest IDs", () => {
       const session1 = createGuestSession("User1");
-      
+
       // Clear mock to get a "different" UUID
       (crypto.randomUUID as jest.Mock).mockReturnValueOnce("different-uuid");
       const session2 = createGuestSession("User2");
@@ -95,6 +101,7 @@ describe("guest-session", () => {
   describe("getGuestSession", () => {
     it("returns null when no session exists", () => {
       const session = getGuestSession();
+
       expect(session).toBeNull();
     });
 
@@ -103,6 +110,7 @@ describe("guest-session", () => {
       const created = createGuestSession(username);
 
       const retrieved = getGuestSession();
+
       expect(retrieved).toBeDefined();
       expect(retrieved?.username).toBe(username);
       expect(retrieved?.id).toBe(created.id);
@@ -117,6 +125,7 @@ describe("guest-session", () => {
       localStorage.setItem("whoisit_guest_session", JSON.stringify(session));
 
       const retrieved = getGuestSession();
+
       expect(retrieved).toBeNull();
 
       // Verify session was cleared
@@ -127,6 +136,7 @@ describe("guest-session", () => {
       localStorage.setItem("whoisit_guest_session", "invalid json");
 
       const retrieved = getGuestSession();
+
       expect(retrieved).toBeNull();
 
       // Verify session was cleared
@@ -141,6 +151,7 @@ describe("guest-session", () => {
       expect(session.expiresAt).toBeGreaterThan(Date.now());
 
       const retrieved = getGuestSession();
+
       expect(retrieved).toBeDefined();
       expect(retrieved?.username).toBe(username);
     });
@@ -198,11 +209,13 @@ describe("guest-session", () => {
 
       // Verify it persisted
       const retrieved = getGuestSession();
+
       expect(retrieved?.username).toBe(newUsername);
     });
 
     it("returns null when no session exists", () => {
       const updated = updateGuestUsername("NewUser");
+
       expect(updated).toBeNull();
     });
 
@@ -225,6 +238,7 @@ describe("guest-session", () => {
 
       const stored = localStorage.getItem("whoisit_guest_session");
       const parsed = JSON.parse(stored!);
+
       expect(parsed.username).toBe("NewUser");
     });
   });
