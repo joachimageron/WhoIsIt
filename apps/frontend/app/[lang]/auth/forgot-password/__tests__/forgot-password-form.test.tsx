@@ -2,6 +2,7 @@ import type { Dictionary } from "@/dictionaries";
 
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { addToast } from "@heroui/toast";
 
 import { ForgotPasswordForm } from "../forgot-password-form";
 
@@ -16,7 +17,6 @@ jest.mock("@heroui/toast", () => ({
   addToast: jest.fn(),
 }));
 
-import { addToast } from "@heroui/toast";
 const mockAddToast = addToast as jest.MockedFunction<typeof addToast>;
 
 // Mock next/navigation
