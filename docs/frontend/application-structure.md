@@ -6,7 +6,7 @@ The WhoIsIt frontend is built with **Next.js 15** using the **App Router** parad
 
 ## Directory Structure
 
-```
+```docs
 apps/frontend/
 ├── app/                          # Next.js App Router
 │   └── [lang]/                  # Internationalized routes
@@ -58,10 +58,12 @@ apps/frontend/
 #### Internationalization Layer (`[lang]`)
 
 All routes are prefixed with a language parameter:
+
 - `/en` - English
 - `/fr` - French
 
 **Benefits**:
+
 - URL-based language switching
 - SEO-friendly
 - Server-side language detection
@@ -70,7 +72,8 @@ All routes are prefixed with a language parameter:
 #### Feature Modules
 
 **Authentication** (`auth/`):
-```
+
+```docs
 auth/
 ├── login/
 │   └── page.tsx              # Login form
@@ -86,7 +89,8 @@ auth/
 ```
 
 **Game** (`game/`):
-```
+
+```docs
 game/
 ├── create/
 │   ├── page.tsx              # Create game form
@@ -113,7 +117,8 @@ game/
 ```
 
 **Profile** (`profile/`):
-```
+
+```docs
 profile/
 ├── page.tsx                  # Profile view
 └── edit/
@@ -123,12 +128,14 @@ profile/
 ### Server vs Client Components
 
 **Server Components** (default):
+
 - `layout.tsx` - Root layout with metadata
 - `page.tsx` - Route pages (wrappers)
 - Static content
 - Data fetching (future)
 
 **Client Components** (`'use client'`):
+
 - Interactive components
 - State management
 - WebSocket connections
@@ -136,6 +143,7 @@ profile/
 - Forms with validation
 
 **Pattern**:
+
 ```tsx
 // app/[lang]/game/lobby/[roomCode]/page.tsx (Server)
 export default function LobbyPage({ params }: { params: { roomCode: string } }) {
@@ -163,6 +171,7 @@ export default function LobbyClient({ roomCode }: { roomCode: string }) {
 - `footer.tsx` (future)
 
 **Example**:
+
 ```tsx
 // components/navbar.tsx
 export const Navbar = () => {
@@ -187,6 +196,7 @@ export const Navbar = () => {
 - Handle metadata
 
 **Example**:
+
 ```tsx
 // app/[lang]/game/lobby/[roomCode]/page.tsx
 export default function LobbyPage({ 
@@ -216,6 +226,7 @@ export default function LobbyPage({
 - Dropdown, Popover, Tooltip
 
 **Usage**:
+
 ```tsx
 import { Button, Card, Input } from '@heroui/react';
 
@@ -233,6 +244,7 @@ import { Button, Card, Input } from '@heroui/react';
 - `GuestGuard` - Allows guests
 
 **Example**:
+
 ```tsx
 // components/guards/auth-guard.tsx
 export function AuthGuard({ children }: { children: React.ReactNode }) {
@@ -291,6 +303,7 @@ export default function Page({ params }: { params: { roomCode: string } }) {
 ### Client-Side Navigation
 
 **Link Component**:
+
 ```tsx
 import Link from 'next/link';
 
@@ -298,6 +311,7 @@ import Link from 'next/link';
 ```
 
 **Programmatic Navigation**:
+
 ```tsx
 import { useRouter } from 'next/navigation';
 
@@ -319,6 +333,7 @@ router.refresh();
 ### Language-Aware Navigation
 
 **Helper Function**:
+
 ```tsx
 // lib/navigation.ts
 export function createLocalizedPath(path: string, lang: string) {
@@ -561,6 +576,7 @@ export async function generateMetadata({ params }: { params: { roomCode: string 
 ### 1. Server Components First
 
 Default to server components, opt into client components:
+
 ```tsx
 // Server by default
 export default function Page() {
@@ -578,7 +594,8 @@ export function InteractiveForm() {
 ### 2. Colocate Components
 
 Keep related components close:
-```
+
+```docs
 game/
   play/
     [roomCode]/
@@ -592,6 +609,7 @@ game/
 ### 3. Use TypeScript
 
 Type everything:
+
 ```tsx
 interface GamePageProps {
   params: { roomCode: string; lang: string };
@@ -615,6 +633,7 @@ const HeavyComponent = dynamic(() => import('./heavy-component'), {
 ### 5. Error Boundaries
 
 Wrap risky operations:
+
 ```tsx
 <ErrorBoundary fallback={<ErrorMessage />}>
   <RiskyComponent />
