@@ -19,6 +19,7 @@ import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
+import { getGuestSession } from "@/lib/guest-session";
 
 interface LobbyClientProps {
   dict: Dictionary;
@@ -44,9 +45,14 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
   const [isStarting, setIsStarting] = useState(false);
   const [isTogglingReady, setIsTogglingReady] = useState(false);
 
+  // Get guest session if user is not authenticated
+  const guestSession = getGuestSession();
+  const currentUsername = user?.username || guestSession?.username;
+  const currentUserId = user?.id;
+
   // Get current player
   const currentPlayer = lobby?.players.find(
-    (p) => p.username === user?.username || p.userId === user?.id,
+    (p) => p.username === currentUsername || p.userId === currentUserId,
   );
   const isHost = currentPlayer?.role === "host";
   const allPlayersReady =
@@ -63,7 +69,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
         // Find current player in the lobby data
         const player = lobbyData.players.find(
-          (p) => p.username === user?.username || p.userId === user?.id,
+          (p) => p.username === currentUsername || p.userId === currentUserId,
         );
 
         // Then join via Socket.IO for real-time updates
