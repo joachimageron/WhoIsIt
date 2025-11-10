@@ -458,7 +458,7 @@ Start the game (host only via WebSocket broadcast).
 
 - `404`: Game not found
 - `400`: Game already started
-- `400`: Not enough players (minimum 2)
+- `400`: Not enough players (exactly 2 required)
 - `400`: Not all players ready
 
 **Side Effects**:

@@ -7,7 +7,6 @@ import React, { useState } from "react";
 import { Card, CardBody, CardHeader } from "@heroui/card";
 import { Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
-import { Select, SelectItem } from "@heroui/select";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 
@@ -30,7 +29,9 @@ export function QuestionsPanel({
 }: QuestionsPanelProps) {
   const [question, setQuestion] = useState("");
   // In a 2-player game, always target the opponent
-  const otherPlayer = gameState.players.filter((p) => p.id !== currentPlayerId)[0];
+  const otherPlayer = gameState.players.filter(
+    (p) => p.id !== currentPlayerId,
+  )[0];
   const targetPlayerId = otherPlayer?.id || "";
   const [isAsking, setIsAsking] = useState(false);
 
@@ -115,7 +116,8 @@ export function QuestionsPanel({
         {/* In a 2-player game, we automatically target the opponent */}
         {otherPlayers.length > 0 && (
           <p className="text-sm text-default-500">
-            {dict.game.play.questions.to} <strong>{otherPlayer?.username}</strong>
+            {dict.game.play.questions.to}{" "}
+            <strong>{otherPlayer?.username}</strong>
           </p>
         )}
 
