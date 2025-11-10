@@ -132,11 +132,15 @@ export class GameController {
       throw new BadRequestException('questionText is required');
     }
 
+    if (!body?.targetPlayerId || body.targetPlayerId.trim().length === 0) {
+      throw new BadRequestException('targetPlayerId is required');
+    }
+
     const question = await this.gameService.askQuestion(roomCode, {
       ...body,
       questionText: body.questionText.trim(),
       playerId: body.playerId.trim(),
-      targetPlayerId: body.targetPlayerId?.trim(),
+      targetPlayerId: body.targetPlayerId.trim(),
     });
 
     // Get updated game state
@@ -245,10 +249,14 @@ export class GameController {
       throw new BadRequestException('targetCharacterId is required');
     }
 
+    if (!body?.targetPlayerId || body.targetPlayerId.trim().length === 0) {
+      throw new BadRequestException('targetPlayerId is required');
+    }
+
     const guess = await this.gameService.submitGuess(roomCode, {
       ...body,
       playerId: body.playerId.trim(),
-      targetPlayerId: body.targetPlayerId?.trim(),
+      targetPlayerId: body.targetPlayerId.trim(),
       targetCharacterId: body.targetCharacterId.trim(),
     });
 

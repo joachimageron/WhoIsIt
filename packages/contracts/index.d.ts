@@ -1,13 +1,12 @@
 export type GameStatus = "lobby" | "in_progress" | "completed" | "aborted";
 export type GameVisibility = "public" | "private";
-export type GamePlayerRole = "host" | "player" | "spectator";
+export type GamePlayerRole = "host" | "player";
 
 export type CreateGameRequest = {
   characterSetId: string;
   hostUsername?: string;
   hostUserId?: string;
   visibility?: GameVisibility;
-  maxPlayers?: number | null;
   turnTimerSeconds?: number | null;
   ruleConfig?: Record<string, unknown>;
 };
@@ -36,7 +35,6 @@ export type GameLobbyResponse = {
   visibility: GameVisibility;
   hostUserId?: string;
   characterSetId: string;
-  maxPlayers?: number;
   turnTimerSeconds?: number;
   ruleConfig: Record<string, unknown>;
   createdAt: string;
@@ -152,7 +150,7 @@ export type PlayerCharacterResponse = {
 // Questions API Types
 export type AskQuestionRequest = {
   playerId: string;
-  targetPlayerId?: string;
+  targetPlayerId: string;
   questionText: string;
 };
 
@@ -162,8 +160,8 @@ export type QuestionResponse = {
   roundNumber: number;
   askedByPlayerId: string;
   askedByPlayerUsername: string;
-  targetPlayerId?: string;
-  targetPlayerUsername?: string;
+  targetPlayerId: string;
+  targetPlayerUsername: string;
   questionText: string;
   askedAt: string;
 };
@@ -217,7 +215,7 @@ export type SocketAnswerSubmittedEvent = {
 // Guesses API Types
 export type SubmitGuessRequest = {
   playerId: string;
-  targetPlayerId?: string;
+  targetPlayerId: string;
   targetCharacterId: string;
 };
 
@@ -227,8 +225,8 @@ export type GuessResponse = {
   roundNumber: number;
   guessedByPlayerId: string;
   guessedByPlayerUsername: string;
-  targetPlayerId?: string;
-  targetPlayerUsername?: string;
+  targetPlayerId: string;
+  targetPlayerUsername: string;
   targetCharacterId: string;
   targetCharacterName: string;
   isCorrect: boolean;

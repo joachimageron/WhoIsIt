@@ -28,11 +28,10 @@ export class Guess {
   guessedBy!: GamePlayer;
 
   @ManyToOne(() => GamePlayer, (player: GamePlayer) => player.incomingGuesses, {
-    nullable: true,
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'target_player_id' })
-  targetPlayer?: GamePlayer | null;
+  targetPlayer!: GamePlayer;
 
   @ManyToOne(() => Character, (character: Character) => character.guesses, {
     onDelete: 'RESTRICT',
