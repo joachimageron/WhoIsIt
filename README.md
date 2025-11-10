@@ -4,6 +4,8 @@
 
 Monorepo template for the WhoIsIt guessing game featuring a mobile-first Next.js frontend styled with [HeroUI](https://www.heroui.dev), real-time updates through Socket.IO, and a NestJS backend with PostgreSQL persistence.
 
+**Note**: WhoIsIt is a strict 2-player game, reflecting the traditional "Guess Who" gameplay.
+
 ## Project structure
 
 ```text

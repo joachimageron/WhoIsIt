@@ -176,9 +176,6 @@ export class Game {
   visibility: GameVisibility;      // Public or private
 
   @Column({ type: 'int' })
-  maxPlayers?: number | null;      // Maximum players allowed
-
-  @Column({ type: 'int' })
   turnTimerSeconds?: number | null; // Turn timer duration
 
   @Column({ type: 'jsonb', default: {} })
@@ -995,7 +992,7 @@ await gameRepository.findOne({
 
 // Full table scan (slow)
 await gameRepository.findOne({
-  where: { maxPlayers: 4 },  // maxPlayers not indexed
+  where: { turnTimerSeconds: 30 },  // turnTimerSeconds not indexed
 });
 ```
 

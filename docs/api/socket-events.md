@@ -239,7 +239,6 @@ socket.on('lobbyUpdate', (lobby) => {
   "visibility": "private",
   "hostUserId": "uuid",
   "characterSetId": "uuid",
-  "maxPlayers": 6,
   "turnTimerSeconds": 30,
   "ruleConfig": {},
   "createdAt": "2024-01-01T00:00:00Z",

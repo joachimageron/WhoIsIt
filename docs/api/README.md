@@ -185,7 +185,6 @@ export type CreateGameRequest = {
   hostUsername?: string;
   hostUserId?: string;
   visibility?: GameVisibility;
-  maxPlayers?: number | null;
   turnTimerSeconds?: number | null;
   ruleConfig?: Record<string, unknown>;
 };
@@ -196,7 +195,7 @@ export type GameLobbyResponse = {
   roomCode: string;
   status: GameStatus;
   visibility: GameVisibility;
-  players: GamePlayerResponse[];
+  players: GamePlayerResponse[]; // Max 2 players
   // ...
 };
 

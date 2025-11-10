@@ -326,9 +326,8 @@ export class CreateGameDto {
 
   @IsOptional()
   @IsInt()
-  @Min(2)
-  @Max(10)
-  maxPlayers?: number;
+  @Min(10)
+  turnTimerSeconds?: number;
 }
 ```
 
@@ -721,14 +720,14 @@ export type CreateGameRequest = {
   characterSetId: string;
   hostUsername?: string;
   visibility?: GameVisibility;
-  maxPlayers?: number;
+  turnTimerSeconds?: number;
 };
 
 export type GameLobbyResponse = {
   id: string;
   roomCode: string;
   status: GameStatus;
-  players: GamePlayerResponse[];
+  players: GamePlayerResponse[]; // Max 2 players
 };
 ```
 

@@ -97,7 +97,7 @@ Translations are organized hierarchically in JSON files:
     "create": {
       "title": "Create a Game",
       "characterSet": "Character Set",
-      "maxPlayers": "Max Players",
+      "turnTimer": "Turn Timer",
       "submit": "Create Game",
       "creating": "Creating..."
     },

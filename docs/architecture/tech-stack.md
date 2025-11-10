@@ -477,9 +477,8 @@ export class CreateGameDto {
 
   @IsOptional()
   @IsInt()
-  @Min(2)
-  @Max(10)
-  maxPlayers?: number;
+  @Min(10)
+  turnTimerSeconds?: number;
 }
 ```
 

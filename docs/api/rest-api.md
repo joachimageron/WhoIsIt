@@ -302,7 +302,6 @@ Create a new game lobby.
   "hostUsername": "Player 1",        // Required if no hostUserId
   "hostUserId": "uuid",              // Optional (from auth)
   "visibility": "private",           // Optional: "public" | "private"
-  "maxPlayers": 6,                   // Optional: 2-10
   "turnTimerSeconds": 30,            // Optional
   "ruleConfig": {}                   // Optional: custom rules
 }
@@ -318,7 +317,6 @@ Create a new game lobby.
   "visibility": "private",
   "hostUserId": "uuid",
   "characterSetId": "uuid",
-  "maxPlayers": 6,
   "turnTimerSeconds": 30,
   "ruleConfig": {},
   "createdAt": "2024-01-01T00:00:00Z",
@@ -339,7 +337,7 @@ Create a new game lobby.
 
 - `400`: Invalid character set ID
 - `400`: Missing hostUsername
-- `400`: Invalid maxPlayers value
+- `400`: Game is full (max 2 players)
 
 ---
 
