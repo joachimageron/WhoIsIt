@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import type { CharacterResponseDto } from "@whois-it/contracts";
 import type { Dictionary } from "@/dictionaries";
+
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import { CharacterGrid } from "../character-grid";
 
@@ -109,6 +110,7 @@ describe("CharacterGrid", () => {
       );
 
       const images = container.querySelectorAll("img");
+
       expect(images.length).toBe(3);
       expect(images[0]).toHaveAttribute("alt", "Alice");
       expect(images[1]).toHaveAttribute("alt", "Bob");
@@ -131,6 +133,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       // First button (Alice) should be disabled
       expect(buttons[0]).toBeDisabled();
       // Others should not be disabled
@@ -152,6 +155,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       expect(buttons[1]).toHaveClass("cursor-not-allowed");
     });
 
@@ -169,6 +173,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       expect(buttons[0]).toHaveClass("scale-95");
     });
 
@@ -188,6 +193,7 @@ describe("CharacterGrid", () => {
 
       // Check that overlay divs are present
       const overlays = container.querySelectorAll(".absolute.inset-0");
+
       // Should have overlays for both eliminated and flipped characters
       expect(overlays.length).toBe(2);
     });
@@ -208,6 +214,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       await user.click(buttons[0]);
 
       expect(mockOnFlipCharacter).toHaveBeenCalledWith("char-1");
@@ -227,6 +234,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       await user.click(buttons[1]);
 
       expect(mockOnFlipCharacter).toHaveBeenCalledWith("char-2");
@@ -247,6 +255,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       // Try to click the eliminated character button (disabled)
       await user.click(buttons[0]);
 
@@ -268,6 +277,7 @@ describe("CharacterGrid", () => {
       );
 
       const buttons = screen.getAllByRole("button");
+
       await user.click(buttons[0]);
 
       // Should still call handler for flipped characters (can flip back)

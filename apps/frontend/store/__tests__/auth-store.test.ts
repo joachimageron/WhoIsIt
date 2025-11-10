@@ -142,7 +142,9 @@ describe("useAuthStore", () => {
         result.current.setGuestUser(username);
       });
 
-      expect(mockGuestSession.createGuestSession).toHaveBeenCalledWith(username);
+      expect(mockGuestSession.createGuestSession).toHaveBeenCalledWith(
+        username,
+      );
       expect(result.current.user).not.toBeNull();
       expect(result.current.user?.username).toBe(username);
       expect(result.current.user?.isGuest).toBe(true);

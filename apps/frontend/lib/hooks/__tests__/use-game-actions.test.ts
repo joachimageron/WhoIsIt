@@ -1,7 +1,10 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
 import type { Dictionary } from "@/dictionaries";
 
+import { renderHook, act } from "@testing-library/react";
+import { addToast } from "@heroui/toast";
+
 import { useGameActions } from "../use-game-actions";
+
 import * as gameApi from "@/lib/game-api";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
@@ -12,6 +15,7 @@ jest.mock("@/store/game-store");
 jest.mock("@/lib/hooks/use-game-socket");
 
 const mockPush = jest.fn();
+
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({
     push: mockPush,
@@ -22,11 +26,12 @@ jest.mock("@heroui/toast", () => ({
   addToast: jest.fn(),
 }));
 
-import { addToast } from "@heroui/toast";
 const mockAddToast = addToast as jest.MockedFunction<typeof addToast>;
 
 const mockGameApi = gameApi as jest.Mocked<typeof gameApi>;
-const mockUseGameStore = useGameStore as jest.MockedFunction<typeof useGameStore>;
+const mockUseGameStore = useGameStore as jest.MockedFunction<
+  typeof useGameStore
+>;
 const mockUseGameSocket = useGameSocket as jest.MockedFunction<
   typeof useGameSocket
 >;

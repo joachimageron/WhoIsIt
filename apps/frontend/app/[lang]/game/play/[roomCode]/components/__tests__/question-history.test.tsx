@@ -88,7 +88,9 @@ describe("QuestionHistory", () => {
   it("displays all questions", () => {
     render(<QuestionHistory {...defaultProps} />);
 
-    expect(screen.getByText("Does the character wear glasses?")).toBeInTheDocument();
+    expect(
+      screen.getByText("Does the character wear glasses?"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Is the character bald?")).toBeInTheDocument();
   });
 
@@ -116,7 +118,9 @@ describe("QuestionHistory", () => {
     render(<QuestionHistory {...defaultProps} />);
 
     // First question has target player Bob
-    expect(screen.getByText("Does the character wear glasses?")).toBeInTheDocument();
+    expect(
+      screen.getByText("Does the character wear glasses?"),
+    ).toBeInTheDocument();
   });
 
   it("displays answer when question has been answered", () => {
@@ -161,8 +165,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[unansweredQuestion]}
         answers={new Map()}
+        questions={[unansweredQuestion]}
       />,
     );
 
@@ -184,8 +188,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[generalQuestion]}
         answers={new Map()}
+        questions={[generalQuestion]}
       />,
     );
 
@@ -207,8 +211,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[myQuestion]}
         answers={new Map()}
+        questions={[myQuestion]}
       />,
     );
 
@@ -230,9 +234,9 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
+        answers={new Map()}
         currentPlayerId={null}
         questions={[unansweredQuestion]}
-        answers={new Map()}
       />,
     );
 
@@ -257,8 +261,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[unansweredQuestion]}
         answers={new Map()}
+        questions={[unansweredQuestion]}
         onAnswerQuestion={mockOnAnswer}
       />,
     );
@@ -285,8 +289,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[generalQuestion]}
         answers={new Map()}
+        questions={[generalQuestion]}
       />,
     );
 
@@ -370,8 +374,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={questionsWithAnswers}
         answers={answersMap}
+        questions={questionsWithAnswers}
       />,
     );
 
@@ -395,8 +399,8 @@ describe("QuestionHistory", () => {
     render(
       <QuestionHistory
         {...defaultProps}
-        questions={[unansweredQuestion]}
         answers={new Map()}
+        questions={[unansweredQuestion]}
         onAnswerQuestion={undefined}
       />,
     );

@@ -19,6 +19,7 @@ jest.mock("@/lib/game-api", () => ({
 }));
 
 const mockAddToast = require("@heroui/toast").addToast;
+
 const mockGameApi = require("@/lib/game-api");
 
 describe("QuestionsPanel", () => {
@@ -102,7 +103,9 @@ describe("QuestionsPanel", () => {
 
   it("renders header with correct title", () => {
     render(<QuestionsPanel {...defaultProps} />);
-    expect(screen.getByRole("heading", { name: "Questions Panel" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Questions Panel" }),
+    ).toBeInTheDocument();
   });
 
   it("displays player selection dropdown", () => {
@@ -380,10 +383,7 @@ describe("QuestionsPanel", () => {
     };
 
     render(
-      <QuestionsPanel
-        {...defaultProps}
-        gameState={singlePlayerGameState}
-      />,
+      <QuestionsPanel {...defaultProps} gameState={singlePlayerGameState} />,
     );
 
     // Player selection should not be shown when there's only one player

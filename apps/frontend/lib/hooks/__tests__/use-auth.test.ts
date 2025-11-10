@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 
 import { useAuth } from "../use-auth";
+
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 
@@ -52,7 +53,9 @@ describe("useAuth", () => {
     });
 
     it("initializes guest session when profile check fails", async () => {
-      mockAuthApi.getProfile.mockRejectedValueOnce(new Error("Not authenticated"));
+      mockAuthApi.getProfile.mockRejectedValueOnce(
+        new Error("Not authenticated"),
+      );
 
       const { result } = renderHook(() => useAuth());
 
@@ -166,7 +169,7 @@ describe("useAuth", () => {
       await result.current.logout();
 
       expect(mockAuthApi.logout).toHaveBeenCalledTimes(1);
-      
+
       // User remains logged in when API fails (by design)
       await waitFor(() => {
         expect(result.current.user).toEqual(mockUser);
@@ -183,7 +186,10 @@ describe("useAuth", () => {
 
       useAuthStore.getState().setUser(mockUser);
       mockAuthApi.logout.mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({ message: "Logged out" }), 50)),
+        () =>
+          new Promise((resolve) =>
+            setTimeout(() => resolve({ message: "Logged out" }), 50),
+          ),
       );
 
       const { result } = renderHook(() => useAuth());
@@ -244,7 +250,9 @@ describe("useAuth", () => {
       const { result } = renderHook(() => useAuth());
 
       // Note: this will trigger auth check, so we need to mock it
-      mockAuthApi.getProfile.mockRejectedValueOnce(new Error("Not authenticated"));
+      mockAuthApi.getProfile.mockRejectedValueOnce(
+        new Error("Not authenticated"),
+      );
 
       expect(result.current.user).toBeNull();
       expect(result.current.isAuthenticated).toBe(false);

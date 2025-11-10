@@ -1,5 +1,4 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 
 import { LanguageSwitcher } from "../language-switcher";
 
@@ -88,6 +87,7 @@ describe("LanguageSwitcher", () => {
     if (select) {
       // Simulate an event that's not an object (edge case)
       const invalidHandler = select.onchange as any;
+
       if (invalidHandler) {
         // Call with null - this would be filtered by the check
         invalidHandler.call(select, null);
@@ -124,9 +124,10 @@ describe("LanguageSwitcher", () => {
 
       // HeroUI may add extra options (placeholder, etc)
       expect(options.length).toBeGreaterThanOrEqual(2);
-      
+
       // Check that both locales are present
-      const values = Array.from(options).map(opt => opt.value);
+      const values = Array.from(options).map((opt) => opt.value);
+
       expect(values).toContain("en");
       expect(values).toContain("fr");
     }

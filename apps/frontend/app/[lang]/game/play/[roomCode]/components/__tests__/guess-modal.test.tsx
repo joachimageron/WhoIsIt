@@ -1,6 +1,6 @@
 import type { CharacterResponseDto } from "@whois-it/contracts";
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { GuessModal } from "../guess-modal";

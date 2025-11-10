@@ -163,7 +163,9 @@ describe("AnswerModal", () => {
     const user = userEvent.setup();
     const mockOnSubmitAnswer = jest.fn().mockResolvedValue(undefined);
 
-    render(<AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />);
+    render(
+      <AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />,
+    );
 
     const textarea = screen.getByPlaceholderText(
       "Add any additional details...",
@@ -188,7 +190,9 @@ describe("AnswerModal", () => {
     const user = userEvent.setup();
     const mockOnSubmitAnswer = jest.fn().mockResolvedValue(undefined);
 
-    render(<AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />);
+    render(
+      <AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />,
+    );
 
     const textarea = screen.getByPlaceholderText(
       "Add any additional details...",
@@ -217,7 +221,9 @@ describe("AnswerModal", () => {
         () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
 
-    render(<AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />);
+    render(
+      <AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />,
+    );
 
     const submitButton = screen.getByText("Submit Answer");
 
@@ -238,7 +244,9 @@ describe("AnswerModal", () => {
         () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
 
-    render(<AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />);
+    render(
+      <AnswerModal {...defaultProps} onSubmitAnswer={mockOnSubmitAnswer} />,
+    );
 
     const submitButton = screen.getByText("Submit Answer");
 
@@ -260,7 +268,6 @@ describe("AnswerModal", () => {
   });
 
   it("does not submit if question is null", async () => {
-    const user = userEvent.setup();
     const mockOnSubmitAnswer = jest.fn().mockResolvedValue(undefined);
 
     const { rerender } = render(

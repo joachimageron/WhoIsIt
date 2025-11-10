@@ -1,6 +1,7 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
+import { renderHook } from "@testing-library/react";
 
 import { useGameSocket } from "../use-game-socket";
+
 import { getSocket, disconnectSocket } from "@/lib/socket";
 
 // Mock socket module
@@ -276,6 +277,7 @@ describe("useGameSocket", () => {
       const { result, rerender } = renderHook(() => useGameSocket());
 
       const firstSocket = result.current.socket;
+
       rerender();
       const secondSocket = result.current.socket;
 
