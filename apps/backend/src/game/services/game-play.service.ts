@@ -287,8 +287,12 @@ export class GamePlayService {
     await this.playerRepository.save(askedByPlayer);
 
     // Update the round state to AWAITING_ANSWER
-    // Keep the same active player - they will remain active until answer is submitted
     currentRound.state = RoundState.AWAITING_ANSWER;
+
+    // Advance to the next player's turn after asking a question
+    const nextPlayer = this.getNextPlayer(currentRound, game);
+    currentRound.activePlayer = nextPlayer;
+
     await this.roundRepository.save(currentRound);
 
     // Return the question response
@@ -518,11 +522,8 @@ export class GamePlayService {
     answeringPlayer.score += GamePlayService.SCORE_ANSWER_BONUS;
     await this.playerRepository.save(answeringPlayer);
 
-    // Advance to the next player's turn after answer is submitted
-    const nextPlayer = this.getNextPlayer(currentRound, game);
-    currentRound.activePlayer = nextPlayer;
-
     // Update the round state back to AWAITING_QUESTION
+    // Note: Turn already changed when question was asked
     currentRound.state = RoundState.AWAITING_QUESTION;
     await this.roundRepository.save(currentRound);
 
