@@ -25,7 +25,7 @@ import type { TypedSocket, TypedServer } from './types';
 
 @WebSocketGateway({
   cors: {
-    origin: process.env.FRONTEND_ORIGIN ?? true,
+    origin: process.env.FRONTEND_ORIGIN || false, // Changed from true to false for security
     credentials: true,
   },
 })
