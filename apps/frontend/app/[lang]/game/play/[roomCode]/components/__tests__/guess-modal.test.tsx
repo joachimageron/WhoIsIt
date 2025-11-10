@@ -39,26 +39,27 @@ describe("GuessModal", () => {
     {
       id: "char-1",
       name: "Alice",
+      slug: "alice",
+      isActive: true,
+      metadata: {},
       imageUrl: "https://example.com/alice.jpg",
-      characterSetId: "set-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+
     },
     {
       id: "char-2",
       name: "Bob",
       imageUrl: "https://example.com/bob.jpg",
-      characterSetId: "set-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      slug: "bob",
+      isActive: true,
+      metadata: {},
     },
     {
       id: "char-3",
       name: "Charlie",
       imageUrl: "https://example.com/charlie.jpg",
-      characterSetId: "set-1",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      slug: "charlie",
+      isActive: true,
+      metadata: {},
     },
   ];
 

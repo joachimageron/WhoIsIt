@@ -38,7 +38,8 @@ describe("AnswerModal", () => {
     targetPlayerId: "player-2",
     targetPlayerUsername: "Bob",
     roundId: "round-1",
-    createdAt: new Date().toISOString(),
+    roundNumber: 1,
+    askedAt: new Date().toISOString(),
   };
 
   const defaultProps = {

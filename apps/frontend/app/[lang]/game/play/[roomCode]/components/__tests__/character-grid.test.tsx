@@ -144,7 +144,7 @@ describe("CharacterGrid", () => {
     it("applies correct styles to eliminated characters", () => {
       const eliminatedIds = new Set(["char-2"]);
 
-      const { container } = render(
+      render(
         <CharacterGrid
           characters={mockCharacters}
           dict={mockDict}
@@ -162,7 +162,7 @@ describe("CharacterGrid", () => {
     it("applies correct styles to flipped characters", () => {
       const flippedIds = new Set(["char-1"]);
 
-      const { container } = render(
+      render(
         <CharacterGrid
           characters={mockCharacters}
           dict={mockDict}

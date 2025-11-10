@@ -34,17 +34,17 @@ describe("QuestionHistory", () => {
       targetPlayerId: "player-2",
       targetPlayerUsername: "Bob",
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     },
     {
       id: "q2",
       questionText: "Is the character bald?",
       askedByPlayerId: "player-2",
       askedByPlayerUsername: "Bob",
-      targetPlayerId: null,
-      targetPlayerUsername: null,
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     },
   ];
 
@@ -55,10 +55,10 @@ describe("QuestionHistory", () => {
         id: "a1",
         questionId: "q1",
         answerValue: "yes",
-        answerText: null,
+        answerText: undefined,
         answeredByPlayerId: "player-2",
         answeredByPlayerUsername: "Bob",
-        createdAt: new Date().toISOString(),
+        answeredAt: new Date().toISOString(),
       },
     ],
   ]);
@@ -140,7 +140,7 @@ describe("QuestionHistory", () => {
           answerText: "Thick black frames",
           answeredByPlayerId: "player-2",
           answeredByPlayerUsername: "Bob",
-          createdAt: new Date().toISOString(),
+          answeredAt: new Date().toISOString(),
         },
       ],
     ]);
@@ -159,7 +159,8 @@ describe("QuestionHistory", () => {
       targetPlayerId: "player-1",
       targetPlayerUsername: "Alice",
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -179,10 +180,9 @@ describe("QuestionHistory", () => {
       questionText: "Has blonde hair?",
       askedByPlayerId: "player-2",
       askedByPlayerUsername: "Bob",
-      targetPlayerId: null,
-      targetPlayerUsername: null,
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -202,10 +202,9 @@ describe("QuestionHistory", () => {
       questionText: "Has red hair?",
       askedByPlayerId: "player-1",
       askedByPlayerUsername: "Alice",
-      targetPlayerId: null,
-      targetPlayerUsername: null,
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -225,10 +224,9 @@ describe("QuestionHistory", () => {
       questionText: "Wears a hat?",
       askedByPlayerId: "player-2",
       askedByPlayerUsername: "Bob",
-      targetPlayerId: null,
-      targetPlayerUsername: null,
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -255,7 +253,8 @@ describe("QuestionHistory", () => {
       targetPlayerId: "player-1",
       targetPlayerUsername: "Alice",
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -280,10 +279,9 @@ describe("QuestionHistory", () => {
       questionText: "Is a male character?",
       askedByPlayerId: "player-1",
       askedByPlayerUsername: "Alice",
-      targetPlayerId: null,
-      targetPlayerUsername: null,
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(
@@ -305,30 +303,27 @@ describe("QuestionHistory", () => {
         questionText: "Question 1",
         askedByPlayerId: "player-1",
         askedByPlayerUsername: "Alice",
-        targetPlayerId: null,
-        targetPlayerUsername: null,
         roundId: "round-1",
-        createdAt: new Date().toISOString(),
+        roundNumber: 1,
+        askedAt: new Date().toISOString(),
       },
       {
         id: "q10",
         questionText: "Question 2",
         askedByPlayerId: "player-1",
         askedByPlayerUsername: "Alice",
-        targetPlayerId: null,
-        targetPlayerUsername: null,
         roundId: "round-1",
-        createdAt: new Date().toISOString(),
+        roundNumber: 1,
+        askedAt: new Date().toISOString(),
       },
       {
         id: "q11",
         questionText: "Question 3",
         askedByPlayerId: "player-1",
         askedByPlayerUsername: "Alice",
-        targetPlayerId: null,
-        targetPlayerUsername: null,
         roundId: "round-1",
-        createdAt: new Date().toISOString(),
+        roundNumber: 1,
+        askedAt: new Date().toISOString(),
       },
     ];
 
@@ -339,11 +334,11 @@ describe("QuestionHistory", () => {
           id: "a9",
           questionId: "q9",
           answerValue: "yes",
-          answerText: null,
+          answerText: undefined,
           answeredByPlayerId: "player-2",
           answeredByPlayerUsername: "Bob",
-          createdAt: new Date().toISOString(),
-        },
+          answeredAt: new Date().toISOString(),
+        } as AnswerResponse,
       ],
       [
         "q10",
@@ -351,11 +346,11 @@ describe("QuestionHistory", () => {
           id: "a10",
           questionId: "q10",
           answerValue: "no",
-          answerText: null,
+          answerText: undefined,
           answeredByPlayerId: "player-2",
           answeredByPlayerUsername: "Bob",
-          createdAt: new Date().toISOString(),
-        },
+          answeredAt: new Date().toISOString(),
+        } as AnswerResponse,
       ],
       [
         "q11",
@@ -363,11 +358,11 @@ describe("QuestionHistory", () => {
           id: "a11",
           questionId: "q11",
           answerValue: "unsure",
-          answerText: null,
+          answerText: undefined,
           answeredByPlayerId: "player-2",
           answeredByPlayerUsername: "Bob",
-          createdAt: new Date().toISOString(),
-        },
+          answeredAt: new Date().toISOString(),
+        } as AnswerResponse,
       ],
     ]);
 
@@ -393,7 +388,8 @@ describe("QuestionHistory", () => {
       targetPlayerId: "player-1",
       targetPlayerUsername: "Alice",
       roundId: "round-1",
-      createdAt: new Date().toISOString(),
+      roundNumber: 1,
+      askedAt: new Date().toISOString(),
     };
 
     render(

@@ -50,20 +50,10 @@ describe("GameHeader", () => {
     roomCode: "ABC123",
     status: "in_progress",
     currentRoundNumber: 1,
-    totalRounds: 5,
     activePlayerId: "2",
     activePlayerUsername: "PlayerTwo",
     players: [],
-    rounds: [],
-    characterSet: {
-      id: "1",
-      name: "Test Set",
-      description: "",
-      isDefault: false,
-    },
-    settings: { maxPlayers: 4, roundTimeLimit: null },
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    currentRoundState: "in_progress",
   };
 
   const defaultProps = {
