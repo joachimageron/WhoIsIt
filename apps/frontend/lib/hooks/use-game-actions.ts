@@ -112,7 +112,6 @@ export function useGameActions({
         } else {
           // Eliminate the incorrectly guessed character
           eliminateCharacter(guess.targetCharacterId);
-          
         }
       } catch (error) {
         addToast({
