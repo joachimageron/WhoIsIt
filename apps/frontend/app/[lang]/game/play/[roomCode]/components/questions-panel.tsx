@@ -116,7 +116,6 @@ export function QuestionsPanel({
         </h2>
       </CardHeader>
       <CardBody className="gap-3">
-
         {/* Question Input */}
         <Textarea
           isDisabled={!isMyTurn || isAsking}
