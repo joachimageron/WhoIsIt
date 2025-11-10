@@ -40,16 +40,21 @@ export function useGameInitialization({
     const initGame = async () => {
       // Check if user is authenticated or is a guest
       const guestSession = getGuestSession();
-      const currentUser = user || (guestSession ? {
-        id: guestSession.id,
-        username: guestSession.username,
-        email: '',
-        avatarUrl: null,
-      } : null);
+      const currentUser =
+        user ||
+        (guestSession
+          ? {
+              id: guestSession.id,
+              username: guestSession.username,
+              email: "",
+              avatarUrl: null,
+            }
+          : null);
 
       if (!currentUser) {
         // No authenticated user and no guest session
         setIsLoading(false);
+
         return;
       }
 
@@ -63,7 +68,8 @@ export function useGameInitialization({
 
         // Find current player - check both username and userId
         const player = gameState.players.find(
-          (p) => p.username === currentUser.username || p.userId === currentUser.id,
+          (p) =>
+            p.username === currentUser.username || p.userId === currentUser.id,
         );
 
         if (player) {
