@@ -43,7 +43,6 @@ describe("GuessModal", () => {
       isActive: true,
       metadata: {},
       imageUrl: "https://example.com/alice.jpg",
-
     },
     {
       id: "char-2",
