@@ -1,7 +1,9 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
 import type { Dictionary } from "@/dictionaries";
 
+import { renderHook, act } from "@testing-library/react";
+
 import { useGameEvents } from "../use-game-events";
+
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
 
@@ -17,7 +19,9 @@ jest.mock("@heroui/toast", () => ({
   addToast: jest.fn(),
 }));
 
-const mockUseGameStore = useGameStore as jest.MockedFunction<typeof useGameStore>;
+const mockUseGameStore = useGameStore as jest.MockedFunction<
+  typeof useGameStore
+>;
 const mockUseGameSocket = useGameSocket as jest.MockedFunction<
   typeof useGameSocket
 >;
@@ -71,18 +75,22 @@ describe("useGameEvents", () => {
       socket: mockSocket,
       onQuestionAsked: jest.fn((cb) => {
         onQuestionAskedCallback = cb;
+
         return jest.fn();
       }),
       onAnswerSubmitted: jest.fn((cb) => {
         onAnswerSubmittedCallback = cb;
+
         return jest.fn();
       }),
       onGuessResult: jest.fn((cb) => {
         onGuessResultCallback = cb;
+
         return jest.fn();
       }),
       onGameOver: jest.fn((cb) => {
         onGameOverCallback = cb;
+
         return jest.fn();
       }),
     } as any);
@@ -100,7 +108,10 @@ describe("useGameEvents", () => {
     it("listens to socket connect events", () => {
       renderHook(() => useGameEvents(mockProps));
 
-      expect(mockSocket.on).toHaveBeenCalledWith("connect", expect.any(Function));
+      expect(mockSocket.on).toHaveBeenCalledWith(
+        "connect",
+        expect.any(Function),
+      );
     });
 
     it("listens to socket disconnect events", () => {
@@ -123,7 +134,10 @@ describe("useGameEvents", () => {
 
       unmount();
 
-      expect(mockSocket.off).toHaveBeenCalledWith("connect", expect.any(Function));
+      expect(mockSocket.off).toHaveBeenCalledWith(
+        "connect",
+        expect.any(Function),
+      );
       expect(mockSocket.off).toHaveBeenCalledWith(
         "disconnect",
         expect.any(Function),

@@ -1,4 +1,3 @@
-import * as authApi from "../auth-api";
 import type {
   RegisterData,
   LoginData,
@@ -7,6 +6,8 @@ import type {
   UpdateProfileData,
   ChangePasswordData,
 } from "../auth-api";
+
+import * as authApi from "../auth-api";
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -333,20 +334,17 @@ describe("auth-api", () => {
 
       await authApi.resetPassword("reset-token", "newPassword123");
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${API_URL}/auth/reset-password`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            token: "reset-token",
-            password: "newPassword123",
-          }),
+      expect(mockFetch).toHaveBeenCalledWith(`${API_URL}/auth/reset-password`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          token: "reset-token",
+          password: "newPassword123",
+        }),
+      });
     });
 
     it("throws error when reset fails", async () => {
