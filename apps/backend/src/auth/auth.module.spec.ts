@@ -8,6 +8,7 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../database/entities';
+import { PlayerStats } from '../database/entities/player-stats.entity';
 import { ConfigModule } from '@nestjs/config';
 import { EmailService } from '../email/email.service';
 
@@ -32,6 +33,8 @@ describe('AuthModule', () => {
       imports: [AuthModule, ConfigModule.forRoot({ isGlobal: true })],
     })
       .overrideProvider(getRepositoryToken(User))
+      .useValue(mockRepository)
+      .overrideProvider(getRepositoryToken(PlayerStats))
       .useValue(mockRepository)
       .overrideProvider(EmailService)
       .useValue(mockEmailService)

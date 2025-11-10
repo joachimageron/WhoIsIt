@@ -144,7 +144,18 @@
       "resendVerification": "Renvoyer l'email de vérification",
       "resendingVerification": "Envoi en cours...",
       "verificationEmailSent": "Email de vérification envoyé avec succès",
-      "verificationEmailFailed": "Échec de l'envoi de l'email de vérification"
+      "verificationEmailFailed": "Échec de l'envoi de l'email de vérification",
+      "gameStats": "Statistiques de jeu",
+      "gamesPlayed": "Parties jouées",
+      "gamesWon": "Parties gagnées",
+      "winRate": "Taux de victoire",
+      "totalQuestions": "Questions posées",
+      "totalGuesses": "Tentatives de devinettes",
+      "fastestWin": "Victoire la plus rapide",
+      "currentStreak": "Série actuelle",
+      "noStatsYet": "Aucune statistique disponible. Jouez votre première partie !",
+      "seconds": "secondes",
+      "wins": "victoires"
     }
   },
   "game": {

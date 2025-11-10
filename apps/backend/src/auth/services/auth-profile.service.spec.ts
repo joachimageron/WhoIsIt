@@ -8,6 +8,7 @@ import { AuthProfileService } from './auth-profile.service';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../../database/entities/user.entity';
+import { PlayerStats } from '../../database/entities/player-stats.entity';
 import { EmailService } from '../../email/email.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
@@ -23,6 +24,7 @@ const bcrypt = require('bcrypt');
 describe('AuthProfileService', () => {
   let service: AuthProfileService;
   let userRepository: jest.Mocked<Repository<User>>;
+  let playerStatsRepository: jest.Mocked<Repository<PlayerStats>>;
   let emailService: jest.Mocked<EmailService>;
 
   const mockUser: Partial<User> = {
@@ -40,6 +42,10 @@ describe('AuthProfileService', () => {
       save: jest.fn(),
     };
 
+    const mockPlayerStatsRepository = {
+      findOne: jest.fn(),
+    };
+
     const mockEmailService = {
       sendVerificationEmail: jest.fn(),
     };
@@ -52,6 +58,10 @@ describe('AuthProfileService', () => {
           useValue: mockUserRepository,
         },
         {
+          provide: getRepositoryToken(PlayerStats),
+          useValue: mockPlayerStatsRepository,
+        },
+        {
           provide: EmailService,
           useValue: mockEmailService,
         },
@@ -60,6 +70,7 @@ describe('AuthProfileService', () => {
 
     service = module.get<AuthProfileService>(AuthProfileService);
     userRepository = module.get(getRepositoryToken(User));
+    playerStatsRepository = module.get(getRepositoryToken(PlayerStats));
     emailService = module.get(EmailService);
 
     jest.clearAllMocks();
@@ -299,6 +310,83 @@ describe('AuthProfileService', () => {
       await expect(
         service.changePassword('user-123', changePasswordDto),
       ).rejects.toThrow('Cannot change password for this account');
+    });
+  });
+
+  describe('getPlayerStats', () => {
+    it('should return player stats when stats exist', async () => {
+      const user = { ...mockUser } as User;
+      const mockStats: Partial<PlayerStats> = {
+        userId: 'user-123',
+        gamesPlayed: 10,
+        gamesWon: 7,
+        totalQuestions: 50,
+        totalGuesses: 20,
+        fastestWinSeconds: 180,
+        streak: 3,
+      };
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(mockStats as PlayerStats);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result).toEqual({
+        gamesPlayed: 10,
+        gamesWon: 7,
+        totalQuestions: 50,
+        totalGuesses: 20,
+        fastestWinSeconds: 180,
+        streak: 3,
+        winRate: 70,
+      });
+    });
+
+    it('should return default stats when no stats exist', async () => {
+      const user = { ...mockUser } as User;
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result).toEqual({
+        gamesPlayed: 0,
+        gamesWon: 0,
+        totalQuestions: 0,
+        totalGuesses: 0,
+        fastestWinSeconds: undefined,
+        streak: 0,
+        winRate: 0,
+      });
+    });
+
+    it('should calculate win rate correctly', async () => {
+      const user = { ...mockUser } as User;
+      const mockStats: Partial<PlayerStats> = {
+        userId: 'user-123',
+        gamesPlayed: 3,
+        gamesWon: 2,
+        totalQuestions: 15,
+        totalGuesses: 6,
+        fastestWinSeconds: null,
+        streak: 0,
+      };
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(mockStats as PlayerStats);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result.winRate).toBe(67); // 2/3 * 100 rounded
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.getPlayerStats('nonexistent-user')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

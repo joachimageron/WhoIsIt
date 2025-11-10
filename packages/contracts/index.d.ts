@@ -274,3 +274,14 @@ export type SocketGameOverEvent = {
   result: GameOverResult;
 };
 
+// Player Stats Types
+export type PlayerStatsResponse = {
+  gamesPlayed: number;
+  gamesWon: number;
+  totalQuestions: number;
+  totalGuesses: number;
+  fastestWinSeconds?: number;
+  streak: number;
+  winRate: number;
+};
+

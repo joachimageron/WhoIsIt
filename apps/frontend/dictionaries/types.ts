@@ -160,6 +160,17 @@ export interface Dictionary {
       resendingVerification: string;
       verificationEmailSent: string;
       verificationEmailFailed: string;
+      gameStats: string;
+      gamesPlayed: string;
+      gamesWon: string;
+      winRate: string;
+      totalQuestions: string;
+      totalGuesses: string;
+      fastestWin: string;
+      currentStreak: string;
+      noStatsYet: string;
+      seconds: string;
+      wins: string;
     };
   };
 

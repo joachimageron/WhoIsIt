@@ -144,7 +144,18 @@
       "resendVerification": "Resend Verification Email",
       "resendingVerification": "Sending...",
       "verificationEmailSent": "Verification email sent successfully",
-      "verificationEmailFailed": "Failed to send verification email"
+      "verificationEmailFailed": "Failed to send verification email",
+      "gameStats": "Game Statistics",
+      "gamesPlayed": "Games Played",
+      "gamesWon": "Games Won",
+      "winRate": "Win Rate",
+      "totalQuestions": "Questions Asked",
+      "totalGuesses": "Guess Attempts",
+      "fastestWin": "Fastest Win",
+      "currentStreak": "Current Streak",
+      "noStatsYet": "No statistics available yet. Play your first game!",
+      "seconds": "seconds",
+      "wins": "wins"
     }
   },
   "game": {

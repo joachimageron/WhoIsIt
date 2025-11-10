@@ -90,6 +90,12 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('profile/stats')
+  async getProfileStats(@Request() req: RequestWithUser) {
+    return this.authService.getPlayerStats(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Response({ passthrough: false }) res: ExpressResponse) {
     // Clear the access_token cookie

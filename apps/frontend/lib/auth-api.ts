@@ -272,3 +272,34 @@ export const changePassword = async (
     throw new Error(error.message || "Failed to change password");
   }
 };
+
+/**
+ * Get player statistics
+ */
+export const getPlayerStats = async (): Promise<PlayerStats> => {
+  const response = await fetch(`${API_URL}/auth/profile/stats`, {
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to fetch player stats" }));
+
+    throw new Error(error.message || "Failed to fetch player stats");
+  }
+
+  const stats: PlayerStats = await response.json();
+
+  return stats;
+};
+
+export type PlayerStats = {
+  gamesPlayed: number;
+  gamesWon: number;
+  totalQuestions: number;
+  totalGuesses: number;
+  fastestWinSeconds?: number;
+  streak: number;
+  winRate: number;
+};

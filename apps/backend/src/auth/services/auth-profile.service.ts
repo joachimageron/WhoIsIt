@@ -9,15 +9,19 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from '../../database/entities/user.entity';
+import { PlayerStats } from '../../database/entities/player-stats.entity';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
 import { EmailService } from '../../email/email.service';
+import type { PlayerStatsResponse } from '@whois-it/contracts';
 
 @Injectable()
 export class AuthProfileService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(PlayerStats)
+    private readonly playerStatsRepository: Repository<PlayerStats>,
     private readonly emailService: EmailService,
   ) {}
 
@@ -122,5 +126,45 @@ export class AuthProfileService {
     user.passwordHash = passwordHash;
 
     await this.userRepository.save(user);
+  }
+
+  async getPlayerStats(userId: string): Promise<PlayerStatsResponse> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Get player stats or return default values for guests
+    let stats = await this.playerStatsRepository.findOne({
+      where: { userId },
+    });
+
+    if (!stats) {
+      // Return default stats if none exist
+      stats = {
+        gamesPlayed: 0,
+        gamesWon: 0,
+        totalQuestions: 0,
+        totalGuesses: 0,
+        fastestWinSeconds: null,
+        streak: 0,
+      } as PlayerStats;
+    }
+
+    const winRate =
+      stats.gamesPlayed > 0
+        ? Math.round((stats.gamesWon / stats.gamesPlayed) * 100)
+        : 0;
+
+    return {
+      gamesPlayed: stats.gamesPlayed,
+      gamesWon: stats.gamesWon,
+      totalQuestions: stats.totalQuestions,
+      totalGuesses: stats.totalGuesses,
+      fastestWinSeconds: stats.fastestWinSeconds ?? undefined,
+      streak: stats.streak,
+      winRate,
+    };
   }
 }
