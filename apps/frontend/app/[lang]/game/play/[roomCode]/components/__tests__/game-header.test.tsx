@@ -54,6 +54,7 @@ describe("GameHeader", () => {
     activePlayerId: "2",
     activePlayerUsername: "PlayerTwo",
     players: [],
+
   };
 
   const defaultProps = {

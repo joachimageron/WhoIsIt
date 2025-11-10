@@ -19,17 +19,20 @@ WhoIsIt uses **Zustand** for global state management. Zustand is a lightweight, 
 ### Comparison to Alternatives
 
 **vs Redux**:
+
 - Less boilerplate
 - No need for actions/reducers
 - Simpler learning curve
 - Similar performance
 
 **vs Context API**:
+
 - Better performance (no unnecessary re-renders)
 - Cleaner syntax
 - Built-in selectors
 
 **vs Jotai/Recoil**:
+
 - Simpler mental model
 - Less atomic
 - More centralized
@@ -38,7 +41,7 @@ WhoIsIt uses **Zustand** for global state management. Zustand is a lightweight, 
 
 ### Store Files
 
-```
+```docs
 store/
 ├── game-store.ts    # Game state (lobby, gameplay)
 └── auth-store.ts    # Authentication state
@@ -166,6 +169,7 @@ export const useGameStore = create<GameState>((set) => ({
 ### Usage
 
 **Basic Selection**:
+
 ```tsx
 'use client';
 import { useGameStore } from '@/store/game-store';
@@ -184,6 +188,7 @@ export function LobbyDisplay() {
 ```
 
 **Selecting Multiple Values**:
+
 ```tsx
 const { lobby, setLobby, isConnected } = useGameStore((state) => ({
   lobby: state.lobby,
@@ -193,6 +198,7 @@ const { lobby, setLobby, isConnected } = useGameStore((state) => ({
 ```
 
 **Calling Actions**:
+
 ```tsx
 const setLobby = useGameStore((state) => state.setLobby);
 
@@ -203,6 +209,7 @@ const handleLobbyUpdate = (newLobby: GameLobbyResponse) => {
 ```
 
 **Accessing Outside Components**:
+
 ```tsx
 import { useGameStore } from '@/store/game-store';
 
@@ -217,7 +224,7 @@ const unsubscribe = useGameStore.subscribe((state) => {
 
 ## Auth Store
 
-### State Structure
+### State Structure >
 
 ```typescript
 interface AuthState {
@@ -231,7 +238,7 @@ interface AuthState {
 }
 ```
 
-### Implementation
+### Implementation >
 
 ```typescript
 export const useAuthStore = create<AuthState>((set) => ({
@@ -257,7 +264,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 ```
 
-### Usage
+### Usage >
 
 ```tsx
 'use client';

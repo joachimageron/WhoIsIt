@@ -24,7 +24,7 @@ interface CreateGameFormProps {
 
 export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, setGuestUser } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [characterSets, setCharacterSets] = useState<CharacterSetResponseDto[]>(
     [],
@@ -77,10 +77,22 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
     setIsLoading(true);
 
     try {
+      // If no authenticated user, create a guest session
+      let hostUsername = user?.username;
+      let hostUserId = user?.id;
+
+      if (!user) {
+        const guestUsername = `Guest-${Math.random().toString(36).substring(2, 7)}`;
+
+        setGuestUser(guestUsername);
+        hostUsername = guestUsername;
+        hostUserId = undefined;
+      }
+
       const gameData: CreateGameRequest = {
         characterSetId: selectedCharacterSet,
-        hostUsername: user?.username ?? "Guest",
-        hostUserId: user?.id,
+        hostUsername: hostUsername ?? "Guest",
+        hostUserId: hostUserId,
       };
 
       // Add optional fields

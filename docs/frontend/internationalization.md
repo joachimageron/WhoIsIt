@@ -9,11 +9,13 @@ WhoIsIt implements internationalization using Next.js App Router's built-in i18n
 ### URL-Based Localization
 
 All routes are prefixed with a language parameter:
+
 - `/en/...` - English routes
 - `/fr/...` - French routes
 
 **Example URLs**:
-```
+
+```docs
 /en/game/create
 /fr/game/create
 /en/auth/login
@@ -22,7 +24,7 @@ All routes are prefixed with a language parameter:
 
 ### Directory Structure
 
-```
+```docs
 apps/frontend/
 ├── app/
 │   └── [lang]/          # Dynamic language segment
@@ -551,13 +553,15 @@ const number = formatNumber(1234567, 'fr'); // "1 234 567"
 
 ### Steps
 
-1. **Create translation file**:
+**Create translation file**:
+
 ```bash
 # Create new dictionary
 touch dictionaries/es.json  # Spanish
 ```
 
-2. **Add translations**:
+**Add translations**:
+
 ```json
 // dictionaries/es.json
 {
@@ -569,7 +573,8 @@ touch dictionaries/es.json  # Spanish
 }
 ```
 
-3. **Update locale type**:
+**Update locale type**:
+
 ```typescript
 // lib/get-dictionary.ts
 type Locale = 'en' | 'fr' | 'es';
@@ -581,13 +586,15 @@ const dictionaries = {
 };
 ```
 
-4. **Update middleware**:
+**Update middleware**:
+
 ```typescript
 // middleware.ts
 const locales = ['en', 'fr', 'es'];
 ```
 
-5. **Update language switcher**:
+**Update language switcher**:
+
 ```typescript
 const languages = {
   en: { label: 'English', flag: '🇬🇧' },

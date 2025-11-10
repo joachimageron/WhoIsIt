@@ -8,7 +8,7 @@ WhoIsIt implements real-time bidirectional communication between frontend and ba
 
 ### Client-Server Communication Flow
 
-```
+```docs
 ┌──────────────────────────────────────────────────────────┐
 │                    Frontend Client                        │
 │  ┌────────────────────────────────────────────────────┐ │
@@ -77,6 +77,7 @@ export function disconnectSocket() {
 ```
 
 **Configuration**:
+
 - `autoConnect: false` - Allows manual connection control
 - `transports: ['websocket']` - Forces WebSocket protocol (faster, no polling)
 - `withCredentials: true` - Sends authentication cookies with requests

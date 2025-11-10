@@ -8,6 +8,7 @@ import {
   Response,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Response as ExpressResponse } from 'express';
 import { AuthService } from './services/auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -27,6 +28,8 @@ export interface RequestWithUser extends Request {
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  // Stricter rate limiting for registration: 3 attempts per minute
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('register')
   async register(
     @Body() registerDto: RegisterDto,
@@ -48,6 +51,8 @@ export class AuthController {
     });
   }
 
+  // Stricter rate limiting for login: 5 attempts per minute
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
@@ -98,12 +103,16 @@ export class AuthController {
     return { message: 'Email verified successfully' };
   }
 
+  // Rate limiting for email resending: 3 per minute
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('resend-verification')
   async resendVerification(@Body('email') email: string) {
     await this.authService.resendVerificationEmail(email);
     return { message: 'Verification email sent' };
   }
 
+  // Rate limiting for password reset: 3 per minute
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forgot-password')
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     await this.authService.requestPasswordReset(forgotPasswordDto.email);

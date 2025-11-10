@@ -27,7 +27,11 @@ export class WsAuthAdapter extends IoAdapter {
     const jwtService = this.app.get(JwtService);
     const authService = this.app.get(AuthService);
     const jwtSecret: string =
-      this.configService.get('JWT_SECRET') || 'your-secret-key';
+      this.configService.get('JWT_SECRET') || 'dev-secret-change-in-production';
+
+    if (!jwtSecret && process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET must be set in production');
+    }
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     server.use(async (socket: AuthenticatedSocket, next) => {
