@@ -369,11 +369,13 @@ describe("useGameInitialization", () => {
   });
 
   describe("no user or guest session", () => {
-    it("does not initialize when no user and no guest session", () => {
+    it("does not initialize when no user and no guest session", async () => {
       const { result } = renderHook(() => useGameInitialization(mockProps));
 
-      // Loading should stay true initially but return early
-      expect(result.current.isLoading).toBe(true);
+      // Should complete loading immediately since there's nothing to load
+      await waitFor(() => {
+        expect(result.current.isLoading).toBe(false);
+      });
 
       // Should not call API methods
       expect(mockGameApi.getGameState).not.toHaveBeenCalled();

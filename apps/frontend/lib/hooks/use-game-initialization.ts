@@ -8,6 +8,7 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+import { getGuestSession } from "@/lib/guest-session";
 
 interface UseGameInitializationProps {
   roomCode: string;
@@ -38,8 +39,17 @@ export function useGameInitialization({
   useEffect(() => {
     const initGame = async () => {
       // Check if user is authenticated or is a guest
-      if (!user) {
-        // No authenticated user and no guest user in store
+      const guestSession = getGuestSession();
+      const currentUser = user || (guestSession ? {
+        id: guestSession.id,
+        username: guestSession.username,
+        email: '',
+        avatarUrl: null,
+      } : null);
+
+      if (!currentUser) {
+        // No authenticated user and no guest session
+        setIsLoading(false);
         return;
       }
 
@@ -53,7 +63,7 @@ export function useGameInitialization({
 
         // Find current player - check both username and userId
         const player = gameState.players.find(
-          (p) => p.username === user.username || p.userId === user.id,
+          (p) => p.username === currentUser.username || p.userId === currentUser.id,
         );
 
         if (player) {
@@ -108,6 +118,8 @@ export function useGameInitialization({
         if (!response.success) {
           throw new Error(response.error || dict.game.play.errors.failedToLoad);
         }
+
+        setIsLoading(false);
       } catch (error) {
         addToast({
           color: "danger",
@@ -115,7 +127,6 @@ export function useGameInitialization({
           description: error instanceof Error ? error.message : String(error),
         });
         router.push(`/${lang}`);
-      } finally {
         setIsLoading(false);
       }
     };
