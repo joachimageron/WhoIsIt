@@ -155,7 +155,21 @@
       "currentStreak": "Série actuelle",
       "noStatsYet": "Aucune statistique disponible. Jouez votre première partie !",
       "seconds": "secondes",
-      "wins": "victoires"
+      "wins": "victoires",
+      "gameHistory": "Historique des parties",
+      "noGamesYet": "Aucune partie jouée. Jouez votre première partie !",
+      "loadingGames": "Chargement de l'historique...",
+      "opponent": "Adversaire",
+      "victory": "Victoire",
+      "defeat": "Défaite",
+      "placement": "Classement",
+      "duration": "Durée",
+      "questions": "Questions",
+      "guesses": "Devinettes",
+      "minutes": "minutes",
+      "minute": "minute",
+      "showMore": "Afficher plus",
+      "showLess": "Afficher moins"
     }
   },
   "game": {

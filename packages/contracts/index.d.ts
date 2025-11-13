@@ -285,3 +285,26 @@ export type PlayerStatsResponse = {
   winRate: number;
 };
 
+// Game History Types
+export type GameHistoryItem = {
+  gameId: string;
+  roomCode: string;
+  characterSetName: string;
+  isWinner: boolean;
+  placement: number;
+  score: number;
+  questionsAsked: number;
+  questionsAnswered: number;
+  correctGuesses: number;
+  incorrectGuesses: number;
+  startedAt: string;
+  endedAt: string;
+  durationSeconds: number;
+  opponentUsername?: string;
+};
+
+export type GameHistoryResponse = {
+  games: GameHistoryItem[];
+  total: number;
+};
+

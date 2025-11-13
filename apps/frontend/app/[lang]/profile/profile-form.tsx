@@ -12,6 +12,7 @@ import { addToast } from "@heroui/toast";
 import { Chip } from "@heroui/chip";
 
 import { GameStats } from "./game-stats";
+import { GameHistory } from "./game-history";
 
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
@@ -252,6 +253,9 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
 
         {/* Game Statistics Card */}
         <GameStats dict={dict} />
+
+        {/* Game History Card */}
+        <GameHistory dict={dict} />
 
         {/* Profile Information Card */}
         <Card className="p-6">

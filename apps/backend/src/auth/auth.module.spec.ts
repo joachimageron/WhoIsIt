@@ -9,6 +9,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../database/entities';
 import { PlayerStats } from '../database/entities/player-stats.entity';
+import { Game } from '../database/entities/game.entity';
+import { GamePlayer } from '../database/entities/game-player.entity';
 import { ConfigModule } from '@nestjs/config';
 import { EmailService } from '../email/email.service';
 
@@ -18,6 +20,7 @@ describe('AuthModule', () => {
   const mockRepository = {
     find: jest.fn(),
     findOne: jest.fn(),
+    findAndCount: jest.fn(),
     save: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
@@ -35,6 +38,10 @@ describe('AuthModule', () => {
       .overrideProvider(getRepositoryToken(User))
       .useValue(mockRepository)
       .overrideProvider(getRepositoryToken(PlayerStats))
+      .useValue(mockRepository)
+      .overrideProvider(getRepositoryToken(Game))
+      .useValue(mockRepository)
+      .overrideProvider(getRepositoryToken(GamePlayer))
       .useValue(mockRepository)
       .overrideProvider(EmailService)
       .useValue(mockEmailService)

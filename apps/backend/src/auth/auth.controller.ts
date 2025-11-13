@@ -4,6 +4,7 @@ import {
   Get,
   Patch,
   Post,
+  Query,
   Request,
   Response,
   UseGuards,
@@ -93,6 +94,19 @@ export class AuthController {
   @Get('profile/stats')
   async getProfileStats(@Request() req: RequestWithUser) {
     return this.authService.getPlayerStats(req.user.id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/game-history')
+  async getGameHistory(
+    @Request() req: RequestWithUser,
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ) {
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+    const offsetNum = offset ? parseInt(offset, 10) : 0;
+
+    return this.authService.getGameHistory(req.user.id, limitNum, offsetNum);
   }
 
   @UseGuards(JwtAuthGuard)

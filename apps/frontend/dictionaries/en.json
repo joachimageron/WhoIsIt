@@ -155,7 +155,21 @@
       "currentStreak": "Current Streak",
       "noStatsYet": "No statistics available yet. Play your first game!",
       "seconds": "seconds",
-      "wins": "wins"
+      "wins": "wins",
+      "gameHistory": "Game History",
+      "noGamesYet": "No games played yet. Play your first game!",
+      "loadingGames": "Loading history...",
+      "opponent": "Opponent",
+      "victory": "Victory",
+      "defeat": "Defeat",
+      "placement": "Placement",
+      "duration": "Duration",
+      "questions": "Questions",
+      "guesses": "Guesses",
+      "minutes": "minutes",
+      "minute": "minute",
+      "showMore": "Show More",
+      "showLess": "Show Less"
     }
   },
   "game": {

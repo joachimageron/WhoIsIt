@@ -171,6 +171,20 @@ export interface Dictionary {
       noStatsYet: string;
       seconds: string;
       wins: string;
+      gameHistory: string;
+      noGamesYet: string;
+      loadingGames: string;
+      opponent: string;
+      victory: string;
+      defeat: string;
+      placement: string;
+      duration: string;
+      questions: string;
+      guesses: string;
+      minutes: string;
+      minute: string;
+      showMore: string;
+      showLess: string;
     };
   };
 

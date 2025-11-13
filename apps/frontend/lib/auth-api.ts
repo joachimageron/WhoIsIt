@@ -294,6 +294,33 @@ export const getPlayerStats = async (): Promise<PlayerStats> => {
   return stats;
 };
 
+/**
+ * Get game history
+ */
+export const getGameHistory = async (
+  limit: number = 10,
+  offset: number = 0,
+): Promise<GameHistoryResponse> => {
+  const response = await fetch(
+    `${API_URL}/auth/profile/game-history?limit=${limit}&offset=${offset}`,
+    {
+      credentials: "include",
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to fetch game history" }));
+
+    throw new Error(error.message || "Failed to fetch game history");
+  }
+
+  const history: GameHistoryResponse = await response.json();
+
+  return history;
+};
+
 export type PlayerStats = {
   gamesPlayed: number;
   gamesWon: number;
@@ -302,4 +329,26 @@ export type PlayerStats = {
   fastestWinSeconds?: number;
   streak: number;
   winRate: number;
+};
+
+export type GameHistoryItem = {
+  gameId: string;
+  roomCode: string;
+  characterSetName: string;
+  isWinner: boolean;
+  placement: number;
+  score: number;
+  questionsAsked: number;
+  questionsAnswered: number;
+  correctGuesses: number;
+  incorrectGuesses: number;
+  startedAt: string;
+  endedAt: string;
+  durationSeconds: number;
+  opponentUsername?: string;
+};
+
+export type GameHistoryResponse = {
+  games: GameHistoryItem[];
+  total: number;
 };
