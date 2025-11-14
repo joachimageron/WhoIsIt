@@ -2,14 +2,12 @@
 
 import { useAuth } from "./use-auth";
 
-import { useAuthStore } from "@/store/auth-store";
-
 /**
  * Hook to manage game access for both authenticated and guest users
  */
 export const useGameAccess = () => {
-  const { user, isAuthenticated, isGuest, isLoading } = useAuth();
-  const { setGuestUser } = useAuthStore();
+  const { user, isAuthenticated, isGuest, isLoading, createGuestSession } =
+    useAuth();
 
   /**
    * Check if the current user can access game features
@@ -22,16 +20,20 @@ export const useGameAccess = () => {
    * Ensure user has access (either authenticated or as guest)
    * Creates a guest session if needed
    */
-  const ensureGameAccess = (guestUsername?: string): boolean => {
+  const ensureGameAccess = async (guestUsername?: string): Promise<boolean> => {
     if (canAccessGame()) {
       return true;
     }
 
     // Create guest session if username provided
     if (guestUsername) {
-      setGuestUser(guestUsername);
+      try {
+        await createGuestSession(guestUsername);
 
-      return true;
+        return true;
+      } catch {
+        return false;
+      }
     }
 
     return false;

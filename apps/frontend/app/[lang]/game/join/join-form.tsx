@@ -11,7 +11,7 @@ import { addToast } from "@heroui/toast";
 import { Form } from "@heroui/form";
 
 import * as gameApi from "@/lib/game-api";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 interface JoinFormProps {
   dict: Dictionary;
@@ -20,7 +20,7 @@ interface JoinFormProps {
 
 export function JoinForm({ dict, lang }: JoinFormProps) {
   const router = useRouter();
-  const { user, setGuestUser } = useAuthStore();
+  const { user, createGuestSession } = useAuth();
   const [roomCode, setRoomCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,22 +51,23 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
     setIsLoading(true);
 
     try {
-      // Join the game with user info if authenticated, or as guest
+      // Join the game with user info if authenticated, or create guest
       let joinData;
+      let currentUser = user;
 
-      if (user) {
+      if (currentUser) {
         joinData = {
-          username: user.username,
-          userId: user.id,
-          avatarUrl: user.avatarUrl || undefined,
+          username: currentUser.username,
+          userId: currentUser.id,
+          avatarUrl: currentUser.avatarUrl || undefined,
         };
       } else {
         // Create a guest user session
         const guestUsername = `Guest-${Math.random().toString(36).substring(2, 7)}`;
 
-        setGuestUser(guestUsername);
+        currentUser = await createGuestSession(guestUsername);
         joinData = {
-          username: guestUsername,
+          username: currentUser.username,
         };
       }
 

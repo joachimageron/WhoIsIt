@@ -43,6 +43,10 @@ export type ChangePasswordData = {
   newPassword: string;
 };
 
+export type CreateGuestData = {
+  username?: string;
+};
+
 /**
  * Register a new user
  */
@@ -271,6 +275,32 @@ export const changePassword = async (
 
     throw new Error(error.message || "Failed to change password");
   }
+};
+
+/**
+ * Create a guest user session
+ */
+export const createGuest = async (data?: CreateGuestData): Promise<User> => {
+  const response = await fetch(`${API_URL}/auth/guest`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data || {}),
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to create guest session" }));
+
+    throw new Error(error.message || "Failed to create guest session");
+  }
+
+  const { user }: AuthResponse = await response.json();
+
+  return user;
 };
 
 /**

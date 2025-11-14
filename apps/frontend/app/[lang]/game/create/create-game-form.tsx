@@ -15,7 +15,7 @@ import { addToast } from "@heroui/toast";
 import { Form } from "@heroui/form";
 
 import * as gameApi from "@/lib/game-api";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 interface CreateGameFormProps {
   dict: Dictionary;
@@ -24,7 +24,7 @@ interface CreateGameFormProps {
 
 export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
   const router = useRouter();
-  const { user, setGuestUser } = useAuthStore();
+  const { user, createGuestSession } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [characterSets, setCharacterSets] = useState<CharacterSetResponseDto[]>(
     [],
@@ -79,12 +79,13 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
       // If no authenticated user, create a guest session
       let hostUsername = user?.username;
       let hostUserId = user?.id;
+      let currentUser = user;
 
-      if (!user) {
+      if (!currentUser) {
         const guestUsername = `Guest-${Math.random().toString(36).substring(2, 7)}`;
 
-        setGuestUser(guestUsername);
-        hostUsername = guestUsername;
+        currentUser = await createGuestSession(guestUsername);
+        hostUsername = currentUser.username;
         hostUserId = undefined;
       }
 
