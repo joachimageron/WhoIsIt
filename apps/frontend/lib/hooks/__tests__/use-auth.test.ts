@@ -133,7 +133,7 @@ describe("useAuth", () => {
       expect(result.current.isAuthenticated).toBe(false);
     });
 
-    it("does not call API logout for guest users", async () => {
+    it("calls API logout for guest users to clear guest_token cookie", async () => {
       const guestUser = {
         id: "guest-1",
         email: "",
@@ -148,7 +148,7 @@ describe("useAuth", () => {
 
       await result.current.logout();
 
-      expect(mockAuthApi.logout).not.toHaveBeenCalled();
+      expect(mockAuthApi.logout).toHaveBeenCalledTimes(1);
       expect(result.current.user).toBeNull();
       expect(result.current.isGuest).toBe(false);
     });

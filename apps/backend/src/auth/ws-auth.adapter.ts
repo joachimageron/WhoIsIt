@@ -39,7 +39,7 @@ export class WsAuthAdapter extends IoAdapter {
         // Try to extract JWT from cookies or auth header
         let token: string | null = null;
 
-        // Extract from cookie
+        // Extract from cookie (try guest_token first, then access_token)
         const cookieHeader = socket.handshake.headers.cookie;
         if (cookieHeader) {
           const cookies = cookieHeader.split(';').reduce(
@@ -50,7 +50,7 @@ export class WsAuthAdapter extends IoAdapter {
             },
             {} as Record<string, string>,
           );
-          token = cookies['access_token'];
+          token = cookies['guest_token'] || cookies['access_token'];
         }
 
         // Fallback to auth header

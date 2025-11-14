@@ -151,7 +151,15 @@ describe("useAuthStore - Persistence", () => {
       const { result } = renderHook(() => useAuthStore());
 
       act(() => {
-        result.current.setGuestUser("GuestPlayer");
+        const guestUser: User = {
+          id: "guest-123",
+          email: "",
+          username: "GuestPlayer",
+          avatarUrl: null,
+          isGuest: true,
+        };
+
+        result.current.setUser(guestUser);
       });
 
       const stored = localStorage.getItem("whoisit-auth-storage");

@@ -1,13 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
-import {
-  getGuestSession,
-  clearGuestSession,
-  createGuestSession,
-  type GuestSession,
-} from "@/lib/guest-session";
-
 export type User = {
   id: string;
   email: string;
@@ -24,25 +17,12 @@ export type AuthState = {
   isLoading: boolean;
   error: string | null;
   setUser: (user: User | null) => void;
-  setGuestUser: (username: string) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
   logout: () => void;
   reset: () => void;
-  initializeAuth: () => void;
 };
-
-/**
- * Convert a guest session to a User object
- */
-const guestSessionToUser = (session: GuestSession): User => ({
-  id: session.id,
-  email: "",
-  username: session.username,
-  avatarUrl: null,
-  isGuest: true,
-});
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -59,22 +39,10 @@ export const useAuthStore = create<AuthState>()(
           isGuest: !!user?.isGuest,
           error: null,
         }),
-      setGuestUser: (username) => {
-        const session = createGuestSession(username);
-        const guestUser = guestSessionToUser(session);
-
-        set({
-          user: guestUser,
-          isAuthenticated: false,
-          isGuest: true,
-          error: null,
-        });
-      },
       setLoading: (isLoading) => set({ isLoading }),
       setError: (error) => set({ error }),
       clearError: () => set({ error: null }),
       logout: () => {
-        clearGuestSession();
         set({
           user: null,
           isAuthenticated: false,
@@ -83,7 +51,6 @@ export const useAuthStore = create<AuthState>()(
         });
       },
       reset: () => {
-        clearGuestSession();
         set({
           user: null,
           isAuthenticated: false,
@@ -91,20 +58,6 @@ export const useAuthStore = create<AuthState>()(
           isLoading: false,
           error: null,
         });
-      },
-      initializeAuth: () => {
-        // Check for existing guest session on initialization
-        const guestSession = getGuestSession();
-
-        if (guestSession) {
-          const guestUser = guestSessionToUser(guestSession);
-
-          set({
-            user: guestUser,
-            isAuthenticated: false,
-            isGuest: true,
-          });
-        }
       },
     }),
     {

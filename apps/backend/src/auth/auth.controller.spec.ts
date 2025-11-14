@@ -14,6 +14,7 @@ describe('AuthController', () => {
     updateLastSeen: jest.fn(),
     updateProfile: jest.fn(),
     changePassword: jest.fn(),
+    createGuest: jest.fn(),
   };
 
   const mockResponse = () => {
@@ -155,12 +156,14 @@ describe('AuthController', () => {
   });
 
   describe('logout', () => {
-    it('should clear the access_token cookie', () => {
+    it('should clear both access_token and guest_token cookies', () => {
       const res = mockResponse();
       controller.logout(res);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.clearCookie).toHaveBeenCalledWith('access_token');
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.clearCookie).toHaveBeenCalledWith('guest_token');
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Logged out successfully',
@@ -236,6 +239,79 @@ describe('AuthController', () => {
       );
       expect(result).toEqual({
         message: 'Password changed successfully',
+      });
+    });
+  });
+
+  describe('createGuest', () => {
+    it('should create a guest user and set guest_token cookie', async () => {
+      const createGuestDto = {
+        username: 'GuestUser123',
+      };
+
+      const expectedResponse = {
+        accessToken: 'guest-jwt-token',
+        user: {
+          id: 'uuid-456',
+          email: null,
+          username: 'GuestUser123',
+          avatarUrl: '/avatar/avatar_5.jpg',
+        },
+      };
+
+      mockAuthService.createGuest.mockResolvedValue(expectedResponse);
+
+      const res = mockResponse();
+      await controller.createGuest(createGuestDto, res);
+
+      expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.cookie).toHaveBeenCalledWith(
+        'guest_token',
+        'guest-jwt-token',
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
+        }),
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        user: expectedResponse.user,
+      });
+    });
+
+    it('should create a guest user without username and set guest_token cookie', async () => {
+      const createGuestDto = {};
+
+      const expectedResponse = {
+        accessToken: 'guest-jwt-token',
+        user: {
+          id: 'uuid-789',
+          email: null,
+          username: 'Guest_1234567890_5678',
+          avatarUrl: '/avatar/avatar_3.jpg',
+        },
+      };
+
+      mockAuthService.createGuest.mockResolvedValue(expectedResponse);
+
+      const res = mockResponse();
+      await controller.createGuest(createGuestDto, res);
+
+      expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(res.cookie).toHaveBeenCalledWith(
+        'guest_token',
+        'guest-jwt-token',
+        expect.objectContaining({
+          httpOnly: true,
+          sameSite: 'lax',
+        }),
+      );
+
+      expect(res.json).toHaveBeenCalledWith({
+        user: expectedResponse.user,
       });
     });
   });

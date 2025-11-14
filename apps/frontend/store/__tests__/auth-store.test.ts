@@ -14,8 +14,6 @@ jest.mock("@/lib/guest-session", () => ({
   })),
 }));
 
-const mockGuestSession = require("@/lib/guest-session");
-
 describe("useAuthStore", () => {
   beforeEach(() => {
     // Reset store to initial state
@@ -132,43 +130,6 @@ describe("useAuthStore", () => {
     });
   });
 
-  describe("setGuestUser", () => {
-    it("creates and sets guest user", () => {
-      const { result } = renderHook(() => useAuthStore());
-
-      const username = "GuestPlayer";
-
-      act(() => {
-        result.current.setGuestUser(username);
-      });
-
-      expect(mockGuestSession.createGuestSession).toHaveBeenCalledWith(
-        username,
-      );
-      expect(result.current.user).not.toBeNull();
-      expect(result.current.user?.username).toBe(username);
-      expect(result.current.user?.isGuest).toBe(true);
-      expect(result.current.isAuthenticated).toBe(false);
-      expect(result.current.isGuest).toBe(true);
-    });
-
-    it("clears error when setting guest user", () => {
-      const { result } = renderHook(() => useAuthStore());
-
-      act(() => {
-        result.current.setError("Some error");
-      });
-
-      expect(result.current.error).toBe("Some error");
-
-      act(() => {
-        result.current.setGuestUser("GuestPlayer");
-      });
-
-      expect(result.current.error).toBeNull();
-    });
-  });
-
   describe("setLoading", () => {
     it("sets loading state", () => {
       const { result } = renderHook(() => useAuthStore());
@@ -258,18 +219,25 @@ describe("useAuthStore", () => {
         result.current.logout();
       });
 
-      expect(mockGuestSession.clearGuestSession).toHaveBeenCalled();
       expect(result.current.user).toBeNull();
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.isGuest).toBe(false);
       expect(result.current.error).toBeNull();
     });
 
-    it("clears guest session", () => {
+    it("clears guest session when guest user logs out", () => {
       const { result } = renderHook(() => useAuthStore());
 
       act(() => {
-        result.current.setGuestUser("GuestPlayer");
+        const guestUser: User = {
+          id: "guest-1",
+          email: "",
+          username: "GuestPlayer",
+          avatarUrl: null,
+          isGuest: true,
+        };
+
+        result.current.setUser(guestUser);
       });
 
       expect(result.current.isGuest).toBe(true);
@@ -278,7 +246,6 @@ describe("useAuthStore", () => {
         result.current.logout();
       });
 
-      expect(mockGuestSession.clearGuestSession).toHaveBeenCalled();
       expect(result.current.isGuest).toBe(false);
     });
   });
@@ -308,55 +275,11 @@ describe("useAuthStore", () => {
         result.current.reset();
       });
 
-      expect(mockGuestSession.clearGuestSession).toHaveBeenCalled();
       expect(result.current.user).toBeNull();
       expect(result.current.isAuthenticated).toBe(false);
       expect(result.current.isGuest).toBe(false);
       expect(result.current.isLoading).toBe(false);
       expect(result.current.error).toBeNull();
-    });
-  });
-
-  describe("initializeAuth", () => {
-    it("initializes with guest session if one exists", () => {
-      const mockSession = {
-        id: "guest-123",
-        username: "GuestPlayer",
-        createdAt: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-      };
-
-      mockGuestSession.getGuestSession.mockReturnValueOnce(mockSession);
-
-      const { result } = renderHook(() => useAuthStore());
-
-      act(() => {
-        result.current.initializeAuth();
-      });
-
-      expect(mockGuestSession.getGuestSession).toHaveBeenCalled();
-      expect(result.current.user).not.toBeNull();
-      expect(result.current.user?.username).toBe("GuestPlayer");
-      expect(result.current.user?.isGuest).toBe(true);
-      expect(result.current.isAuthenticated).toBe(false);
-      expect(result.current.isGuest).toBe(true);
-    });
-
-    it("does not change state if no guest session exists", () => {
-      mockGuestSession.getGuestSession.mockReturnValueOnce(null);
-
-      const { result } = renderHook(() => useAuthStore());
-
-      expect(result.current.user).toBeNull();
-      expect(result.current.isGuest).toBe(false);
-
-      act(() => {
-        result.current.initializeAuth();
-      });
-
-      expect(mockGuestSession.getGuestSession).toHaveBeenCalled();
-      expect(result.current.user).toBeNull();
-      expect(result.current.isGuest).toBe(false);
     });
   });
 });
