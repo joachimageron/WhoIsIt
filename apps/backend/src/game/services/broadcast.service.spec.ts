@@ -124,7 +124,7 @@ describe('BroadcastService', () => {
     }).compile();
 
     service = module.get<BroadcastService>(BroadcastService);
-    gameService = module.get(GameService) as jest.Mocked<GameService>;
+    gameService = module.get(GameService);
 
     // Set the mock server
     service.setServer(mockServer);
