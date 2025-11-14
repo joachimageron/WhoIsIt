@@ -8,9 +8,13 @@ import { AuthProfileService } from './auth-profile.service';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../../database/entities/user.entity';
+import { PlayerStats } from '../../database/entities/player-stats.entity';
+import { Game } from '../../database/entities/game.entity';
+import { GamePlayer } from '../../database/entities/game-player.entity';
 import { EmailService } from '../../email/email.service';
 import { UpdateProfileDto } from '../dto/update-profile.dto';
 import { ChangePasswordDto } from '../dto/change-password.dto';
+import { GameStatus } from '../../database/enums';
 
 // Mock bcrypt at the top level
 jest.mock('bcrypt', () => ({
@@ -23,6 +27,9 @@ const bcrypt = require('bcrypt');
 describe('AuthProfileService', () => {
   let service: AuthProfileService;
   let userRepository: jest.Mocked<Repository<User>>;
+  let playerStatsRepository: jest.Mocked<Repository<PlayerStats>>;
+  let gamePlayerRepository: jest.Mocked<Repository<GamePlayer>>;
+  let _gameRepository: jest.Mocked<Repository<Game>>;
   let emailService: jest.Mocked<EmailService>;
 
   const mockUser: Partial<User> = {
@@ -40,6 +47,18 @@ describe('AuthProfileService', () => {
       save: jest.fn(),
     };
 
+    const mockPlayerStatsRepository = {
+      findOne: jest.fn(),
+    };
+
+    const mockGamePlayerRepository = {
+      findAndCount: jest.fn(),
+    };
+
+    const mockGameRepository = {
+      find: jest.fn(),
+    };
+
     const mockEmailService = {
       sendVerificationEmail: jest.fn(),
     };
@@ -52,6 +71,18 @@ describe('AuthProfileService', () => {
           useValue: mockUserRepository,
         },
         {
+          provide: getRepositoryToken(PlayerStats),
+          useValue: mockPlayerStatsRepository,
+        },
+        {
+          provide: getRepositoryToken(GamePlayer),
+          useValue: mockGamePlayerRepository,
+        },
+        {
+          provide: getRepositoryToken(Game),
+          useValue: mockGameRepository,
+        },
+        {
           provide: EmailService,
           useValue: mockEmailService,
         },
@@ -60,6 +91,9 @@ describe('AuthProfileService', () => {
 
     service = module.get<AuthProfileService>(AuthProfileService);
     userRepository = module.get(getRepositoryToken(User));
+    playerStatsRepository = module.get(getRepositoryToken(PlayerStats));
+    gamePlayerRepository = module.get(getRepositoryToken(GamePlayer));
+    _gameRepository = module.get(getRepositoryToken(Game));
     emailService = module.get(EmailService);
 
     jest.clearAllMocks();
@@ -108,11 +142,11 @@ describe('AuthProfileService', () => {
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow(ConflictException);
-      
+
       // Clear the mock before the second call
       userRepository.findOne.mockClear();
       userRepository.findOne.mockResolvedValueOnce(user).mockResolvedValueOnce(existingUser);
-      
+
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow('Username already taken');
@@ -161,11 +195,11 @@ describe('AuthProfileService', () => {
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow(ConflictException);
-      
+
       // Clear the mock before the second call
       userRepository.findOne.mockClear();
       userRepository.findOne.mockResolvedValueOnce(user).mockResolvedValueOnce(existingUser);
-      
+
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow('Email already in use');
@@ -299,6 +333,177 @@ describe('AuthProfileService', () => {
       await expect(
         service.changePassword('user-123', changePasswordDto),
       ).rejects.toThrow('Cannot change password for this account');
+    });
+  });
+
+  describe('getPlayerStats', () => {
+    it('should return player stats when stats exist', async () => {
+      const user = { ...mockUser } as User;
+      const mockStats: Partial<PlayerStats> = {
+        userId: 'user-123',
+        gamesPlayed: 10,
+        gamesWon: 7,
+        totalQuestions: 50,
+        totalGuesses: 20,
+        fastestWinSeconds: 180,
+        streak: 3,
+      };
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(mockStats as PlayerStats);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result).toEqual({
+        gamesPlayed: 10,
+        gamesWon: 7,
+        totalQuestions: 50,
+        totalGuesses: 20,
+        fastestWinSeconds: 180,
+        streak: 3,
+        winRate: 70,
+      });
+    });
+
+    it('should return default stats when no stats exist', async () => {
+      const user = { ...mockUser } as User;
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(null);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result).toEqual({
+        gamesPlayed: 0,
+        gamesWon: 0,
+        totalQuestions: 0,
+        totalGuesses: 0,
+        fastestWinSeconds: undefined,
+        streak: 0,
+        winRate: 0,
+      });
+    });
+
+    it('should calculate win rate correctly', async () => {
+      const user = { ...mockUser } as User;
+      const mockStats: Partial<PlayerStats> = {
+        userId: 'user-123',
+        gamesPlayed: 3,
+        gamesWon: 2,
+        totalQuestions: 15,
+        totalGuesses: 6,
+        fastestWinSeconds: null,
+        streak: 0,
+      };
+
+      userRepository.findOne.mockResolvedValue(user);
+      playerStatsRepository.findOne.mockResolvedValue(mockStats as PlayerStats);
+
+      const result = await service.getPlayerStats('user-123');
+
+      expect(result.winRate).toBe(67); // 2/3 * 100 rounded
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.getPlayerStats('nonexistent-user')).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
+
+  describe('getGameHistory', () => {
+    it('should return game history when games exist', async () => {
+      const user = { ...mockUser } as User;
+      const mockGame = {
+        id: 'game-123',
+        roomCode: 'ABC123',
+        status: GameStatus.COMPLETED,
+        characterSet: { id: 'set-1', name: 'Characters' },
+        winner: { id: 'user-123' },
+        players: [
+          { id: 'player-1', user: { id: 'user-123' }, username: 'testuser' },
+          { id: 'player-2', user: { id: 'user-456' }, username: 'opponent' },
+        ],
+        startedAt: new Date('2024-01-01T10:00:00Z'),
+        endedAt: new Date('2024-01-01T10:10:00Z'),
+        createdAt: new Date('2024-01-01T09:55:00Z'),
+      } as any;
+
+      const mockGamePlayer = {
+        id: 'player-1',
+        game: mockGame,
+        user: { id: 'user-123' },
+        username: 'testuser',
+        score: 100,
+        placement: 1,
+        askedQuestions: [{}, {}],
+        answers: [{}, {}, {}],
+        guesses: [{ isCorrect: true }, { isCorrect: false }],
+      } as any;
+
+      userRepository.findOne.mockResolvedValue(user);
+      gamePlayerRepository.findAndCount.mockResolvedValue([
+        [mockGamePlayer],
+        1,
+      ]);
+
+      const result = await service.getGameHistory('user-123', 10, 0);
+
+      expect(result.total).toBe(1);
+      expect(result.games).toHaveLength(1);
+      expect(result.games[0]).toMatchObject({
+        gameId: 'game-123',
+        roomCode: 'ABC123',
+        characterSetName: 'Characters',
+        isWinner: true,
+        placement: 1,
+        score: 100,
+        questionsAsked: 2,
+        questionsAnswered: 3,
+        correctGuesses: 1,
+        incorrectGuesses: 1,
+        durationSeconds: 600,
+        opponentUsername: 'opponent',
+      });
+    });
+
+    it('should return empty array when no games exist', async () => {
+      const user = { ...mockUser } as User;
+
+      userRepository.findOne.mockResolvedValue(user);
+      gamePlayerRepository.findAndCount.mockResolvedValue([[], 0]);
+
+      const result = await service.getGameHistory('user-123', 10, 0);
+
+      expect(result.total).toBe(0);
+      expect(result.games).toHaveLength(0);
+    });
+
+    it('should throw NotFoundException if user does not exist', async () => {
+      userRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.getGameHistory('nonexistent-user', 10, 0),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should handle pagination correctly', async () => {
+      const user = { ...mockUser } as User;
+
+      userRepository.findOne.mockResolvedValue(user);
+      gamePlayerRepository.findAndCount.mockResolvedValue([[], 25]);
+
+      const result = await service.getGameHistory('user-123', 10, 10);
+
+      expect(gamePlayerRepository.findAndCount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 10,
+          skip: 10,
+        }),
+      );
+      expect(result.total).toBe(25);
     });
   });
 });

@@ -180,4 +180,12 @@ export class AuthService {
   ): Promise<void> {
     return this.authProfileService.changePassword(userId, changePasswordDto);
   }
+
+  async getPlayerStats(userId: string) {
+    return this.authProfileService.getPlayerStats(userId);
+  }
+
+  async getGameHistory(userId: string, limit: number, offset: number) {
+    return this.authProfileService.getGameHistory(userId, limit, offset);
+  }
 }

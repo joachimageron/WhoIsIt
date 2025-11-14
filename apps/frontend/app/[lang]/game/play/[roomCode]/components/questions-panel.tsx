@@ -35,9 +35,6 @@ export function QuestionsPanel({
   const targetPlayerId = otherPlayer?.id || "";
   const [isAsking, setIsAsking] = useState(false);
 
-  console.log("gameState.players:", gameState.players);
-
-  console.log("targetPlayerId:", targetPlayerId);
   const handleAskQuestion = async () => {
     if (!question.trim()) {
       addToast({
@@ -110,12 +107,20 @@ export function QuestionsPanel({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-col gap-1 items-start">
         <h2 className="text-lg font-semibold">
           {dict.game.play.questions.questionsPanel}
         </h2>
+                {/* Show opponent name in 2-player mode */}
+        {otherPlayers.length > 0 && (
+          <p className="text-sm text-default-600">
+            Asking:{" "}
+            <span className="font-semibold">{otherPlayers[0].username}</span>
+          </p>
+        )}
       </CardHeader>
       <CardBody className="gap-3">
+
 
         {/* Question Input */}
         <Textarea
