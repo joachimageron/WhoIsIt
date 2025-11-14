@@ -18,71 +18,86 @@ describe('BroadcastService', () => {
   let mockServer: any;
 
   const mockLobbyResponse: GameLobbyResponse = {
+    id: 'game-1',
     roomCode: 'ABC12',
     status: 'lobby',
     visibility: 'public',
-    maxPlayers: 4,
-    currentPlayers: 2,
+    characterSetId: 'charset-1',
+    ruleConfig: {},
+    createdAt: new Date().toISOString(),
     players: [
       {
         id: 'player1',
         username: 'Host',
-        isHost: true,
+        role: 'host',
         isReady: true,
-        avatarUrl: null,
+        avatarUrl: undefined,
+        joinedAt: new Date().toISOString(),
       },
       {
         id: 'player2',
         username: 'Player2',
-        isHost: false,
+        role: 'player',
         isReady: false,
-        avatarUrl: null,
+        avatarUrl: undefined,
+        joinedAt: new Date().toISOString(),
       },
     ],
   };
 
   const mockGameState: GameStateResponse = {
+    id: 'game-1',
     roomCode: 'ABC12',
     status: 'in_progress',
-    currentRound: 1,
+    currentRoundNumber: 1,
+    currentRoundState: 'awaiting_question',
     players: [],
   };
 
   const mockQuestion: QuestionResponse = {
     id: 'q1',
+    roundId: 'round-1',
     questionText: 'Test question?',
     roundNumber: 1,
-    playerId: 'player1',
+    askedByPlayerId: 'player1',
+    askedByPlayerUsername: 'Host',
     targetPlayerId: 'player2',
-    createdAt: new Date().toISOString(),
+    targetPlayerUsername: 'Player2',
+    askedAt: new Date().toISOString(),
   };
 
   const mockAnswer: AnswerResponse = {
     id: 'a1',
     questionId: 'q1',
-    playerId: 'player2',
+    answeredByPlayerId: 'player2',
+    answeredByPlayerUsername: 'Player2',
     answerValue: AnswerValue.YES,
-    answerText: null,
-    createdAt: new Date().toISOString(),
+    answerText: undefined,
+    answeredAt: new Date().toISOString(),
   };
 
   const mockGuess: GuessResponse = {
     id: 'g1',
-    playerId: 'player1',
+    roundId: 'round-1',
+    roundNumber: 1,
+    guessedByPlayerId: 'player1',
+    guessedByPlayerUsername: 'Host',
     targetPlayerId: 'player2',
+    targetPlayerUsername: 'Player2',
     targetCharacterId: 'char1',
+    targetCharacterName: 'Character 1',
     isCorrect: true,
-    createdAt: new Date().toISOString(),
+    guessedAt: new Date().toISOString(),
   };
 
   const mockGameOverResult: GameOverResult = {
+    gameId: 'game-1',
     roomCode: 'ABC12',
+    winnerId: 'player1',
     winnerUsername: 'Host',
-    winner: {
-      playerId: 'player1',
-      username: 'Host',
-      score: 100,
-    },
+    totalRounds: 5,
+    gameDurationSeconds: 300,
+    endReason: 'victory',
     players: [],
   };
 
@@ -134,7 +149,7 @@ describe('BroadcastService', () => {
         emit: jest.fn(),
       };
 
-      service.setServer(newMockServer);
+      service.setServer(newMockServer as any);
 
       // Test that the server was set by using it
       gameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
@@ -363,7 +378,7 @@ describe('BroadcastService', () => {
     });
 
     it('should handle no winner case', async () => {
-      const noWinnerResult = { ...mockGameOverResult, winnerUsername: null };
+      const noWinnerResult = { ...mockGameOverResult, winnerUsername: undefined };
       gameService.getGameOverResult.mockResolvedValue(noWinnerResult);
 
       await service.broadcastGameOver('ABC12');

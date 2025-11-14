@@ -20,17 +20,33 @@ describe('GameStatsService', () => {
   let playerSecretRepository: any;
   let roundRepository: any;
 
+  const mockUser = {
+    id: 'user-1',
+    username: 'testuser',
+    isGuest: false,
+    emailVerified: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const mockPlayer = {
     id: 'player-1',
     username: 'testplayer',
-    user: { id: 'user-1' },
+    user: mockUser,
+    game: null as any,
+    role: 'player',
+    isReady: true,
+    joinedAt: new Date(),
     score: 100,
+    askedQuestions: [],
+    answers: [],
+    guesses: [],
   } as GamePlayer;
 
   const mockGame = {
     id: 'game-1',
     roomCode: 'ABC12',
-    status: GameStatus.ACTIVE,
+    status: GameStatus.IN_PROGRESS,
     players: [mockPlayer],
   } as Game;
 
@@ -129,7 +145,7 @@ describe('GameStatsService', () => {
     it('should return false if game not ended', async () => {
       const game = {
         ...mockGame,
-        status: GameStatus.ACTIVE,
+        status: GameStatus.IN_PROGRESS,
       };
 
       // Mock more than 1 unrevealed player
@@ -150,7 +166,12 @@ describe('GameStatsService', () => {
       const winner = {
         id: 'player-1',
         username: 'winner',
-        user: { id: 'user-1' },
+        user: mockUser,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
+        joinedAt: new Date(),
+        score: 0,
         askedQuestions: [],
         answers: [],
         guesses: [],
@@ -202,11 +223,16 @@ describe('GameStatsService', () => {
       expect(gameRepository.save).toHaveBeenCalled();
     });
 
-    it('should end game when winner provided and only one remains', async () => {
+    it('should end game when winner provided', async () => {
       const winner = {
         id: 'player-1',
         username: 'winner',
-        user: { id: 'user-1' },
+        user: mockUser,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
+        joinedAt: new Date(),
+        score: 0,
         askedQuestions: [],
         answers: [],
         guesses: [],
@@ -253,11 +279,16 @@ describe('GameStatsService', () => {
   });
 
   describe('endGame', () => {
-    it('should mark game as completed and update statistics', async () => {
+    it('endGame should mark game as completed', async () => {
       const winner = {
         id: 'player-1',
         username: 'winner',
-        user: { id: 'user-1' },
+        user: mockUser,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
+        joinedAt: new Date(),
+        score: 0,
         askedQuestions: [],
         answers: [],
         guesses: [],
@@ -301,7 +332,12 @@ describe('GameStatsService', () => {
       const winner = {
         id: 'player-1',
         username: 'winner',
-        user: { id: 'user-1' },
+        user: mockUser,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
+        joinedAt: new Date(),
+        score: 0,
         askedQuestions: [],
         answers: [],
         guesses: [],
@@ -338,7 +374,10 @@ describe('GameStatsService', () => {
       const winner = {
         id: 'player-1',
         username: 'winner',
-        user: { id: 'user-1' },
+        user: mockUser,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
         score: 1000,
         placement: 1,
         joinedAt: new Date('2024-01-01T10:00:00'),
@@ -381,6 +420,9 @@ describe('GameStatsService', () => {
         id: 'player-1',
         username: 'player1',
         user: null,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
         score: 100,
         placement: 1,
         joinedAt: new Date('2024-01-01T10:00:00'),
@@ -388,7 +430,7 @@ describe('GameStatsService', () => {
         askedQuestions: [],
         answers: [],
         guesses: [],
-      } as GamePlayer;
+      } as unknown as GamePlayer;
 
       const completedGame = {
         ...mockGame,
@@ -409,10 +451,17 @@ describe('GameStatsService', () => {
     });
 
     it('should sort players by placement', async () => {
+      const user1 = { ...mockUser, id: 'user-1' };
+      const user2 = { ...mockUser, id: 'user-2' };
+      const user3 = { ...mockUser, id: 'user-3' };
+
       const player1 = {
         id: 'player-1',
         username: 'first',
-        user: { id: 'user-1' },
+        user: user1,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
         score: 1000,
         placement: 1,
         joinedAt: new Date('2024-01-01T10:00:00'),
@@ -425,7 +474,10 @@ describe('GameStatsService', () => {
       const player2 = {
         id: 'player-2',
         username: 'second',
-        user: { id: 'user-2' },
+        user: user2,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
         score: 500,
         placement: 2,
         joinedAt: new Date('2024-01-01T10:00:00'),
@@ -438,7 +490,10 @@ describe('GameStatsService', () => {
       const player3 = {
         id: 'player-3',
         username: 'third',
-        user: { id: 'user-3' },
+        user: user3,
+        game: mockGame,
+        role: 'player',
+        isReady: true,
         score: 250,
         placement: 3,
         joinedAt: new Date('2024-01-01T10:00:00'),

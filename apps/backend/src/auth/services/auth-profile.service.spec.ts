@@ -29,7 +29,7 @@ describe('AuthProfileService', () => {
   let userRepository: jest.Mocked<Repository<User>>;
   let playerStatsRepository: jest.Mocked<Repository<PlayerStats>>;
   let gamePlayerRepository: jest.Mocked<Repository<GamePlayer>>;
-  let gameRepository: jest.Mocked<Repository<Game>>;
+  let _gameRepository: jest.Mocked<Repository<Game>>;
   let emailService: jest.Mocked<EmailService>;
 
   const mockUser: Partial<User> = {
@@ -93,7 +93,7 @@ describe('AuthProfileService', () => {
     userRepository = module.get(getRepositoryToken(User));
     playerStatsRepository = module.get(getRepositoryToken(PlayerStats));
     gamePlayerRepository = module.get(getRepositoryToken(GamePlayer));
-    gameRepository = module.get(getRepositoryToken(Game));
+    _gameRepository = module.get(getRepositoryToken(Game));
     emailService = module.get(EmailService);
 
     jest.clearAllMocks();
@@ -142,11 +142,11 @@ describe('AuthProfileService', () => {
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow(ConflictException);
-      
+
       // Clear the mock before the second call
       userRepository.findOne.mockClear();
       userRepository.findOne.mockResolvedValueOnce(user).mockResolvedValueOnce(existingUser);
-      
+
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow('Username already taken');
@@ -195,11 +195,11 @@ describe('AuthProfileService', () => {
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow(ConflictException);
-      
+
       // Clear the mock before the second call
       userRepository.findOne.mockClear();
       userRepository.findOne.mockResolvedValueOnce(user).mockResolvedValueOnce(existingUser);
-      
+
       await expect(
         service.updateProfile('user-123', updateDto),
       ).rejects.toThrow('Email already in use');
