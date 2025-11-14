@@ -465,7 +465,7 @@ describe('GameLobbyService', () => {
 
       const activeGame = {
         ...mockGame,
-        status: GameStatus.ACTIVE,
+        status: GameStatus.IN_PROGRESS,
       };
 
       gameRepository.findOne.mockResolvedValue(activeGame);
@@ -631,7 +631,7 @@ describe('GameLobbyService', () => {
     it('should throw BadRequestException if game not in lobby', async () => {
       const mockPlayer = {
         id: 'player-1',
-        game: { ...mockGame, status: GameStatus.ACTIVE },
+        game: { ...mockGame, status: GameStatus.IN_PROGRESS },
       } as GamePlayer;
 
       playerRepository.findOne.mockResolvedValue(mockPlayer);

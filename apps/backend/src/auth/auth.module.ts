@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './services/auth.service';
 import { AuthController } from './auth.controller';
 import { User } from '../database/entities/user.entity';
+import { PlayerStats } from '../database/entities/player-stats.entity';
+import { Game } from '../database/entities/game.entity';
+import { GamePlayer } from '../database/entities/game-player.entity';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmailModule } from '../email/email.module';
@@ -14,7 +17,7 @@ import { AuthProfileService } from './services/auth-profile.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, PlayerStats, Game, GamePlayer]),
     PassportModule,
     EmailModule,
     JwtModule.registerAsync({

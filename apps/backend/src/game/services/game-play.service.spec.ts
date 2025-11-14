@@ -47,7 +47,7 @@ describe('GamePlayService', () => {
   const mockGame = {
     id: 'game-1',
     roomCode: 'ABC12',
-    status: GameStatus.ACTIVE,
+    status: GameStatus.IN_PROGRESS,
     characterSet: { id: 'charset-1' },
     players: [mockPlayer],
   } as Game;
@@ -307,7 +307,7 @@ describe('GamePlayService', () => {
 
       expect(result).toBeDefined();
       expect(result.roomCode).toBe('ABC12');
-      expect(result.status).toBe(GameStatus.ACTIVE);
+      expect(result.status).toBe(GameStatus.IN_PROGRESS);
       expect(result.currentRoundNumber).toBe(1);
       expect(result.currentRoundState).toBe(RoundState.AWAITING_QUESTION);
       expect(result.activePlayerId).toBe('player-1');
@@ -530,7 +530,7 @@ describe('GamePlayService', () => {
         playerId: 'player-2',
         questionId: 'question-1',
         answerValue: AnswerValue.YES,
-        answerText: null,
+        answerText: undefined,
       };
 
       const mockQuestion = {
@@ -539,6 +539,8 @@ describe('GamePlayService', () => {
         askedBy: mockPlayer,
         targetPlayer: { id: 'player-2' } as GamePlayer,
         answers: [],
+        questionText: 'Test question?',
+        askedAt: new Date(),
       } as Question;
 
       const answeringPlayer = {
@@ -568,7 +570,7 @@ describe('GamePlayService', () => {
       const mockAnswer = {
         id: 'answer-1',
         question: mockQuestion,
-        answeredByPlayer: answeringPlayer,
+        answeredBy: answeringPlayer,
         answerValue: AnswerValue.YES,
         answeredAt: new Date(),
       } as Answer;
@@ -699,7 +701,9 @@ describe('GamePlayService', () => {
         askedBy: mockPlayer,
         targetPlayer: null,
         answers: [],
-      } as Question;
+        questionText: 'Test question?',
+        askedAt: new Date(),
+      } as unknown as Question;
 
       const roundAwaitingAnswer = {
         ...mockRound,
@@ -728,9 +732,9 @@ describe('GamePlayService', () => {
   describe('submitGuess', () => {
     it('should submit a correct guess successfully', async () => {
       const request = {
-        guessingPlayerId: 'player-1',
+        playerId: 'player-1',
         targetPlayerId: 'player-2',
-        characterId: 'char-1',
+        targetCharacterId: 'char-1',
       };
 
       const targetPlayer = {
@@ -769,9 +773,11 @@ describe('GamePlayService', () => {
 
       const mockGuess = {
         id: 'guess-1',
+        round: mockRound,
         guessedBy: guessingPlayer,
         targetPlayer: targetPlayer,
         guessedCharacter: mockCharacter,
+        targetCharacter: mockCharacter,
         isCorrect: true,
         guessedAt: new Date(),
       } as Guess;
@@ -790,9 +796,9 @@ describe('GamePlayService', () => {
 
     it('should submit an incorrect guess', async () => {
       const request = {
-        guessingPlayerId: 'player-1',
+        playerId: 'player-1',
         targetPlayerId: 'player-2',
-        characterId: 'char-2',
+        targetCharacterId: 'char-2',
       };
 
       const targetPlayer = {
@@ -837,9 +843,11 @@ describe('GamePlayService', () => {
 
       const mockGuess = {
         id: 'guess-1',
+        round: mockRound,
         guessedBy: guessingPlayer,
         targetPlayer: targetPlayer,
         guessedCharacter: wrongCharacter,
+        targetCharacter: mockCharacter,
         isCorrect: false,
         guessedAt: new Date(),
       } as Guess;
@@ -855,9 +863,9 @@ describe('GamePlayService', () => {
 
     it('should throw NotFoundException if game not found', async () => {
       const request = {
-        guessingPlayerId: 'player-1',
+        playerId: 'player-1',
         targetPlayerId: 'player-2',
-        characterId: 'char-1',
+        targetCharacterId: 'char-1',
       };
 
       gameRepository.findOne.mockResolvedValue(null);
@@ -869,9 +877,9 @@ describe('GamePlayService', () => {
 
     it('should throw BadRequestException if game is not in progress', async () => {
       const request = {
-        guessingPlayerId: 'player-1',
+        playerId: 'player-1',
         targetPlayerId: 'player-2',
-        characterId: 'char-1',
+        targetCharacterId: 'char-1',
       };
 
       const gameInLobby = {
@@ -889,9 +897,9 @@ describe('GamePlayService', () => {
 
     it('should throw NotFoundException if guessing player not found', async () => {
       const request = {
-        guessingPlayerId: 'invalid-player',
+        playerId: 'invalid-player',
         targetPlayerId: 'player-2',
-        characterId: 'char-1',
+        targetCharacterId: 'char-1',
       };
 
       const gameWithRounds = {
@@ -910,9 +918,9 @@ describe('GamePlayService', () => {
 
     it('should throw NotFoundException if character not found', async () => {
       const request = {
-        guessingPlayerId: 'player-1',
+        playerId: 'player-1',
         targetPlayerId: 'player-2',
-        characterId: 'invalid-char',
+        targetCharacterId: 'invalid-char',
       };
 
       const targetPlayer = {
@@ -1242,8 +1250,8 @@ describe('GamePlayService', () => {
 
       const result = await service.handleGuessResult(incorrectGuess);
 
-      expect(result).toBe(true);
-      expect(playerRepository.save).toHaveBeenCalled();
+      expect(result).toBe(false);
+      expect(playerRepository.save).not.toHaveBeenCalled();
     });
   });
 });

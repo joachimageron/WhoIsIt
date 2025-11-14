@@ -19,9 +19,7 @@ import {
 } from '../../database/entities';
 import {
   GameStatus,
-  PlayerSecretStatus,
   AnswerValue,
-  RoundState,
 } from '../../database/enums';
 
 describe('GameService - Scoring and Game End', () => {
@@ -230,12 +228,14 @@ describe('GameService - Scoring and Game End', () => {
 
       const result = await service.askQuestion('ABC12', {
         playerId: 'player-1',
+        targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
       });
 
       expect(result).toBe(questionResponse);
       expect(mockGamePlayService.askQuestion).toHaveBeenCalledWith('ABC12', {
         playerId: 'player-1',
+        targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
       });
     });
@@ -283,7 +283,11 @@ describe('GameService - Scoring and Game End', () => {
         status: GameStatus.IN_PROGRESS,
         players: [],
         rounds: [{ id: 'round-1' }],
-      } as Game;
+        characterSet: null,
+        visibility: 'public',
+        ruleConfig: {},
+        createdAt: new Date(),
+      } as unknown as Game;
 
       const guessResponse = {
         id: 'guess-1',
@@ -330,7 +334,11 @@ describe('GameService - Scoring and Game End', () => {
         status: GameStatus.IN_PROGRESS,
         players: [],
         rounds: [{ id: 'round-1' }],
-      } as Game;
+        characterSet: null,
+        visibility: 'public',
+        ruleConfig: {},
+        createdAt: new Date(),
+      } as unknown as Game;
 
       const mockGuess = {
         id: 'guess-1',
