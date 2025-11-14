@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { GamePlayService } from './game-play.service';
-import { GameService } from './game.service';
-import { GameStatsService } from './game-stats.service';
+import { GamePlayService } from '../services/game-play.service';
+import { GameService } from '../services/game.service';
+import { GameStatsService } from '../services/game-stats.service';
 import {
   Game,
   GamePlayer,
@@ -19,7 +19,7 @@ import {
   AnswerValue,
   PlayerSecretStatus,
 } from '../../database/enums';
-import { GameLobbyService } from './game-lobby.service';
+import { GameLobbyService } from '../services/game-lobby.service';
 
 /**
  * Test suite specifically for verifying turn-changing logic

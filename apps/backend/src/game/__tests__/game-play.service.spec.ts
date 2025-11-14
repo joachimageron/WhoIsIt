@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { GamePlayService } from './game-play.service';
+import { GamePlayService } from '../services/game-play.service';
 import {
   Game,
   GamePlayer,
@@ -22,7 +22,7 @@ import {
   PlayerSecretStatus,
   AnswerValue,
 } from '../../database/enums';
-import { GameLobbyService } from './game-lobby.service';
+import { GameLobbyService } from '../services/game-lobby.service';
 
 describe('GamePlayService', () => {
   let service: GamePlayService;

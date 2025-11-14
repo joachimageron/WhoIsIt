@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BroadcastService } from './broadcast.service';
-import { GameService } from './game.service';
+import { BroadcastService } from '../services/broadcast.service';
+import { GameService } from '../services/game.service';
 import { Logger } from '@nestjs/common';
 import type {
   GameLobbyResponse,

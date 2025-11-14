@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { GameLobbyService } from './game-lobby.service';
+import { GameLobbyService } from '../services/game-lobby.service';
 import {
   CharacterSet,
   Game,

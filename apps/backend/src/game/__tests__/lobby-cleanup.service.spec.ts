@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LobbyCleanupService } from './lobby-cleanup.service';
-import { GameService } from './game.service';
+import { LobbyCleanupService } from '../services/lobby-cleanup.service';
+import { GameService } from '../services/game.service';
 import { ConnectionManager } from '../gateway/connection.manager';
 import { Logger } from '@nestjs/common';
 import { GameStatus } from '../../database/enums';
