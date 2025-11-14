@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from '../../database/entities/user.entity';
 import { RegisterDto } from '../dto/register.dto';
+import { CreateGuestDto } from '../dto/create-guest.dto';
 import { AuthResponseDto } from '../dto/auth-response.dto';
 import { EmailService } from '../../email/email.service';
 import { JwtPayload } from '../types/jwt-payload.type';
@@ -187,5 +188,58 @@ export class AuthService {
 
   async getGameHistory(userId: string, limit: number, offset: number) {
     return this.authProfileService.getGameHistory(userId, limit, offset);
+  }
+
+  async createGuest(createGuestDto: CreateGuestDto): Promise<AuthResponseDto> {
+    let username = createGuestDto.username;
+
+    // Generate a unique username if not provided
+    if (!username) {
+      const timestamp = Date.now();
+      const randomNum = Math.floor(Math.random() * 10000);
+      username = `Guest_${timestamp}_${randomNum}`;
+    }
+
+    // Check if username already exists (very unlikely for generated names)
+    const existingUser = await this.userRepository.findOne({
+      where: { username },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Username already exists');
+    }
+
+    // Select random avatar for guest
+    const avatarNumber = Math.floor(Math.random() * 18);
+    const avatarUrl = `/avatar/avatar_${avatarNumber}.jpg`;
+
+    // Create guest user (no email, no password)
+    const user = this.userRepository.create({
+      username,
+      avatarUrl,
+      isGuest: true,
+      emailVerified: false,
+      lastSeenAt: new Date(),
+    });
+
+    await this.userRepository.save(user);
+
+    // Generate JWT
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: null,
+      username: user.username,
+    };
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: null,
+        username: user.username,
+        avatarUrl: user.avatarUrl ?? null,
+      },
+    };
   }
 }

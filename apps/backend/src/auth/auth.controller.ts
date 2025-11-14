@@ -13,6 +13,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response as ExpressResponse } from 'express';
 import { AuthService } from './services/auth.service';
 import { RegisterDto } from './dto/register.dto';
+import { CreateGuestDto } from './dto/create-guest.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -112,8 +113,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Response({ passthrough: false }) res: ExpressResponse) {
-    // Clear the access_token cookie
+    // Clear both access_token and guest_token cookies
     res.clearCookie('access_token');
+    res.clearCookie('guest_token');
     return res.json({ message: 'Logged out successfully' });
   }
 
@@ -176,5 +178,28 @@ export class AuthController {
   ) {
     await this.authService.changePassword(req.user.id, changePasswordDto);
     return { message: 'Password changed successfully' };
+  }
+
+  // Rate limiting for guest creation: 10 attempts per minute
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post('guest')
+  async createGuest(
+    @Body() createGuestDto: CreateGuestDto,
+    @Response({ passthrough: false }) res: ExpressResponse,
+  ) {
+    const result = await this.authService.createGuest(createGuestDto);
+
+    // Set JWT token as HTTP-only cookie with guest_token name
+    res.cookie('guest_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    // Return user data without the token in the response body
+    return res.json({
+      user: result.user,
+    });
   }
 }

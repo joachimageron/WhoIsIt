@@ -244,4 +244,97 @@ describe('AuthService', () => {
       });
     });
   });
+
+  describe('createGuest', () => {
+    it('should create a guest user with provided username', async () => {
+      const createGuestDto = {
+        username: 'GuestUser123',
+      };
+
+      const mockGuestUser = {
+        id: 'uuid-456',
+        username: 'GuestUser123',
+        avatarUrl: '/avatar/avatar_5.jpg',
+        isGuest: true,
+        emailVerified: false,
+      };
+
+      mockUserRepository.findOne.mockResolvedValue(null);
+      mockUserRepository.create.mockReturnValue(mockGuestUser);
+      mockUserRepository.save.mockResolvedValue(mockGuestUser);
+      mockJwtService.sign.mockReturnValue('guest-jwt-token');
+
+      const result = await service.createGuest(createGuestDto);
+
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { username: 'GuestUser123' },
+      });
+      expect(mockUserRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          username: 'GuestUser123',
+          isGuest: true,
+          emailVerified: false,
+        }),
+      );
+      expect(mockUserRepository.save).toHaveBeenCalled();
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sub: 'uuid-456',
+          email: null,
+          username: 'GuestUser123',
+        }),
+      );
+      expect(result).toEqual({
+        accessToken: 'guest-jwt-token',
+        user: {
+          id: 'uuid-456',
+          email: null,
+          username: 'GuestUser123',
+          avatarUrl: '/avatar/avatar_5.jpg',
+        },
+      });
+    });
+
+    it('should create a guest user with auto-generated username', async () => {
+      const createGuestDto = {};
+
+      const mockGuestUser = {
+        id: 'uuid-789',
+        username: expect.stringMatching(/^Guest_\d+_\d+$/),
+        avatarUrl: '/avatar/avatar_3.jpg',
+        isGuest: true,
+        emailVerified: false,
+      };
+
+      mockUserRepository.findOne.mockResolvedValue(null);
+      mockUserRepository.create.mockReturnValue(mockGuestUser);
+      mockUserRepository.save.mockResolvedValue(mockGuestUser);
+      mockJwtService.sign.mockReturnValue('guest-jwt-token');
+
+      const result = await service.createGuest(createGuestDto);
+
+      expect(mockUserRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          username: expect.stringMatching(/^Guest_\d+_\d+$/),
+          isGuest: true,
+          emailVerified: false,
+        }),
+      );
+      expect(result.accessToken).toBe('guest-jwt-token');
+      expect(result.user.id).toBe('uuid-789');
+      expect(result.user.email).toBeNull();
+    });
+
+    it('should throw ConflictException if username already exists', async () => {
+      const createGuestDto = {
+        username: 'ExistingUser',
+      };
+
+      mockUserRepository.findOne.mockResolvedValue({ id: 'existing-id' });
+
+      await expect(service.createGuest(createGuestDto)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+  });
 });
