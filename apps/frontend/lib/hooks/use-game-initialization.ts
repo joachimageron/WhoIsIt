@@ -29,6 +29,7 @@ export function useGameInitialization({
     setMyCharacter,
     addQuestion,
     addAnswer,
+    resetPlayState,
   } = useGameStore();
   const { user } = useAuthStore();
 
@@ -60,6 +61,9 @@ export function useGameInitialization({
 
       try {
         setIsLoading(true);
+
+        // Reset play state when initializing a new game session
+        resetPlayState();
 
         // Get game state
         const gameState = await gameApi.getGameState(roomCode);

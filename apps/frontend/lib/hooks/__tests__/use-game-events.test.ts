@@ -61,6 +61,7 @@ describe("useGameEvents", () => {
   const mockAddAnswer = jest.fn();
   const mockSetConnected = jest.fn();
   const mockEliminateCharacter = jest.fn();
+  const mockResetPlayState = jest.fn();
 
   // Store cleanup functions for event listeners
   let onQuestionAskedCallback: any;
@@ -101,6 +102,7 @@ describe("useGameEvents", () => {
       addAnswer: mockAddAnswer,
       setConnected: mockSetConnected,
       eliminateCharacter: mockEliminateCharacter,
+      resetPlayState: mockResetPlayState,
     } as any);
   });
 
@@ -375,6 +377,7 @@ describe("useGameEvents", () => {
         });
       });
 
+      expect(mockResetPlayState).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith("/en/game/results/TEST123");
     });
 
@@ -387,6 +390,7 @@ describe("useGameEvents", () => {
         });
       });
 
+      expect(mockResetPlayState).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith("/en/game/results/TEST123");
     });
   });

@@ -19,6 +19,7 @@ import { useGameStore } from "@/store/game-store";
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
+import { resetGameStore } from "@/lib/utils/reset-game-store";
 
 interface LobbyClientProps {
   dict: Dictionary;
@@ -217,6 +218,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     } catch {
       // Ignore errors when leaving
     } finally {
+      resetGameStore();
       router.push(`/${lang}`);
     }
   }, [roomCode, currentPlayer, leaveRoom, router, lang]);

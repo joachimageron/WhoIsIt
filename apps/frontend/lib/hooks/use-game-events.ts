@@ -35,6 +35,7 @@ export function useGameEvents({
     addAnswer,
     setConnected,
     eliminateCharacter,
+    resetPlayState,
   } = useGameStore();
 
   const [pendingQuestion, setPendingQuestion] =
@@ -145,6 +146,8 @@ export function useGameEvents({
           ? `${event.result.winnerUsername} won the game!`
           : "Game ended",
       });
+      // Reset play state before navigating to results
+      resetPlayState();
       // Navigate to results page
       router.push(`/${lang}/game/results/${roomCode}`);
     });
@@ -152,7 +155,7 @@ export function useGameEvents({
     return () => {
       unsubscribeGameOver();
     };
-  }, [onGameOver, router, lang, roomCode, dict]);
+  }, [onGameOver, router, lang, roomCode, dict, resetPlayState]);
 
   return {
     pendingQuestion,

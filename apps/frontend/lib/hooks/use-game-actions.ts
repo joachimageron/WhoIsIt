@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import * as gameApi from "@/lib/game-api";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+import { resetGameStore } from "@/lib/utils/reset-game-store";
 
 interface UseGameActionsProps {
   roomCode: string;
@@ -41,6 +42,7 @@ export function useGameActions({
     } catch {
       // Ignore errors when leaving
     } finally {
+      resetGameStore();
       router.push(`/${lang}`);
     }
   }, [roomCode, currentPlayerId, leaveRoom, router, lang]);

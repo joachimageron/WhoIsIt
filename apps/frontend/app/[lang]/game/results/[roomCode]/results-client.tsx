@@ -23,6 +23,7 @@ import {
 import { useAuthStore } from "@/store/auth-store";
 import * as gameApi from "@/lib/game-api";
 import { RoomCodeDisplay } from "@/components/room-code-display";
+import { resetGameStore } from "@/lib/utils/reset-game-store";
 
 interface GameResultsClientProps {
   dict: Dictionary;
@@ -326,7 +327,10 @@ export function GameResultsClient({
           color="primary"
           size="lg"
           startContent={<Icon icon="mdi:plus-circle" width={24} />}
-          onPress={() => router.push(`/${lang}/game/create`)}
+          onPress={() => {
+            resetGameStore();
+            router.push(`/${lang}/game/create`);
+          }}
         >
           {dict.game.results.actions.newGame}
         </Button>
@@ -334,7 +338,10 @@ export function GameResultsClient({
           size="lg"
           startContent={<Icon icon="mdi:home" width={24} />}
           variant="bordered"
-          onPress={() => router.push(`/${lang}`)}
+          onPress={() => {
+            resetGameStore();
+            router.push(`/${lang}`);
+          }}
         >
           {dict.game.results.actions.backToHome}
         </Button>

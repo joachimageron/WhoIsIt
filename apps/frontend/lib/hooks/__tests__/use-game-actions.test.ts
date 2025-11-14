@@ -13,6 +13,7 @@ import { useGameSocket } from "@/lib/hooks/use-game-socket";
 jest.mock("@/lib/game-api");
 jest.mock("@/store/game-store");
 jest.mock("@/lib/hooks/use-game-socket");
+jest.mock("@/lib/utils/reset-game-store");
 
 const mockPush = jest.fn();
 

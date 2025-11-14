@@ -63,6 +63,7 @@ describe("useGameInitialization", () => {
   const mockSetMyCharacter = jest.fn();
   const mockAddQuestion = jest.fn();
   const mockAddAnswer = jest.fn();
+  const mockResetPlayState = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,6 +78,7 @@ describe("useGameInitialization", () => {
       setMyCharacter: mockSetMyCharacter,
       addQuestion: mockAddQuestion,
       addAnswer: mockAddAnswer,
+      resetPlayState: mockResetPlayState,
     } as any);
 
     mockUseAuthStore.mockReturnValue({
