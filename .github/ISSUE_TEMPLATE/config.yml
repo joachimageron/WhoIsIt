@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/joachimageron/WhoIsIt/discussions
+    about: Ask questions, share ideas, or discuss features with the community
+  - name: 📖 Documentation
+    url: https://github.com/joachimageron/WhoIsIt/tree/main/docs
+    about: Browse the comprehensive documentation before opening an issue
+  - name: 🔒 Security Advisory
+    url: https://github.com/joachimageron/WhoIsIt/security/advisories/new
+    about: Report a serious security vulnerability privately

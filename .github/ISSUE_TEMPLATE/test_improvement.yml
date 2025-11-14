@@ -1,0 +1,131 @@
+name: 🧪 Test Improvement
+description: Report weak tests or suggest testing improvements
+title: "[Test]: "
+labels: ["testing", "quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve test quality! Report weak tests or suggest testing improvements.
+        
+        See our [Testing Coverage Strategy](../docs/development/testing-coverage-strategy.md) for guidelines.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Test Area
+      description: Which part of the codebase needs better tests?
+      options:
+        - Backend - Controllers
+        - Backend - Services
+        - Backend - Gateways (WebSocket)
+        - Backend - Authentication
+        - Backend - Database/Repositories
+        - Backend - E2E Tests
+        - Frontend - Components
+        - Frontend - Composables/Hooks
+        - Frontend - API Clients
+        - Frontend - State Management (Zustand)
+        - Integration Tests
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What kind of testing issue is this?
+      options:
+        - Weak Test - Only checks mocks, no behavior validation
+        - Missing Tests - Feature has no tests
+        - Incomplete Coverage - Tests exist but don't cover edge cases
+        - Flaky Test - Test passes/fails inconsistently
+        - Slow Test - Test takes too long to run
+        - Test Enhancement - Suggestion to improve existing tests
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: File Location
+      description: Which file(s) contain the weak/missing tests?
+      placeholder: |
+        apps/backend/src/game/services/game.service.spec.ts
+        apps/frontend/src/components/__tests__/room-code-display.test.tsx
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_state
+    attributes:
+      label: Current State
+      description: |
+        Describe the current test state (if tests exist)
+        For weak tests, explain what they check vs. what they should check
+      placeholder: |
+        The current test only verifies that `repository.save()` was called,
+        but doesn't validate the actual data saved or returned.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Why is the current test inadequate?
+      placeholder: |
+        - Test passes even when feature is broken
+        - Only tests implementation details (mocks) not behavior
+        - Missing error handling scenarios
+        - Doesn't validate actual output/side effects
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Test Behavior
+      description: What should a robust test validate?
+      placeholder: |
+        A robust test should:
+        1. Validate the actual returned data structure
+        2. Test both success and error cases
+        3. Verify side effects (database state, emitted events)
+        4. Fail when the feature is broken
+    validations:
+      required: true
+
+  - type: textarea
+    id: code_example
+    attributes:
+      label: Code Example (Optional)
+      description: |
+        If you have a suggested test implementation, provide it here
+      render: typescript
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: |
+        - Related test files that might need similar improvements
+        - Performance implications
+        - Dependencies or setup requirements
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to contribute the test improvements
+          required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have reviewed the [Testing Coverage Strategy](../docs/development/testing-coverage-strategy.md)
+          required: true
+        - label: I have identified specific test(s) that need improvement
+          required: true
+        - label: I have described what a robust test should validate
+          required: true

@@ -1,0 +1,120 @@
+name: 📚 Documentation
+description: Report missing or incorrect documentation
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the documentation! Report issues or suggest improvements.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Documentation Area
+      description: Which part of the documentation needs attention?
+      options:
+        - Getting Started
+        - Architecture
+        - API Reference (REST)
+        - API Reference (WebSocket)
+        - Backend Documentation
+        - Frontend Documentation
+        - Deployment Guides
+        - Testing Documentation
+        - Security Documentation
+        - README.md
+        - Code Comments
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing Documentation
+        - Incorrect/Outdated Information
+        - Unclear/Confusing
+        - Typo/Grammar
+        - Broken Links
+        - Missing Examples
+        - Needs More Detail
+        - Enhancement Suggestion
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: File/Section Location
+      description: Where is the documentation issue located?
+      placeholder: |
+        File: docs/backend/authentication.md
+        Section: "JWT Token Generation"
+        
+        Or provide a link to the specific section
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: What is wrong or missing?
+      placeholder: Describe what is incorrect, missing, or unclear
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix
+      description: How should the documentation be improved?
+      placeholder: |
+        Provide suggestions for:
+        - Correct information
+        - Additional details needed
+        - Better explanations
+        - Examples that would help
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example/Reference (Optional)
+      description: |
+        Provide examples, code snippets, or references that could help
+      render: markdown
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected by this documentation issue?
+      placeholder: |
+        - New contributors trying to set up the project
+        - Developers working on the backend
+        - Users deploying to production
+        - etc.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to contribute the documentation improvements
+          required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: I have searched for similar documentation issues
+          required: true
+        - label: I have checked the [documentation index](../docs/README.md)
+          required: false

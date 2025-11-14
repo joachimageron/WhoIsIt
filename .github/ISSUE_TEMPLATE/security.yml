@@ -1,0 +1,100 @@
+name: 🔒 Security Issue
+description: Report a security vulnerability (use privately for serious issues)
+title: "[Security]: "
+labels: ["security"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **IMPORTANT:** For serious security vulnerabilities that could be exploited, 
+        please report them privately through GitHub's Security Advisories instead of creating a public issue.
+        
+        Go to: Repository → Security → Report a vulnerability
+        
+        Use this template only for non-critical security improvements or questions.
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity Level
+      description: How severe is this security concern?
+      options:
+        - Low - Informational/Best Practice
+        - Medium - Potential risk with mitigation
+        - High - Should be reported privately
+        - Critical - REPORT PRIVATELY INSTEAD
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the application is affected?
+      options:
+        - Authentication/Authorization
+        - Input Validation
+        - Database Security
+        - API Security
+        - WebSocket Security
+        - Dependency Vulnerability
+        - Environment Variables/Secrets
+        - Docker/Deployment
+        - CORS/CSP
+        - XSS/Injection
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the security concern (avoid exploit details if sensitive)
+      placeholder: What is the security issue or concern?
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Affected Components
+      description: Which files, endpoints, or components are affected?
+      placeholder: |
+        - File: apps/backend/src/auth/...
+        - Endpoint: POST /api/auth/login
+        - Dependency: package-name@version
+
+  - type: textarea
+    id: recommendation
+    attributes:
+      label: Recommended Action
+      description: How should this be addressed?
+      placeholder: |
+        Suggested fixes or mitigations:
+        - Implement input validation
+        - Update dependencies
+        - Add rate limiting
+        - etc.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to relevant security guidelines, CVEs, or documentation
+      placeholder: |
+        - CVE-XXXX-XXXXX
+        - OWASP guideline: https://...
+        - Related documentation: ...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      options:
+        - label: This is NOT a critical vulnerability that should be reported privately
+          required: true
+        - label: I have reviewed the [security documentation](../docs/security/README.md)
+          required: false
+        - label: I have searched for similar security issues
+          required: true
