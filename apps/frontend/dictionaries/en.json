@@ -185,7 +185,11 @@
       "loadingCharacterSets": "Loading character sets...",
       "fillCharacterSet": "Please select a character set",
       "creationFailed": "Failed to create game",
-      "noCharacterSets": "No character sets available"
+      "noCharacterSets": "No character sets available",
+      "authRequired": "Authentication Required",
+      "authRequiredDescription": "To create a game, you must log in or continue as a guest.",
+      "continueAsGuest": "Continue as Guest",
+      "loginButton": "Log In"
     },
     "join": {
       "title": "Join a Game",
@@ -196,7 +200,11 @@
       "enterRoomCode": "Please enter a room code",
       "invalidRoomCode": "Room code must be 5 characters",
       "joinFailed": "Failed to join game",
-      "joining": "Joining game..."
+      "joining": "Joining game...",
+      "authRequired": "Authentication Required",
+      "authRequiredDescription": "To join a game, you must log in or continue as a guest.",
+      "continueAsGuest": "Continue as Guest",
+      "loginButton": "Log In"
     },
     "lobby": {
       "title": "Game Lobby",

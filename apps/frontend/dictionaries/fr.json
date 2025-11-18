@@ -185,7 +185,11 @@
       "loadingCharacterSets": "Chargement des jeux de personnages...",
       "fillCharacterSet": "Veuillez sélectionner un jeu de personnages",
       "creationFailed": "Échec de la création de la partie",
-      "noCharacterSets": "Aucun jeu de personnages disponible"
+      "noCharacterSets": "Aucun jeu de personnages disponible",
+      "authRequired": "Authentification requise",
+      "authRequiredDescription": "Pour créer une partie, vous devez vous connecter ou continuer en tant qu'invité.",
+      "continueAsGuest": "Continuer en tant qu'invité",
+      "loginButton": "Se connecter"
     },
     "join": {
       "title": "Rejoindre une Partie",
@@ -196,7 +200,11 @@
       "enterRoomCode": "Veuillez entrer un code de partie",
       "invalidRoomCode": "Le code doit contenir 5 caractères",
       "joinFailed": "Échec de la connexion à la partie",
-      "joining": "Connexion en cours..."
+      "joining": "Connexion en cours...",
+      "authRequired": "Authentification requise",
+      "authRequiredDescription": "Pour rejoindre une partie, vous devez vous connecter ou continuer en tant qu'invité.",
+      "continueAsGuest": "Continuer en tant qu'invité",
+      "loginButton": "Se connecter"
     },
     "lobby": {
       "title": "Lobby de Jeu",
