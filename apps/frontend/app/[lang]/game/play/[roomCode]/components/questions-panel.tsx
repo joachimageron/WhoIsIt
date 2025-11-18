@@ -111,7 +111,7 @@ export function QuestionsPanel({
         <h2 className="text-lg font-semibold">
           {dict.game.play.questions.questionsPanel}
         </h2>
-                {/* Show opponent name in 2-player mode */}
+        {/* Show opponent name in 2-player mode */}
         {otherPlayers.length > 0 && (
           <p className="text-sm text-default-600">
             Asking:{" "}
