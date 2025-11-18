@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomBytes } from 'crypto';
 import {
   GamePlayerRole,
   GameStatus,
@@ -357,8 +358,9 @@ export class GameLobbyService {
   private createRoomCodeCandidate(): string {
     const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
     let code = '';
+    const randomBytesBuffer = randomBytes(GameLobbyService.ROOM_CODE_LENGTH);
     for (let i = 0; i < GameLobbyService.ROOM_CODE_LENGTH; i += 1) {
-      const index = Math.floor(Math.random() * alphabet.length);
+      const index = randomBytesBuffer[i] % alphabet.length;
       code += alphabet[index];
     }
     return code;

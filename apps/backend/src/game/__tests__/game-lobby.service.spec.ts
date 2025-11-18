@@ -745,4 +745,72 @@ describe('GameLobbyService', () => {
       expect(result.players).toHaveLength(0);
     });
   });
+
+  describe('room code generation', () => {
+    it('should generate room codes with correct format and high randomness', async () => {
+      // Test the actual room code generation multiple times
+      const codes = new Set<string>();
+      const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+      
+      // Generate 50 games and collect their room codes
+      for (let i = 0; i < 50; i++) {
+        characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
+        // Always report room code doesn't exist so we get a new one
+        gameRepository.exists.mockResolvedValue(false);
+        
+        // Capture the room code when create is called
+        let capturedRoomCode: string | undefined;
+        gameRepository.create.mockImplementation((game: Partial<Game>) => {
+          capturedRoomCode = game.roomCode;
+          return { ...mockGame, roomCode: game.roomCode } as Game;
+        });
+        
+        gameRepository.save.mockImplementation((game: Game) => {
+          return Promise.resolve(game);
+        });
+        
+        const mockHostPlayer = {
+          id: `player-${i}`,
+          username: 'testuser',
+          role: GamePlayerRole.HOST,
+          isReady: true,
+        } as GamePlayer;
+        
+        playerRepository.create.mockReturnValue(mockHostPlayer);
+        playerRepository.save.mockResolvedValue(mockHostPlayer);
+        
+        gameRepository.findOne.mockImplementation(({ where }: any) => {
+          if (where?.id) {
+            return Promise.resolve({
+              ...mockGame,
+              roomCode: capturedRoomCode,
+              players: [mockHostPlayer],
+            } as Game);
+          }
+          return Promise.resolve(null);
+        });
+
+        const result = await service.createGame({
+          characterSetId: 'char-set-1',
+          hostUsername: 'testuser',
+        });
+        
+        // Verify room code properties
+        expect(result.roomCode).toBeDefined();
+        expect(result.roomCode).toHaveLength(5);
+        
+        // Verify all characters are from the allowed alphabet
+        for (const char of result.roomCode) {
+          expect(alphabet).toContain(char);
+        }
+        
+        codes.add(result.roomCode);
+      }
+      
+      // With cryptographically secure random, we should have very high diversity
+      // 50 codes with 5 characters from 32-char alphabet should be mostly unique
+      // (32^5 = 33,554,432 possible combinations, collision probability is very low)
+      expect(codes.size).toBeGreaterThan(48);
+    });
+  });
 });
