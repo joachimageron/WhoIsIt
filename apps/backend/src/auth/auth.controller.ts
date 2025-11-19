@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Patch,
   Post,
@@ -27,7 +28,7 @@ export interface RequestWithUser extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   // Stricter rate limiting for registration: 3 attempts per minute
   @Throttle({ default: { limit: 3, ttl: 60000 } })
@@ -112,8 +113,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Response({ passthrough: false }) res: ExpressResponse) {
-    // Clear the access_token cookie
+    // Clear both access_token and guest_token cookies
     res.clearCookie('access_token');
+    res.clearCookie('guest_token');
     return res.json({ message: 'Logged out successfully' });
   }
 
@@ -154,10 +156,11 @@ export class AuthController {
     @Request() req: RequestWithUser,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    const user = await this.authService.updateProfile(
-      req.user.id,
-      updateProfileDto,
-    );
+    if (req.user.isGuest) {
+      throw new ForbiddenException('Guest users cannot update profile');
+    }
+
+    const user = await this.authService.updateProfile(req.user.id, updateProfileDto);
 
     return {
       id: user.id,
@@ -176,5 +179,27 @@ export class AuthController {
   ) {
     await this.authService.changePassword(req.user.id, changePasswordDto);
     return { message: 'Password changed successfully' };
+  }
+
+  // Rate limiting for guest creation: 10 attempts per minute
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post('guest')
+  async createGuest(
+    @Response({ passthrough: false }) res: ExpressResponse,
+  ) {
+    const result = await this.authService.createGuest();
+
+    // Set JWT token as HTTP-only cookie with guest_token name
+    res.cookie('guest_token', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    });
+
+    // Return user data without the token in the response body
+    return res.json({
+      user: result.user,
+    });
   }
 }

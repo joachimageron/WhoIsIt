@@ -49,12 +49,6 @@ export function ProfileForm({ dict, lang }: ProfileFormProps) {
 
   // Initialize form with user data
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push(`/${lang}/auth/login`);
-
-      return;
-    }
-
     if (user) {
       setProfileData({
         username: user.username || "",

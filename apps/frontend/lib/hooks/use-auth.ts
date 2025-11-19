@@ -14,7 +14,7 @@ export const useAuth = () => {
     isLoading,
     isAuthenticated,
     isGuest,
-    initializeAuth,
+    logout,
   } = useAuthStore();
 
   useEffect(() => {
@@ -27,8 +27,8 @@ export const useAuth = () => {
 
           setUser(profile);
         } catch {
-          // User is not authenticated with JWT, check for guest session
-          initializeAuth();
+          // Not authenticated - empty state
+          logout();
         } finally {
           setLoading(false);
         }
@@ -36,19 +36,30 @@ export const useAuth = () => {
 
       checkAuth();
     }
-  }, [user, setUser, setLoading, initializeAuth]);
+  }, [user, setUser, setLoading]);
 
   const handleLogout = async () => {
     setLoading(true);
     try {
-      // Only call API logout if user is authenticated (not guest)
-      if (isAuthenticated) {
-        await authApi.logout();
-      }
-      useAuthStore.getState().logout();
+      // Call API logout to clear server-side cookies
+      await authApi.logout();
+      logout();
     } catch {
       // Silently fail - user will remain logged in on the frontend
       // This is acceptable as the server-side cookie is still cleared
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createGuestSession = async () => {
+    setLoading(true);
+    try {
+      const guestUser = await authApi.createGuest();
+
+      setUser(guestUser);
+
+      return guestUser;
     } finally {
       setLoading(false);
     }
@@ -60,5 +71,6 @@ export const useAuth = () => {
     isGuest,
     isLoading,
     logout: handleLogout,
+    createGuestSession,
   };
 };

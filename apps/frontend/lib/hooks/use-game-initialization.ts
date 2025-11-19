@@ -8,7 +8,6 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
-import { getGuestSession } from "@/lib/guest-session";
 
 interface UseGameInitializationProps {
   roomCode: string;
@@ -29,7 +28,6 @@ export function useGameInitialization({
     setMyCharacter,
     addQuestion,
     addAnswer,
-    resetPlayState,
   } = useGameStore();
   const { user } = useAuthStore();
 
@@ -39,20 +37,8 @@ export function useGameInitialization({
 
   useEffect(() => {
     const initGame = async () => {
-      // Check if user is authenticated or is a guest
-      const guestSession = getGuestSession();
-      const currentUser =
-        user ||
-        (guestSession
-          ? {
-              id: guestSession.id,
-              username: guestSession.username,
-              email: "",
-              avatarUrl: null,
-            }
-          : null);
-
-      if (!currentUser) {
+      // Check if user exists (authenticated or guest)
+      if (!user) {
         // No authenticated user and no guest session
         setIsLoading(false);
 
@@ -62,18 +48,14 @@ export function useGameInitialization({
       try {
         setIsLoading(true);
 
-        // Reset play state when initializing a new game session
-        resetPlayState();
-
-        // Get game state
+        // Get game state (resetPlayState is now handled automatically in setGameState when roomCode changes)
         const gameState = await gameApi.getGameState(roomCode);
 
         setGameState(gameState);
 
         // Find current player - check both username and userId
         const player = gameState.players.find(
-          (p) =>
-            p.username === currentUser.username || p.userId === currentUser.id,
+          (p) => p.username === user.username || p.userId === user.id,
         );
 
         if (player) {

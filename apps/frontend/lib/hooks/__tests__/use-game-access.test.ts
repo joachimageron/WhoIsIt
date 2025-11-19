@@ -3,19 +3,9 @@ import { renderHook } from "@testing-library/react";
 import { useGameAccess } from "../use-game-access";
 import { useAuth } from "../use-auth";
 
-import { useAuthStore } from "@/store/auth-store";
-
 // Mock useAuth hook
 jest.mock("../use-auth");
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-
-// Mock auth store
-jest.mock("@/store/auth-store", () => ({
-  useAuthStore: jest.fn(),
-}));
-const mockUseAuthStore = useAuthStore as jest.MockedFunction<
-  typeof useAuthStore
->;
 
 // Mock guest-session
 jest.mock("@/lib/guest-session", () => ({
@@ -30,15 +20,19 @@ jest.mock("@/lib/guest-session", () => ({
 }));
 
 describe("useGameAccess", () => {
-  const mockSetGuestUser = jest.fn();
+  const mockCreateGuestSession = jest.fn();
   const mockLogout = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    mockUseAuthStore.mockReturnValue({
-      setGuestUser: mockSetGuestUser,
-    } as any);
+    mockCreateGuestSession.mockResolvedValue({
+      id: "guest-123",
+      email: "",
+      username: "GuestPlayer",
+      avatarUrl: null,
+      isGuest: true,
+    });
 
     mockUseAuth.mockReturnValue({
       user: null,
@@ -46,6 +40,7 @@ describe("useGameAccess", () => {
       isGuest: false,
       isLoading: false,
       logout: mockLogout,
+      createGuestSession: mockCreateGuestSession,
     });
   });
 
@@ -62,6 +57,7 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -82,6 +78,7 @@ describe("useGameAccess", () => {
         isGuest: true,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -97,7 +94,7 @@ describe("useGameAccess", () => {
   });
 
   describe("ensureGameAccess", () => {
-    it("returns true when user is already authenticated", () => {
+    it("returns true when user is already authenticated", async () => {
       mockUseAuth.mockReturnValue({
         user: {
           id: "user-1",
@@ -109,15 +106,16 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
 
-      expect(result.current.ensureGameAccess()).toBe(true);
-      expect(mockSetGuestUser).not.toHaveBeenCalled();
+      expect(await result.current.ensureGameAccess()).toBe(true);
+      expect(mockCreateGuestSession).not.toHaveBeenCalled();
     });
 
-    it("returns true when user is already guest", () => {
+    it("returns true when user is already guest", async () => {
       mockUseAuth.mockReturnValue({
         user: {
           id: "guest-1",
@@ -130,26 +128,35 @@ describe("useGameAccess", () => {
         isGuest: true,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
 
-      expect(result.current.ensureGameAccess()).toBe(true);
-      expect(mockSetGuestUser).not.toHaveBeenCalled();
+      expect(await result.current.ensureGameAccess()).toBe(true);
+      expect(mockCreateGuestSession).not.toHaveBeenCalled();
     });
 
-    it("creates guest session when username provided and not authenticated", () => {
+    it("creates guest session when username provided and not authenticated", async () => {
       const { result } = renderHook(() => useGameAccess());
 
-      expect(result.current.ensureGameAccess("GuestPlayer")).toBe(true);
-      expect(mockSetGuestUser).toHaveBeenCalledWith("GuestPlayer");
+      expect(await result.current.ensureGameAccess("GuestPlayer")).toBe(true);
+      expect(mockCreateGuestSession).toHaveBeenCalledWith("GuestPlayer");
     });
 
-    it("returns false when no username provided and not authenticated", () => {
+    it("returns false when no username provided and not authenticated", async () => {
       const { result } = renderHook(() => useGameAccess());
 
-      expect(result.current.ensureGameAccess()).toBe(false);
-      expect(mockSetGuestUser).not.toHaveBeenCalled();
+      expect(await result.current.ensureGameAccess()).toBe(false);
+      expect(mockCreateGuestSession).not.toHaveBeenCalled();
+    });
+
+    it("returns false when guest creation fails", async () => {
+      mockCreateGuestSession.mockRejectedValue(new Error("Failed"));
+      const { result } = renderHook(() => useGameAccess());
+
+      expect(await result.current.ensureGameAccess("GuestPlayer")).toBe(false);
+      expect(mockCreateGuestSession).toHaveBeenCalledWith("GuestPlayer");
     });
   });
 

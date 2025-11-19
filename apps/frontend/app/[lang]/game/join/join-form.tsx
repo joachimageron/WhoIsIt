@@ -9,9 +9,16 @@ import { Input } from "@heroui/input";
 import { Link } from "@heroui/link";
 import { addToast } from "@heroui/toast";
 import { Form } from "@heroui/form";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@heroui/modal";
 
 import * as gameApi from "@/lib/game-api";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "@/lib/hooks/use-auth";
 
 interface JoinFormProps {
   dict: Dictionary;
@@ -20,10 +27,12 @@ interface JoinFormProps {
 
 export function JoinForm({ dict, lang }: JoinFormProps) {
   const router = useRouter();
-  const { user, setGuestUser } = useAuthStore();
+  const { user, createGuestSession } = useAuth();
   const [roomCode, setRoomCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingRoomCode, setPendingRoomCode] = useState<string | null>(null);
 
   const validateRoomCode = (code: string): boolean => {
     // Room codes should be exactly 5 characters (uppercase alphanumeric)
@@ -48,32 +57,33 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
       return;
     }
 
+    // Check if user is authenticated
+    if (!user) {
+      // Show auth modal if no user
+      setPendingRoomCode(trimmedCode);
+      setShowAuthModal(true);
+
+      return;
+    }
+
+    // User is authenticated, proceed with join
+    await joinGameWithUser(trimmedCode);
+  };
+
+  const joinGameWithUser = async (code: string) => {
     setIsLoading(true);
 
     try {
-      // Join the game with user info if authenticated, or as guest
-      let joinData;
+      const joinData = {
+        username: user!.username,
+        userId: user!.id,
+        avatarUrl: user!.avatarUrl || undefined,
+      };
 
-      if (user) {
-        joinData = {
-          username: user.username,
-          userId: user.id,
-          avatarUrl: user.avatarUrl || undefined,
-        };
-      } else {
-        // Create a guest user session
-        const guestUsername = `Guest-${Math.random().toString(36).substring(2, 7)}`;
-
-        setGuestUser(guestUsername);
-        joinData = {
-          username: guestUsername,
-        };
-      }
-
-      await gameApi.joinGame(trimmedCode, joinData);
+      await gameApi.joinGame(code, joinData);
 
       // Redirect to lobby page
-      router.push(`/${lang}/game/lobby/${trimmedCode}`);
+      router.push(`/${lang}/game/lobby/${code}`);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : dict.game.join.joinFailed;
@@ -82,6 +92,39 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleContinueAsGuest = async () => {
+    setShowAuthModal(false);
+    setIsLoading(true);
+
+    try {
+      // Create guest session without username - backend will generate it
+      const guestUser = await createGuestSession();
+
+      // Join the game with the newly created guest user
+      const joinData = {
+        username: guestUser.username,
+      };
+
+      await gameApi.joinGame(pendingRoomCode!, joinData);
+
+      // Redirect to lobby page
+      router.push(`/${lang}/game/lobby/${pendingRoomCode}`);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : dict.game.join.joinFailed;
+
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setPendingRoomCode(null);
+    }
+  };
+
+  const handleLogin = () => {
+    setShowAuthModal(false);
+    router.push(`/${lang}/auth/login`);
   };
 
   useEffect(() => {
@@ -95,34 +138,62 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
   }, [error, dict]);
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
-        <p className="pb-4 text-left text-3xl font-semibold">
-          {dict.game.join.title}
-        </p>
-        <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <Input
-            isRequired
-            label={dict.game.join.roomCode}
-            labelPlacement="outside"
-            maxLength={5}
-            name="roomCode"
-            placeholder={dict.game.join.roomCodePlaceholder}
-            type="text"
-            value={roomCode}
-            variant="bordered"
-            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-          />
-          <Button fullWidth color="primary" isLoading={isLoading} type="submit">
-            {isLoading ? dict.game.join.joining : dict.game.join.joinButton}
-          </Button>
-        </Form>
-        <p className="text-small text-center">
-          <Link href={`/${lang}`} size="sm">
-            {dict.game.join.backToHome}
-          </Link>
-        </p>
+    <>
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="rounded-large flex w-full max-w-sm flex-col gap-4 px-8 pt-6 pb-10">
+          <p className="pb-4 text-left text-3xl font-semibold">
+            {dict.game.join.title}
+          </p>
+          <Form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <Input
+              isRequired
+              label={dict.game.join.roomCode}
+              labelPlacement="outside"
+              maxLength={5}
+              name="roomCode"
+              placeholder={dict.game.join.roomCodePlaceholder}
+              type="text"
+              value={roomCode}
+              variant="bordered"
+              onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+            />
+            <Button
+              fullWidth
+              color="primary"
+              isLoading={isLoading}
+              type="submit"
+            >
+              {isLoading ? dict.game.join.joining : dict.game.join.joinButton}
+            </Button>
+          </Form>
+          <p className="text-small text-center">
+            <Link href={`/${lang}`} size="sm">
+              {dict.game.join.backToHome}
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+
+      <Modal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)}>
+        <ModalContent>
+          <ModalHeader>{dict.game.join.authRequired}</ModalHeader>
+          <ModalBody>
+            <p>{dict.game.join.authRequiredDescription}</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              variant="light"
+              onPress={handleContinueAsGuest}
+            >
+              {dict.game.join.continueAsGuest}
+            </Button>
+            <Button color="primary" onPress={handleLogin}>
+              {dict.game.join.loginButton}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }

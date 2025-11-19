@@ -8,14 +8,12 @@ import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
-import { getGuestSession } from "@/lib/guest-session";
 
 // Mock dependencies
 jest.mock("@/lib/game-api");
 jest.mock("@/store/auth-store");
 jest.mock("@/store/game-store");
 jest.mock("@/lib/hooks/use-game-socket");
-jest.mock("@/lib/guest-session");
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
     push: mockPush,
@@ -34,9 +32,6 @@ const mockUseGameStore = useGameStore as jest.MockedFunction<
 >;
 const mockUseGameSocket = useGameSocket as jest.MockedFunction<
   typeof useGameSocket
->;
-const mockGetGuestSession = getGuestSession as jest.MockedFunction<
-  typeof getGuestSession
 >;
 const mockPush = jest.fn();
 
@@ -84,8 +79,6 @@ describe("useGameInitialization", () => {
     mockUseAuthStore.mockReturnValue({
       user: null,
     } as any);
-
-    mockGetGuestSession.mockReturnValue(null);
   });
 
   describe("initialization with authenticated user", () => {
@@ -162,14 +155,17 @@ describe("useGameInitialization", () => {
 
   describe("initialization with guest user", () => {
     it("loads game state for guest user", async () => {
-      const mockGuestSession = {
+      const mockGuestUser = {
         id: "guest-1",
+        email: "",
         username: "guestuser",
-        createdAt: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000,
+        avatarUrl: null,
+        isGuest: true,
       };
 
-      mockGetGuestSession.mockReturnValue(mockGuestSession);
+      mockUseAuthStore.mockReturnValue({
+        user: mockGuestUser,
+      } as any);
 
       const mockGameState = {
         id: "game-1",

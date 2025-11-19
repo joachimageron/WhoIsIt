@@ -12,6 +12,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 // Type for the serialized playState (with arrays instead of Sets/Maps)
 type SerializedGamePlayState = {
+  roomCode: string | null;
   gameState: null;
   characters: [];
   questions: [];
@@ -22,6 +23,7 @@ type SerializedGamePlayState = {
 };
 
 export interface GamePlayState {
+  roomCode: string | null;
   gameState: GameStateResponse | null;
   characters: CharacterResponseDto[];
   questions: QuestionResponse[];
@@ -57,10 +59,19 @@ export const useGameStore = create<GameState>()(
       setLobby: (lobby) => set({ lobby }),
       setConnected: (isConnected) => set({ isConnected }),
       setGameState: (gameState) =>
-        set((state) => ({
-          playState: state.playState
-            ? { ...state.playState, gameState }
-            : {
+        set((state) => {
+          const newRoomCode = gameState?.roomCode ?? null;
+          const currentRoomCode = state.playState?.roomCode ?? null;
+
+          // Reset playState if roomCode changed
+          if (
+            currentRoomCode &&
+            newRoomCode &&
+            currentRoomCode !== newRoomCode
+          ) {
+            return {
+              playState: {
+                roomCode: newRoomCode,
                 gameState,
                 characters: [],
                 questions: [],
@@ -69,40 +80,60 @@ export const useGameStore = create<GameState>()(
                 flippedCharacterIds: new Set(),
                 myCharacter: null,
               },
-        })),
-      setCharacters: (characters) =>
-        set((state) => ({
-          playState: state.playState
-            ? { ...state.playState, characters }
-            : {
-                gameState: null,
-                characters,
+            };
+          }
+
+          return {
+            playState: state.playState
+              ? { ...state.playState, gameState, roomCode: newRoomCode }
+              : {
+                roomCode: newRoomCode,
+                gameState,
+                characters: [],
                 questions: [],
                 answers: new Map(),
                 eliminatedCharacterIds: new Set(),
                 flippedCharacterIds: new Set(),
                 myCharacter: null,
               },
+          };
+        }),
+      setCharacters: (characters) =>
+        set((state) => ({
+          playState: state.playState
+            ? { ...state.playState, characters }
+            : {
+              roomCode: null,
+              gameState: null,
+              characters,
+              questions: [],
+              answers: new Map(),
+              eliminatedCharacterIds: new Set(),
+              flippedCharacterIds: new Set(),
+              myCharacter: null,
+            },
         })),
       setMyCharacter: (myCharacter) =>
         set((state) => ({
           playState: state.playState
             ? { ...state.playState, myCharacter }
             : {
-                gameState: null,
-                characters: [],
-                questions: [],
-                answers: new Map(),
-                eliminatedCharacterIds: new Set(),
-                flippedCharacterIds: new Set(),
-                myCharacter,
-              },
+              roomCode: null,
+              gameState: null,
+              characters: [],
+              questions: [],
+              answers: new Map(),
+              eliminatedCharacterIds: new Set(),
+              flippedCharacterIds: new Set(),
+              myCharacter,
+            },
         })),
       addQuestion: (question) =>
         set((state) => {
           if (!state.playState) {
             return {
               playState: {
+                roomCode: null,
                 gameState: null,
                 characters: [],
                 questions: [question],
@@ -198,6 +229,7 @@ export const useGameStore = create<GameState>()(
         // Convert Sets to arrays for JSON serialization
         return {
           playState: {
+            roomCode: state.playState.roomCode, // Persist roomCode to detect changes
             gameState: null, // Don't persist - comes from server
             characters: [], // Don't persist - comes from server
             questions: [], // Don't persist - comes from server
@@ -225,6 +257,7 @@ export const useGameStore = create<GameState>()(
         return {
           ...currentState,
           playState: {
+            roomCode: persisted.playState.roomCode,
             gameState: null,
             characters: [],
             questions: [],

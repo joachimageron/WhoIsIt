@@ -23,7 +23,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly authTokenService: AuthTokenService,
     private readonly authProfileService: AuthProfileService,
-  ) {}
+  ) { }
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, username, password } = registerDto;
@@ -84,6 +84,7 @@ export class AuthService {
       sub: user.id,
       email: user.email ?? null,
       username: user.username,
+      isGuest: false,
     };
     const accessToken = this.jwtService.sign(payload);
 
@@ -126,6 +127,7 @@ export class AuthService {
       sub: user.id,
       email: user.email ?? null,
       username: user.username,
+      isGuest: user.isGuest || false,
     };
 
     const accessToken = this.jwtService.sign(payload);
@@ -187,5 +189,57 @@ export class AuthService {
 
   async getGameHistory(userId: string, limit: number, offset: number) {
     return this.authProfileService.getGameHistory(userId, limit, offset);
+  }
+
+  async createGuest(): Promise<AuthResponseDto> {
+    let username: string;
+    let existingUser: User | null;
+    let attempts = 0;
+
+    do {
+      username = `Guest-${Math.random().toString(36).substring(2, 8)}`;
+      existingUser = await this.userRepository.findOne({
+        where: { username },
+      });
+      attempts += 1;
+    } while (existingUser && attempts < 5);
+
+    if (existingUser) {
+      throw new ConflictException('Unable to generate unique guest username');
+    }
+
+    // Select random avatar for guest
+    // const avatarNumber = Math.floor(Math.random() * 18);
+    // const avatarUrl = `/avatar/avatar_${avatarNumber}.jpg`;
+
+    // Create guest user (no email, no password)
+    const user = this.userRepository.create({
+      username,
+      // avatarUrl,
+      isGuest: true,
+      emailVerified: false,
+      lastSeenAt: new Date(),
+    });
+
+    await this.userRepository.save(user);
+
+    // Generate JWT
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: null,
+      username: user.username,
+      isGuest: true,
+    };
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      accessToken,
+      user: {
+        id: user.id,
+        email: null,
+        username: user.username,
+        avatarUrl: user.avatarUrl ?? null,
+      },
+    };
   }
 }

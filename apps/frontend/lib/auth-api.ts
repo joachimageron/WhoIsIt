@@ -274,6 +274,31 @@ export const changePassword = async (
 };
 
 /**
+ * Create a guest user session
+ */
+export const createGuest = async (): Promise<User> => {
+  const response = await fetch(`${API_URL}/auth/guest`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: "Failed to create guest session" }));
+
+    throw new Error(error.message || "Failed to create guest session");
+  }
+
+  const { user }: AuthResponse = await response.json();
+
+  return user;
+};
+
+/**
  * Get player statistics
  */
 export const getPlayerStats = async (): Promise<PlayerStats> => {

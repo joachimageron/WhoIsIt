@@ -203,6 +203,10 @@ export interface Dictionary {
       fillCharacterSet: string;
       creationFailed: string;
       noCharacterSets: string;
+      authRequired: string;
+      authRequiredDescription: string;
+      continueAsGuest: string;
+      loginButton: string;
     };
     join: {
       title: string;
@@ -214,6 +218,10 @@ export interface Dictionary {
       invalidRoomCode: string;
       joinFailed: string;
       joining: string;
+      authRequired: string;
+      authRequiredDescription: string;
+      continueAsGuest: string;
+      loginButton: string;
     };
     lobby: {
       title: string;
