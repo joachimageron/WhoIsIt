@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { LobbyCleanupService } from '../services/lobby-cleanup.service';
 import { GameService } from '../services/game.service';
 import { ConnectionManager } from '../gateway/connection.manager';
@@ -9,6 +11,7 @@ import { Game } from '../../database/entities';
 describe('LobbyCleanupService', () => {
   let service: LobbyCleanupService;
   let gameService: jest.Mocked<GameService>;
+  let gameRepository: jest.Mocked<Repository<Game>>;
   let connectionManager: jest.Mocked<ConnectionManager>;
   let mockServer: any;
 
@@ -26,6 +29,11 @@ describe('LobbyCleanupService', () => {
       getGameByRoomCode: jest.fn(),
     };
 
+    const mockGameRepository = {
+      find: jest.fn(),
+      remove: jest.fn(),
+    };
+
     const mockConnectionManager = {
       getConnection: jest.fn(),
     };
@@ -33,6 +41,10 @@ describe('LobbyCleanupService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LobbyCleanupService,
+        {
+          provide: getRepositoryToken(Game),
+          useValue: mockGameRepository,
+        },
         {
           provide: GameService,
           useValue: mockGameService,
@@ -45,6 +57,9 @@ describe('LobbyCleanupService', () => {
     }).compile();
 
     service = module.get<LobbyCleanupService>(LobbyCleanupService);
+    gameRepository = module.get(getRepositoryToken(Game)) as jest.Mocked<
+      Repository<Game>
+    >;
     gameService = module.get(GameService) as jest.Mocked<GameService>;
     connectionManager = module.get(
       ConnectionManager,
@@ -147,7 +162,7 @@ describe('LobbyCleanupService', () => {
       expect(gameService.getGameByRoomCode).not.toHaveBeenCalled();
     });
 
-    it('should check inactive lobbies', async () => {
+    it('should check inactive lobbies and delete old ones', async () => {
       const roomCode = 'ABC12';
       const socketId = 'socket123';
       const sockets = new Set([socketId]);
@@ -157,21 +172,27 @@ describe('LobbyCleanupService', () => {
       connectionManager.getConnection.mockReturnValue(null);
 
       const oldGame = {
+        id: 'game-id-1',
         roomCode,
         status: GameStatus.LOBBY,
-        createdAt: new Date(Date.now() - 31 * 60 * 1000), // 31 minutes ago
+        createdAt: new Date(Date.now() - 61 * 60 * 1000), // 61 minutes ago (> 1 hour)
       } as Game;
 
       gameService.getGameByRoomCode.mockResolvedValue(oldGame);
+      gameRepository.remove.mockResolvedValue(oldGame);
 
       await (service as any).cleanupAbandonedLobbies();
 
       expect(gameService.getGameByRoomCode).toHaveBeenCalledWith(roomCode);
+      expect(gameRepository.remove).toHaveBeenCalledWith(oldGame);
       expect(Logger.prototype.log).toHaveBeenCalledWith(
         expect.stringContaining('Found 1 potentially inactive lobbies'),
       );
       expect(Logger.prototype.log).toHaveBeenCalledWith(
         expect.stringContaining('Cleaning up abandoned lobby: ABC12'),
+      );
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Deleted abandoned lobby: ABC12'),
       );
     });
 
@@ -186,7 +207,7 @@ describe('LobbyCleanupService', () => {
       const recentGame = {
         roomCode,
         status: GameStatus.LOBBY,
-        createdAt: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+        createdAt: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago (< 1 hour)
       } as Game;
 
       gameService.getGameByRoomCode.mockResolvedValue(recentGame);
@@ -194,6 +215,7 @@ describe('LobbyCleanupService', () => {
       await (service as any).cleanupAbandonedLobbies();
 
       expect(gameService.getGameByRoomCode).toHaveBeenCalledWith(roomCode);
+      expect(gameRepository.remove).not.toHaveBeenCalled();
       // Should not log cleanup message
       const logCalls = (Logger.prototype.log as jest.Mock).mock.calls;
       const hasCleanupMessage = logCalls.some((call) =>
@@ -213,7 +235,7 @@ describe('LobbyCleanupService', () => {
       const activeGame = {
         roomCode,
         status: GameStatus.IN_PROGRESS,
-        createdAt: new Date(Date.now() - 31 * 60 * 1000), // 31 minutes ago
+        createdAt: new Date(Date.now() - 61 * 60 * 1000), // 61 minutes ago
       } as Game;
 
       gameService.getGameByRoomCode.mockResolvedValue(activeGame);
@@ -221,6 +243,7 @@ describe('LobbyCleanupService', () => {
       await (service as any).cleanupAbandonedLobbies();
 
       expect(gameService.getGameByRoomCode).toHaveBeenCalledWith(roomCode);
+      expect(gameRepository.remove).not.toHaveBeenCalled();
       // Should not log cleanup message for in-progress games
       const logCalls = (Logger.prototype.log as jest.Mock).mock.calls;
       const hasCleanupMessage = logCalls.some((call) =>
@@ -276,6 +299,125 @@ describe('LobbyCleanupService', () => {
 
       expect(Logger.prototype.error).toHaveBeenCalledWith(
         'Error in cleanupAbandonedLobbies:',
+        error,
+      );
+    });
+  });
+
+  describe('cleanupCompletedGames', () => {
+    it('should cleanup completed games older than 7 days', async () => {
+      const oldCompletedGame = {
+        id: 'game-id-1',
+        roomCode: 'ABC12',
+        status: GameStatus.COMPLETED,
+        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+        endedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      } as Game;
+
+      gameRepository.find.mockResolvedValue([oldCompletedGame]);
+      gameRepository.remove.mockResolvedValue(oldCompletedGame);
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(gameRepository.find).toHaveBeenCalled();
+      expect(gameRepository.remove).toHaveBeenCalledWith(oldCompletedGame);
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Found 1 completed/aborted games older than 7 days'),
+      );
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Cleaning up completed game: ABC12'),
+      );
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Deleted completed game: ABC12'),
+      );
+    });
+
+    it('should cleanup aborted games older than 7 days', async () => {
+      const oldAbortedGame = {
+        id: 'game-id-2',
+        roomCode: 'XYZ99',
+        status: GameStatus.ABORTED,
+        createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000), // 8 days ago
+        endedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+      } as Game;
+
+      gameRepository.find.mockResolvedValue([oldAbortedGame]);
+      gameRepository.remove.mockResolvedValue(oldAbortedGame);
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(gameRepository.find).toHaveBeenCalled();
+      expect(gameRepository.remove).toHaveBeenCalledWith(oldAbortedGame);
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Cleaning up completed game: XYZ99'),
+      );
+    });
+
+    it('should cleanup multiple old games', async () => {
+      const oldGames = [
+        {
+          id: 'game-id-1',
+          roomCode: 'ABC12',
+          status: GameStatus.COMPLETED,
+          endedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        },
+        {
+          id: 'game-id-2',
+          roomCode: 'XYZ99',
+          status: GameStatus.ABORTED,
+          endedAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000),
+        },
+      ] as Game[];
+
+      gameRepository.find.mockResolvedValue(oldGames);
+      gameRepository.remove.mockImplementation((game) => Promise.resolve(game));
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(gameRepository.find).toHaveBeenCalled();
+      expect(gameRepository.remove).toHaveBeenCalledTimes(2);
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
+        expect.stringContaining('Found 2 completed/aborted games older than 7 days'),
+      );
+    });
+
+    it('should not cleanup recent completed games', async () => {
+      gameRepository.find.mockResolvedValue([]);
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(gameRepository.find).toHaveBeenCalled();
+      expect(gameRepository.remove).not.toHaveBeenCalled();
+    });
+
+    it('should handle errors when cleaning up individual games', async () => {
+      const oldGame = {
+        id: 'game-id-1',
+        roomCode: 'ABC12',
+        status: GameStatus.COMPLETED,
+        endedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+      } as Game;
+
+      gameRepository.find.mockResolvedValue([oldGame]);
+      const error = new Error('Database error');
+      gameRepository.remove.mockRejectedValue(error);
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
+        expect.stringContaining('Error cleaning up game ABC12:'),
+        error,
+      );
+    });
+
+    it('should handle errors in the cleanup process', async () => {
+      const error = new Error('Find error');
+      gameRepository.find.mockRejectedValue(error);
+
+      await (service as any).cleanupCompletedGames();
+
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
+        'Error in cleanupCompletedGames:',
         error,
       );
     });
