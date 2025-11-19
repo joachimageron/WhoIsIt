@@ -120,6 +120,7 @@ describe('Game Turn Change Logic', () => {
     guessRepository = {
       create: jest.fn(),
       save: jest.fn(),
+      count: jest.fn(),
     };
 
     gameLobbyService = {
@@ -379,6 +380,7 @@ describe('Game Turn Change Logic', () => {
 
       guessRepository.create.mockReturnValue(mockGuess);
       guessRepository.save.mockResolvedValue(mockGuess);
+      guessRepository.count.mockResolvedValue(0);
 
       // Mock the guess retrieval for game.service.ts
       gameRepository.manager.findOne.mockResolvedValue({
@@ -469,6 +471,7 @@ describe('Game Turn Change Logic', () => {
 
       guessRepository.create.mockReturnValue(mockGuess);
       guessRepository.save.mockResolvedValue(mockGuess);
+      guessRepository.count.mockResolvedValue(0);
 
       // Mock the guess retrieval for game.service.ts
       gameRepository.manager.findOne.mockResolvedValue({

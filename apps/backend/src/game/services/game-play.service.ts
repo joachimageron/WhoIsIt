@@ -708,8 +708,15 @@ export class GamePlayService {
       throw new BadRequestException('Only the active player can make a guess');
     }
 
-    // Validate guess limit
-    if (guessingPlayer.guessCount >= GamePlayService.MAX_GUESSES_PER_PLAYER) {
+    // Validate guess limit by counting existing guesses
+    const existingGuessCount = await this.guessRepository.count({
+      where: {
+        guessedBy: { id: guessingPlayer.id },
+        round: { game: { id: game.id } },
+      },
+    });
+
+    if (existingGuessCount >= GamePlayService.MAX_GUESSES_PER_PLAYER) {
       throw new BadRequestException(
         `Maximum number of guesses (${GamePlayService.MAX_GUESSES_PER_PLAYER}) reached`,
       );
@@ -766,9 +773,6 @@ export class GamePlayService {
 
     const savedGuess = await this.guessRepository.save(guess);
 
-    // Increment guess count
-    guessingPlayer.guessCount += 1;
-
     // Apply score penalty for incorrect guess
     if (!isCorrect) {
       guessingPlayer.score += GamePlayService.SCORE_INCORRECT_GUESS_PENALTY;
@@ -776,9 +780,8 @@ export class GamePlayService {
       if (guessingPlayer.score < 0) {
         guessingPlayer.score = 0;
       }
+      await this.playerRepository.save(guessingPlayer);
     }
-
-    await this.playerRepository.save(guessingPlayer);
 
     // Return the guess response
     return this.mapToGuessResponse(

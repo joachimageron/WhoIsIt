@@ -42,7 +42,6 @@ describe('GamePlayService', () => {
     avatarUrl: null,
     leftAt: null,
     game: { id: 'game-1' },
-    guessCount: 0,
   } as GamePlayer;
 
   const mockGame = {
@@ -113,6 +112,7 @@ describe('GamePlayService', () => {
     guessRepository = {
       create: jest.fn(),
       save: jest.fn(),
+      count: jest.fn(),
     };
 
     gameLobbyService = {
@@ -777,6 +777,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(targetPlayer);
       playerSecretRepository.findOne.mockResolvedValue(mockSecret);
       characterRepository.findOne.mockResolvedValue(mockCharacter);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -853,6 +854,7 @@ describe('GamePlayService', () => {
       playerSecretRepository.findOne.mockResolvedValue(mockSecret);
       characterRepository.findOne.mockResolvedValue(wrongCharacter);
       playerRepository.save.mockResolvedValue(guessingPlayer);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -1050,7 +1052,6 @@ describe('GamePlayService', () => {
 
       const guessingPlayer = {
         ...mockPlayer,
-        guessCount: 3, // Already at max
       } as GamePlayer;
 
       const roundForGuess = {
@@ -1067,13 +1068,14 @@ describe('GamePlayService', () => {
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       playerRepository.findOne.mockResolvedValueOnce(guessingPlayer);
+      guessRepository.count.mockResolvedValue(3); // Already at max
 
       await expect(
         service.submitGuess('ABC12', request),
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should increment guess count after submitting a guess', async () => {
+    it('should allow guess when under the limit', async () => {
       const request = {
         playerId: 'player-1',
         targetPlayerId: 'player-2',
@@ -1092,7 +1094,6 @@ describe('GamePlayService', () => {
       const guessingPlayer = {
         ...mockPlayer,
         score: 100,
-        guessCount: 0,
       } as GamePlayer;
 
       const roundForGuess = {
@@ -1112,6 +1113,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(guessingPlayer)
         .mockResolvedValueOnce(targetPlayer);
       characterRepository.findOne.mockResolvedValue(mockCharacter);
+      guessRepository.count.mockResolvedValue(2); // Under limit
 
       const mockGuess = {
         id: 'guess-1',
@@ -1125,15 +1127,16 @@ describe('GamePlayService', () => {
 
       guessRepository.create.mockReturnValue(mockGuess);
       guessRepository.save.mockResolvedValue(mockGuess);
-      playerRepository.save.mockResolvedValue(guessingPlayer);
 
-      await service.submitGuess('ABC12', request);
+      const result = await service.submitGuess('ABC12', request);
 
-      expect(playerRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({
-          guessCount: 1,
-        }),
-      );
+      expect(result).toBeDefined();
+      expect(guessRepository.count).toHaveBeenCalledWith({
+        where: {
+          guessedBy: { id: guessingPlayer.id },
+          round: { game: { id: mockGame.id } },
+        },
+      });
     });
 
     it('should apply score penalty for incorrect guess', async () => {
@@ -1155,7 +1158,6 @@ describe('GamePlayService', () => {
       const guessingPlayer = {
         ...mockPlayer,
         score: 200,
-        guessCount: 0,
       } as GamePlayer;
 
       const wrongCharacter = {
@@ -1180,6 +1182,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(guessingPlayer)
         .mockResolvedValueOnce(targetPlayer);
       characterRepository.findOne.mockResolvedValue(wrongCharacter);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -1200,7 +1203,6 @@ describe('GamePlayService', () => {
       expect(playerRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           score: 100, // 200 - 100 penalty
-          guessCount: 1,
         }),
       );
     });
@@ -1224,7 +1226,6 @@ describe('GamePlayService', () => {
       const guessingPlayer = {
         ...mockPlayer,
         score: 50, // Less than penalty
-        guessCount: 0,
       } as GamePlayer;
 
       const wrongCharacter = {
@@ -1249,6 +1250,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(guessingPlayer)
         .mockResolvedValueOnce(targetPlayer);
       characterRepository.findOne.mockResolvedValue(wrongCharacter);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -1269,7 +1271,6 @@ describe('GamePlayService', () => {
       expect(playerRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           score: 0, // Should be clamped to 0, not negative
-          guessCount: 1,
         }),
       );
     });
