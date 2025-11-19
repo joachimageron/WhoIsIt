@@ -175,12 +175,13 @@ describe('GameService', () => {
 
       mockGameLobbyService.updatePlayerReady.mockResolvedValue(expectedResult);
 
-      const result = await service.updatePlayerReady(playerId, isReady);
+      const result = await service.updatePlayerReady(playerId, isReady, null);
 
       expect(result).toBe(expectedResult);
       expect(mockGameLobbyService.updatePlayerReady).toHaveBeenCalledWith(
         playerId,
         isReady,
+        null,
       );
     });
   });
@@ -262,12 +263,13 @@ describe('GameService', () => {
 
       mockGamePlayService.askQuestion.mockResolvedValue(expectedResult);
 
-      const result = await service.askQuestion(roomCode, request);
+      const result = await service.askQuestion(roomCode, request, null);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.askQuestion).toHaveBeenCalledWith(
         roomCode,
         request,
+        null,
       );
     });
   });
@@ -308,12 +310,13 @@ describe('GameService', () => {
 
       mockGamePlayService.submitAnswer.mockResolvedValue(expectedResult);
 
-      const result = await service.submitAnswer(roomCode, request);
+      const result = await service.submitAnswer(roomCode, request, null);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.submitAnswer).toHaveBeenCalledWith(
         roomCode,
         request,
+        null,
       );
     });
   });
@@ -326,12 +329,13 @@ describe('GameService', () => {
 
       mockGamePlayService.getPlayerCharacter.mockResolvedValue(expectedResult);
 
-      const result = await service.getPlayerCharacter(roomCode, playerId);
+      const result = await service.getPlayerCharacter(roomCode, playerId, null);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.getPlayerCharacter).toHaveBeenCalledWith(
         roomCode,
         playerId,
+        null,
       );
     });
   });
