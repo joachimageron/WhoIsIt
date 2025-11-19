@@ -25,7 +25,6 @@ export function useGameInitialization({
   const {
     setGameState,
     setCharacters,
-    setMyCharacter,
     addQuestion,
     addAnswer,
   } = useGameStore();
@@ -74,20 +73,8 @@ export function useGameInitialization({
 
         setCharacters(characters);
 
-        // Load player's assigned character
-        if (player) {
-          try {
-            const myCharacter = await gameApi.getPlayerCharacter(
-              roomCode,
-              player.id,
-            );
-
-            setMyCharacter(myCharacter);
-          } catch {
-            // Character might not be assigned yet if game hasn't started
-            // Silently ignore this error
-          }
-        }
+        // Character assignment will be received via WebSocket
+        // when the game starts (characterAssigned event)
 
         // Load existing questions and answers (for reconnection/refresh)
         const [questions, answers] = await Promise.all([

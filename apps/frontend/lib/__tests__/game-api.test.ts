@@ -541,40 +541,4 @@ describe("game-api", () => {
       );
     });
   });
-
-  describe("getPlayerCharacter", () => {
-    it("successfully fetches player character", async () => {
-      const mockCharacter = {
-        id: "char-1",
-        name: "Alice",
-        imageUrl: "/images/alice.jpg",
-      };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCharacter,
-      } as Response);
-
-      const result = await gameApi.getPlayerCharacter("TEST123", "player-1");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${API_URL}/games/TEST123/players/player-1/character`,
-        {
-          credentials: "include",
-        },
-      );
-      expect(result).toEqual(mockCharacter);
-    });
-
-    it("throws error when fetch fails", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        json: async () => ({ message: "Character not assigned" }),
-      } as Response);
-
-      await expect(
-        gameApi.getPlayerCharacter("TEST123", "player-1"),
-      ).rejects.toThrow("Character not assigned");
-    });
-  });
 });

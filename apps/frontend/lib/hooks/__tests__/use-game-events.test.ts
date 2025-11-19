@@ -64,16 +64,24 @@ describe("useGameEvents", () => {
   const mockResetPlayState = jest.fn();
 
   // Store cleanup functions for event listeners
+  let onCharacterAssignedCallback: any;
   let onQuestionAskedCallback: any;
   let onAnswerSubmittedCallback: any;
   let onGuessResultCallback: any;
   let onGameOverCallback: any;
+
+  const mockSetMyCharacter = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     mockUseGameSocket.mockReturnValue({
       socket: mockSocket,
+      onCharacterAssigned: jest.fn((cb) => {
+        onCharacterAssignedCallback = cb;
+
+        return jest.fn();
+      }),
       onQuestionAsked: jest.fn((cb) => {
         onQuestionAskedCallback = cb;
 
@@ -98,6 +106,7 @@ describe("useGameEvents", () => {
 
     mockUseGameStore.mockReturnValue({
       setGameState: mockSetGameState,
+      setMyCharacter: mockSetMyCharacter,
       addQuestion: mockAddQuestion,
       addAnswer: mockAddAnswer,
       setConnected: mockSetConnected,

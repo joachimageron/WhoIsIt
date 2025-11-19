@@ -15,7 +15,6 @@ import type {
   SubmitGuessRequest,
   GuessResponse,
   GameOverResult,
-  PlayerCharacterResponse,
 } from '@whois-it/contracts';
 import { GameLobbyService } from './game-lobby.service';
 import { GamePlayService } from './game-play.service';
@@ -206,13 +205,6 @@ export class GameService {
     }
 
     return guessResponse;
-  }
-
-  async getPlayerCharacter(
-    roomCode: string,
-    playerId: string,
-  ): Promise<PlayerCharacterResponse> {
-    return this.gamePlayService.getPlayerCharacter(roomCode, playerId);
   }
 
   // Delegate statistics operations to GameStatsService

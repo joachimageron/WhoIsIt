@@ -8,6 +8,7 @@ import type {
   SocketPlayerJoinedEvent,
   SocketPlayerLeftEvent,
   SocketGameStartedEvent,
+  SocketCharacterAssignedEvent,
   SocketQuestionAskedEvent,
   SocketAnswerSubmittedEvent,
   SocketGuessResultEvent,
@@ -109,6 +110,17 @@ export const useGameSocket = () => {
     [],
   );
 
+  const onCharacterAssigned = useCallback(
+    (callback: (event: SocketCharacterAssignedEvent) => void) => {
+      socketRef.current.on("characterAssigned", callback);
+
+      return () => {
+        socketRef.current.off("characterAssigned", callback);
+      };
+    },
+    [],
+  );
+
   const onQuestionAsked = useCallback(
     (callback: (event: SocketQuestionAskedEvent) => void) => {
       socketRef.current.on("questionAsked", callback);
@@ -162,6 +174,7 @@ export const useGameSocket = () => {
     onPlayerJoined,
     onPlayerLeft,
     onGameStarted,
+    onCharacterAssigned,
     onQuestionAsked,
     onAnswerSubmitted,
     onGuessResult,

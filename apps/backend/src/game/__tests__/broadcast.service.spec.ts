@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BroadcastService } from '../services/broadcast.service';
 import { GameService } from '../services/game.service';
+import { GamePlayService } from '../services/game-play.service';
+import { ConnectionManager } from '../gateway/connection.manager';
 import { Logger } from '@nestjs/common';
 import type {
   GameLobbyResponse,
@@ -15,6 +17,8 @@ import { AnswerValue } from '../../database/enums';
 describe('BroadcastService', () => {
   let service: BroadcastService;
   let gameService: jest.Mocked<GameService>;
+  let gamePlayService: jest.Mocked<GamePlayService>;
+  let connectionManager: jest.Mocked<ConnectionManager>;
   let mockServer: any;
 
   const mockLobbyResponse: GameLobbyResponse = {
@@ -113,6 +117,14 @@ describe('BroadcastService', () => {
       getGameOverResult: jest.fn(),
     };
 
+    const mockGamePlayService = {
+      getPlayerCharacter: jest.fn(),
+    };
+
+    const mockConnectionManager = {
+      getAllConnections: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         BroadcastService,
@@ -120,11 +132,21 @@ describe('BroadcastService', () => {
           provide: GameService,
           useValue: mockGameService,
         },
+        {
+          provide: GamePlayService,
+          useValue: mockGamePlayService,
+        },
+        {
+          provide: ConnectionManager,
+          useValue: mockConnectionManager,
+        },
       ],
     }).compile();
 
     service = module.get<BroadcastService>(BroadcastService);
     gameService = module.get(GameService);
+    gamePlayService = module.get(GamePlayService);
+    connectionManager = module.get(ConnectionManager);
 
     // Set the mock server
     service.setServer(mockServer);
@@ -132,6 +154,7 @@ describe('BroadcastService', () => {
     // Mock the logger to avoid console output during tests
     jest.spyOn(Logger.prototype, 'log').mockImplementation();
     jest.spyOn(Logger.prototype, 'error').mockImplementation();
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation();
   });
 
   afterEach(() => {

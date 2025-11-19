@@ -24,6 +24,7 @@ export function useGameEvents({
   const router = useRouter();
   const {
     socket,
+    onCharacterAssigned,
     onQuestionAsked,
     onAnswerSubmitted,
     onGuessResult,
@@ -31,6 +32,7 @@ export function useGameEvents({
   } = useGameSocket();
   const {
     setGameState,
+    setMyCharacter,
     addQuestion,
     addAnswer,
     setConnected,
@@ -57,6 +59,19 @@ export function useGameEvents({
       socket.off("disconnect", handleDisconnect);
     };
   }, [socket, setConnected]);
+
+  // Listen to character assigned events
+  useEffect(() => {
+    const unsubscribeCharacterAssigned = onCharacterAssigned((event) => {
+      if (event.roomCode === roomCode) {
+        setMyCharacter(event.character);
+      }
+    });
+
+    return () => {
+      unsubscribeCharacterAssigned();
+    };
+  }, [onCharacterAssigned, setMyCharacter, roomCode]);
 
   // Listen to question asked events
   useEffect(() => {

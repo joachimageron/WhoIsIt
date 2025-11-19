@@ -16,7 +16,6 @@ import type {
   SubmitGuessRequest,
   GuessResponse,
   GameOverResult,
-  PlayerCharacterResponse,
 } from '@whois-it/contracts';
 
 describe('GameController', () => {
@@ -75,12 +74,6 @@ describe('GameController', () => {
     createdAt: new Date().toISOString(),
   };
 
-  const mockPlayerCharacterResponse: PlayerCharacterResponse = {
-    characterId: 'char1',
-    characterName: 'Alice',
-    imageUrl: 'https://example.com/alice.jpg',
-  };
-
   const mockGameOverResult: GameOverResult = {
     roomCode: 'ABC12',
     winner: {
@@ -96,7 +89,6 @@ describe('GameController', () => {
       createGame: jest.fn(),
       joinGame: jest.fn(),
       getLobbyByRoomCode: jest.fn(),
-      getPlayerCharacter: jest.fn(),
       startGame: jest.fn(),
       askQuestion: jest.fn(),
       getGameState: jest.fn(),
@@ -319,37 +311,6 @@ describe('GameController', () => {
       await expect(controller.getLobby('')).rejects.toThrow(
         'roomCode is required',
       );
-    });
-  });
-
-  describe('getPlayerCharacter', () => {
-    it('should get player character', async () => {
-      const roomCode = 'ABC12';
-      const playerId = 'player1';
-
-      gameService.getPlayerCharacter.mockResolvedValue(
-        mockPlayerCharacterResponse,
-      );
-
-      const result = await controller.getPlayerCharacter(roomCode, playerId);
-
-      expect(result).toEqual(mockPlayerCharacterResponse);
-      expect(gameService.getPlayerCharacter).toHaveBeenCalledWith(
-        roomCode,
-        playerId,
-      );
-    });
-
-    it('should throw BadRequestException if roomCode is missing', async () => {
-      await expect(
-        controller.getPlayerCharacter('', 'player1'),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException if playerId is missing', async () => {
-      await expect(
-        controller.getPlayerCharacter('ABC12', ''),
-      ).rejects.toThrow(BadRequestException);
     });
   });
 

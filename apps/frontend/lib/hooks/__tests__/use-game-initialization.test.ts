@@ -122,9 +122,6 @@ describe("useGameInitialization", () => {
       mockGameApi.getGameState.mockResolvedValueOnce(mockGameState as any);
       mockGameApi.getLobby.mockResolvedValueOnce(mockLobby as any);
       mockGameApi.getCharacters.mockResolvedValueOnce(mockCharacters as any);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce(
-        mockMyCharacter as any,
-      );
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({ success: true });
@@ -140,10 +137,6 @@ describe("useGameInitialization", () => {
       expect(mockGameApi.getGameState).toHaveBeenCalledWith("TEST123");
       expect(mockGameApi.getLobby).toHaveBeenCalledWith("TEST123");
       expect(mockGameApi.getCharacters).toHaveBeenCalledWith("set-1");
-      expect(mockGameApi.getPlayerCharacter).toHaveBeenCalledWith(
-        "TEST123",
-        "player-1",
-      );
       expect(mockJoinRoom).toHaveBeenCalledWith({
         roomCode: "TEST123",
         playerId: "player-1",
@@ -185,9 +178,6 @@ describe("useGameInitialization", () => {
       mockGameApi.getGameState.mockResolvedValueOnce(mockGameState as any);
       mockGameApi.getLobby.mockResolvedValueOnce(mockLobby as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
-        id: "char-1",
-      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({ success: true });
@@ -251,9 +241,6 @@ describe("useGameInitialization", () => {
         characterSetId: "set-1",
       } as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockRejectedValueOnce(
-        new Error("Not assigned yet"),
-      );
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({ success: true });
@@ -292,9 +279,6 @@ describe("useGameInitialization", () => {
         characterSetId: "set-1",
       } as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
-        id: "char-1",
-      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce([]);
       mockGameApi.getAnswers.mockResolvedValueOnce([]);
       mockJoinRoom.mockResolvedValueOnce({
@@ -343,9 +327,6 @@ describe("useGameInitialization", () => {
         characterSetId: "set-1",
       } as any);
       mockGameApi.getCharacters.mockResolvedValueOnce([]);
-      mockGameApi.getPlayerCharacter.mockResolvedValueOnce({
-        id: "char-1",
-      } as any);
       mockGameApi.getQuestions.mockResolvedValueOnce(mockQuestions as any);
       mockGameApi.getAnswers.mockResolvedValueOnce(mockAnswers as any);
       mockJoinRoom.mockResolvedValueOnce({ success: true });

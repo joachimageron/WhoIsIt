@@ -39,7 +39,6 @@ describe('GameService', () => {
     getAnswers: jest.fn(),
     submitAnswer: jest.fn(),
     submitGuess: jest.fn(),
-    getPlayerCharacter: jest.fn(),
     handleGuessResult: jest.fn(),
     advanceToNextTurn: jest.fn(),
   };
@@ -314,24 +313,6 @@ describe('GameService', () => {
       expect(mockGamePlayService.submitAnswer).toHaveBeenCalledWith(
         roomCode,
         request,
-      );
-    });
-  });
-
-  describe('getPlayerCharacter', () => {
-    it('should delegate to GamePlayService', async () => {
-      const roomCode = 'ABC12';
-      const playerId = 'p1';
-      const expectedResult = { playerId: 'p1', character: { id: 'c1' } };
-
-      mockGamePlayService.getPlayerCharacter.mockResolvedValue(expectedResult);
-
-      const result = await service.getPlayerCharacter(roomCode, playerId);
-
-      expect(result).toBe(expectedResult);
-      expect(mockGamePlayService.getPlayerCharacter).toHaveBeenCalledWith(
-        roomCode,
-        playerId,
       );
     });
   });
