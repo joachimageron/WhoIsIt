@@ -186,8 +186,7 @@ describe("useAuth", () => {
 
       useAuthStore.getState().setUser(mockUser);
       mockAuthApi.logout.mockImplementation(
-        () =>
-          new Promise((resolve) => setTimeout(() => resolve(), 50)),
+        () => new Promise((resolve) => setTimeout(() => resolve(), 50)),
       );
 
       const { result } = renderHook(() => useAuth());

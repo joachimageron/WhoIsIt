@@ -74,6 +74,9 @@ export class GamePlayer {
   @Column({ type: 'int', nullable: true })
   placement?: number | null;
 
+  @Column({ type: 'int', default: 0 })
+  guessCount!: number;
+
   @OneToOne(() => PlayerSecret, (secret: PlayerSecret) => secret.player)
   secret?: PlayerSecret;
 
