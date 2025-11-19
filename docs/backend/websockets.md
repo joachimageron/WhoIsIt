@@ -8,7 +8,7 @@ WhoIsIt uses **Socket.IO** for real-time bidirectional communication. The backen
 
 ### WebSocket Stack
 
-```
+```docs
 ┌─────────────────────────────────────────────────────────────┐
 │                      Client Layer                            │
 │  Socket.IO Client (Frontend) → WebSocket Transport          │
@@ -47,12 +47,14 @@ Custom Socket.IO adapter that validates JWT tokens for incoming connections.
 **Location**: `apps/backend/src/auth/ws-auth.adapter.ts`
 
 **Purpose**:
+
 - Extract JWT from cookies or auth headers
 - Verify token signature
 - Attach user to socket instance
 - Allow unauthenticated connections (guests)
 
 **Implementation**:
+
 ```typescript
 export class WsAuthAdapter extends IoAdapter {
   private readonly logger = new Logger(WsAuthAdapter.name);
@@ -117,12 +119,14 @@ export class WsAuthAdapter extends IoAdapter {
 ```
 
 **Key Features**:
+
 - **Token Extraction**: Tries cookie first, then auth header
 - **Graceful Degradation**: Invalid/missing token doesn't prevent connection
 - **User Attachment**: Authenticated user available as `socket.user`
 - **Logging**: Tracks authentication success/failure
 
 **Token Extraction from Cookie**:
+
 ```typescript
 function extractTokenFromCookie(socket: Socket): string | null {
   const cookieHeader = socket.handshake.headers.cookie;
@@ -147,6 +151,7 @@ Main WebSocket gateway handling game-related events.
 **Decorator**: `@WebSocketGateway`
 
 **Configuration**:
+
 ```typescript
 @WebSocketGateway({
   cors: {
@@ -173,6 +178,7 @@ export class GameGateway implements
 **Lifecycle Hooks**:
 
 **`afterInit()`** - Called after gateway initialization
+
 ```typescript
 afterInit() {
   this.logger.log('WebSocket Gateway initialized');
@@ -190,6 +196,7 @@ afterInit() {
 ```
 
 **`onModuleDestroy()`** - Called on shutdown
+
 ```typescript
 onModuleDestroy() {
   this.connectionManager.stopInactivityMonitoring();
@@ -198,6 +205,7 @@ onModuleDestroy() {
 ```
 
 **`handleConnection()`** - Called when client connects
+
 ```typescript
 handleConnection(client: TypedSocket) {
   const result = this.connectionManager.trackConnection(client);
@@ -225,6 +233,7 @@ handleConnection(client: TypedSocket) {
 ```
 
 **`handleDisconnect()`** - Called when client disconnects
+
 ```typescript
 handleDisconnect(client: TypedSocket) {
   this.connectionManager.handleDisconnect(client);
@@ -235,6 +244,7 @@ handleDisconnect(client: TypedSocket) {
 **Event Handlers**:
 
 **`@SubscribeMessage('joinRoom')`**
+
 ```typescript
 @SubscribeMessage('joinRoom')
 async handleJoinRoom(
@@ -275,6 +285,7 @@ async handleJoinRoom(
 ```
 
 **`@SubscribeMessage('leaveRoom')`**
+
 ```typescript
 @SubscribeMessage('leaveRoom')
 async handleLeaveRoom(
@@ -315,6 +326,7 @@ async handleLeaveRoom(
 ```
 
 **`@SubscribeMessage('updatePlayerReady')`**
+
 ```typescript
 @SubscribeMessage('updatePlayerReady')
 async handleUpdatePlayerReady(
@@ -348,6 +360,7 @@ Tracks active WebSocket connections and enforces security policies.
 **Location**: `apps/backend/src/game/gateway/connection.manager.ts`
 
 **Purpose**:
+
 - Track connected sockets
 - Map sockets to rooms and players
 - Handle reconnections
@@ -358,6 +371,7 @@ Tracks active WebSocket connections and enforces security policies.
 - **Temporarily ban abusive users**
 
 **Connection Info**:
+
 ```typescript
 interface ConnectedUser {
   socketId: string;          // Socket.IO ID
@@ -376,6 +390,7 @@ interface UserReconnectionHistory {
 ```
 
 **Security Configuration**:
+
 ```typescript
 private readonly MAX_RECONNECTIONS_PER_MINUTE = 5;
 private readonly RECONNECTION_WINDOW_MS = 60 * 1000; // 1 minute
@@ -386,6 +401,7 @@ private readonly INACTIVITY_TIMEOUT_MS = 60 * 1000; // 60 seconds
 **Methods**:
 
 **`trackConnection()`** - Track new connection with security checks
+
 ```typescript
 trackConnection(client: TypedSocket): {
   allowed: boolean;
@@ -446,6 +462,7 @@ trackConnection(client: TypedSocket): {
 ```
 
 **`handleDisconnect()`** - Clean up on disconnect
+
 ```typescript
 handleDisconnect(client: TypedSocket) {
   const connection = this.connectedUsers.get(client.id);
@@ -461,6 +478,7 @@ handleDisconnect(client: TypedSocket) {
 ```
 
 **`updateConnectionRoom()`** - Update room assignment
+
 ```typescript
 updateConnectionRoom(
   socketId: string,
@@ -479,6 +497,7 @@ updateConnectionRoom(
 ```
 
 **`updateLastSeen()`** - Update activity timestamp
+
 ```typescript
 updateLastSeen(socketId: string) {
   const connection = this.connectedUsers.get(socketId);
@@ -489,6 +508,7 @@ updateLastSeen(socketId: string) {
 ```
 
 **`startInactivityMonitoring()`** - Begin monitoring for inactive connections
+
 ```typescript
 startInactivityMonitoring(disconnectCallback: (socketId: string) => void) {
   this.inactivityCheckInterval = setInterval(() => {
@@ -512,6 +532,7 @@ startInactivityMonitoring(disconnectCallback: (socketId: string) => void) {
 ```
 
 **`stopInactivityMonitoring()`** - Stop monitoring
+
 ```typescript
 stopInactivityMonitoring() {
   if (this.inactivityCheckInterval) {
@@ -522,6 +543,7 @@ stopInactivityMonitoring() {
 ```
 
 **`getUserBanStatus()`** - Check if user is banned
+
 ```typescript
 getUserBanStatus(userId: string): { 
   banned: boolean; 
@@ -537,6 +559,7 @@ getUserBanStatus(userId: string): {
 ```
 
 **`getUserReconnectionHistory()`** - Get reconnection history
+
 ```typescript
 getUserReconnectionHistory(userId: string): {
   attempts: number;
@@ -557,6 +580,7 @@ getUserReconnectionHistory(userId: string): {
 ```
 
 **`getConnection()`** - Retrieve connection info
+
 ```typescript
 getConnection(socketId: string): ConnectedUser | undefined {
   return this.connectedUsers.get(socketId);
@@ -564,6 +588,7 @@ getConnection(socketId: string): ConnectedUser | undefined {
 ```
 
 **`getConnectedUsersCount()`** - Get connection count
+
 ```typescript
 getConnectedUsersCount(): number {
   return this.connectedUsers.size;
@@ -577,6 +602,7 @@ Centralized service for broadcasting events to rooms.
 **Location**: `apps/backend/src/game/services/broadcast.service.ts`
 
 **Purpose**:
+
 - Centralize broadcasting logic
 - Reduce code duplication
 - Provide type-safe broadcast methods
@@ -584,6 +610,7 @@ Centralized service for broadcasting events to rooms.
 **Methods**:
 
 **`setServer()`** - Initialize with Socket.IO server
+
 ```typescript
 setServer(server: TypedServer) {
   this.server = server;
@@ -591,6 +618,7 @@ setServer(server: TypedServer) {
 ```
 
 **`broadcastGameStarted()`** - Broadcast game start
+
 ```typescript
 broadcastGameStarted(roomCode: string, lobby: GameLobbyResponse) {
   if (!this.server) return;
@@ -605,6 +633,7 @@ broadcastGameStarted(roomCode: string, lobby: GameLobbyResponse) {
 ```
 
 **`broadcastLobbyUpdate()`** - Broadcast lobby changes
+
 ```typescript
 broadcastLobbyUpdate(roomCode: string, lobby: GameLobbyResponse) {
   if (!this.server) return;
@@ -616,6 +645,7 @@ broadcastLobbyUpdate(roomCode: string, lobby: GameLobbyResponse) {
 ```
 
 **`broadcastQuestionAsked()`** - Broadcast question event
+
 ```typescript
 broadcastQuestionAsked(
   roomCode: string,
@@ -639,6 +669,7 @@ Scheduled task to clean up abandoned lobbies.
 **Location**: `apps/backend/src/game/services/lobby-cleanup.service.ts`
 
 **Purpose**:
+
 - Remove empty lobbies
 - Handle disconnected players
 - Prevent memory leaks
@@ -646,6 +677,7 @@ Scheduled task to clean up abandoned lobbies.
 **Methods**:
 
 **`startCleanup()`** - Start periodic cleanup
+
 ```typescript
 startCleanup() {
   this.cleanupInterval = setInterval(() => {
@@ -657,6 +689,7 @@ startCleanup() {
 ```
 
 **`performCleanup()`** - Execute cleanup logic
+
 ```typescript
 async performCleanup() {
   // Find lobbies with no active connections
@@ -935,17 +968,20 @@ this.logger.error(`Error in handleJoinRoom:`, error);
 
 **Purpose**: Prevent users from maintaining multiple simultaneous connections
 
-**Implementation**: 
+**Implementation**:
+
 - Track active connections by userId
 - When user reconnects, automatically disconnect previous socket
 - Guest users (no userId) can maintain multiple connections
 
 **Benefits**:
+
 - Prevents connection abuse
 - Reduces server load
 - Ensures consistent player state
 
 **Example**:
+
 ```typescript
 // When user reconnects
 const result = connectionManager.trackConnection(client);
@@ -963,17 +999,20 @@ if (result.socketsToDisconnect) {
 **Purpose**: Detect and prevent rapid reconnection attacks
 
 **Configuration**:
+
 - **Max Reconnections**: 5 per minute
 - **Time Window**: 60 seconds
 - **Ban Duration**: 5 minutes
 
 **How It Works**:
+
 1. Track reconnection attempts per user
 2. Count attempts within sliding 60-second window
 3. If exceeds 5 attempts, temporarily ban user
 4. Ban expires after 5 minutes
 
 **Implementation**:
+
 ```typescript
 interface UserReconnectionHistory {
   userId: string;
@@ -1000,6 +1039,7 @@ if (userId && this.isReconnectionAbusive(userId)) {
 ```
 
 **Monitoring**:
+
 ```typescript
 // Check user's ban status
 const banStatus = connectionManager.getUserBanStatus(userId);
@@ -1015,10 +1055,12 @@ const history = connectionManager.getUserReconnectionHistory(userId);
 **Purpose**: Automatically disconnect idle clients to prevent resource exhaustion
 
 **Configuration**:
+
 - **Timeout Duration**: 60 seconds
 - **Check Interval**: 30 seconds
 
 **How It Works**:
+
 1. Track last activity time for each connection
 2. Periodically check for inactive connections (every 30s)
 3. Disconnect sockets inactive for >60 seconds
@@ -1029,6 +1071,7 @@ const history = connectionManager.getUserReconnectionHistory(userId);
    - Any game action
 
 **Implementation**:
+
 ```typescript
 // Start monitoring when gateway initializes
 connectionManager.startInactivityMonitoring((socketId: string) => {
@@ -1043,6 +1086,7 @@ connectionManager.updateLastSeen(client.id);
 ```
 
 **Lifecycle**:
+
 ```typescript
 // In GameGateway
 afterInit() {
@@ -1061,6 +1105,7 @@ onModuleDestroy() {
 ### Rate Limiting
 
 Consider implementing rate limiting for:
+
 - Connection attempts
 - Event emissions  
 - Room joins
@@ -1140,6 +1185,7 @@ describe('ConnectionManager Security', () => {
 **Problem**: Client can't connect
 
 **Solutions**:
+
 - Check CORS configuration
 - Verify backend is running
 - Check firewall rules
@@ -1150,6 +1196,7 @@ describe('ConnectionManager Security', () => {
 **Problem**: User not authenticated on socket
 
 **Solutions**:
+
 - Check JWT token present in cookie
 - Verify token not expired
 - Check JWT_SECRET matches
@@ -1160,6 +1207,7 @@ describe('ConnectionManager Security', () => {
 **Problem**: Events not received by clients
 
 **Solutions**:
+
 - Verify client joined room
 - Check room code normalized correctly
 - Verify server has reference
@@ -1170,6 +1218,7 @@ describe('ConnectionManager Security', () => {
 **Problem**: Memory usage grows over time
 
 **Solutions**:
+
 - Implement cleanup on disconnect
 - Remove event listeners
 - Clear intervals/timeouts
