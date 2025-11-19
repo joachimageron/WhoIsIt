@@ -123,9 +123,7 @@ export class BroadcastService {
         guess,
         gameState,
       });
-      this.logger.log(
-        `Broadcasted guess result to room ${normalizedRoomCode} (correct: ${guess.isCorrect})`,
-      );
+      this.logger.log(`Broadcasted guess result to room ${normalizedRoomCode}`);
     } catch (error) {
       this.logger.error('Error broadcasting guess result:', error);
     }
@@ -145,9 +143,7 @@ export class BroadcastService {
         result,
       });
 
-      this.logger.log(
-        `Broadcasted game over to room ${normalizedRoomCode} (winner: ${result.winnerUsername ?? 'none'})`,
-      );
+      this.logger.log(`Broadcasted game over to room ${normalizedRoomCode}`);
     } catch (error) {
       this.logger.error('Error broadcasting game over:', error);
     }

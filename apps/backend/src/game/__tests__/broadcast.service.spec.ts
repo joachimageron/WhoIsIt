@@ -313,21 +313,14 @@ describe('BroadcastService', () => {
       expect(mockServer.to).toHaveBeenCalledWith('ABC12');
     });
 
-    it('should log correct guess result', () => {
+    it('should log guess result event without sensitive data', () => {
       service.broadcastGuessResult('ABC12', mockGuess, mockGameState);
 
       expect(Logger.prototype.log).toHaveBeenCalledWith(
-        expect.stringContaining('correct: true'),
+        'Broadcasted guess result to room ABC12',
       );
-    });
-
-    it('should log incorrect guess result', () => {
-      const incorrectGuess = { ...mockGuess, isCorrect: false };
-
-      service.broadcastGuessResult('ABC12', incorrectGuess, mockGameState);
-
-      expect(Logger.prototype.log).toHaveBeenCalledWith(
-        expect.stringContaining('correct: false'),
+      expect(Logger.prototype.log).not.toHaveBeenCalledWith(
+        expect.stringContaining('correct'),
       );
     });
 
@@ -367,24 +360,16 @@ describe('BroadcastService', () => {
       expect(gameService.getGameOverResult).toHaveBeenCalledWith('ABC12');
     });
 
-    it('should log winner username', async () => {
+    it('should log game over event without sensitive data', async () => {
       gameService.getGameOverResult.mockResolvedValue(mockGameOverResult);
 
       await service.broadcastGameOver('ABC12');
 
       expect(Logger.prototype.log).toHaveBeenCalledWith(
-        expect.stringContaining('winner: Host'),
+        'Broadcasted game over to room ABC12',
       );
-    });
-
-    it('should handle no winner case', async () => {
-      const noWinnerResult = { ...mockGameOverResult, winnerUsername: undefined };
-      gameService.getGameOverResult.mockResolvedValue(noWinnerResult);
-
-      await service.broadcastGameOver('ABC12');
-
-      expect(Logger.prototype.log).toHaveBeenCalledWith(
-        expect.stringContaining('winner: none'),
+      expect(Logger.prototype.log).not.toHaveBeenCalledWith(
+        expect.stringContaining('winner'),
       );
     });
 
