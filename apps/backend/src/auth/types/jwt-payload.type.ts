@@ -9,4 +9,6 @@ export interface JwtPayload {
   email: string | null;
   /** Username */
   username: string;
+  /** Is Guest */
+  isGuest: boolean;
 }

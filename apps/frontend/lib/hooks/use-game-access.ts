@@ -20,20 +20,18 @@ export const useGameAccess = () => {
    * Ensure user has access (either authenticated or as guest)
    * Creates a guest session if needed
    */
-  const ensureGameAccess = async (guestUsername?: string): Promise<boolean> => {
+  const ensureGameAccess = async (): Promise<boolean> => {
     if (canAccessGame()) {
       return true;
     }
 
     // Create guest session if username provided
-    if (guestUsername) {
-      try {
-        await createGuestSession(guestUsername);
+    try {
+      await createGuestSession();
 
-        return true;
-      } catch {
-        return false;
-      }
+      return true;
+    } catch {
+      return false;
     }
 
     return false;

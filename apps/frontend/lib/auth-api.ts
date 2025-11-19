@@ -43,10 +43,6 @@ export type ChangePasswordData = {
   newPassword: string;
 };
 
-export type CreateGuestData = {
-  username?: string;
-};
-
 /**
  * Register a new user
  */
@@ -280,14 +276,13 @@ export const changePassword = async (
 /**
  * Create a guest user session
  */
-export const createGuest = async (data?: CreateGuestData): Promise<User> => {
+export const createGuest = async (): Promise<User> => {
   const response = await fetch(`${API_URL}/auth/guest`, {
     method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data || {}),
   });
 
   if (!response.ok) {

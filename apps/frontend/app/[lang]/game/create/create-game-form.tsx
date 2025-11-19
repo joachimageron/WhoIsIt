@@ -251,10 +251,10 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
           <ModalBody>
             <p>{dict.game.create.authRequiredDescription}</p>
           </ModalBody>
-          <ModalFooter>
+          <ModalFooter className="gap-2">
             <Button
               color="primary"
-              variant="light"
+              variant="bordered"
               onPress={handleContinueAsGuest}
             >
               {dict.game.create.continueAsGuest}

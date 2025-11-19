@@ -7,8 +7,15 @@ import * as authApi from "@/lib/auth-api";
  * Hook to check and restore authentication state on app initialization
  */
 export const useAuth = () => {
-  const { user, setUser, setLoading, isLoading, isAuthenticated, isGuest } =
-    useAuthStore();
+  const {
+    user,
+    setUser,
+    setLoading,
+    isLoading,
+    isAuthenticated,
+    isGuest,
+    logout,
+  } = useAuthStore();
 
   useEffect(() => {
     // Only check profile if we don't already have a user
@@ -20,7 +27,8 @@ export const useAuth = () => {
 
           setUser(profile);
         } catch {
-          // User is not authenticated - that's okay, they can create a guest session if needed
+          // Not authenticated - empty state
+          logout();
         } finally {
           setLoading(false);
         }
@@ -35,7 +43,7 @@ export const useAuth = () => {
     try {
       // Call API logout to clear server-side cookies
       await authApi.logout();
-      useAuthStore.getState().logout();
+      logout();
     } catch {
       // Silently fail - user will remain logged in on the frontend
       // This is acceptable as the server-side cookie is still cleared
@@ -44,18 +52,14 @@ export const useAuth = () => {
     }
   };
 
-  const createGuestSession = async (username?: string) => {
+  const createGuestSession = async () => {
     setLoading(true);
     try {
-      const guestUser = await authApi.createGuest(
-        username ? { username } : undefined,
-      );
+      const guestUser = await authApi.createGuest();
 
       setUser(guestUser);
 
       return guestUser;
-    } catch (error) {
-      throw error;
     } finally {
       setLoading(false);
     }

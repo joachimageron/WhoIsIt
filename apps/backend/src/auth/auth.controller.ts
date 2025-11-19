@@ -13,7 +13,6 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response as ExpressResponse } from 'express';
 import { AuthService } from './services/auth.service';
 import { RegisterDto } from './dto/register.dto';
-import { CreateGuestDto } from './dto/create-guest.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -28,7 +27,7 @@ export interface RequestWithUser extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   // Stricter rate limiting for registration: 3 attempts per minute
   @Throttle({ default: { limit: 3, ttl: 60000 } })
@@ -184,10 +183,9 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('guest')
   async createGuest(
-    @Body() createGuestDto: CreateGuestDto,
     @Response({ passthrough: false }) res: ExpressResponse,
   ) {
-    const result = await this.authService.createGuest(createGuestDto);
+    const result = await this.authService.createGuest();
 
     // Set JWT token as HTTP-only cookie with guest_token name
     res.cookie('guest_token', result.accessToken, {
