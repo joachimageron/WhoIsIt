@@ -38,7 +38,6 @@ describe('GameGateway', () => {
     roomCode: 'ABC12',
     status: 'lobby',
     characterSetId: 'char-set-1',
-    maxPlayers: 4,
     turnTimerSeconds: 60,
     players: [
       {
@@ -122,6 +121,10 @@ describe('GameGateway', () => {
   });
 
   afterEach(() => {
+    // Stop inactivity monitoring to prevent open handles
+    const connectionManager = (gateway as any).connectionManager as ConnectionManager;
+    connectionManager.stopInactivityMonitoring();
+
     // Clean up is handled by LobbyCleanupService
     jest.clearAllMocks();
   });
