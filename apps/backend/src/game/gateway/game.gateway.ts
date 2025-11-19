@@ -8,7 +8,7 @@ import {
   ConnectedSocket,
   MessageBody,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleDestroy } from '@nestjs/common';
 import { GameService } from '../services/game.service';
 import type {
   SocketJoinRoomRequest,
@@ -30,7 +30,11 @@ import type { TypedSocket, TypedServer } from './types';
   },
 })
 export class GameGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
 {
   @WebSocketServer()
   server!: TypedServer;
@@ -60,10 +64,38 @@ export class GameGateway
 
     // Start periodic cleanup of abandoned lobbies
     this.lobbyCleanupService.startCleanup();
+
+    // Start inactivity monitoring
+    this.connectionManager.startInactivityMonitoring((socketId: string) => {
+      const socket = this.server.sockets.sockets.get(socketId);
+      if (socket) {
+        socket.disconnect(true);
+      }
+    });
   }
 
   handleConnection(client: TypedSocket) {
-    this.connectionManager.trackConnection(client);
+    const result = this.connectionManager.trackConnection(client);
+
+    if (!result.allowed) {
+      this.logger.warn(
+        `Connection rejected for ${client.id}: ${result.reason}`,
+      );
+      // Disconnect immediately without emitting error event (not in contract)
+      client.disconnect(true);
+      return;
+    }
+
+    // Disconnect old sockets if this is a reconnection
+    if (result.socketsToDisconnect && result.socketsToDisconnect.length > 0) {
+      result.socketsToDisconnect.forEach((socketId) => {
+        const oldSocket = this.server?.sockets?.sockets?.get(socketId);
+        if (oldSocket) {
+          this.logger.log(`Disconnecting old socket ${socketId}`);
+          oldSocket.disconnect(true);
+        }
+      });
+    }
   }
 
   handleDisconnect(client: TypedSocket) {
@@ -251,5 +283,13 @@ export class GameGateway
       }
     });
     return count;
+  }
+
+  /**
+   * Cleanup on module destroy
+   */
+  onModuleDestroy() {
+    this.connectionManager.stopInactivityMonitoring();
+    this.logger.log('WebSocket Gateway destroyed');
   }
 }

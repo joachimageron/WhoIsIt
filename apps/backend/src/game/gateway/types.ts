@@ -20,3 +20,15 @@ export interface ConnectedUser {
   connectedAt: Date;
   lastSeenAt: Date;
 }
+
+// Track reconnection attempts for abuse detection
+export interface ReconnectionAttempt {
+  timestamp: Date;
+}
+
+// Track user reconnection history for rate limiting
+export interface UserReconnectionHistory {
+  userId: string;
+  attempts: ReconnectionAttempt[];
+  bannedUntil: Date | null;
+}
