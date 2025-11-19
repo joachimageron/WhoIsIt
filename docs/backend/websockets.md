@@ -178,14 +178,49 @@ afterInit() {
   this.logger.log('WebSocket Gateway initialized');
   this.broadcastService.setServer(this.server);
   this.lobbyCleanupService.startCleanup();
+  
+  // Start inactivity monitoring
+  this.connectionManager.startInactivityMonitoring((socketId: string) => {
+    const socket = this.server.sockets.sockets.get(socketId);
+    if (socket) {
+      socket.disconnect(true);
+    }
+  });
+}
+```
+
+**`onModuleDestroy()`** - Called on shutdown
+```typescript
+onModuleDestroy() {
+  this.connectionManager.stopInactivityMonitoring();
+  this.logger.log('WebSocket Gateway destroyed');
 }
 ```
 
 **`handleConnection()`** - Called when client connects
 ```typescript
 handleConnection(client: TypedSocket) {
-  this.connectionManager.trackConnection(client);
-  this.logger.log(`Client connected: ${client.id}`);
+  const result = this.connectionManager.trackConnection(client);
+
+  if (!result.allowed) {
+    this.logger.warn(
+      `Connection rejected for ${client.id}: ${result.reason}`,
+    );
+    client.emit('error', { message: result.reason });
+    client.disconnect(true);
+    return;
+  }
+
+  // Disconnect old sockets if this is a reconnection
+  if (result.socketsToDisconnect && result.socketsToDisconnect.length > 0) {
+    result.socketsToDisconnect.forEach((socketId) => {
+      const oldSocket = this.server?.sockets?.sockets?.get(socketId);
+      if (oldSocket) {
+        this.logger.log(`Disconnecting old socket ${socketId}`);
+        oldSocket.disconnect(true);
+      }
+    });
+  }
 }
 ```
 
@@ -308,7 +343,7 @@ async handleUpdatePlayerReady(
 
 ### 3. ConnectionManager
 
-Tracks active WebSocket connections and their state.
+Tracks active WebSocket connections and enforces security policies.
 
 **Location**: `apps/backend/src/game/gateway/connection.manager.ts`
 
@@ -317,6 +352,10 @@ Tracks active WebSocket connections and their state.
 - Map sockets to rooms and players
 - Handle reconnections
 - Monitor connection count
+- **Enforce single connection per user**
+- **Detect reconnection abuse**
+- **Monitor inactivity**
+- **Temporarily ban abusive users**
 
 **Connection Info**:
 ```typescript
@@ -328,20 +367,65 @@ interface ConnectedUser {
   connectedAt: Date;         // Connection timestamp
   lastSeenAt: Date;          // Last activity
 }
+
+interface UserReconnectionHistory {
+  userId: string;
+  attempts: ReconnectionAttempt[];
+  bannedUntil: Date | null;
+}
+```
+
+**Security Configuration**:
+```typescript
+private readonly MAX_RECONNECTIONS_PER_MINUTE = 5;
+private readonly RECONNECTION_WINDOW_MS = 60 * 1000; // 1 minute
+private readonly BAN_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+private readonly INACTIVITY_TIMEOUT_MS = 60 * 1000; // 60 seconds
 ```
 
 **Methods**:
 
-**`trackConnection()`** - Track new connection
+**`trackConnection()`** - Track new connection with security checks
 ```typescript
-trackConnection(client: TypedSocket) {
-  const user = client.user;
-  const userId = user?.id ?? null;
-  const username = user?.username ?? 'guest';
+trackConnection(client: TypedSocket): {
+  allowed: boolean;
+  reason?: string;
+  socketsToDisconnect?: string[];
+} {
+  const userId = client.user?.id ?? null;
 
-  this.logger.log(
-    `Client connected: ${client.id} (user: ${username}, authenticated: ${!!user})`
-  );
+  // Check if user is banned
+  if (userId && this.isUserBanned(userId)) {
+    return {
+      allowed: false,
+      reason: 'Temporarily banned for connection abuse.'
+    };
+  }
+
+  // Check for abusive reconnection pattern
+  if (userId && this.isReconnectionAbusive(userId)) {
+    this.banUser(userId);
+    return {
+      allowed: false,
+      reason: 'Too many reconnection attempts.'
+    };
+  }
+
+  // Find existing connections for single-connection enforcement
+  const socketsToDisconnect: string[] = [];
+  if (userId) {
+    this.recordReconnectionAttempt(userId);
+    
+    const existingConnections = Array.from(this.connectedUsers.values())
+      .filter(conn => conn.userId === userId);
+    
+    if (existingConnections.length > 0) {
+      existingConnections.forEach(conn => {
+        socketsToDisconnect.push(conn.socketId);
+        this.connectedUsers.delete(conn.socketId);
+      });
+    }
+  }
 
   this.connectedUsers.set(client.id, {
     socketId: client.id,
@@ -351,6 +435,13 @@ trackConnection(client: TypedSocket) {
     connectedAt: new Date(),
     lastSeenAt: new Date(),
   });
+
+  return {
+    allowed: true,
+    socketsToDisconnect: socketsToDisconnect.length > 0 
+      ? socketsToDisconnect 
+      : undefined
+  };
 }
 ```
 
@@ -384,6 +475,84 @@ updateConnectionRoom(
     }
     connection.lastSeenAt = new Date();
   }
+}
+```
+
+**`updateLastSeen()`** - Update activity timestamp
+```typescript
+updateLastSeen(socketId: string) {
+  const connection = this.connectedUsers.get(socketId);
+  if (connection) {
+    connection.lastSeenAt = new Date();
+  }
+}
+```
+
+**`startInactivityMonitoring()`** - Begin monitoring for inactive connections
+```typescript
+startInactivityMonitoring(disconnectCallback: (socketId: string) => void) {
+  this.inactivityCheckInterval = setInterval(() => {
+    const now = new Date();
+    const inactiveConnections: string[] = [];
+
+    this.connectedUsers.forEach((connection, socketId) => {
+      const inactiveDuration = now.getTime() - connection.lastSeenAt.getTime();
+      if (inactiveDuration > this.INACTIVITY_TIMEOUT_MS) {
+        inactiveConnections.push(socketId);
+      }
+    });
+
+    inactiveConnections.forEach(socketId => {
+      this.logger.log(`Disconnecting inactive socket ${socketId}`);
+      disconnectCallback(socketId);
+      this.connectedUsers.delete(socketId);
+    });
+  }, 30000); // Check every 30 seconds
+}
+```
+
+**`stopInactivityMonitoring()`** - Stop monitoring
+```typescript
+stopInactivityMonitoring() {
+  if (this.inactivityCheckInterval) {
+    clearInterval(this.inactivityCheckInterval);
+    this.inactivityCheckInterval = null;
+  }
+}
+```
+
+**`getUserBanStatus()`** - Check if user is banned
+```typescript
+getUserBanStatus(userId: string): { 
+  banned: boolean; 
+  bannedUntil?: Date 
+} {
+  const history = this.reconnectionHistory.get(userId);
+  if (!history?.bannedUntil) {
+    return { banned: false };
+  }
+  const banned = new Date() < history.bannedUntil;
+  return { banned, bannedUntil: banned ? history.bannedUntil : undefined };
+}
+```
+
+**`getUserReconnectionHistory()`** - Get reconnection history
+```typescript
+getUserReconnectionHistory(userId: string): {
+  attempts: number;
+  recentAttempts: Date[];
+} {
+  const history = this.reconnectionHistory.get(userId);
+  if (!history) {
+    return { attempts: 0, recentAttempts: [] };
+  }
+  
+  const windowStart = new Date(Date.now() - this.RECONNECTION_WINDOW_MS);
+  const recentAttempts = history.attempts
+    .filter(attempt => attempt.timestamp >= windowStart)
+    .map(attempt => attempt.timestamp);
+  
+  return { attempts: recentAttempts.length, recentAttempts };
 }
 ```
 
@@ -762,11 +931,138 @@ this.logger.error(`Error in handleJoinRoom:`, error);
 - Expired tokens rejected
 - Invalid tokens don't prevent connection (guest mode)
 
+### Single Connection Enforcement
+
+**Purpose**: Prevent users from maintaining multiple simultaneous connections
+
+**Implementation**: 
+- Track active connections by userId
+- When user reconnects, automatically disconnect previous socket
+- Guest users (no userId) can maintain multiple connections
+
+**Benefits**:
+- Prevents connection abuse
+- Reduces server load
+- Ensures consistent player state
+
+**Example**:
+```typescript
+// When user reconnects
+const result = connectionManager.trackConnection(client);
+if (result.socketsToDisconnect) {
+  // Disconnect old sockets for this user
+  result.socketsToDisconnect.forEach(socketId => {
+    const oldSocket = server.sockets.sockets.get(socketId);
+    oldSocket?.disconnect(true);
+  });
+}
+```
+
+### Reconnection Abuse Detection
+
+**Purpose**: Detect and prevent rapid reconnection attacks
+
+**Configuration**:
+- **Max Reconnections**: 5 per minute
+- **Time Window**: 60 seconds
+- **Ban Duration**: 5 minutes
+
+**How It Works**:
+1. Track reconnection attempts per user
+2. Count attempts within sliding 60-second window
+3. If exceeds 5 attempts, temporarily ban user
+4. Ban expires after 5 minutes
+
+**Implementation**:
+```typescript
+interface UserReconnectionHistory {
+  userId: string;
+  attempts: ReconnectionAttempt[];
+  bannedUntil: Date | null;
+}
+
+// Check if user is banned
+if (userId && this.isUserBanned(userId)) {
+  return {
+    allowed: false,
+    reason: 'Temporarily banned for connection abuse.'
+  };
+}
+
+// Check for abusive pattern
+if (userId && this.isReconnectionAbusive(userId)) {
+  this.banUser(userId);
+  return {
+    allowed: false,
+    reason: 'Too many reconnection attempts.'
+  };
+}
+```
+
+**Monitoring**:
+```typescript
+// Check user's ban status
+const banStatus = connectionManager.getUserBanStatus(userId);
+// { banned: true, bannedUntil: Date }
+
+// Check reconnection history
+const history = connectionManager.getUserReconnectionHistory(userId);
+// { attempts: 3, recentAttempts: [Date, Date, Date] }
+```
+
+### Inactivity Timeout
+
+**Purpose**: Automatically disconnect idle clients to prevent resource exhaustion
+
+**Configuration**:
+- **Timeout Duration**: 60 seconds
+- **Check Interval**: 30 seconds
+
+**How It Works**:
+1. Track last activity time for each connection
+2. Periodically check for inactive connections (every 30s)
+3. Disconnect sockets inactive for >60 seconds
+4. Activity updated on:
+   - Initial connection
+   - Room join/leave
+   - Player ready updates
+   - Any game action
+
+**Implementation**:
+```typescript
+// Start monitoring when gateway initializes
+connectionManager.startInactivityMonitoring((socketId: string) => {
+  const socket = server.sockets.sockets.get(socketId);
+  if (socket) {
+    socket.disconnect(true);
+  }
+});
+
+// Update activity on events
+connectionManager.updateLastSeen(client.id);
+```
+
+**Lifecycle**:
+```typescript
+// In GameGateway
+afterInit() {
+  // Start monitoring
+  this.connectionManager.startInactivityMonitoring(
+    (socketId) => this.disconnectSocket(socketId)
+  );
+}
+
+onModuleDestroy() {
+  // Clean up
+  this.connectionManager.stopInactivityMonitoring();
+}
+```
+
 ### Rate Limiting
 
-Consider rate limiting for:
+Consider implementing rate limiting for:
 - Connection attempts
-- Event emissions
+- Event emissions  
 - Room joins
 
 ### Input Validation
@@ -779,6 +1075,62 @@ async handleJoinRoom(
   @ConnectedSocket() client: TypedSocket,
   @MessageBody() data: SocketJoinRoomRequest,  // Validated by pipes
 ): Promise<SocketJoinRoomResponse>
+```
+
+### Security Best Practices
+
+1. **Single connection per user**: Automatically enforced
+2. **Monitor reconnection patterns**: Detect abuse early
+3. **Timeout inactive connections**: Prevent resource exhaustion
+4. **Validate all inputs**: Use DTOs and validation pipes
+5. **Log security events**: Track bans and suspicious activity
+6. **Regular cleanup**: Run lobby cleanup service
+7. **Monitor metrics**: Track connection counts and patterns
+
+### Testing Security Features
+
+Example tests for security features:
+
+```typescript
+describe('ConnectionManager Security', () => {
+  it('should enforce single connection per user', () => {
+    const socket1 = createMockSocket(user, 'socket-1');
+    const socket2 = createMockSocket(user, 'socket-2');
+    
+    connectionManager.trackConnection(socket1);
+    const result = connectionManager.trackConnection(socket2);
+    
+    expect(result.socketsToDisconnect).toEqual(['socket-1']);
+  });
+
+  it('should ban user after excessive reconnections', () => {
+    for (let i = 0; i < 7; i++) {
+      connectionManager.trackConnection(
+        createMockSocket(user, `socket-${i}`)
+      );
+    }
+    
+    const result = connectionManager.trackConnection(
+      createMockSocket(user, 'socket-new')
+    );
+    
+    expect(result.allowed).toBe(false);
+    expect(result.reason).toContain('banned');
+  });
+
+  it('should disconnect inactive connections', (done) => {
+    const disconnectCallback = jest.fn();
+    
+    connectionManager.trackConnection(socket);
+    connectionManager.startInactivityMonitoring(disconnectCallback);
+    
+    // Fast forward past timeout
+    jest.advanceTimersByTime(91000);
+    
+    expect(disconnectCallback).toHaveBeenCalledWith(socket.id);
+    done();
+  });
+});
 ```
 
 ## Troubleshooting
