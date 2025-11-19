@@ -262,7 +262,7 @@ describe('AuthController', () => {
       mockAuthService.createGuest.mockResolvedValue(expectedResponse);
 
       const res = mockResponse();
-      await controller.createGuest(createGuestDto, res);
+      await controller.createGuest(res);
 
       expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -297,7 +297,7 @@ describe('AuthController', () => {
       mockAuthService.createGuest.mockResolvedValue(expectedResponse);
 
       const res = mockResponse();
-      await controller.createGuest(createGuestDto, res);
+      await controller.createGuest(res);
 
       expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
       // eslint-disable-next-line @typescript-eslint/unbound-method

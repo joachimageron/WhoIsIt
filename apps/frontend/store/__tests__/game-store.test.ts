@@ -122,12 +122,13 @@ describe("useGameStore", () => {
 
       expect(result.current.playState).not.toBeNull();
       expect(result.current.playState?.gameState).toEqual(gameState);
+      expect(result.current.playState?.roomCode).toBe("TEST123");
       expect(result.current.playState?.characters).toEqual([]);
       expect(result.current.playState?.questions).toEqual([]);
       expect(result.current.playState?.answers).toEqual(new Map());
     });
 
-    it("updates gameState when playState exists", () => {
+    it("updates gameState when playState exists with same roomCode", () => {
       const { result } = renderHook(() => useGameStore());
 
       const gameState1: GameStateResponse = {
@@ -153,6 +154,104 @@ describe("useGameStore", () => {
       });
 
       expect(result.current.playState?.gameState).toEqual(gameState2);
+      expect(result.current.playState?.roomCode).toBe("TEST123");
+    });
+
+    it("resets playState when roomCode changes", () => {
+      const { result } = renderHook(() => useGameStore());
+
+      // Set up initial game state with data
+      const gameState1: GameStateResponse = {
+        id: "game-1",
+        roomCode: "TEST123",
+        currentPlayerId: "player-1",
+        roundNumber: 1,
+      } as GameStateResponse;
+
+      const characters: CharacterResponseDto[] = [
+        {
+          id: "char-1",
+          name: "Alice",
+          imageUrl: "url1",
+        } as CharacterResponseDto,
+        { id: "char-2", name: "Bob", imageUrl: "url2" } as CharacterResponseDto,
+      ];
+
+      const question: QuestionResponse = {
+        id: "q1",
+        text: "Is it a person?",
+        playerId: "player-1",
+      } as QuestionResponse;
+
+      act(() => {
+        result.current.setGameState(gameState1);
+        result.current.setCharacters(characters);
+        result.current.addQuestion(question);
+        result.current.eliminateCharacter("char-1");
+        result.current.toggleFlipCharacter("char-2");
+      });
+
+      // Verify initial state has data
+      expect(result.current.playState?.roomCode).toBe("TEST123");
+      expect(result.current.playState?.characters).toHaveLength(2);
+      expect(result.current.playState?.questions).toHaveLength(1);
+      expect(result.current.playState?.eliminatedCharacterIds.size).toBe(1);
+      expect(result.current.playState?.flippedCharacterIds.size).toBe(1);
+
+      // Change roomCode
+      const gameState2: GameStateResponse = {
+        id: "game-2",
+        roomCode: "NEWROOM",
+        currentPlayerId: "player-1",
+        roundNumber: 1,
+      } as GameStateResponse;
+
+      act(() => {
+        result.current.setGameState(gameState2);
+      });
+
+      // Verify playState was reset but new gameState is set
+      expect(result.current.playState?.roomCode).toBe("NEWROOM");
+      expect(result.current.playState?.gameState).toEqual(gameState2);
+      expect(result.current.playState?.characters).toEqual([]);
+      expect(result.current.playState?.questions).toEqual([]);
+      expect(result.current.playState?.answers).toEqual(new Map());
+      expect(result.current.playState?.eliminatedCharacterIds.size).toBe(0);
+      expect(result.current.playState?.flippedCharacterIds.size).toBe(0);
+      expect(result.current.playState?.myCharacter).toBeNull();
+    });
+
+    it("does not reset when roomCode is null", () => {
+      const { result } = renderHook(() => useGameStore());
+
+      const gameState1: GameStateResponse = {
+        id: "game-1",
+        roomCode: "TEST123",
+        currentPlayerId: "player-1",
+        roundNumber: 1,
+      } as GameStateResponse;
+
+      act(() => {
+        result.current.setGameState(gameState1);
+        result.current.eliminateCharacter("char-1");
+      });
+
+      expect(result.current.playState?.eliminatedCharacterIds.size).toBe(1);
+
+      // Set gameState with null roomCode
+      const gameState2: GameStateResponse = {
+        id: "game-1",
+        roomCode: null as any,
+        currentPlayerId: "player-1",
+        roundNumber: 2,
+      } as GameStateResponse;
+
+      act(() => {
+        result.current.setGameState(gameState2);
+      });
+
+      // Should preserve eliminated characters
+      expect(result.current.playState?.eliminatedCharacterIds.size).toBe(1);
     });
   });
 

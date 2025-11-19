@@ -8,7 +8,7 @@ const locales = ["en", "fr"];
 const defaultLocale = "en";
 
 // Routes that require authentication or guest session
-const protectedGameRoutes = ["/game/play"];
+const protectedGameRoutes = ["/game/play", "/profile"];
 
 function getLocale(request: NextRequest): string {
   // Get locale from Accept-Language header
@@ -69,7 +69,7 @@ export function middleware(request: NextRequest) {
   if (isProtectedGameRoute(pathname)) {
     const hasAuth = hasAuthCookie(request);
     const hasGuestSession =
-      request.cookies.has("guest_session") ||
+      request.cookies.has("guest_token") ||
       // Check for localStorage-based guest session marker cookie
       request.headers.get("cookie")?.includes("whoisit_has_guest_session=true");
 

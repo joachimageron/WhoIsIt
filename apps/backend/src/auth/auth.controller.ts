@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Patch,
   Post,
@@ -155,10 +156,11 @@ export class AuthController {
     @Request() req: RequestWithUser,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    const user = await this.authService.updateProfile(
-      req.user.id,
-      updateProfileDto,
-    );
+    if (req.user.isGuest) {
+      throw new ForbiddenException('Guest users cannot update profile');
+    }
+
+    const user = await this.authService.updateProfile(req.user.id, updateProfileDto);
 
     return {
       id: user.id,
