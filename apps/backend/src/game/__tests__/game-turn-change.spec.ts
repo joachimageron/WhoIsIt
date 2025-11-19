@@ -213,8 +213,9 @@ describe('Game Turn Change Logic', () => {
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       playerRepository.findOne
-        .mockResolvedValueOnce(mockPlayer1)
-        .mockResolvedValueOnce(mockPlayer2);
+        .mockResolvedValueOnce(mockPlayer1) // For validatePlayerOwnership
+        .mockResolvedValueOnce(mockPlayer1) // For getting the asking player
+        .mockResolvedValueOnce(mockPlayer2); // For getting the target player
 
       const mockQuestion = {
         id: 'question-1',
@@ -234,7 +235,7 @@ describe('Game Turn Change Logic', () => {
         return Promise.resolve(round);
       });
 
-      await gamePlayService.askQuestion('ABC12', request);
+      await gamePlayService.askQuestion('ABC12', request, null);
 
       // Verify round was saved
       expect(roundRepository.save).toHaveBeenCalled();
@@ -364,8 +365,9 @@ describe('Game Turn Change Logic', () => {
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       playerRepository.findOne
-        .mockResolvedValueOnce(mockPlayer1)
-        .mockResolvedValueOnce(targetPlayerWithSecret);
+        .mockResolvedValueOnce(mockPlayer1) // For validatePlayerOwnership
+        .mockResolvedValueOnce(mockPlayer1) // For getting the guessing player
+        .mockResolvedValueOnce(targetPlayerWithSecret); // For getting the target player
       characterRepository.findOne.mockResolvedValue(mockCharacter);
 
       const mockGuess = {
@@ -400,7 +402,7 @@ describe('Game Turn Change Logic', () => {
       playerRepository.save.mockResolvedValue(mockPlayer1);
       gameStatsService.checkAndHandleGameEnd.mockResolvedValue(false);
 
-      await gameService.submitGuess('ABC12', request);
+      await gameService.submitGuess('ABC12', request, null);
 
       // Verify round was saved (by advanceToNextTurn)
       expect(roundRepository.save).toHaveBeenCalled();
@@ -455,8 +457,9 @@ describe('Game Turn Change Logic', () => {
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       playerRepository.findOne
-        .mockResolvedValueOnce(mockPlayer1)
-        .mockResolvedValueOnce(targetPlayerWithSecret);
+        .mockResolvedValueOnce(mockPlayer1) // For validatePlayerOwnership
+        .mockResolvedValueOnce(mockPlayer1) // For getting the guessing player
+        .mockResolvedValueOnce(targetPlayerWithSecret); // For getting the target player
       characterRepository.findOne.mockResolvedValue(wrongCharacter);
 
       const mockGuess = {
@@ -490,7 +493,7 @@ describe('Game Turn Change Logic', () => {
       playerRepository.save.mockResolvedValue(mockPlayer1);
       gameStatsService.checkAndHandleGameEnd.mockResolvedValue(false);
 
-      await gameService.submitGuess('ABC12', request);
+      await gameService.submitGuess('ABC12', request, null);
 
       // Verify round was saved (by advanceToNextTurn)
       expect(roundRepository.save).toHaveBeenCalled();

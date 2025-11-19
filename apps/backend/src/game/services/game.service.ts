@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GameStatus } from '../../database/enums';
 import { Game, Guess } from '../../database/entities';
+import { User } from '../../database/entities/user.entity';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
@@ -60,8 +61,16 @@ export class GameService {
     });
   }
 
-  async updatePlayerReady(playerId: string, isReady: boolean) {
-    return this.gameLobbyService.updatePlayerReady(playerId, isReady);
+  async updatePlayerReady(
+    playerId: string,
+    isReady: boolean,
+    authenticatedUser: User | null,
+  ) {
+    return this.gameLobbyService.updatePlayerReady(
+      playerId,
+      isReady,
+      authenticatedUser,
+    );
   }
 
   async markPlayerAsLeft(playerId: string) {
@@ -120,8 +129,13 @@ export class GameService {
   async askQuestion(
     roomCode: string,
     request: AskQuestionRequest,
+    authenticatedUser: User | null,
   ): Promise<QuestionResponse> {
-    return this.gamePlayService.askQuestion(roomCode, request);
+    return this.gamePlayService.askQuestion(
+      roomCode,
+      request,
+      authenticatedUser,
+    );
   }
 
   async getQuestions(roomCode: string): Promise<QuestionResponse[]> {
@@ -135,13 +149,19 @@ export class GameService {
   async submitAnswer(
     roomCode: string,
     request: SubmitAnswerRequest,
+    authenticatedUser: User | null,
   ): Promise<AnswerResponse> {
-    return this.gamePlayService.submitAnswer(roomCode, request);
+    return this.gamePlayService.submitAnswer(
+      roomCode,
+      request,
+      authenticatedUser,
+    );
   }
 
   async submitGuess(
     roomCode: string,
     request: SubmitGuessRequest,
+    authenticatedUser: User | null,
   ): Promise<GuessResponse> {
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
@@ -171,6 +191,7 @@ export class GameService {
     const guessResponse = await this.gamePlayService.submitGuess(
       roomCode,
       request,
+      authenticatedUser,
     );
 
     // Get the guess entity to handle game logic
@@ -211,8 +232,13 @@ export class GameService {
   async getPlayerCharacter(
     roomCode: string,
     playerId: string,
+    authenticatedUser: User | null,
   ): Promise<PlayerCharacterResponse> {
-    return this.gamePlayService.getPlayerCharacter(roomCode, playerId);
+    return this.gamePlayService.getPlayerCharacter(
+      roomCode,
+      playerId,
+      authenticatedUser,
+    );
   }
 
   // Delegate statistics operations to GameStatsService

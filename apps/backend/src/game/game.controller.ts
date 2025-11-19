@@ -5,6 +5,8 @@ import {
   Get,
   Param,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import type {
   CreateGameRequest,
@@ -23,6 +25,12 @@ import type {
 import { GameService } from './services/game.service';
 import { BroadcastService } from './services/broadcast.service';
 import { AnswerValue } from '../database/enums';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { User } from '../database/entities/user.entity';
+
+export interface RequestWithUser extends Request {
+  user?: User | null;
+}
 
 @Controller('games')
 export class GameController {
@@ -83,10 +91,12 @@ export class GameController {
     return this.gameService.getLobbyByRoomCode(roomCode);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':roomCode/players/:playerId/character')
   async getPlayerCharacter(
     @Param('roomCode') roomCode: string,
     @Param('playerId') playerId: string,
+    @Request() req: RequestWithUser,
   ): Promise<PlayerCharacterResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
@@ -96,7 +106,11 @@ export class GameController {
       throw new BadRequestException('playerId is required');
     }
 
-    return this.gameService.getPlayerCharacter(roomCode, playerId);
+    return this.gameService.getPlayerCharacter(
+      roomCode,
+      playerId,
+      req.user ?? null,
+    );
   }
 
   @Post(':roomCode/start')
@@ -115,10 +129,12 @@ export class GameController {
     return result;
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post(':roomCode/questions')
   async askQuestion(
     @Param('roomCode') roomCode: string,
     @Body() body: AskQuestionRequest,
+    @Request() req: RequestWithUser,
   ): Promise<QuestionResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
@@ -136,12 +152,16 @@ export class GameController {
       throw new BadRequestException('targetPlayerId is required');
     }
 
-    const question = await this.gameService.askQuestion(roomCode, {
-      ...body,
-      questionText: body.questionText.trim(),
-      playerId: body.playerId.trim(),
-      targetPlayerId: body.targetPlayerId.trim(),
-    });
+    const question = await this.gameService.askQuestion(
+      roomCode,
+      {
+        ...body,
+        questionText: body.questionText.trim(),
+        playerId: body.playerId.trim(),
+        targetPlayerId: body.targetPlayerId.trim(),
+      },
+      req.user ?? null,
+    );
 
     // Get updated game state
     const gameState = await this.gameService.getGameState(roomCode);
@@ -185,10 +205,12 @@ export class GameController {
     return this.gameService.getAnswers(roomCode);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post(':roomCode/answers')
   async submitAnswer(
     @Param('roomCode') roomCode: string,
     @Body() body: SubmitAnswerRequest,
+    @Request() req: RequestWithUser,
   ): Promise<AnswerResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
@@ -213,12 +235,16 @@ export class GameController {
       );
     }
 
-    const answer = await this.gameService.submitAnswer(roomCode, {
-      ...body,
-      playerId: body.playerId.trim(),
-      questionId: body.questionId.trim(),
-      answerText: body.answerText?.trim(),
-    });
+    const answer = await this.gameService.submitAnswer(
+      roomCode,
+      {
+        ...body,
+        playerId: body.playerId.trim(),
+        questionId: body.questionId.trim(),
+        answerText: body.answerText?.trim(),
+      },
+      req.user ?? null,
+    );
 
     // Get updated game state
     const gameState = await this.gameService.getGameState(roomCode);
@@ -229,10 +255,12 @@ export class GameController {
     return answer;
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post(':roomCode/guesses')
   async submitGuess(
     @Param('roomCode') roomCode: string,
     @Body() body: SubmitGuessRequest,
+    @Request() req: RequestWithUser,
   ): Promise<GuessResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
@@ -253,12 +281,16 @@ export class GameController {
       throw new BadRequestException('targetPlayerId is required');
     }
 
-    const guess = await this.gameService.submitGuess(roomCode, {
-      ...body,
-      playerId: body.playerId.trim(),
-      targetPlayerId: body.targetPlayerId.trim(),
-      targetCharacterId: body.targetCharacterId.trim(),
-    });
+    const guess = await this.gameService.submitGuess(
+      roomCode,
+      {
+        ...body,
+        playerId: body.playerId.trim(),
+        targetPlayerId: body.targetPlayerId.trim(),
+        targetCharacterId: body.targetCharacterId.trim(),
+      },
+      req.user ?? null,
+    );
 
     // Get updated game state
     const gameState = await this.gameService.getGameState(roomCode);

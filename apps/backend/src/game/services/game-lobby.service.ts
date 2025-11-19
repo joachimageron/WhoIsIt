@@ -19,6 +19,7 @@ import type {
   JoinGameRequest,
   GameVisibility as ContractGameVisibility,
 } from '@whois-it/contracts';
+import { validatePlayerOwnership } from '../utils/authorization.utils';
 
 @Injectable()
 export class GameLobbyService {
@@ -227,7 +228,15 @@ export class GameLobbyService {
   async updatePlayerReady(
     playerId: string,
     isReady: boolean,
+    authenticatedUser: User | null,
   ): Promise<GamePlayer> {
+    // Validate that the authenticated user owns the player making the action
+    await validatePlayerOwnership(
+      this.playerRepository,
+      playerId,
+      authenticatedUser,
+    );
+
     const player = await this.playerRepository.findOne({
       where: { id: playerId },
       relations: { game: true },

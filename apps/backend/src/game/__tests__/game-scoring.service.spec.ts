@@ -265,7 +265,7 @@ describe('GameService - Scoring and Game End', () => {
         playerId: 'player-2',
         questionId: 'question-1',
         answerValue: AnswerValue.YES,
-      });
+      }, null);
     });
 
     it('should award 1000 points for correct guess', async () => {
@@ -309,12 +309,13 @@ describe('GameService - Scoring and Game End', () => {
       mockGameRepository.manager.findOne.mockResolvedValue(null); // No guess entity found
       mockGamePlayService.handleGuessResult.mockResolvedValue(false);
 
-      const result = await service.submitGuess('ABC12', guessRequest);
+      const result = await service.submitGuess('ABC12', guessRequest, null);
 
       expect(result).toBe(guessResponse);
       expect(mockGamePlayService.submitGuess).toHaveBeenCalledWith(
         'ABC12',
         guessRequest,
+        null,
       );
     });
   });
@@ -358,7 +359,7 @@ describe('GameService - Scoring and Game End', () => {
       mockGamePlayService.handleGuessResult.mockResolvedValue(true); // Should check game end
       mockGameStatsService.checkAndHandleGameEnd.mockResolvedValue(true); // Game ended
 
-      await service.submitGuess('ABC12', guessRequest);
+      await service.submitGuess('ABC12', guessRequest, null);
 
       expect(mockGameStatsService.checkAndHandleGameEnd).toHaveBeenCalled();
     });
