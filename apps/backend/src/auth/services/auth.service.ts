@@ -23,7 +23,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly authTokenService: AuthTokenService,
     private readonly authProfileService: AuthProfileService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     const { email, username, password } = registerDto;

@@ -87,15 +87,15 @@ export const useGameStore = create<GameState>()(
             playState: state.playState
               ? { ...state.playState, gameState, roomCode: newRoomCode }
               : {
-                roomCode: newRoomCode,
-                gameState,
-                characters: [],
-                questions: [],
-                answers: new Map(),
-                eliminatedCharacterIds: new Set(),
-                flippedCharacterIds: new Set(),
-                myCharacter: null,
-              },
+                  roomCode: newRoomCode,
+                  gameState,
+                  characters: [],
+                  questions: [],
+                  answers: new Map(),
+                  eliminatedCharacterIds: new Set(),
+                  flippedCharacterIds: new Set(),
+                  myCharacter: null,
+                },
           };
         }),
       setCharacters: (characters) =>
@@ -103,30 +103,30 @@ export const useGameStore = create<GameState>()(
           playState: state.playState
             ? { ...state.playState, characters }
             : {
-              roomCode: null,
-              gameState: null,
-              characters,
-              questions: [],
-              answers: new Map(),
-              eliminatedCharacterIds: new Set(),
-              flippedCharacterIds: new Set(),
-              myCharacter: null,
-            },
+                roomCode: null,
+                gameState: null,
+                characters,
+                questions: [],
+                answers: new Map(),
+                eliminatedCharacterIds: new Set(),
+                flippedCharacterIds: new Set(),
+                myCharacter: null,
+              },
         })),
       setMyCharacter: (myCharacter) =>
         set((state) => ({
           playState: state.playState
             ? { ...state.playState, myCharacter }
             : {
-              roomCode: null,
-              gameState: null,
-              characters: [],
-              questions: [],
-              answers: new Map(),
-              eliminatedCharacterIds: new Set(),
-              flippedCharacterIds: new Set(),
-              myCharacter,
-            },
+                roomCode: null,
+                gameState: null,
+                characters: [],
+                questions: [],
+                answers: new Map(),
+                eliminatedCharacterIds: new Set(),
+                flippedCharacterIds: new Set(),
+                myCharacter,
+              },
         })),
       addQuestion: (question) =>
         set((state) => {
