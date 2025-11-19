@@ -22,6 +22,7 @@ import {
   Answer,
   Guess,
 } from '../../database/entities';
+import { User } from '../../database/entities/user.entity';
 import type {
   AskQuestionRequest,
   QuestionResponse,
@@ -33,6 +34,7 @@ import type {
   PlayerCharacterResponse,
 } from '@whois-it/contracts';
 import { GameLobbyService } from './game-lobby.service';
+import { validatePlayerOwnership } from '../utils/authorization.utils';
 
 @Injectable()
 export class GamePlayService {
@@ -199,9 +201,17 @@ export class GamePlayService {
   async askQuestion(
     roomCode: string,
     request: AskQuestionRequest,
+    authenticatedUser: User | null,
   ): Promise<QuestionResponse> {
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
+
+    // Validate that the authenticated user owns the player making the action
+    await validatePlayerOwnership(
+      this.playerRepository,
+      request.playerId,
+      authenticatedUser,
+    );
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -411,9 +421,17 @@ export class GamePlayService {
   async submitAnswer(
     roomCode: string,
     request: SubmitAnswerRequest,
+    authenticatedUser: User | null,
   ): Promise<AnswerResponse> {
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
+
+    // Validate that the authenticated user owns the player making the action
+    await validatePlayerOwnership(
+      this.playerRepository,
+      request.playerId,
+      authenticatedUser,
+    );
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -643,9 +661,17 @@ export class GamePlayService {
   async submitGuess(
     roomCode: string,
     request: SubmitGuessRequest,
+    authenticatedUser: User | null,
   ): Promise<GuessResponse> {
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
+
+    // Validate that the authenticated user owns the player making the action
+    await validatePlayerOwnership(
+      this.playerRepository,
+      request.playerId,
+      authenticatedUser,
+    );
 
     // Get the game with all necessary relations
     const game = await this.gameRepository.findOne({
@@ -824,9 +850,17 @@ export class GamePlayService {
   async getPlayerCharacter(
     roomCode: string,
     playerId: string,
+    authenticatedUser: User | null,
   ): Promise<PlayerCharacterResponse> {
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
+
+    // Validate that the authenticated user owns the player making the action
+    await validatePlayerOwnership(
+      this.playerRepository,
+      playerId,
+      authenticatedUser,
+    );
 
     // Get the game to verify it exists and is in progress
     const game = await this.gameRepository.findOne({

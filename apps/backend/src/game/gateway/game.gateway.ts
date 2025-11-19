@@ -242,8 +242,12 @@ export class GameGateway
       // Update last seen time
       this.connectionManager.updateLastSeen(client.id);
 
-      // Update player ready state
-      await this.gameService.updatePlayerReady(playerId, isReady);
+      // Update player ready state with authorization
+      await this.gameService.updatePlayerReady(
+        playerId,
+        isReady,
+        client.user ?? null,
+      );
 
       // Get updated lobby state
       const lobby =
