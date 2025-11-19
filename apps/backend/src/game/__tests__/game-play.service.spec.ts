@@ -112,6 +112,7 @@ describe('GamePlayService', () => {
     guessRepository = {
       create: jest.fn(),
       save: jest.fn(),
+      count: jest.fn(),
     };
 
     gameLobbyService = {
@@ -776,6 +777,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(targetPlayer);
       playerSecretRepository.findOne.mockResolvedValue(mockSecret);
       characterRepository.findOne.mockResolvedValue(mockCharacter);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -852,6 +854,7 @@ describe('GamePlayService', () => {
       playerSecretRepository.findOne.mockResolvedValue(mockSecret);
       characterRepository.findOne.mockResolvedValue(wrongCharacter);
       playerRepository.save.mockResolvedValue(guessingPlayer);
+      guessRepository.count.mockResolvedValue(0);
 
       const mockGuess = {
         id: 'guess-1',
@@ -1038,6 +1041,238 @@ describe('GamePlayService', () => {
       await expect(
         service.submitGuess('ABC12', request),
       ).rejects.toThrow('Only the active player can make a guess');
+    });
+
+    it('should throw BadRequestException if player has reached max guesses', async () => {
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      const guessingPlayer = {
+        ...mockPlayer,
+      } as GamePlayer;
+
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
+      const gameWithRounds = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundForGuess],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithRounds);
+      playerRepository.findOne.mockResolvedValueOnce(guessingPlayer);
+      guessRepository.count.mockResolvedValue(3); // Already at max
+
+      await expect(
+        service.submitGuess('ABC12', request),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should allow guess when under the limit', async () => {
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      const targetPlayer = {
+        id: 'player-2',
+        username: 'target',
+        game: mockGame,
+        secret: {
+          character: mockCharacter,
+        },
+      } as GamePlayer;
+
+      const guessingPlayer = {
+        ...mockPlayer,
+        score: 100,
+      } as GamePlayer;
+
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
+      const gameWithRounds = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundForGuess],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithRounds);
+      playerRepository.findOne
+        .mockResolvedValueOnce(guessingPlayer)
+        .mockResolvedValueOnce(targetPlayer);
+      characterRepository.findOne.mockResolvedValue(mockCharacter);
+      guessRepository.count.mockResolvedValue(2); // Under limit
+
+      const mockGuess = {
+        id: 'guess-1',
+        round: roundForGuess,
+        guessedBy: guessingPlayer,
+        targetPlayer: targetPlayer,
+        targetCharacter: mockCharacter,
+        isCorrect: true,
+        guessedAt: new Date(),
+      } as Guess;
+
+      guessRepository.create.mockReturnValue(mockGuess);
+      guessRepository.save.mockResolvedValue(mockGuess);
+
+      const result = await service.submitGuess('ABC12', request);
+
+      expect(result).toBeDefined();
+      expect(guessRepository.count).toHaveBeenCalledWith({
+        where: {
+          guessedBy: { id: guessingPlayer.id },
+          round: { game: { id: mockGame.id } },
+        },
+      });
+    });
+
+    it('should apply score penalty for incorrect guess', async () => {
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-2',
+      };
+
+      const targetPlayer = {
+        id: 'player-2',
+        username: 'target',
+        game: mockGame,
+        secret: {
+          character: mockCharacter,
+        },
+      } as GamePlayer;
+
+      const guessingPlayer = {
+        ...mockPlayer,
+        score: 200,
+      } as GamePlayer;
+
+      const wrongCharacter = {
+        id: 'char-2',
+        name: 'Wrong Character',
+      } as Character;
+
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
+      const gameWithRounds = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundForGuess],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithRounds);
+      playerRepository.findOne
+        .mockResolvedValueOnce(guessingPlayer)
+        .mockResolvedValueOnce(targetPlayer);
+      characterRepository.findOne.mockResolvedValue(wrongCharacter);
+      guessRepository.count.mockResolvedValue(0);
+
+      const mockGuess = {
+        id: 'guess-1',
+        round: roundForGuess,
+        guessedBy: guessingPlayer,
+        targetPlayer: targetPlayer,
+        targetCharacter: wrongCharacter,
+        isCorrect: false,
+        guessedAt: new Date(),
+      } as Guess;
+
+      guessRepository.create.mockReturnValue(mockGuess);
+      guessRepository.save.mockResolvedValue(mockGuess);
+      playerRepository.save.mockResolvedValue(guessingPlayer);
+
+      await service.submitGuess('ABC12', request);
+
+      expect(playerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          score: 100, // 200 - 100 penalty
+        }),
+      );
+    });
+
+    it('should not let score go below zero after penalty', async () => {
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-2',
+      };
+
+      const targetPlayer = {
+        id: 'player-2',
+        username: 'target',
+        game: mockGame,
+        secret: {
+          character: mockCharacter,
+        },
+      } as GamePlayer;
+
+      const guessingPlayer = {
+        ...mockPlayer,
+        score: 50, // Less than penalty
+      } as GamePlayer;
+
+      const wrongCharacter = {
+        id: 'char-2',
+        name: 'Wrong Character',
+      } as Character;
+
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
+      const gameWithRounds = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundForGuess],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithRounds);
+      playerRepository.findOne
+        .mockResolvedValueOnce(guessingPlayer)
+        .mockResolvedValueOnce(targetPlayer);
+      characterRepository.findOne.mockResolvedValue(wrongCharacter);
+      guessRepository.count.mockResolvedValue(0);
+
+      const mockGuess = {
+        id: 'guess-1',
+        round: roundForGuess,
+        guessedBy: guessingPlayer,
+        targetPlayer: targetPlayer,
+        targetCharacter: wrongCharacter,
+        isCorrect: false,
+        guessedAt: new Date(),
+      } as Guess;
+
+      guessRepository.create.mockReturnValue(mockGuess);
+      guessRepository.save.mockResolvedValue(mockGuess);
+      playerRepository.save.mockResolvedValue(guessingPlayer);
+
+      await service.submitGuess('ABC12', request);
+
+      expect(playerRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          score: 0, // Should be clamped to 0, not negative
+        }),
+      );
     });
   });
 

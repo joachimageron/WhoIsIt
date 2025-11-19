@@ -40,6 +40,10 @@ export class GamePlayService {
   private static readonly SCORE_CORRECT_GUESS = 1000;
   private static readonly SCORE_QUESTION_BONUS = 10;
   private static readonly SCORE_ANSWER_BONUS = 5;
+  private static readonly SCORE_INCORRECT_GUESS_PENALTY = -100;
+
+  // Game rules constants
+  private static readonly MAX_GUESSES_PER_PLAYER = 3;
 
   constructor(
     @InjectRepository(Game)
@@ -704,6 +708,20 @@ export class GamePlayService {
       throw new BadRequestException('Only the active player can make a guess');
     }
 
+    // Validate guess limit by counting existing guesses
+    const existingGuessCount = await this.guessRepository.count({
+      where: {
+        guessedBy: { id: guessingPlayer.id },
+        round: { game: { id: game.id } },
+      },
+    });
+
+    if (existingGuessCount >= GamePlayService.MAX_GUESSES_PER_PLAYER) {
+      throw new BadRequestException(
+        `Maximum number of guesses (${GamePlayService.MAX_GUESSES_PER_PLAYER}) reached`,
+      );
+    }
+
     // Get the target player (required in 2-player game)
     const targetPlayer = await this.playerRepository.findOne({
       where: { id: request.targetPlayerId },
@@ -754,6 +772,16 @@ export class GamePlayService {
     });
 
     const savedGuess = await this.guessRepository.save(guess);
+
+    // Apply score penalty for incorrect guess
+    if (!isCorrect) {
+      guessingPlayer.score += GamePlayService.SCORE_INCORRECT_GUESS_PENALTY;
+      // Ensure score doesn't go below 0
+      if (guessingPlayer.score < 0) {
+        guessingPlayer.score = 0;
+      }
+      await this.playerRepository.save(guessingPlayer);
+    }
 
     // Return the guess response
     return this.mapToGuessResponse(
