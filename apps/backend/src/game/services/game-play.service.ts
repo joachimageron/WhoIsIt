@@ -652,7 +652,7 @@ export class GamePlayService {
       where: { roomCode: normalizedRoomCode },
       relations: {
         players: true,
-        rounds: true,
+        rounds: { activePlayer: true },
       },
       order: {
         rounds: { roundNumber: 'DESC' },
@@ -673,6 +673,13 @@ export class GamePlayService {
       throw new InternalServerErrorException('No active round found');
     }
 
+    // Validate round state - guessing is only allowed during AWAITING_QUESTION
+    if (currentRound.state !== RoundState.AWAITING_QUESTION) {
+      throw new BadRequestException(
+        `Cannot submit guess in round state: ${currentRound.state}`,
+      );
+    }
+
     // Get the player making the guess
     const guessingPlayer = await this.playerRepository.findOne({
       where: { id: request.playerId },
@@ -687,6 +694,14 @@ export class GamePlayService {
 
     if (guessingPlayer.game.id !== game.id) {
       throw new BadRequestException('Player is not in this game');
+    }
+
+    // Validate that the player making the guess is the active player
+    if (
+      !currentRound.activePlayer ||
+      currentRound.activePlayer.id !== request.playerId
+    ) {
+      throw new BadRequestException('Only the active player can make a guess');
     }
 
     // Get the target player (required in 2-player game)

@@ -758,10 +758,16 @@ describe('GamePlayService', () => {
         status: PlayerSecretStatus.HIDDEN,
       } as PlayerSecret;
 
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
       const gameWithRounds = {
         ...mockGame,
         status: GameStatus.IN_PROGRESS,
-        rounds: [mockRound],
+        rounds: [roundForGuess],
       };
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
@@ -773,7 +779,7 @@ describe('GamePlayService', () => {
 
       const mockGuess = {
         id: 'guess-1',
-        round: mockRound,
+        round: roundForGuess,
         guessedBy: guessingPlayer,
         targetPlayer: targetPlayer,
         guessedCharacter: mockCharacter,
@@ -827,10 +833,16 @@ describe('GamePlayService', () => {
         status: PlayerSecretStatus.HIDDEN,
       } as PlayerSecret;
 
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
       const gameWithRounds = {
         ...mockGame,
         status: GameStatus.IN_PROGRESS,
-        rounds: [mockRound],
+        rounds: [roundForGuess],
       };
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
@@ -843,7 +855,7 @@ describe('GamePlayService', () => {
 
       const mockGuess = {
         id: 'guess-1',
-        round: mockRound,
+        round: roundForGuess,
         guessedBy: guessingPlayer,
         targetPlayer: targetPlayer,
         guessedCharacter: wrongCharacter,
@@ -902,10 +914,15 @@ describe('GamePlayService', () => {
         targetCharacterId: 'char-1',
       };
 
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+      } as Round;
+
       const gameWithRounds = {
         ...mockGame,
         status: GameStatus.IN_PROGRESS,
-        rounds: [mockRound],
+        rounds: [roundForGuess],
       };
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
@@ -929,10 +946,21 @@ describe('GamePlayService', () => {
         game: mockGame,
       } as GamePlayer;
 
+      const guessingPlayer = {
+        ...mockPlayer,
+        score: 0,
+      } as GamePlayer;
+
+      const roundForGuess = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: guessingPlayer,
+      } as Round;
+
       const gameWithRounds = {
         ...mockGame,
         status: GameStatus.IN_PROGRESS,
-        rounds: [mockRound],
+        rounds: [roundForGuess],
       };
 
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
@@ -944,6 +972,72 @@ describe('GamePlayService', () => {
       await expect(
         service.submitGuess('ABC12', request),
       ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if round is not in AWAITING_QUESTION state', async () => {
+      const request = {
+        playerId: 'player-1',
+        targetPlayerId: 'player-2',
+        targetCharacterId: 'char-1',
+      };
+
+      const roundAwaitingAnswer = {
+        ...mockRound,
+        state: RoundState.AWAITING_ANSWER,
+      } as Round;
+
+      const gameWithWrongState = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundAwaitingAnswer],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithWrongState);
+
+      await expect(
+        service.submitGuess('ABC12', request),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitGuess('ABC12', request),
+      ).rejects.toThrow('Cannot submit guess in round state: awaiting_answer');
+    });
+
+    it('should throw BadRequestException if player is not the active player', async () => {
+      const request = {
+        playerId: 'player-2',
+        targetPlayerId: 'player-1',
+        targetCharacterId: 'char-1',
+      };
+
+      const player2 = {
+        id: 'player-2',
+        username: 'player2',
+        game: mockGame,
+      } as GamePlayer;
+
+      const roundWithDifferentActivePlayer = {
+        ...mockRound,
+        state: RoundState.AWAITING_QUESTION,
+        activePlayer: mockPlayer, // player-1 is active
+      } as Round;
+
+      const gameWithRounds = {
+        ...mockGame,
+        status: GameStatus.IN_PROGRESS,
+        rounds: [roundWithDifferentActivePlayer],
+      };
+
+      gameRepository.findOne.mockResolvedValue(gameWithRounds);
+      playerRepository.findOne
+        .mockResolvedValueOnce(player2)
+        .mockResolvedValueOnce(player2);
+
+      await expect(
+        service.submitGuess('ABC12', request),
+      ).rejects.toThrow(BadRequestException);
+      await expect(
+        service.submitGuess('ABC12', request),
+      ).rejects.toThrow('Only the active player can make a guess');
     });
   });
 
