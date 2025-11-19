@@ -245,16 +245,12 @@ describe('AuthController', () => {
 
   describe('createGuest', () => {
     it('should create a guest user and set guest_token cookie', async () => {
-      const createGuestDto = {
-        username: 'GuestUser123',
-      };
-
       const expectedResponse = {
         accessToken: 'guest-jwt-token',
         user: {
           id: 'uuid-456',
           email: null,
-          username: 'GuestUser123',
+          username: 'Guest-abc123',
           avatarUrl: '/avatar/avatar_5.jpg',
         },
       };
@@ -264,7 +260,7 @@ describe('AuthController', () => {
       const res = mockResponse();
       await controller.createGuest(res);
 
-      expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
+      expect(mockAuthService.createGuest).toHaveBeenCalledWith();
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.cookie).toHaveBeenCalledWith(
         'guest_token',
@@ -281,15 +277,13 @@ describe('AuthController', () => {
       });
     });
 
-    it('should create a guest user without username and set guest_token cookie', async () => {
-      const createGuestDto = {};
-
+    it('should create a guest user with auto-generated username and set guest_token cookie', async () => {
       const expectedResponse = {
         accessToken: 'guest-jwt-token',
         user: {
           id: 'uuid-789',
           email: null,
-          username: 'Guest_1234567890_5678',
+          username: 'Guest-7tsacn',
           avatarUrl: '/avatar/avatar_3.jpg',
         },
       };
@@ -299,7 +293,7 @@ describe('AuthController', () => {
       const res = mockResponse();
       await controller.createGuest(res);
 
-      expect(mockAuthService.createGuest).toHaveBeenCalledWith(createGuestDto);
+      expect(mockAuthService.createGuest).toHaveBeenCalledWith();
       // eslint-disable-next-line @typescript-eslint/unbound-method
       expect(res.cookie).toHaveBeenCalledWith(
         'guest_token',
