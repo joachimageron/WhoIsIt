@@ -137,26 +137,19 @@ describe("useGameAccess", () => {
       expect(mockCreateGuestSession).not.toHaveBeenCalled();
     });
 
-    it("creates guest session when username provided and not authenticated", async () => {
+    it("creates guest session when not authenticated", async () => {
       const { result } = renderHook(() => useGameAccess());
 
-      expect(await result.current.ensureGameAccess("GuestPlayer")).toBe(true);
-      expect(mockCreateGuestSession).toHaveBeenCalledWith("GuestPlayer");
-    });
-
-    it("returns false when no username provided and not authenticated", async () => {
-      const { result } = renderHook(() => useGameAccess());
-
-      expect(await result.current.ensureGameAccess()).toBe(false);
-      expect(mockCreateGuestSession).not.toHaveBeenCalled();
+      expect(await result.current.ensureGameAccess()).toBe(true);
+      expect(mockCreateGuestSession).toHaveBeenCalledWith();
     });
 
     it("returns false when guest creation fails", async () => {
       mockCreateGuestSession.mockRejectedValue(new Error("Failed"));
       const { result } = renderHook(() => useGameAccess());
 
-      expect(await result.current.ensureGameAccess("GuestPlayer")).toBe(false);
-      expect(mockCreateGuestSession).toHaveBeenCalledWith("GuestPlayer");
+      expect(await result.current.ensureGameAccess()).toBe(false);
+      expect(mockCreateGuestSession).toHaveBeenCalledWith();
     });
   });
 
@@ -173,6 +166,7 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -193,6 +187,7 @@ describe("useGameAccess", () => {
         isGuest: true,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -220,6 +215,7 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -240,6 +236,7 @@ describe("useGameAccess", () => {
         isGuest: true,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -267,6 +264,7 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -287,6 +285,7 @@ describe("useGameAccess", () => {
         isGuest: true,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());
@@ -309,6 +308,7 @@ describe("useGameAccess", () => {
         isGuest: false,
         isLoading: true,
         logout: mockLogout,
+        createGuestSession: mockCreateGuestSession,
       });
 
       const { result } = renderHook(() => useGameAccess());

@@ -33,8 +33,6 @@ export const useGameAccess = () => {
     } catch {
       return false;
     }
-
-    return false;
   };
 
   /**

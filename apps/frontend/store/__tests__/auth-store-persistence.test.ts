@@ -101,9 +101,7 @@ describe("useAuthStore - Persistence", () => {
       );
 
       // Force rehydration by calling persist.rehydrate()
-      // @ts-expect-error - accessing internal persist API for testing
       if (useAuthStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useAuthStore.persist.rehydrate();
       }
 
@@ -172,7 +170,7 @@ describe("useAuthStore - Persistence", () => {
         expect(parsed.state.user).not.toBeNull();
         expect(parsed.state.user?.username).toBe("GuestPlayer");
         expect(parsed.state.user?.isGuest).toBe(true);
-        expect(parsed.state.isAuthenticated).toBe(false);
+        expect(parsed.state.isAuthenticated).toBe(true);
         expect(parsed.state.isGuest).toBe(true);
       }
     });

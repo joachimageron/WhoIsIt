@@ -122,7 +122,7 @@ describe("useAuth", () => {
       };
 
       useAuthStore.getState().setUser(mockUser);
-      mockAuthApi.logout.mockResolvedValueOnce({ message: "Logged out" });
+      mockAuthApi.logout.mockResolvedValueOnce(undefined);
 
       const { result } = renderHook(() => useAuth());
 
@@ -187,9 +187,7 @@ describe("useAuth", () => {
       useAuthStore.getState().setUser(mockUser);
       mockAuthApi.logout.mockImplementation(
         () =>
-          new Promise((resolve) =>
-            setTimeout(() => resolve({ message: "Logged out" }), 50),
-          ),
+          new Promise((resolve) => setTimeout(() => resolve(), 50)),
       );
 
       const { result } = renderHook(() => useAuth());
@@ -242,7 +240,7 @@ describe("useAuth", () => {
       const { result } = renderHook(() => useAuth());
 
       expect(result.current.user).toEqual(guestUser);
-      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.isGuest).toBe(true);
     });
 

@@ -76,7 +76,7 @@ describe("useAuthStore", () => {
       });
 
       expect(result.current.user).toEqual(guestUser);
-      expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.isAuthenticated).toBe(true);
       expect(result.current.isGuest).toBe(true);
       expect(result.current.error).toBeNull();
     });

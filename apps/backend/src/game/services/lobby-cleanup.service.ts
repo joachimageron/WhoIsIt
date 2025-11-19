@@ -25,7 +25,7 @@ export class LobbyCleanupService implements OnModuleDestroy {
     private readonly gameRepository: Repository<Game>,
     private readonly gameService: GameService,
     private readonly connectionManager: ConnectionManager,
-  ) { }
+  ) {}
 
   /**
    * Set the Socket.IO server instance
@@ -151,10 +151,10 @@ export class LobbyCleanupService implements OnModuleDestroy {
           try {
             const gameAge = Math.floor(
               (Date.now() - (game.endedAt?.getTime() ?? 0)) /
-              1000 /
-              60 /
-              60 /
-              24,
+                1000 /
+                60 /
+                60 /
+                24,
             );
             this.logger.log(
               `Cleaning up completed game: ${game.roomCode} (status: ${game.status}, age: ${gameAge}d)`,
