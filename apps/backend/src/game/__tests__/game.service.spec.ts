@@ -6,12 +6,10 @@ import { GamePlayService } from '../services/game-play.service';
 import { GameStatsService } from '../services/game-stats.service';
 import { Game } from '../../database/entities';
 import { GameStatus } from '../../database/enums';
+import { AnswerValue } from '@whois-it/contracts';
 
 describe('GameService', () => {
   let service: GameService;
-  let gameLobbyService: GameLobbyService;
-  let gamePlayService: GamePlayService;
-  let gameStatsService: GameStatsService;
 
   const mockGameRepository = {
     findOne: jest.fn(),
@@ -73,9 +71,6 @@ describe('GameService', () => {
     }).compile();
 
     service = module.get<GameService>(GameService);
-    gameLobbyService = module.get<GameLobbyService>(GameLobbyService);
-    gamePlayService = module.get<GamePlayService>(GamePlayService);
-    gameStatsService = module.get<GameStatsService>(GameStatsService);
 
     jest.clearAllMocks();
   });
@@ -257,7 +252,7 @@ describe('GameService', () => {
   describe('askQuestion', () => {
     it('should delegate to GamePlayService', async () => {
       const roomCode = 'ABC12';
-      const request = { playerId: 'p1', questionText: 'Is it red?' };
+      const request = { playerId: 'p1', questionText: 'Is it red?', targetPlayerId: 'p2' };
       const expectedResult = { id: 'q-123' };
 
       mockGamePlayService.askQuestion.mockResolvedValue(expectedResult);
@@ -303,7 +298,7 @@ describe('GameService', () => {
   describe('submitAnswer', () => {
     it('should delegate to GamePlayService', async () => {
       const roomCode = 'ABC12';
-      const request = { playerId: 'p1', questionId: 'q1', answerValue: 'yes' };
+      const request = { playerId: 'p1', questionId: 'q1', answerValue: 'yes' as AnswerValue };
       const expectedResult = { id: 'a-123' };
 
       mockGamePlayService.submitAnswer.mockResolvedValue(expectedResult);
