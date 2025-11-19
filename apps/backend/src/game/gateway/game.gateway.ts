@@ -81,7 +81,7 @@ export class GameGateway
       this.logger.warn(
         `Connection rejected for ${client.id}: ${result.reason}`,
       );
-      client.emit('error', { message: result.reason });
+      // Disconnect immediately without emitting error event (not in contract)
       client.disconnect(true);
       return;
     }
