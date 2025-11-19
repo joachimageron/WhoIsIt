@@ -28,7 +28,7 @@ export interface RequestWithUser extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   // Stricter rate limiting for registration: 3 attempts per minute
   @Throttle({ default: { limit: 3, ttl: 60000 } })
@@ -160,7 +160,10 @@ export class AuthController {
       throw new ForbiddenException('Guest users cannot update profile');
     }
 
-    const user = await this.authService.updateProfile(req.user.id, updateProfileDto);
+    const user = await this.authService.updateProfile(
+      req.user.id,
+      updateProfileDto,
+    );
 
     return {
       id: user.id,
@@ -184,9 +187,7 @@ export class AuthController {
   // Rate limiting for guest creation: 10 attempts per minute
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('guest')
-  async createGuest(
-    @Response({ passthrough: false }) res: ExpressResponse,
-  ) {
+  async createGuest(@Response({ passthrough: false }) res: ExpressResponse) {
     const result = await this.authService.createGuest();
 
     // Set JWT token as HTTP-only cookie with guest_token name
