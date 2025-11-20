@@ -92,12 +92,18 @@ export type SocketGameStartedEvent = {
   lobby: GameLobbyResponse;
 };
 
+export type SocketCharacterAssignedEvent = {
+  roomCode: string;
+  character: PlayerCharacterResponse;
+};
+
 // Socket.IO Events
 export interface ServerToClientEvents {
   lobbyUpdate: (lobby: GameLobbyResponse) => void;
   playerJoined: (event: SocketPlayerJoinedEvent) => void;
   playerLeft: (event: SocketPlayerLeftEvent) => void;
   gameStarted: (event: SocketGameStartedEvent) => void;
+  characterAssigned: (event: SocketCharacterAssignedEvent) => void;
   questionAsked: (event: SocketQuestionAskedEvent) => void;
   answerSubmitted: (event: SocketAnswerSubmittedEvent) => void;
   guessResult: (event: SocketGuessResultEvent) => void;

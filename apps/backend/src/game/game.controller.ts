@@ -18,7 +18,6 @@ import type {
   SubmitGuessRequest,
   GuessResponse,
   GameOverResult,
-  PlayerCharacterResponse,
 } from '@whois-it/contracts';
 import { GameService } from './services/game.service';
 import { BroadcastService } from './services/broadcast.service';
@@ -81,22 +80,6 @@ export class GameController {
     }
 
     return this.gameService.getLobbyByRoomCode(roomCode);
-  }
-
-  @Get(':roomCode/players/:playerId/character')
-  async getPlayerCharacter(
-    @Param('roomCode') roomCode: string,
-    @Param('playerId') playerId: string,
-  ): Promise<PlayerCharacterResponse> {
-    if (!roomCode || roomCode.trim().length === 0) {
-      throw new BadRequestException('roomCode is required');
-    }
-
-    if (!playerId || playerId.trim().length === 0) {
-      throw new BadRequestException('playerId is required');
-    }
-
-    return this.gameService.getPlayerCharacter(roomCode, playerId);
   }
 
   @Post(':roomCode/start')
