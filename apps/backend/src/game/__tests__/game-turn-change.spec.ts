@@ -41,6 +41,8 @@ describe('Game Turn Change Logic', () => {
   const mockPlayer1 = {
     id: 'player-1',
     username: 'player1',
+    user: { id: 'user-1' },
+    isReady: true,
     avatarUrl: null,
     leftAt: null,
     score: 0,
@@ -50,6 +52,8 @@ describe('Game Turn Change Logic', () => {
   const mockPlayer2 = {
     id: 'player-2',
     username: 'player2',
+    user: { id: 'user-2' },
+    isReady: true,
     avatarUrl: null,
     leftAt: null,
     score: 0,
@@ -234,7 +238,7 @@ describe('Game Turn Change Logic', () => {
         return Promise.resolve(round);
       });
 
-      await gamePlayService.askQuestion('ABC12', request);
+      await gamePlayService.askQuestion('ABC12', 'player-1', request);
 
       // Verify round was saved
       expect(roundRepository.save).toHaveBeenCalled();
@@ -302,6 +306,11 @@ describe('Game Turn Change Logic', () => {
         answeredAt: new Date(),
       } as Answer;
 
+      const answerRequest = {
+        questionId: 'question-1',
+        answer: AnswerValue.YES,
+      };
+
       answerRepository.create.mockReturnValue(mockAnswer);
       answerRepository.save.mockResolvedValue(mockAnswer);
       playerRepository.save.mockResolvedValue(mockPlayer2);
@@ -312,7 +321,7 @@ describe('Game Turn Change Logic', () => {
         return Promise.resolve(round);
       });
 
-      await gamePlayService.submitAnswer('ABC12', request);
+      await gamePlayService.submitAnswer('ABC12', 'player-2', answerRequest);
 
       // Verify round was saved
       expect(roundRepository.save).toHaveBeenCalled();
@@ -400,7 +409,7 @@ describe('Game Turn Change Logic', () => {
       playerRepository.save.mockResolvedValue(mockPlayer1);
       gameStatsService.checkAndHandleGameEnd.mockResolvedValue(false);
 
-      await gameService.submitGuess('ABC12', request);
+      await gameService.submitGuess('ABC12', 'user-1', request);
 
       // Verify round was saved (by advanceToNextTurn)
       expect(roundRepository.save).toHaveBeenCalled();
@@ -490,7 +499,7 @@ describe('Game Turn Change Logic', () => {
       playerRepository.save.mockResolvedValue(mockPlayer1);
       gameStatsService.checkAndHandleGameEnd.mockResolvedValue(false);
 
-      await gameService.submitGuess('ABC12', request);
+      await gameService.submitGuess('ABC12', 'user-1', request);
 
       // Verify round was saved (by advanceToNextTurn)
       expect(roundRepository.save).toHaveBeenCalled();

@@ -83,8 +83,9 @@ describe('GameService', () => {
     it('should delegate to GameLobbyService', async () => {
       const createRequest = {
         characterSetId: 'char-set-123',
-        hostUsername: 'Test User',
       };
+      const hostUserId = 'user-1';
+      const hostUsername = 'Test User';
 
       const expectedResult = {
         id: 'game-123',
@@ -94,11 +95,13 @@ describe('GameService', () => {
 
       mockGameLobbyService.createGame.mockResolvedValue(expectedResult);
 
-      const result = await service.createGame(createRequest);
+      const result = await service.createGame(createRequest, hostUserId, hostUsername);
 
       expect(result).toBe(expectedResult);
       expect(mockGameLobbyService.createGame).toHaveBeenCalledWith(
         createRequest,
+        hostUserId,
+        hostUsername,
       );
     });
   });
@@ -106,17 +109,21 @@ describe('GameService', () => {
   describe('joinGame', () => {
     it('should delegate to GameLobbyService', async () => {
       const roomCode = 'ABC12';
-      const joinRequest = { username: 'Player' };
+      const joinRequest = {};
+      const userId = 'user-2';
+      const username = 'Player';
       const expectedResult = { id: 'game-123' };
 
       mockGameLobbyService.joinGame.mockResolvedValue(expectedResult);
 
-      const result = await service.joinGame(roomCode, joinRequest);
+      const result = await service.joinGame(roomCode, joinRequest, userId, username);
 
       expect(result).toBe(expectedResult);
       expect(mockGameLobbyService.joinGame).toHaveBeenCalledWith(
         roomCode,
         joinRequest,
+        userId,
+        username,
       );
     });
   });
@@ -252,16 +259,24 @@ describe('GameService', () => {
   describe('askQuestion', () => {
     it('should delegate to GamePlayService', async () => {
       const roomCode = 'ABC12';
-      const request = { playerId: 'p1', questionText: 'Is it red?', targetPlayerId: 'p2' };
+      const userId = 'user-1';
+      const request = { questionText: 'Is it red?', targetPlayerId: 'p2' };
       const expectedResult = { id: 'q-123' };
 
+      const mockGame = {
+        players: [{ id: 'p1', user: { id: 'user-1' } }],
+      };
+
+      mockGameLobbyService.normalizeRoomCode.mockReturnValue('ABC12');
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockGamePlayService.askQuestion.mockResolvedValue(expectedResult);
 
-      const result = await service.askQuestion(roomCode, request);
+      const result = await service.askQuestion(roomCode, userId, request);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.askQuestion).toHaveBeenCalledWith(
         roomCode,
+        'p1',
         request,
       );
     });
@@ -298,16 +313,24 @@ describe('GameService', () => {
   describe('submitAnswer', () => {
     it('should delegate to GamePlayService', async () => {
       const roomCode = 'ABC12';
-      const request = { playerId: 'p1', questionId: 'q1', answerValue: 'yes' as AnswerValue };
+      const userId = 'user-1';
+      const request = { questionId: 'q1', answerValue: 'yes' as AnswerValue };
       const expectedResult = { id: 'a-123' };
 
+      const mockGame = {
+        players: [{ id: 'p1', user: { id: 'user-1' } }],
+      };
+
+      mockGameLobbyService.normalizeRoomCode.mockReturnValue('ABC12');
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockGamePlayService.submitAnswer.mockResolvedValue(expectedResult);
 
-      const result = await service.submitAnswer(roomCode, request);
+      const result = await service.submitAnswer(roomCode, userId, request);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.submitAnswer).toHaveBeenCalledWith(
         roomCode,
+        'p1',
         request,
       );
     });
@@ -316,12 +339,19 @@ describe('GameService', () => {
   describe('getPlayerCharacter', () => {
     it('should delegate to GamePlayService', async () => {
       const roomCode = 'ABC12';
+      const userId = 'user-1';
       const playerId = 'p1';
       const expectedResult = { playerId: 'p1', character: { id: 'c1' } };
 
+      const mockGame = {
+        players: [{ id: 'p1', user: { id: 'user-1' } }],
+      };
+
+      mockGameLobbyService.normalizeRoomCode.mockReturnValue('ABC12');
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
       mockGamePlayService.getPlayerCharacter.mockResolvedValue(expectedResult);
 
-      const result = await service.getPlayerCharacter(roomCode, playerId);
+      const result = await service.getPlayerCharacter(roomCode, userId, playerId);
 
       expect(result).toBe(expectedResult);
       expect(mockGamePlayService.getPlayerCharacter).toHaveBeenCalledWith(

@@ -1,6 +1,5 @@
 import type {
   CreateGameRequest,
-  JoinGameRequest,
   GameLobbyResponse,
   CharacterSetResponseDto,
   CharacterResponseDto,
@@ -93,7 +92,6 @@ export const createGame = async (
  */
 export const joinGame = async (
   roomCode: string,
-  data: JoinGameRequest,
 ): Promise<GameLobbyResponse> => {
   const response = await fetch(`${API_URL}/games/${roomCode}/join`, {
     method: "POST",
@@ -101,7 +99,6 @@ export const joinGame = async (
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
   });
 
   if (!response.ok) {

@@ -108,8 +108,19 @@ export class GameGateway
     @MessageBody() data: SocketJoinRoomRequest,
   ): Promise<SocketJoinRoomResponse> {
     try {
-      const { roomCode, playerId } = data;
+      const { roomCode } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      // Verify that the user is authenticated
+      const userId = client.user?.id;
+      if (!userId) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      const authenticatedPlayerId = await this.gameService.getPlayerIdByUserId(
+        normalizedRoomCode,
+        userId,
+      );
 
       // Join the Socket.IO room
       await client.join(normalizedRoomCode);
@@ -118,7 +129,7 @@ export class GameGateway
       this.connectionManager.updateConnectionRoom(
         client.id,
         normalizedRoomCode,
-        playerId ?? null,
+        authenticatedPlayerId ?? null,
       );
 
       // Get current lobby state
@@ -152,13 +163,12 @@ export class GameGateway
     @MessageBody() data: SocketLeaveRoomRequest,
   ): Promise<SocketLeaveRoomResponse> {
     try {
-      const { roomCode, playerId: requestPlayerId } = data;
+      const { roomCode } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
 
       // Get the player ID from either the request or connection tracking
       const connection = this.connectionManager.getConnection(client.id);
-      let playerId: string | null =
-        requestPlayerId ?? connection?.playerId ?? null;
+      let playerId: string | null = connection?.playerId ?? null;
 
       // If we still don't have a playerId, try to find it from the lobby
       if (!playerId) {
@@ -236,14 +246,32 @@ export class GameGateway
     @MessageBody() data: SocketUpdatePlayerReadyRequest,
   ): Promise<SocketUpdatePlayerReadyResponse> {
     try {
-      const { roomCode, playerId, isReady } = data;
+      const { roomCode, isReady } = data;
       const normalizedRoomCode = this.normalizeRoomCode(roomCode);
+
+      // Verify that the user owns the player ID
+      const userId = client.user?.id;
+      if (!userId) {
+        return { success: false, error: 'User not authenticated' };
+      }
+
+      const authenticatedPlayerId = await this.gameService.getPlayerIdByUserId(
+        normalizedRoomCode,
+        userId,
+      );
+
+      if (!authenticatedPlayerId) {
+        return {
+          success: false,
+          error: 'You are not a player in this game',
+        };
+      }
 
       // Update last seen time
       this.connectionManager.updateLastSeen(client.id);
 
       // Update player ready state
-      await this.gameService.updatePlayerReady(playerId, isReady);
+      await this.gameService.updatePlayerReady(authenticatedPlayerId, isReady);
 
       // Get updated lobby state
       const lobby =
@@ -254,7 +282,7 @@ export class GameGateway
 
       const username = client.user?.username ?? 'guest';
       this.logger.log(
-        `Player ${playerId} (${username}) ready state updated to ${isReady} in room ${normalizedRoomCode}`,
+        `Player ${authenticatedPlayerId} (${username}) ready state updated to ${isReady} in room ${normalizedRoomCode}`,
       );
 
       return { success: true, lobby };

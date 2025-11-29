@@ -5,11 +5,12 @@ import {
   Get,
   Param,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
-  JoinGameRequest,
   AskQuestionRequest,
   QuestionResponse,
   GameStateResponse,
@@ -23,8 +24,12 @@ import type {
 import { GameService } from './services/game.service';
 import { BroadcastService } from './services/broadcast.service';
 import { AnswerValue } from '../database/enums';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import type { Request } from 'express';
+import { User } from '../database/entities/user.entity';
 
 @Controller('games')
+@UseGuards(JwtAuthGuard)
 export class GameController {
   constructor(
     private readonly gameService: GameService,
@@ -32,44 +37,42 @@ export class GameController {
   ) {}
 
   @Post()
-  async create(@Body() body: CreateGameRequest): Promise<GameLobbyResponse> {
+  async create(
+    @Req() req: Request,
+    @Body() body: CreateGameRequest,
+  ): Promise<GameLobbyResponse> {
     if (!body?.characterSetId || body.characterSetId.trim().length === 0) {
       throw new BadRequestException('characterSetId is required');
     }
 
-    if (!body.hostUsername && !body.hostUserId) {
-      throw new BadRequestException(
-        'hostUsername is required when hostUserId is missing',
-      );
-    }
+    const user = req.user as User;
 
-    return this.gameService.createGame({
-      ...body,
-      characterSetId: body.characterSetId.trim(),
-      hostUsername: body.hostUsername?.trim(),
-    });
+    return this.gameService.createGame(
+      {
+        ...body,
+        characterSetId: body.characterSetId.trim(),
+      },
+      user.id,
+      user.username,
+    );
   }
 
   @Post(':roomCode/join')
   async join(
     @Param('roomCode') roomCode: string,
-    @Body() body: JoinGameRequest,
+    @Req() req: Request,
   ): Promise<GameLobbyResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
     }
 
-    if (!body?.username && !body?.userId) {
-      throw new BadRequestException(
-        'username is required when userId is missing',
-      );
-    }
+    const user = req.user as User;
 
-    return this.gameService.joinGame(roomCode, {
-      ...body,
-      username: body.username?.trim(),
-      avatarUrl: body.avatarUrl?.trim(),
-    });
+    return this.gameService.joinGame(
+      roomCode,
+      user.id,
+      user.username,
+    );
   }
 
   @Get(':roomCode')
@@ -87,6 +90,7 @@ export class GameController {
   async getPlayerCharacter(
     @Param('roomCode') roomCode: string,
     @Param('playerId') playerId: string,
+    @Req() req: Request,
   ): Promise<PlayerCharacterResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
@@ -96,7 +100,8 @@ export class GameController {
       throw new BadRequestException('playerId is required');
     }
 
-    return this.gameService.getPlayerCharacter(roomCode, playerId);
+    const user = req.user as User;
+    return this.gameService.getPlayerCharacter(roomCode, user.id, playerId);
   }
 
   @Post(':roomCode/start')
@@ -118,14 +123,11 @@ export class GameController {
   @Post(':roomCode/questions')
   async askQuestion(
     @Param('roomCode') roomCode: string,
+    @Req() req: Request,
     @Body() body: AskQuestionRequest,
   ): Promise<QuestionResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
-    }
-
-    if (!body?.playerId || body.playerId.trim().length === 0) {
-      throw new BadRequestException('playerId is required');
     }
 
     if (!body?.questionText || body.questionText.trim().length === 0) {
@@ -136,10 +138,10 @@ export class GameController {
       throw new BadRequestException('targetPlayerId is required');
     }
 
-    const question = await this.gameService.askQuestion(roomCode, {
+    const user = req.user as User;
+    const question = await this.gameService.askQuestion(roomCode, user.id, {
       ...body,
       questionText: body.questionText.trim(),
-      playerId: body.playerId.trim(),
       targetPlayerId: body.targetPlayerId.trim(),
     });
 
@@ -188,14 +190,11 @@ export class GameController {
   @Post(':roomCode/answers')
   async submitAnswer(
     @Param('roomCode') roomCode: string,
+    @Req() req: Request,
     @Body() body: SubmitAnswerRequest,
   ): Promise<AnswerResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
-    }
-
-    if (!body?.playerId || body.playerId.trim().length === 0) {
-      throw new BadRequestException('playerId is required');
     }
 
     if (!body?.questionId || body.questionId.trim().length === 0) {
@@ -213,9 +212,9 @@ export class GameController {
       );
     }
 
-    const answer = await this.gameService.submitAnswer(roomCode, {
+    const user = req.user as User;
+    const answer = await this.gameService.submitAnswer(roomCode, user.id, {
       ...body,
-      playerId: body.playerId.trim(),
       questionId: body.questionId.trim(),
       answerText: body.answerText?.trim(),
     });
@@ -232,14 +231,11 @@ export class GameController {
   @Post(':roomCode/guesses')
   async submitGuess(
     @Param('roomCode') roomCode: string,
+    @Req() req: Request,
     @Body() body: SubmitGuessRequest,
   ): Promise<GuessResponse> {
     if (!roomCode || roomCode.trim().length === 0) {
       throw new BadRequestException('roomCode is required');
-    }
-
-    if (!body?.playerId || body.playerId.trim().length === 0) {
-      throw new BadRequestException('playerId is required');
     }
 
     if (
@@ -253,9 +249,9 @@ export class GameController {
       throw new BadRequestException('targetPlayerId is required');
     }
 
-    const guess = await this.gameService.submitGuess(roomCode, {
+    const user = req.user as User;
+    const guess = await this.gameService.submitGuess(roomCode, user.id, {
       ...body,
-      playerId: body.playerId.trim(),
       targetPlayerId: body.targetPlayerId.trim(),
       targetCharacterId: body.targetCharacterId.trim(),
     });

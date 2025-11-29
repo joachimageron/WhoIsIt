@@ -16,7 +16,6 @@ import type {
   CreateGameRequest,
   GameLobbyResponse,
   GamePlayerResponse,
-  JoinGameRequest,
   GameVisibility as ContractGameVisibility,
 } from '@whois-it/contracts';
 
@@ -43,7 +42,11 @@ export class GameLobbyService {
     return roomCode.trim().toUpperCase();
   }
 
-  async createGame(request: CreateGameRequest): Promise<GameLobbyResponse> {
+  async createGame(
+    request: CreateGameRequest,
+    hostUserId: string,
+    hostUsername: string,
+  ): Promise<GameLobbyResponse> {
     const characterSet = await this.characterSetRepository.findOne({
       where: { id: request.characterSetId },
     });
@@ -53,9 +56,9 @@ export class GameLobbyService {
     }
 
     let hostUser: User | null = null;
-    if (request.hostUserId) {
+    if (hostUserId) {
       hostUser = await this.userRepository.findOne({
-        where: { id: request.hostUserId },
+        where: { id: hostUserId },
       });
 
       if (!hostUser) {
@@ -77,15 +80,15 @@ export class GameLobbyService {
 
     const savedGame = await this.gameRepository.save(game);
 
-    const hostUsername = request.hostUsername?.trim() || hostUser?.username;
-    if (!hostUsername) {
+    const finalHostUsername = hostUsername?.trim() || hostUser?.username;
+    if (!finalHostUsername) {
       throw new BadRequestException('A host username is required');
     }
 
     const hostPlayer = this.playerRepository.create({
       game: savedGame,
       user: hostUser ?? undefined,
-      username: hostUsername,
+      username: finalHostUsername,
       avatarUrl: hostUser?.avatarUrl ?? undefined,
       role: GamePlayerRole.HOST,
       isReady: true,
@@ -99,7 +102,8 @@ export class GameLobbyService {
 
   async joinGame(
     roomCode: string,
-    request: JoinGameRequest,
+    userId: string,
+    username: string,
   ): Promise<GameLobbyResponse> {
     const normalizedRoomCode = this.normalizeRoomCode(roomCode);
     const game = await this.gameRepository.findOne({
@@ -120,9 +124,9 @@ export class GameLobbyService {
     }
 
     let joiningUser: User | null = null;
-    if (request.userId) {
+    if (userId) {
       joiningUser = await this.userRepository.findOne({
-        where: { id: request.userId },
+        where: { id: userId },
       });
       if (!joiningUser) {
         throw new NotFoundException('Joining user not found');
@@ -139,7 +143,7 @@ export class GameLobbyService {
       );
     } else {
       // For guests, match by username (case-insensitive)
-      const requestUsername = request.username?.trim();
+      const requestUsername = username?.trim();
       if (requestUsername) {
         existingPlayer = game.players?.find(
           (player) =>
@@ -150,8 +154,8 @@ export class GameLobbyService {
       }
     }
 
-    const username = request.username?.trim() || joiningUser?.username;
-    if (!username) {
+    const finalUsername = username?.trim() || joiningUser?.username;
+    if (!finalUsername) {
       throw new BadRequestException('A username is required');
     }
 
@@ -164,14 +168,7 @@ export class GameLobbyService {
       // Player is rejoining - clear leftAt and reset ready state
       existingPlayer.leftAt = null;
       existingPlayer.isReady = false;
-      existingPlayer.username = username; // Update username in case it changed
-
-      const preferredAvatar = request.avatarUrl?.trim();
-      if (preferredAvatar && preferredAvatar.length > 0) {
-        existingPlayer.avatarUrl = preferredAvatar;
-      } else if (joiningUser?.avatarUrl) {
-        existingPlayer.avatarUrl = joiningUser.avatarUrl;
-      }
+      existingPlayer.username = finalUsername; // Update username in case it changed
 
       await this.playerRepository.save(existingPlayer);
 
@@ -185,17 +182,11 @@ export class GameLobbyService {
       throw new BadRequestException('Game is full (maximum 2 players)');
     }
 
-    // Create new player
-    const preferredAvatar = request.avatarUrl?.trim();
-
     const player = this.playerRepository.create({
       game,
       user: joiningUser ?? undefined,
-      username,
-      avatarUrl:
-        preferredAvatar && preferredAvatar.length > 0
-          ? preferredAvatar
-          : (joiningUser?.avatarUrl ?? undefined),
+      username: finalUsername,
+      avatarUrl: joiningUser?.avatarUrl ?? undefined,
       role: GamePlayerRole.PLAYER,
       isReady: false,
     });

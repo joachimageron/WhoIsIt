@@ -31,7 +31,7 @@ interface CreateGameFormProps {
 
 export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
   const router = useRouter();
-  const { user, createGuestSession } = useAuth();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [characterSets, setCharacterSets] = useState<CharacterSetResponseDto[]>(
     [],
@@ -107,8 +107,6 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
     try {
       const gameData: CreateGameRequest = {
         characterSetId,
-        hostUsername: user!.username,
-        hostUserId: user!.id,
       };
 
       // Add optional fields
@@ -134,14 +132,9 @@ export function CreateGameForm({ dict, lang }: CreateGameFormProps) {
     setIsLoading(true);
 
     try {
-      // Create guest session without username - backend will generate it
-      const guestUser = await createGuestSession();
-
       // Create the game with the newly created guest user
       const gameData: CreateGameRequest = {
         characterSetId: pendingGameData!.characterSetId,
-        hostUsername: guestUser.username,
-        hostUserId: undefined,
       };
 
       // Add optional fields

@@ -37,7 +37,7 @@ export function useGameActions({
   const handleLeaveGame = useCallback(async () => {
     try {
       if (currentPlayerId) {
-        await leaveRoom({ roomCode, playerId: currentPlayerId });
+        await leaveRoom({ roomCode });
       }
     } catch {
       // Ignore errors when leaving
@@ -98,7 +98,6 @@ export function useGameActions({
 
       try {
         const guess = await gameApi.submitGuess(roomCode, {
-          playerId: currentPlayerId,
           targetPlayerId,
           targetCharacterId: characterId,
         });
@@ -147,7 +146,6 @@ export function useGameActions({
 
       try {
         await gameApi.submitAnswer(roomCode, {
-          playerId: currentPlayerId,
           questionId,
           answerValue,
           answerText,

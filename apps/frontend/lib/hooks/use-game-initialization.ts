@@ -104,7 +104,6 @@ export function useGameInitialization({
         // Join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,
-          playerId: player?.id,
         });
 
         if (!response.success) {

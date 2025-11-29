@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GameStatus } from '../../database/enums';
@@ -6,7 +10,6 @@ import { Game, Guess } from '../../database/entities';
 import type {
   CreateGameRequest,
   GameLobbyResponse,
-  JoinGameRequest,
   AskQuestionRequest,
   QuestionResponse,
   GameStateResponse,
@@ -32,15 +35,20 @@ export class GameService {
   ) {}
 
   // Delegate lobby operations to GameLobbyService
-  async createGame(request: CreateGameRequest): Promise<GameLobbyResponse> {
-    return this.gameLobbyService.createGame(request);
+  async createGame(
+    request: CreateGameRequest,
+    hostUserId: string,
+    hostUsername: string,
+  ): Promise<GameLobbyResponse> {
+    return this.gameLobbyService.createGame(request, hostUserId, hostUsername);
   }
 
   async joinGame(
     roomCode: string,
-    request: JoinGameRequest,
+    userId: string,
+    username: string,
   ): Promise<GameLobbyResponse> {
-    return this.gameLobbyService.joinGame(roomCode, request);
+    return this.gameLobbyService.joinGame(roomCode, userId, username);
   }
 
   async getLobbyByRoomCode(roomCode: string): Promise<GameLobbyResponse> {
@@ -58,6 +66,17 @@ export class GameService {
         players: { user: true },
       },
     });
+  }
+
+  async getPlayerIdByUserId(
+    roomCode: string,
+    userId: string,
+  ): Promise<string | null> {
+    const game = await this.getGameByRoomCode(roomCode);
+    if (!game) return null;
+
+    const player = game.players?.find((p) => p.user?.id === userId);
+    return player ? player.id : null;
   }
 
   async updatePlayerReady(playerId: string, isReady: boolean) {
@@ -119,9 +138,14 @@ export class GameService {
 
   async askQuestion(
     roomCode: string,
+    userId: string,
     request: AskQuestionRequest,
   ): Promise<QuestionResponse> {
-    return this.gamePlayService.askQuestion(roomCode, request);
+    const playerId = await this.getPlayerIdByUserId(roomCode, userId);
+    if (!playerId) {
+      throw new ForbiddenException('You are not a player in this game');
+    }
+    return this.gamePlayService.askQuestion(roomCode, playerId, request);
   }
 
   async getQuestions(roomCode: string): Promise<QuestionResponse[]> {
@@ -134,15 +158,26 @@ export class GameService {
 
   async submitAnswer(
     roomCode: string,
+    userId: string,
     request: SubmitAnswerRequest,
   ): Promise<AnswerResponse> {
-    return this.gamePlayService.submitAnswer(roomCode, request);
+    const playerId = await this.getPlayerIdByUserId(roomCode, userId);
+    if (!playerId) {
+      throw new ForbiddenException('You are not a player in this game');
+    }
+    return this.gamePlayService.submitAnswer(roomCode, playerId, request);
   }
 
   async submitGuess(
     roomCode: string,
+    userId: string,
     request: SubmitGuessRequest,
   ): Promise<GuessResponse> {
+    const playerId = await this.getPlayerIdByUserId(roomCode, userId);
+    if (!playerId) {
+      throw new ForbiddenException('You are not a player in this game');
+    }
+
     const normalizedRoomCode =
       this.gameLobbyService.normalizeRoomCode(roomCode);
 
@@ -170,6 +205,7 @@ export class GameService {
     // Submit the guess
     const guessResponse = await this.gamePlayService.submitGuess(
       roomCode,
+      playerId,
       request,
     );
 
@@ -210,8 +246,16 @@ export class GameService {
 
   async getPlayerCharacter(
     roomCode: string,
+    userId: string,
     playerId: string,
   ): Promise<PlayerCharacterResponse> {
+    const authenticatedPlayerId = await this.getPlayerIdByUserId(
+      roomCode,
+      userId,
+    );
+    if (authenticatedPlayerId !== playerId) {
+      throw new ForbiddenException('You can only view your own character');
+    }
     return this.gamePlayService.getPlayerCharacter(roomCode, playerId);
   }
 

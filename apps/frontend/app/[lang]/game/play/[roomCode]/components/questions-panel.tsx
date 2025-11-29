@@ -77,7 +77,6 @@ export function QuestionsPanel({
 
     try {
       await gameApi.askQuestion(roomCode, {
-        playerId: currentPlayerId,
         targetPlayerId: targetPlayerId,
         questionText: question.trim(),
       });

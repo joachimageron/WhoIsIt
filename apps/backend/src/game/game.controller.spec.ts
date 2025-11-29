@@ -91,6 +91,17 @@ describe('GameController', () => {
     players: [],
   };
 
+  const mockUser = {
+    id: 'user-1',
+    username: 'TestHost',
+    email: 'test@example.com',
+    avatarUrl: 'https://example.com/avatar.jpg',
+  };
+
+  const mockRequest = {
+    user: mockUser,
+  } as any;
+
   beforeEach(async () => {
     const mockGameService = {
       createGame: jest.fn(),
@@ -148,55 +159,56 @@ describe('GameController', () => {
     it('should create a game successfully', async () => {
       const createRequest: CreateGameRequest = {
         characterSetId: 'charset1',
-        hostUsername: 'TestHost',
-        hostUserId: undefined,
         visibility: 'public',
         maxPlayers: 4,
       };
 
       gameService.createGame.mockResolvedValue(mockGameLobbyResponse);
 
-      const result = await controller.create(createRequest);
+      const result = await controller.create(mockRequest, createRequest);
 
       expect(result).toEqual(mockGameLobbyResponse);
-      expect(gameService.createGame).toHaveBeenCalledWith({
-        ...createRequest,
-        characterSetId: 'charset1',
-        hostUsername: 'TestHost',
-      });
+      expect(gameService.createGame).toHaveBeenCalledWith(
+        {
+          ...createRequest,
+          characterSetId: 'charset1',
+        },
+        mockUser.id,
+        mockUser.username,
+      );
     });
 
-    it('should trim characterSetId and hostUsername', async () => {
+    it('should trim characterSetId', async () => {
       const createRequest: CreateGameRequest = {
         characterSetId: '  charset1  ',
-        hostUsername: '  TestHost  ',
-        hostUserId: undefined,
         visibility: 'public',
         maxPlayers: 4,
       };
 
       gameService.createGame.mockResolvedValue(mockGameLobbyResponse);
 
-      await controller.create(createRequest);
+      await controller.create(mockRequest, createRequest);
 
-      expect(gameService.createGame).toHaveBeenCalledWith({
-        ...createRequest,
-        characterSetId: 'charset1',
-        hostUsername: 'TestHost',
-      });
+      expect(gameService.createGame).toHaveBeenCalledWith(
+        {
+          ...createRequest,
+          characterSetId: 'charset1',
+        },
+        mockUser.id,
+        mockUser.username,
+      );
     });
 
     it('should throw BadRequestException if characterSetId is missing', async () => {
       const createRequest: any = {
-        hostUsername: 'TestHost',
         visibility: 'public',
         maxPlayers: 4,
       };
 
-      await expect(controller.create(createRequest)).rejects.toThrow(
+      await expect(controller.create(mockRequest, createRequest)).rejects.toThrow(
         BadRequestException,
       );
-      await expect(controller.create(createRequest)).rejects.toThrow(
+      await expect(controller.create(mockRequest, createRequest)).rejects.toThrow(
         'characterSetId is required',
       );
     });
@@ -204,29 +216,12 @@ describe('GameController', () => {
     it('should throw BadRequestException if characterSetId is empty', async () => {
       const createRequest: CreateGameRequest = {
         characterSetId: '   ',
-        hostUsername: 'TestHost',
-        hostUserId: undefined,
         visibility: 'public',
         maxPlayers: 4,
       };
 
-      await expect(controller.create(createRequest)).rejects.toThrow(
+      await expect(controller.create(mockRequest, createRequest)).rejects.toThrow(
         BadRequestException,
-      );
-    });
-
-    it('should throw BadRequestException if hostUsername and hostUserId are both missing', async () => {
-      const createRequest: any = {
-        characterSetId: 'charset1',
-        visibility: 'public',
-        maxPlayers: 4,
-      };
-
-      await expect(controller.create(createRequest)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(controller.create(createRequest)).rejects.toThrow(
-        'hostUsername is required when hostUserId is missing',
       );
     });
   });
@@ -235,67 +230,54 @@ describe('GameController', () => {
     it('should join a game successfully', async () => {
       const roomCode = 'ABC12';
       const joinRequest: JoinGameRequest = {
-        username: 'Player2',
-        userId: undefined,
         avatarUrl: 'https://example.com/avatar.jpg',
       };
 
       gameService.joinGame.mockResolvedValue(mockGameLobbyResponse);
 
-      const result = await controller.join(roomCode, joinRequest);
+      const result = await controller.join(roomCode, mockRequest, joinRequest);
 
       expect(result).toEqual(mockGameLobbyResponse);
-      expect(gameService.joinGame).toHaveBeenCalledWith(roomCode, {
-        ...joinRequest,
-        username: 'Player2',
-        avatarUrl: 'https://example.com/avatar.jpg',
-      });
+      expect(gameService.joinGame).toHaveBeenCalledWith(
+        roomCode,
+        {
+          ...joinRequest,
+          avatarUrl: 'https://example.com/avatar.jpg',
+        },
+        mockUser.id,
+        mockUser.username,
+      );
     });
 
-    it('should trim username and avatarUrl', async () => {
+    it('should trim avatarUrl', async () => {
       const roomCode = 'ABC12';
       const joinRequest: JoinGameRequest = {
-        username: '  Player2  ',
-        userId: undefined,
         avatarUrl: '  https://example.com/avatar.jpg  ',
       };
 
       gameService.joinGame.mockResolvedValue(mockGameLobbyResponse);
 
-      await controller.join(roomCode, joinRequest);
+      await controller.join(roomCode, mockRequest, joinRequest);
 
-      expect(gameService.joinGame).toHaveBeenCalledWith(roomCode, {
-        ...joinRequest,
-        username: 'Player2',
-        avatarUrl: 'https://example.com/avatar.jpg',
-      });
+      expect(gameService.joinGame).toHaveBeenCalledWith(
+        roomCode,
+        {
+          ...joinRequest,
+          avatarUrl: 'https://example.com/avatar.jpg',
+        },
+        mockUser.id,
+        mockUser.username,
+      );
     });
 
     it('should throw BadRequestException if roomCode is missing', async () => {
-      const joinRequest: JoinGameRequest = {
-        username: 'Player2',
-        userId: undefined,
-      };
+      const joinRequest: JoinGameRequest = {};
 
-      await expect(controller.join('', joinRequest)).rejects.toThrow(
+      await expect(controller.join('', mockRequest, joinRequest)).rejects.toThrow(
         BadRequestException,
       );
-      await expect(controller.join('', joinRequest)).rejects.toThrow(
+      await expect(controller.join('', mockRequest, joinRequest)).rejects.toThrow(
         'roomCode is required',
-      );
-    });
-
-    it('should throw BadRequestException if username and userId are both missing', async () => {
-      const roomCode = 'ABC12';
-      const joinRequest: any = {
-        avatarUrl: 'https://example.com/avatar.jpg',
-      };
-
-      await expect(controller.join(roomCode, joinRequest)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(controller.join(roomCode, joinRequest)).rejects.toThrow(
-        'username is required when userId is missing',
       );
     });
   });
@@ -331,24 +313,25 @@ describe('GameController', () => {
         mockPlayerCharacterResponse,
       );
 
-      const result = await controller.getPlayerCharacter(roomCode, playerId);
+      const result = await controller.getPlayerCharacter(roomCode, playerId, mockRequest);
 
       expect(result).toEqual(mockPlayerCharacterResponse);
       expect(gameService.getPlayerCharacter).toHaveBeenCalledWith(
         roomCode,
+        mockUser.id,
         playerId,
       );
     });
 
     it('should throw BadRequestException if roomCode is missing', async () => {
       await expect(
-        controller.getPlayerCharacter('', 'player1'),
+        controller.getPlayerCharacter('', 'player1', mockRequest),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if playerId is missing', async () => {
       await expect(
-        controller.getPlayerCharacter('ABC12', ''),
+        controller.getPlayerCharacter('ABC12', '', mockRequest),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -379,7 +362,6 @@ describe('GameController', () => {
     it('should ask a question successfully', async () => {
       const roomCode = 'ABC12';
       const askRequest: AskQuestionRequest = {
-        playerId: 'player1',
         questionText: 'Does your character have brown hair?',
         targetPlayerId: 'player2',
       };
@@ -387,13 +369,12 @@ describe('GameController', () => {
       gameService.askQuestion.mockResolvedValue(mockQuestionResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      const result = await controller.askQuestion(roomCode, askRequest);
+      const result = await controller.askQuestion(roomCode, mockRequest, askRequest);
 
       expect(result).toEqual(mockQuestionResponse);
-      expect(gameService.askQuestion).toHaveBeenCalledWith(roomCode, {
+      expect(gameService.askQuestion).toHaveBeenCalledWith(roomCode, mockUser.id, {
         ...askRequest,
         questionText: 'Does your character have brown hair?',
-        playerId: 'player1',
         targetPlayerId: 'player2',
       });
       expect(gameService.getGameState).toHaveBeenCalledWith(roomCode);
@@ -407,7 +388,6 @@ describe('GameController', () => {
     it('should trim text fields', async () => {
       const roomCode = 'ABC12';
       const askRequest: AskQuestionRequest = {
-        playerId: '  player1  ',
         questionText: '  Does your character have brown hair?  ',
         targetPlayerId: '  player2  ',
       };
@@ -415,44 +395,43 @@ describe('GameController', () => {
       gameService.askQuestion.mockResolvedValue(mockQuestionResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      await controller.askQuestion(roomCode, askRequest);
+      await controller.askQuestion(roomCode, mockRequest, askRequest);
 
-      expect(gameService.askQuestion).toHaveBeenCalledWith(roomCode, {
+      expect(gameService.askQuestion).toHaveBeenCalledWith(roomCode, mockUser.id, {
         ...askRequest,
         questionText: 'Does your character have brown hair?',
-        playerId: 'player1',
         targetPlayerId: 'player2',
       });
     });
 
     it('should throw BadRequestException if roomCode is missing', async () => {
       const askRequest: AskQuestionRequest = {
-        playerId: 'player1',
         questionText: 'Does your character have brown hair?',
+        targetPlayerId: 'player2',
       };
 
-      await expect(controller.askQuestion('', askRequest)).rejects.toThrow(
+      await expect(controller.askQuestion('', mockRequest, askRequest)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw BadRequestException if playerId is missing', async () => {
+    it('should throw BadRequestException if questionText is missing', async () => {
+      const askRequest: any = {
+        targetPlayerId: 'player2',
+      };
+
+      await expect(
+        controller.askQuestion('ABC12', mockRequest, askRequest),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if targetPlayerId is missing', async () => {
       const askRequest: any = {
         questionText: 'Does your character have brown hair?',
       };
 
       await expect(
-        controller.askQuestion('ABC12', askRequest),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException if questionText is missing', async () => {
-      const askRequest: any = {
-        playerId: 'player1',
-      };
-
-      await expect(
-        controller.askQuestion('ABC12', askRequest),
+        controller.askQuestion('ABC12', mockRequest, askRequest),
       ).rejects.toThrow(BadRequestException);
     });
   });
@@ -520,7 +499,6 @@ describe('GameController', () => {
     it('should submit an answer successfully', async () => {
       const roomCode = 'ABC12';
       const submitRequest: SubmitAnswerRequest = {
-        playerId: 'player2',
         questionId: 'question1',
         answerValue: AnswerValue.YES,
         answerText: null,
@@ -529,11 +507,10 @@ describe('GameController', () => {
       gameService.submitAnswer.mockResolvedValue(mockAnswerResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      const result = await controller.submitAnswer(roomCode, submitRequest);
+      const result = await controller.submitAnswer(roomCode, mockRequest, submitRequest);
 
       expect(result).toEqual(mockAnswerResponse);
-      expect(gameService.submitAnswer).toHaveBeenCalledWith(roomCode, {
-        playerId: 'player2',
+      expect(gameService.submitAnswer).toHaveBeenCalledWith(roomCode, mockUser.id, {
         questionId: 'question1',
         answerValue: AnswerValue.YES,
         answerText: undefined,
@@ -549,7 +526,6 @@ describe('GameController', () => {
     it('should trim text fields', async () => {
       const roomCode = 'ABC12';
       const submitRequest: SubmitAnswerRequest = {
-        playerId: '  player2  ',
         questionId: '  question1  ',
         answerValue: AnswerValue.YES,
         answerText: '  Some text  ',
@@ -558,11 +534,10 @@ describe('GameController', () => {
       gameService.submitAnswer.mockResolvedValue(mockAnswerResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      await controller.submitAnswer(roomCode, submitRequest);
+      await controller.submitAnswer(roomCode, mockRequest, submitRequest);
 
-      expect(gameService.submitAnswer).toHaveBeenCalledWith(roomCode, {
+      expect(gameService.submitAnswer).toHaveBeenCalledWith(roomCode, mockUser.id, {
         ...submitRequest,
-        playerId: 'player2',
         questionId: 'question1',
         answerText: 'Some text',
       });
@@ -570,61 +545,46 @@ describe('GameController', () => {
 
     it('should throw BadRequestException if roomCode is missing', async () => {
       const submitRequest: SubmitAnswerRequest = {
-        playerId: 'player2',
         questionId: 'question1',
         answerValue: AnswerValue.YES,
       };
 
-      await expect(controller.submitAnswer('', submitRequest)).rejects.toThrow(
+      await expect(controller.submitAnswer('', mockRequest, submitRequest)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw BadRequestException if playerId is missing', async () => {
-      const submitRequest: any = {
-        questionId: 'question1',
-        answerValue: AnswerValue.YES,
-      };
-
-      await expect(
-        controller.submitAnswer('ABC12', submitRequest),
-      ).rejects.toThrow(BadRequestException);
-    });
-
     it('should throw BadRequestException if questionId is missing', async () => {
       const submitRequest: any = {
-        playerId: 'player2',
         answerValue: AnswerValue.YES,
       };
 
       await expect(
-        controller.submitAnswer('ABC12', submitRequest),
+        controller.submitAnswer('ABC12', mockRequest, submitRequest),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if answerValue is missing', async () => {
       const submitRequest: any = {
-        playerId: 'player2',
         questionId: 'question1',
       };
 
       await expect(
-        controller.submitAnswer('ABC12', submitRequest),
+        controller.submitAnswer('ABC12', mockRequest, submitRequest),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw BadRequestException if answerValue is invalid', async () => {
       const submitRequest: any = {
-        playerId: 'player2',
         questionId: 'question1',
         answerValue: 'INVALID',
       };
 
       await expect(
-        controller.submitAnswer('ABC12', submitRequest),
+        controller.submitAnswer('ABC12', mockRequest, submitRequest),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        controller.submitAnswer('ABC12', submitRequest),
+        controller.submitAnswer('ABC12', mockRequest, submitRequest),
       ).rejects.toThrow('answerValue must be one of:');
     });
   });
@@ -633,7 +593,6 @@ describe('GameController', () => {
     it('should submit a guess successfully', async () => {
       const roomCode = 'ABC12';
       const guessRequest: SubmitGuessRequest = {
-        playerId: 'player1',
         targetPlayerId: 'player2',
         targetCharacterId: 'char1',
       };
@@ -641,11 +600,12 @@ describe('GameController', () => {
       gameService.submitGuess.mockResolvedValue(mockGuessResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      const result = await controller.submitGuess(roomCode, guessRequest);
+      const result = await controller.submitGuess(roomCode, mockRequest, guessRequest);
 
       expect(result).toEqual(mockGuessResponse);
       expect(gameService.submitGuess).toHaveBeenCalledWith(
         roomCode,
+        mockUser.id,
         guessRequest,
       );
       expect(gameService.getGameState).toHaveBeenCalledWith(roomCode);
@@ -659,7 +619,6 @@ describe('GameController', () => {
     it('should broadcast gameOver when game is completed', async () => {
       const roomCode = 'ABC12';
       const guessRequest: SubmitGuessRequest = {
-        playerId: 'player1',
         targetPlayerId: 'player2',
         targetCharacterId: 'char1',
       };
@@ -672,7 +631,7 @@ describe('GameController', () => {
       gameService.submitGuess.mockResolvedValue(mockGuessResponse);
       gameService.getGameState.mockResolvedValue(completedGameState);
 
-      await controller.submitGuess(roomCode, guessRequest);
+      await controller.submitGuess(roomCode, mockRequest, guessRequest);
 
       expect(broadcastService.broadcastGuessResult).toHaveBeenCalledWith(
         roomCode,
@@ -685,7 +644,6 @@ describe('GameController', () => {
     it('should trim text fields', async () => {
       const roomCode = 'ABC12';
       const guessRequest: SubmitGuessRequest = {
-        playerId: '  player1  ',
         targetPlayerId: '  player2  ',
         targetCharacterId: '  char1  ',
       };
@@ -693,11 +651,10 @@ describe('GameController', () => {
       gameService.submitGuess.mockResolvedValue(mockGuessResponse);
       gameService.getGameState.mockResolvedValue(mockGameStateResponse);
 
-      await controller.submitGuess(roomCode, guessRequest);
+      await controller.submitGuess(roomCode, mockRequest, guessRequest);
 
-      expect(gameService.submitGuess).toHaveBeenCalledWith(roomCode, {
+      expect(gameService.submitGuess).toHaveBeenCalledWith(roomCode, mockUser.id, {
         ...guessRequest,
-        playerId: 'player1',
         targetPlayerId: 'player2',
         targetCharacterId: 'char1',
       });
@@ -705,32 +662,32 @@ describe('GameController', () => {
 
     it('should throw BadRequestException if roomCode is missing', async () => {
       const guessRequest: SubmitGuessRequest = {
-        playerId: 'player1',
         targetCharacterId: 'char1',
+        targetPlayerId: 'player2',
       };
 
-      await expect(controller.submitGuess('', guessRequest)).rejects.toThrow(
+      await expect(controller.submitGuess('', mockRequest, guessRequest)).rejects.toThrow(
         BadRequestException,
       );
     });
 
-    it('should throw BadRequestException if playerId is missing', async () => {
+    it('should throw BadRequestException if targetCharacterId is missing', async () => {
+      const guessRequest: any = {
+        targetPlayerId: 'player2',
+      };
+
+      await expect(
+        controller.submitGuess('ABC12', mockRequest, guessRequest),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if targetPlayerId is missing', async () => {
       const guessRequest: any = {
         targetCharacterId: 'char1',
       };
 
       await expect(
-        controller.submitGuess('ABC12', guessRequest),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException if targetCharacterId is missing', async () => {
-      const guessRequest: any = {
-        playerId: 'player1',
-      };
-
-      await expect(
-        controller.submitGuess('ABC12', guessRequest),
+        controller.submitGuess('ABC12', mockRequest, guessRequest),
       ).rejects.toThrow(BadRequestException);
     });
   });

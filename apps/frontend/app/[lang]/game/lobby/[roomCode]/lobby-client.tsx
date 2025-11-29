@@ -64,15 +64,9 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
         setLobby(lobbyData);
 
-        // Find current player in the lobby data
-        const player = lobbyData.players.find(
-          (p) => p.username === user?.username || p.userId === user?.id,
-        );
-
         // Then join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,
-          playerId: player?.id,
         });
 
         if (response.success && response.lobby) {
@@ -163,7 +157,6 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     try {
       const response = await updatePlayerReady({
         roomCode,
-        playerId: currentPlayer.id,
         isReady: !currentPlayer.isReady,
       });
 
@@ -213,7 +206,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
     try {
       // Leave the room via Socket.IO
       if (currentPlayer) {
-        await leaveRoom({ roomCode, playerId: currentPlayer.id });
+        await leaveRoom({ roomCode });
       }
     } catch {
       // Ignore errors when leaving

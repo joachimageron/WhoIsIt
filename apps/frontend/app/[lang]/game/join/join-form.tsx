@@ -74,13 +74,7 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
     setIsLoading(true);
 
     try {
-      const joinData = {
-        username: user!.username,
-        userId: user!.id,
-        avatarUrl: user!.avatarUrl || undefined,
-      };
-
-      await gameApi.joinGame(code, joinData);
+      await gameApi.joinGame(code);
 
       // Redirect to lobby page
       router.push(`/${lang}/game/lobby/${code}`);
@@ -99,15 +93,8 @@ export function JoinForm({ dict, lang }: JoinFormProps) {
     setIsLoading(true);
 
     try {
-      // Create guest session without username - backend will generate it
-      const guestUser = await createGuestSession();
-
-      // Join the game with the newly created guest user
-      const joinData = {
-        username: guestUser.username,
-      };
-
-      await gameApi.joinGame(pendingRoomCode!, joinData);
+      await createGuestSession();
+      await gameApi.joinGame(pendingRoomCode!);
 
       // Redirect to lobby page
       router.push(`/${lang}/game/lobby/${pendingRoomCode}`);

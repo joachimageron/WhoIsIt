@@ -16,6 +16,7 @@ describe('GameGateway', () => {
     getGameByRoomCode: jest.fn(),
     updatePlayerReady: jest.fn(),
     markPlayerAsLeft: jest.fn(),
+    getPlayerIdByUserId: jest.fn(),
   };
 
   const mockUser: User = {
@@ -228,6 +229,7 @@ describe('GameGateway', () => {
     it('should successfully join a room', async () => {
       const socket = createMockSocket(mockUser);
       mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
+      mockGameService.getPlayerIdByUserId.mockResolvedValue('player-1');
 
       const result = await gateway.handleJoinRoom(socket, {
         roomCode: 'abc12',
@@ -307,15 +309,14 @@ describe('GameGateway', () => {
         players: [], // Player has left, so empty
       };
 
+      // Mock player ID lookup
+      mockGameService.getPlayerIdByUserId.mockResolvedValueOnce('player-1');
+
       // First call for joining
       mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(
         mockLobbyResponse,
       );
-      // Second call for finding player when leaving
-      mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(
-        mockLobbyResponse,
-      );
-      // Third call for broadcasting updated state
+      // Second call for broadcasting updated state (lookup skipped because we have ID)
       mockGameService.getLobbyByRoomCode.mockResolvedValueOnce(updatedLobby);
 
       mockGameService.markPlayerAsLeft.mockResolvedValue({
@@ -404,12 +405,12 @@ describe('GameGateway', () => {
         isReady: true,
       });
       mockGameService.getLobbyByRoomCode.mockResolvedValue(mockLobbyResponse);
+      mockGameService.getPlayerIdByUserId.mockResolvedValue('player-1');
 
       gateway.handleConnection(socket);
 
       const result = await gateway.handleUpdatePlayerReady(socket, {
         roomCode: 'ABC12',
-        playerId: 'player-1',
         isReady: true,
       });
 
@@ -430,7 +431,6 @@ describe('GameGateway', () => {
 
       const result = await gateway.handleUpdatePlayerReady(socket, {
         roomCode: 'ABC12',
-        playerId: 'player-1',
         isReady: true,
       });
 

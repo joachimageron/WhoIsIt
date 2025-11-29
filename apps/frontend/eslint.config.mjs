@@ -43,14 +43,15 @@ export default defineConfig([globalIgnores([
     "!**/plopfile.js",
     "!**/react-shim.js",
     "!**/tsup.config.ts",
-]), {
-    extends: fixupConfigRules(compat.extends(
-        "plugin:react/recommended",
-        "plugin:prettier/recommended",
-        "plugin:react-hooks/recommended",
-        "plugin:jsx-a11y/recommended",
-    )),
-
+]),
+...fixupConfigRules(compat.extends(
+    "next/core-web-vitals",
+    "plugin:react/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:jsx-a11y/recommended",
+)),
+{
     plugins: {
         react: fixupPluginRules(react),
         "unused-imports": unusedImports,
@@ -144,13 +145,13 @@ export default defineConfig([globalIgnores([
             prev: "*",
             next: "return",
         }, {
-            blankLine: "always",
-            prev: ["const", "let", "var"],
-            next: "*",
-        }, {
-            blankLine: "any",
-            prev: ["const", "let", "var"],
-            next: ["const", "let", "var"],
-        }],
+                blankLine: "always",
+                prev: ["const", "let", "var"],
+                next: "*",
+            }, {
+                blankLine: "any",
+                prev: ["const", "let", "var"],
+                next: ["const", "let", "var"],
+            }],
     },
 }]);

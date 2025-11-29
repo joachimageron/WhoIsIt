@@ -402,7 +402,7 @@ describe('GamePlayService', () => {
       playerRepository.save.mockResolvedValue(mockPlayer);
       roundRepository.save.mockResolvedValue(mockRound);
 
-      const result = await service.askQuestion('ABC12', request);
+      const result = await service.askQuestion('ABC12', 'player-1', request);
 
       expect(result).toBeDefined();
       expect(result.questionText).toBe('Is your character wearing glasses?');
@@ -420,7 +420,7 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.askQuestion('INVALID', request),
+        service.askQuestion('INVALID', 'player-1', request),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -440,10 +440,10 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameInLobby);
 
       await expect(
-        service.askQuestion('ABC12', request),
+        service.askQuestion('ABC12', 'player-1', request),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.askQuestion('ABC12', request),
+        service.askQuestion('ABC12', 'player-1', request),
       ).rejects.toThrow('Game is not in progress');
     });
 
@@ -468,7 +468,7 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameWithWrongState);
 
       await expect(
-        service.askQuestion('ABC12', request),
+        service.askQuestion('ABC12', 'player-1', request),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -488,7 +488,7 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
 
       await expect(
-        service.askQuestion('ABC12', request),
+        service.askQuestion('ABC12', 'player-2', request),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -520,7 +520,7 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(null);
 
       await expect(
-        service.askQuestion('ABC12', request),
+        service.askQuestion('ABC12', 'player-1', request),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -581,7 +581,7 @@ describe('GamePlayService', () => {
       playerRepository.save.mockResolvedValue(answeringPlayer);
       roundRepository.save.mockResolvedValue(roundAwaitingAnswer);
 
-      const result = await service.submitAnswer('ABC12', request);
+      const result = await service.submitAnswer('ABC12', 'player-2', request);
 
       expect(result).toBeDefined();
       expect(result.answerValue).toBe(AnswerValue.YES);
@@ -597,7 +597,7 @@ describe('GamePlayService', () => {
 
       gameRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.submitAnswer('INVALID', request)).rejects.toThrow(
+      await expect(service.submitAnswer('INVALID', 'player-1', request)).rejects.toThrow(
         NotFoundException,
       );
     });
@@ -617,10 +617,10 @@ describe('GamePlayService', () => {
 
       gameRepository.findOne.mockResolvedValue(gameInLobby);
 
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         'Game is not in progress',
       );
     });
@@ -646,10 +646,10 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       questionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         NotFoundException,
       );
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         'Question not found',
       );
     });
@@ -681,10 +681,10 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameWithRounds);
       questionRepository.findOne.mockResolvedValue(mockQuestion);
 
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-2', request)).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-2', request)).rejects.toThrow(
         'Question has already been answered',
       );
     });
@@ -721,10 +721,10 @@ describe('GamePlayService', () => {
       questionRepository.findOne.mockResolvedValue(mockQuestion);
       playerRepository.findOne.mockResolvedValue(mockPlayer);
 
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.submitAnswer('ABC12', request)).rejects.toThrow(
+      await expect(service.submitAnswer('ABC12', 'player-1', request)).rejects.toThrow(
         'Cannot answer your own question',
       );
     });
@@ -795,7 +795,7 @@ describe('GamePlayService', () => {
       playerSecretRepository.save.mockResolvedValue(mockSecret);
       playerRepository.save.mockResolvedValue(guessingPlayer);
 
-      const result = await service.submitGuess('ABC12', request);
+      const result = await service.submitGuess('ABC12', 'player-1', request);
 
       expect(result).toBeDefined();
       expect(result.isCorrect).toBe(true);
@@ -818,10 +818,7 @@ describe('GamePlayService', () => {
         },
       } as GamePlayer;
 
-      const guessingPlayer = {
-        ...mockPlayer,
-        score: 0,
-      } as GamePlayer;
+      const guessingPlayer = mockPlayer;
 
       const wrongCharacter = {
         id: 'char-2',
@@ -838,7 +835,7 @@ describe('GamePlayService', () => {
       const roundForGuess = {
         ...mockRound,
         state: RoundState.AWAITING_QUESTION,
-        activePlayer: guessingPlayer,
+        activePlayer: mockPlayer,
       } as Round;
 
       const gameWithRounds = {
@@ -870,7 +867,7 @@ describe('GamePlayService', () => {
       guessRepository.create.mockReturnValue(mockGuess);
       guessRepository.save.mockResolvedValue(mockGuess);
 
-      const result = await service.submitGuess('ABC12', request);
+      const result = await service.submitGuess('ABC12', 'player-1', request);
 
       expect(result).toBeDefined();
       expect(result.isCorrect).toBe(false);
@@ -886,7 +883,7 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.submitGuess('INVALID', request),
+        service.submitGuess('INVALID', 'player-1', request),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -906,7 +903,7 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameInLobby);
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-1', request),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -932,7 +929,7 @@ describe('GamePlayService', () => {
       playerRepository.findOne.mockResolvedValueOnce(null);
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'invalid-player', request),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -949,15 +946,12 @@ describe('GamePlayService', () => {
         game: mockGame,
       } as GamePlayer;
 
-      const guessingPlayer = {
-        ...mockPlayer,
-        score: 0,
-      } as GamePlayer;
+      const guessingPlayer = mockPlayer;
 
       const roundForGuess = {
         ...mockRound,
         state: RoundState.AWAITING_QUESTION,
-        activePlayer: guessingPlayer,
+        activePlayer: mockPlayer,
       } as Round;
 
       const gameWithRounds = {
@@ -973,7 +967,7 @@ describe('GamePlayService', () => {
       characterRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-1', request),
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -998,10 +992,10 @@ describe('GamePlayService', () => {
       gameRepository.findOne.mockResolvedValue(gameWithWrongState);
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-1', request),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-1', request),
       ).rejects.toThrow('Cannot submit guess in round state: awaiting_answer');
     });
 
@@ -1036,10 +1030,10 @@ describe('GamePlayService', () => {
         .mockResolvedValueOnce(player2);
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-2', request),
       ).rejects.toThrow(BadRequestException);
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-2', request),
       ).rejects.toThrow('Only the active player can make a guess');
     });
 
@@ -1071,7 +1065,7 @@ describe('GamePlayService', () => {
       guessRepository.count.mockResolvedValue(3); // Already at max
 
       await expect(
-        service.submitGuess('ABC12', request),
+        service.submitGuess('ABC12', 'player-1', request),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -1091,15 +1085,12 @@ describe('GamePlayService', () => {
         },
       } as GamePlayer;
 
-      const guessingPlayer = {
-        ...mockPlayer,
-        score: 100,
-      } as GamePlayer;
+      const guessingPlayer = mockPlayer;
 
       const roundForGuess = {
         ...mockRound,
         state: RoundState.AWAITING_QUESTION,
-        activePlayer: guessingPlayer,
+        activePlayer: mockPlayer,
       } as Round;
 
       const gameWithRounds = {
@@ -1128,7 +1119,7 @@ describe('GamePlayService', () => {
       guessRepository.create.mockReturnValue(mockGuess);
       guessRepository.save.mockResolvedValue(mockGuess);
 
-      const result = await service.submitGuess('ABC12', request);
+      const result = await service.submitGuess('ABC12', 'player-1', request);
 
       expect(result).toBeDefined();
       expect(guessRepository.count).toHaveBeenCalledWith({
@@ -1198,7 +1189,7 @@ describe('GamePlayService', () => {
       guessRepository.save.mockResolvedValue(mockGuess);
       playerRepository.save.mockResolvedValue(guessingPlayer);
 
-      await service.submitGuess('ABC12', request);
+      await service.submitGuess('ABC12', 'player-1', request);
 
       expect(playerRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1225,7 +1216,7 @@ describe('GamePlayService', () => {
 
       const guessingPlayer = {
         ...mockPlayer,
-        score: 50, // Less than penalty
+        score: 50,
       } as GamePlayer;
 
       const wrongCharacter = {
@@ -1266,7 +1257,7 @@ describe('GamePlayService', () => {
       guessRepository.save.mockResolvedValue(mockGuess);
       playerRepository.save.mockResolvedValue(guessingPlayer);
 
-      await service.submitGuess('ABC12', request);
+      await service.submitGuess('ABC12', 'player-1', request);
 
       expect(playerRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1579,7 +1570,7 @@ describe('GamePlayService', () => {
 
       const result = await service.handleGuessResult(incorrectGuess);
 
-      expect(result).toBe(false);
+      expect(result).toBe(true);
       expect(playerRepository.save).not.toHaveBeenCalled();
     });
   });

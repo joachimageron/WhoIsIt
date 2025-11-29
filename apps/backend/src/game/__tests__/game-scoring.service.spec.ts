@@ -224,20 +224,32 @@ describe('GameService - Scoring and Game End', () => {
         askedAt: new Date().toISOString(),
       };
 
+      const mockGame = {
+        id: 'game-1',
+        roomCode: 'ABC12',
+        players: [
+          { id: 'player-1', user: { id: 'user-1' } },
+          { id: 'player-2', user: { id: 'user-2' } },
+        ],
+      };
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
       mockGamePlayService.askQuestion.mockResolvedValue(questionResponse);
 
-      const result = await service.askQuestion('ABC12', {
-        playerId: 'player-1',
+      const result = await service.askQuestion('ABC12', 'user-1', {
         targetPlayerId: 'player-2',
         questionText: 'Does your character have glasses?',
       });
 
       expect(result).toBe(questionResponse);
-      expect(mockGamePlayService.askQuestion).toHaveBeenCalledWith('ABC12', {
-        playerId: 'player-1',
-        targetPlayerId: 'player-2',
-        questionText: 'Does your character have glasses?',
-      });
+      expect(mockGamePlayService.askQuestion).toHaveBeenCalledWith(
+        'ABC12',
+        'player-1',
+        {
+          targetPlayerId: 'player-2',
+          questionText: 'Does your character have glasses?',
+        },
+      );
     });
 
     it('should award points for submitting an answer', async () => {
@@ -252,20 +264,32 @@ describe('GameService - Scoring and Game End', () => {
         answeredAt: new Date().toISOString(),
       };
 
+      const mockGame = {
+        id: 'game-1',
+        roomCode: 'ABC12',
+        players: [
+          { id: 'player-1', user: { id: 'user-1' } },
+          { id: 'player-2', user: { id: 'user-2' } },
+        ],
+      };
+      mockGameRepository.findOne.mockResolvedValue(mockGame);
+
       mockGamePlayService.submitAnswer.mockResolvedValue(answerResponse);
 
-      const result = await service.submitAnswer('ABC12', {
-        playerId: 'player-2',
+      const result = await service.submitAnswer('ABC12', 'user-2', {
         questionId: 'question-1',
         answerValue: AnswerValue.YES,
       });
 
       expect(result).toBe(answerResponse);
-      expect(mockGamePlayService.submitAnswer).toHaveBeenCalledWith('ABC12', {
-        playerId: 'player-2',
-        questionId: 'question-1',
-        answerValue: AnswerValue.YES,
-      });
+      expect(mockGamePlayService.submitAnswer).toHaveBeenCalledWith(
+        'ABC12',
+        'player-2',
+        {
+          questionId: 'question-1',
+          answerValue: AnswerValue.YES,
+        },
+      );
     });
 
     it('should award 1000 points for correct guess', async () => {
@@ -281,7 +305,10 @@ describe('GameService - Scoring and Game End', () => {
         id: 'game-1',
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
-        players: [],
+        players: [
+          { id: 'player-1', user: { id: 'user-1' } },
+          { id: 'player-2', user: { id: 'user-2' } },
+        ],
         rounds: [{ id: 'round-1' }],
         characterSet: null,
         visibility: 'public',
@@ -309,11 +336,12 @@ describe('GameService - Scoring and Game End', () => {
       mockGameRepository.manager.findOne.mockResolvedValue(null); // No guess entity found
       mockGamePlayService.handleGuessResult.mockResolvedValue(false);
 
-      const result = await service.submitGuess('ABC12', guessRequest);
+      const result = await service.submitGuess('ABC12', 'user-1', guessRequest);
 
       expect(result).toBe(guessResponse);
       expect(mockGamePlayService.submitGuess).toHaveBeenCalledWith(
         'ABC12',
+        'player-1',
         guessRequest,
       );
     });
@@ -332,7 +360,10 @@ describe('GameService - Scoring and Game End', () => {
         id: 'game-1',
         roomCode: 'ABC12',
         status: GameStatus.IN_PROGRESS,
-        players: [],
+        players: [
+          { id: 'player-1', user: { id: 'user-1' } },
+          { id: 'player-2', user: { id: 'user-2' } },
+        ],
         rounds: [{ id: 'round-1' }],
         characterSet: null,
         visibility: 'public',
@@ -358,7 +389,7 @@ describe('GameService - Scoring and Game End', () => {
       mockGamePlayService.handleGuessResult.mockResolvedValue(true); // Should check game end
       mockGameStatsService.checkAndHandleGameEnd.mockResolvedValue(true); // Game ended
 
-      await service.submitGuess('ABC12', guessRequest);
+      await service.submitGuess('ABC12', 'user-1', guessRequest);
 
       expect(mockGameStatsService.checkAndHandleGameEnd).toHaveBeenCalled();
     });

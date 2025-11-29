@@ -202,6 +202,7 @@ export class GamePlayService {
    */
   async askQuestion(
     roomCode: string,
+    playerId: string,
     request: AskQuestionRequest,
   ): Promise<QuestionResponse> {
     const normalizedRoomCode =
@@ -242,7 +243,7 @@ export class GamePlayService {
     // Validate that the player asking the question is the active player
     if (
       !currentRound.activePlayer ||
-      currentRound.activePlayer.id !== request.playerId
+      currentRound.activePlayer.id !== playerId
     ) {
       throw new BadRequestException(
         'Only the active player can ask a question',
@@ -251,7 +252,7 @@ export class GamePlayService {
 
     // Get the player asking the question
     const askedByPlayer = await this.playerRepository.findOne({
-      where: { id: request.playerId },
+      where: { id: playerId },
       relations: { game: true },
     });
 
@@ -414,6 +415,7 @@ export class GamePlayService {
    */
   async submitAnswer(
     roomCode: string,
+    playerId: string,
     request: SubmitAnswerRequest,
   ): Promise<AnswerResponse> {
     const normalizedRoomCode =
@@ -477,7 +479,7 @@ export class GamePlayService {
 
     // Get the player submitting the answer
     const answeringPlayer = await this.playerRepository.findOne({
-      where: { id: request.playerId },
+      where: { id: playerId },
       relations: {
         game: true,
         secret: { character: true },
@@ -646,6 +648,7 @@ export class GamePlayService {
    */
   async submitGuess(
     roomCode: string,
+    playerId: string,
     request: SubmitGuessRequest,
   ): Promise<GuessResponse> {
     const normalizedRoomCode =
@@ -686,7 +689,7 @@ export class GamePlayService {
 
     // Get the player making the guess
     const guessingPlayer = await this.playerRepository.findOne({
-      where: { id: request.playerId },
+      where: { id: playerId },
       relations: {
         game: true,
       },
@@ -703,7 +706,7 @@ export class GamePlayService {
     // Validate that the player making the guess is the active player
     if (
       !currentRound.activePlayer ||
-      currentRound.activePlayer.id !== request.playerId
+      currentRound.activePlayer.id !== playerId
     ) {
       throw new BadRequestException('Only the active player can make a guess');
     }
@@ -812,12 +815,14 @@ export class GamePlayService {
       // Award points to the guessing player
       guessingPlayer.score += GamePlayService.SCORE_CORRECT_GUESS;
       await this.playerRepository.save(guessingPlayer);
-
-      // Return true to indicate we need to check for game end
-      return true;
+    } else {
+      // Incorrect guess - penalty is applied in submitGuess
+      // We just need to return false to indicate no game end check needed yet
+      // unless we want to implement elimination logic here
     }
 
-    return false;
+    // Return true to indicate we need to check for game end
+    return true;
   }
 
   /**

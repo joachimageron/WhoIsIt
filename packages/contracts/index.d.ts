@@ -4,17 +4,9 @@ export type GamePlayerRole = "host" | "player";
 
 export type CreateGameRequest = {
   characterSetId: string;
-  hostUsername?: string;
-  hostUserId?: string;
   visibility?: GameVisibility;
   turnTimerSeconds?: number | null;
   ruleConfig?: Record<string, unknown>;
-};
-
-export type JoinGameRequest = {
-  username?: string;
-  userId?: string;
-  avatarUrl?: string;
 };
 
 export type GamePlayerResponse = {
@@ -46,7 +38,6 @@ export type GameLobbyResponse = {
 // Socket.IO Event Types
 export type SocketJoinRoomRequest = {
   roomCode: string;
-  playerId?: string;
 };
 
 export type SocketJoinRoomResponse = {
@@ -57,7 +48,6 @@ export type SocketJoinRoomResponse = {
 
 export type SocketLeaveRoomRequest = {
   roomCode: string;
-  playerId?: string;
 };
 
 export type SocketLeaveRoomResponse = {
@@ -67,7 +57,6 @@ export type SocketLeaveRoomResponse = {
 
 export type SocketUpdatePlayerReadyRequest = {
   roomCode: string;
-  playerId: string;
   isReady: boolean;
 };
 
@@ -149,7 +138,6 @@ export type PlayerCharacterResponse = {
 
 // Questions API Types
 export type AskQuestionRequest = {
-  playerId: string;
   targetPlayerId: string;
   questionText: string;
 };
@@ -188,7 +176,6 @@ export type SocketQuestionAskedEvent = {
 export type AnswerValue = "yes" | "no" | "unsure";
 
 export type SubmitAnswerRequest = {
-  playerId: string;
   questionId: string;
   answerValue: AnswerValue;
   answerText?: string;
@@ -214,7 +201,6 @@ export type SocketAnswerSubmittedEvent = {
 
 // Guesses API Types
 export type SubmitGuessRequest = {
-  playerId: string;
   targetPlayerId: string;
   targetCharacterId: string;
 };

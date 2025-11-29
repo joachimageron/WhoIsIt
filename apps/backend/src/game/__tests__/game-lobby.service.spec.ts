@@ -114,8 +114,6 @@ describe('GameLobbyService', () => {
     it('should create a game with authenticated host', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUserId: 'user-1',
-        hostUsername: 'testuser',
         visibility: 'private' as const,
         turnTimerSeconds: 60,
         ruleConfig: {},
@@ -126,7 +124,7 @@ describe('GameLobbyService', () => {
       gameRepository.exists.mockResolvedValue(false);
       gameRepository.create.mockReturnValue(mockGame);
       gameRepository.save.mockResolvedValue(mockGame);
-      
+
       const mockHostPlayer = {
         id: 'player-1',
         username: 'testuser',
@@ -135,18 +133,18 @@ describe('GameLobbyService', () => {
         game: mockGame,
         user: mockUser,
       } as GamePlayer;
-      
+
       playerRepository.create.mockReturnValue(mockHostPlayer);
       playerRepository.save.mockResolvedValue(mockHostPlayer);
-      
+
       const mockGameWithPlayers = {
         ...mockGame,
         players: [mockHostPlayer],
       };
-      
+
       gameRepository.findOne.mockResolvedValue(mockGameWithPlayers);
 
-      const result = await service.createGame(request);
+      const result = await service.createGame(request, 'user-1', 'testuser');
 
       expect(result).toBeDefined();
       expect(result.roomCode).toBeDefined();
@@ -163,22 +161,21 @@ describe('GameLobbyService', () => {
     it('should create a game with guest host', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUsername: 'guestuser',
         visibility: 'public' as const,
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
       gameRepository.exists.mockResolvedValue(false);
-      
+
       const mockGuestGame = {
         ...mockGame,
         host: null,
         visibility: GameVisibility.PUBLIC, // Fix: set the correct visibility
       };
-      
+
       gameRepository.create.mockReturnValue(mockGuestGame);
       gameRepository.save.mockResolvedValue(mockGuestGame);
-      
+
       const mockGuestPlayer = {
         id: 'player-1',
         username: 'guestuser',
@@ -187,18 +184,18 @@ describe('GameLobbyService', () => {
         game: mockGuestGame,
         user: null,
       } as GamePlayer;
-      
+
       playerRepository.create.mockReturnValue(mockGuestPlayer);
       playerRepository.save.mockResolvedValue(mockGuestPlayer);
-      
+
       const mockGameWithPlayers = {
         ...mockGuestGame,
         players: [mockGuestPlayer],
       };
-      
+
       gameRepository.findOne.mockResolvedValue(mockGameWithPlayers);
 
-      const result = await service.createGame(request);
+      const result = await service.createGame(request, undefined, 'guestuser');
 
       expect(result).toBeDefined();
       expect(result.visibility).toBe(GameVisibility.PUBLIC);
@@ -207,15 +204,14 @@ describe('GameLobbyService', () => {
     it('should throw NotFoundException if character set not found', async () => {
       const request = {
         characterSetId: 'invalid-id',
-        hostUsername: 'testuser',
       };
 
       characterSetRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         NotFoundException,
       );
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         'Character set not found',
       );
     });
@@ -223,17 +219,15 @@ describe('GameLobbyService', () => {
     it('should throw NotFoundException if host user not found', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUserId: 'invalid-user-id',
-        hostUsername: 'testuser',
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
       userRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, 'invalid-user-id', 'testuser')).rejects.toThrow(
         NotFoundException,
       );
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, 'invalid-user-id', 'testuser')).rejects.toThrow(
         'Host user not found',
       );
     });
@@ -241,7 +235,6 @@ describe('GameLobbyService', () => {
     it('should throw BadRequestException if no host username provided', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUsername: '',
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -249,7 +242,7 @@ describe('GameLobbyService', () => {
       gameRepository.create.mockReturnValue(mockGame);
       gameRepository.save.mockResolvedValue(mockGame);
 
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, '')).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -257,7 +250,6 @@ describe('GameLobbyService', () => {
     it('should handle room code generation retry logic', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUsername: 'testuser',
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
@@ -267,22 +259,22 @@ describe('GameLobbyService', () => {
         .mockResolvedValueOnce(false);
       gameRepository.create.mockReturnValue(mockGame);
       gameRepository.save.mockResolvedValue(mockGame);
-      
+
       const mockHostPlayer = {
         id: 'player-1',
         username: 'testuser',
         role: GamePlayerRole.HOST,
       } as GamePlayer;
-      
+
       playerRepository.create.mockReturnValue(mockHostPlayer);
       playerRepository.save.mockResolvedValue(mockHostPlayer);
-      
+
       gameRepository.findOne.mockResolvedValue({
         ...mockGame,
         players: [mockHostPlayer],
       });
 
-      const result = await service.createGame(request);
+      const result = await service.createGame(request, undefined, 'testuser');
 
       expect(result).toBeDefined();
       expect(gameRepository.exists).toHaveBeenCalledTimes(2);
@@ -291,17 +283,16 @@ describe('GameLobbyService', () => {
     it('should throw InternalServerErrorException after max room code attempts', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUsername: 'testuser',
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
       // All attempts fail
       gameRepository.exists.mockResolvedValue(true);
 
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         InternalServerErrorException,
       );
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         'Unable to allocate a room code',
       );
     });
@@ -309,16 +300,15 @@ describe('GameLobbyService', () => {
     it('should validate turnTimerSeconds is finite', async () => {
       const request = {
         characterSetId: 'char-set-1',
-        hostUsername: 'testuser',
         turnTimerSeconds: Infinity,
       };
 
       characterSetRepository.findOne.mockResolvedValue(mockCharacterSet);
 
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.createGame(request)).rejects.toThrow(
+      await expect(service.createGame(request, undefined, 'testuser')).rejects.toThrow(
         'Numeric fields must be finite numbers',
       );
     });
@@ -326,9 +316,7 @@ describe('GameLobbyService', () => {
 
   describe('joinGame', () => {
     it('should allow a new player to join', async () => {
-      const request = {
-        username: 'newplayer',
-      };
+      const request = {};
 
       const mockGameWithPlayers = {
         ...mockGame,
@@ -344,23 +332,23 @@ describe('GameLobbyService', () => {
 
       // First call for the initial join check
       gameRepository.findOne.mockResolvedValueOnce(mockGameWithPlayers);
-      
+
       const newPlayer = {
         id: 'player-2',
         username: 'newplayer',
         role: GamePlayerRole.PLAYER,
       } as GamePlayer;
-      
+
       playerRepository.create.mockReturnValue(newPlayer);
       playerRepository.save.mockResolvedValue(newPlayer);
-      
+
       // Second call for loading the lobby after join
       gameRepository.findOne.mockResolvedValueOnce({
         ...mockGameWithPlayers,
         players: [...mockGameWithPlayers.players, newPlayer],
       });
 
-      const result = await service.joinGame('ABC12', request);
+      const result = await service.joinGame('ABC12', request, undefined, 'newplayer');
 
       expect(result).toBeDefined();
       expect(playerRepository.create).toHaveBeenCalled();
@@ -368,9 +356,7 @@ describe('GameLobbyService', () => {
     });
 
     it('should allow a player to rejoin after leaving', async () => {
-      const request = {
-        username: 'rejoinplayer',
-      };
+      const request = {};
 
       const leftPlayer = {
         id: 'player-2',
@@ -400,7 +386,7 @@ describe('GameLobbyService', () => {
         leftAt: null,
         isReady: false,
       });
-      
+
       // Second call for loading the lobby after rejoin
       gameRepository.findOne.mockResolvedValueOnce({
         ...mockGameWithPlayers,
@@ -410,7 +396,7 @@ describe('GameLobbyService', () => {
         ],
       });
 
-      const result = await service.joinGame('ABC12', request);
+      const result = await service.joinGame('ABC12', request, undefined, 'rejoinplayer');
 
       expect(result).toBeDefined();
       expect(playerRepository.save).toHaveBeenCalled();
@@ -421,10 +407,7 @@ describe('GameLobbyService', () => {
     });
 
     it('should return current state if player already in game', async () => {
-      const request = {
-        userId: 'user-2',
-        username: 'existingplayer',
-      };
+      const request = {};
 
       const existingPlayer = {
         id: 'player-2',
@@ -441,27 +424,27 @@ describe('GameLobbyService', () => {
       gameRepository.findOne.mockResolvedValue(mockGameWithPlayers);
       userRepository.findOne.mockResolvedValue({ id: 'user-2' } as User);
 
-      const result = await service.joinGame('ABC12', request);
+      const result = await service.joinGame('ABC12', request, 'user-2', 'existingplayer');
 
       expect(result).toBeDefined();
       expect(playerRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if game not found', async () => {
-      const request = { username: 'testuser' };
+      const request = {};
 
       gameRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.joinGame('INVALID', request)).rejects.toThrow(
+      await expect(service.joinGame('INVALID', request, undefined, 'testuser')).rejects.toThrow(
         NotFoundException,
       );
-      await expect(service.joinGame('INVALID', request)).rejects.toThrow(
+      await expect(service.joinGame('INVALID', request, undefined, 'testuser')).rejects.toThrow(
         'Game not found',
       );
     });
 
     it('should throw BadRequestException if game is not in lobby', async () => {
-      const request = { username: 'testuser' };
+      const request = {};
 
       const activeGame = {
         ...mockGame,
@@ -470,16 +453,16 @@ describe('GameLobbyService', () => {
 
       gameRepository.findOne.mockResolvedValue(activeGame);
 
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, 'testuser')).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, 'testuser')).rejects.toThrow(
         'Game is not joinable',
       );
     });
 
     it('should throw BadRequestException if game is full (2 players)', async () => {
-      const request = { username: 'newplayer' };
+      const request = {};
 
       const fullGame = {
         ...mockGame,
@@ -497,10 +480,10 @@ describe('GameLobbyService', () => {
 
       gameRepository.findOne.mockResolvedValue(fullGame);
 
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, 'newplayer')).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, 'newplayer')).rejects.toThrow(
         'Game is full (maximum 2 players)',
       );
     });
@@ -510,39 +493,37 @@ describe('GameLobbyService', () => {
 
       gameRepository.findOne.mockResolvedValue(mockGame);
 
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, '')).rejects.toThrow(
         BadRequestException,
       );
-      await expect(service.joinGame('ABC12', request)).rejects.toThrow(
+      await expect(service.joinGame('ABC12', request, undefined, '')).rejects.toThrow(
         'A username is required',
       );
     });
 
     it('should handle avatar URL for authenticated users', async () => {
       const request = {
-        userId: 'user-1',
-        username: 'testuser',
         avatarUrl: 'custom-avatar.jpg',
       };
 
       gameRepository.findOne.mockResolvedValue({ ...mockGame, players: [] });
       userRepository.findOne.mockResolvedValue(mockUser);
-      
+
       const newPlayer = {
         id: 'player-2',
         username: 'testuser',
         avatarUrl: 'custom-avatar.jpg',
       } as GamePlayer;
-      
+
       playerRepository.create.mockReturnValue(newPlayer);
       playerRepository.save.mockResolvedValue(newPlayer);
-      
+
       gameRepository.findOne.mockResolvedValue({
         ...mockGame,
         players: [newPlayer],
       });
 
-      await service.joinGame('ABC12', request);
+      await service.joinGame('ABC12', request, 'user-1', 'testuser');
 
       expect(playerRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -552,14 +533,14 @@ describe('GameLobbyService', () => {
     });
 
     it('should normalize room code when joining', async () => {
-      const request = { username: 'testuser' };
+      const request = {};
 
       gameRepository.findOne.mockResolvedValue(mockGame);
       playerRepository.create.mockReturnValue({} as GamePlayer);
       playerRepository.save.mockResolvedValue({} as GamePlayer);
       gameRepository.findOne.mockResolvedValue({ ...mockGame, players: [] });
 
-      await service.joinGame('  abc12  ', request);
+      await service.joinGame('  abc12  ', request, undefined, 'testuser');
 
       expect(gameRepository.findOne).toHaveBeenCalledWith(
         expect.objectContaining({
