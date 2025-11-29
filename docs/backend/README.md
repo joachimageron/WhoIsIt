@@ -193,8 +193,7 @@ pnpm --filter @whois-it/backend test:cov
 
 ### Current Test Status
 
-- **162/162** tests passing
-- Controllers, services, and integration tests
+- **Comprehensive test suite** covering controllers, services, and integration tests
 - Mock repositories and dependencies
 
 ### E2E Tests
@@ -254,7 +253,7 @@ nest generate service feature
 For complete API endpoint documentation, see:
 
 - [REST API Reference](../api/rest-api.md)
-- [Socket.IO Events](../api/socket-events.md) (Coming Soon)
+- [Socket.IO Events](../api/socket-events.md)
 
 ## Common Patterns
 

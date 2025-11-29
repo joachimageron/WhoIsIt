@@ -11,7 +11,7 @@ Monorepo for the WhoIsIt 2-player guessing game featuring a mobile-first Next.js
 ├─ apps/
 │  ├─ frontend/    # Next.js + HeroUI client, includes Zustand store and Socket.IO client runtime deps
 │  └─ backend/     # NestJS API/WebSocket server configured for PostgreSQL via TypeORM
-├─ packages/       # Reserved for future shared libraries
+├─ packages/       # Shared libraries (contracts)
 ├─ package.json    # Workspace orchestration scripts
 ├─ pnpm-lock.yaml
 └─ pnpm-workspace.yaml
@@ -103,7 +103,7 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
 
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.
 - **Backend**: NestJS 11 with ConfigModule, TypeORM auto-loading entities, Socket.IO gateway support, and PostgreSQL driver.
-- **Package manager**: pnpm workspaces with shared hoisting configured for HeroUI packages.
+- **Package manager**: pnpm workspaces with shared hoisting configured for HeroUI packages and shared contracts.
 
 ## Documentation
 

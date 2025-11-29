@@ -498,13 +498,20 @@ pnpm dev:frontend  # --turbopack flag automatic
 - Debug configurations
 - TypeScript IntelliSense
 
-### Testingg
+### Testing
 
-Currently no tests set up. Future additions:
+Jest and React Testing Library are set up for testing:
 
-- Jest for unit tests
-- Testing Library for components
-- Playwright for E2E tests
+- [Testing Coverage Strategy](./testing-coverage-strategy.md) - Frontend test coverage requirements and strategy
+- **Unit Tests**: For utility functions, hooks, and stores
+- **Component Tests**: Using React Testing Library for UI components
+- **Integration Tests**: Testing interactions between components and stores
+
+Run tests with:
+
+```bash
+pnpm test:frontend
+```
 
 ## Common Patterns
 
