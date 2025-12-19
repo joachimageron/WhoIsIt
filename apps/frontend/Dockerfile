@@ -3,7 +3,6 @@
 # ============================================
 FROM node:25-alpine AS builder
 
-# Install pnpm
 RUN npm install -g pnpm
 
 WORKDIR /app
@@ -23,39 +22,40 @@ COPY apps/frontend ./apps/frontend
 COPY packages/contracts ./packages/contracts
 
 # Set build-time environment variables
-ARG NEXT_PUBLIC_API_URL=http://localhost:4000
-ARG NEXT_PUBLIC_SOCKET_URL=http://localhost:4000
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_SOCKET_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
 ENV DOCKER_BUILD=true
 
-# Build frontend - run from root to access workspace context
-RUN pnpm --filter @whois-it/frontend... install --frozen-lockfile && \
-  pnpm --filter @whois-it/frontend build
+# Build frontend
+RUN pnpm --filter @whois-it/frontend build
 
 # ============================================
 # Stage 2: Production
 # ============================================
 FROM node:25-alpine AS production
 
-# Install pnpm
-RUN npm install -g pnpm
-
 WORKDIR /app
 
-# Copy built application from builder
+# Variables d'environnement indispensables pour Docker
+ENV NODE_ENV=production
+ENV HOSTNAME="0.0.0.0"
+ENV PORT=3000
+
+# Copy built application from builder (standalone mode)
 COPY --from=builder /app/apps/frontend/.next/standalone ./
 COPY --from=builder /app/apps/frontend/.next/static ./apps/frontend/.next/static
 COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
 
+# Placement dans le dossier de l'app pour lancer le serveur
 WORKDIR /app/apps/frontend
 
-# Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+# Healthcheck amélioré (accepte 200, 301, 302, 307, 308)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=3 \
+  CMD node -e "require('http').get('http://127.0.0.1:3000/', (r) => {process.exit(r.statusCode < 400 ? 0 : 1)})"
 
 # Start command
 CMD ["node", "server.js"]

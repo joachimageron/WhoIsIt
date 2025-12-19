@@ -71,16 +71,15 @@ services:
       dockerfile: apps/frontend/Dockerfile
       target: production
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:?NEXT_PUBLIC_API_URL is required}
-        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL:?NEXT_PUBLIC_SOCKET_URL is required}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+        NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
     container_name: whoisit-frontend-prod
     environment:
       NODE_ENV: production
+      HOSTNAME: "0.0.0.0" # TRÈS IMPORTANT
+      PORT: 3000
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
-    depends_on:
-      backend:
-        condition: service_healthy
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoisit-frontend.rule=Host(`whoisit.ageronjoachim.com`)"
