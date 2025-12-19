@@ -1,7 +1,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:18-alpine
+    image: postgres:alpine
     container_name: whoisit-postgres-dev
     environment:
       POSTGRES_USER: postgres
@@ -21,7 +21,7 @@ services:
 
   # Backend Service (Development mode with hot-reload)
   backend-dev:
-    image: node:25-alpine
+    image: node:alpine
     container_name: whoisit-backend-dev
     working_dir: /app
     environment:
@@ -56,7 +56,7 @@ services:
 
   # Frontend Service (Development mode with hot-reload)
   frontend-dev:
-    image: node:25-alpine
+    image: node:alpine
     container_name: whoisit-frontend-dev
     working_dir: /app
     environment:

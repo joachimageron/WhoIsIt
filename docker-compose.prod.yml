@@ -1,7 +1,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:18-alpine
+    image: postgres:alpine
     container_name: whoisit-postgres-prod
     environment:
       POSTGRES_USER: ${DB_USER:-postgres}
