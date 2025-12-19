@@ -15,7 +15,8 @@ COPY packages/contracts/package.json ./packages/contracts/
 
 # Install dependencies
 ENV CI=true
-RUN pnpm install --frozen-lockfile
+RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile
 
 # Copy source files
 COPY apps/frontend ./apps/frontend
