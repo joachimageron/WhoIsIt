@@ -48,6 +48,10 @@ For production deployment, see the `docker-compose.prod.yml` file.
    Duplicate `apps/backend/.env.example` to `.env` and adjust values for your PostgreSQL instance.
 
    ```bash
+   # On Unix/Linux/macOS
+   cp apps/backend/.env.example apps/backend/.env
+   
+   # On Windows
    copy apps\backend\.env.example apps\backend\.env
    ```
 
@@ -56,6 +60,10 @@ For production deployment, see the `docker-compose.prod.yml` file.
    Duplicate `apps/frontend/.env.example` to `.env` to configure API and Socket.IO URLs.
 
    ```bash
+   # On Unix/Linux/macOS
+   cp apps/frontend/.env.example apps/frontend/.env
+   
+   # On Windows
    copy apps\frontend\.env.example apps\frontend\.env
    ```
 
@@ -125,5 +133,3 @@ Comprehensive documentation is available throughout the codebase:
 ## Contributing
 
 This repository includes [GitHub Copilot instructions](./.github/copilot-instructions.md) to help developers and AI coding assistants understand the architecture, conventions, and workflows. Review these guidelines before making changes.
-
-For detailed development guidelines, see the [Development Documentation](./docs/development/README.md).
