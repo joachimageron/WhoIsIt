@@ -63,7 +63,7 @@ export class GamePlayService {
     @InjectRepository(Guess)
     private readonly guessRepository: Repository<Guess>,
     private readonly gameLobbyService: GameLobbyService,
-  ) { }
+  ) {}
 
   /**
    * Initialize the first round of the game
@@ -832,9 +832,10 @@ export class GamePlayService {
           // Eliminate player by revealing their secret
           let secret = guessingPlayer.secret;
           if (!secret) {
-            secret = await this.playerSecretRepository.findOne({
-              where: { player: { id: guessingPlayer.id } },
-            }) ?? undefined;
+            secret =
+              (await this.playerSecretRepository.findOne({
+                where: { player: { id: guessingPlayer.id } },
+              })) ?? undefined;
           }
 
           if (secret) {

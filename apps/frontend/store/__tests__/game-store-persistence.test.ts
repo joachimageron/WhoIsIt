@@ -138,9 +138,7 @@ describe("useGameStore - Persistence", () => {
       );
 
       // Force rehydration by calling persist.rehydrate()
-      // @ts-expect-error - accessing internal persist API for testing
       if (useGameStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useGameStore.persist.rehydrate();
       }
 
@@ -281,9 +279,7 @@ describe("useGameStore - Persistence", () => {
       );
 
       // Force rehydration by calling persist.rehydrate()
-      // @ts-expect-error - accessing internal persist API for testing
       if (useGameStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useGameStore.persist.rehydrate();
       }
 

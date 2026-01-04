@@ -7,18 +7,6 @@ import { useAuth } from "../use-auth";
 jest.mock("../use-auth");
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 
-// Mock guest-session
-jest.mock("@/lib/guest-session", () => ({
-  getGuestSession: jest.fn(),
-  clearGuestSession: jest.fn(),
-  createGuestSession: jest.fn((username: string) => ({
-    id: "guest-123",
-    username,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-  })),
-}));
-
 describe("useGameAccess", () => {
   const mockCreateGuestSession = jest.fn();
   const mockLogout = jest.fn();

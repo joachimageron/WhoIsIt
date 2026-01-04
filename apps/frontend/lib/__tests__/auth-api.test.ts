@@ -81,7 +81,7 @@ describe("auth-api", () => {
         json: async () => {
           throw new Error("Invalid JSON");
         },
-      } as Response);
+      } as unknown as Response);
 
       await expect(authApi.register(registerData)).rejects.toThrow(
         "Registration failed",
@@ -236,7 +236,7 @@ describe("auth-api", () => {
         json: async () => {
           throw new Error("Invalid JSON");
         },
-      } as Response);
+      } as unknown as Response);
 
       await expect(
         authApi.resendVerificationEmail("test@example.com"),

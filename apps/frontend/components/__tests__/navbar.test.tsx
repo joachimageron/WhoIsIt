@@ -60,6 +60,7 @@ describe("Navbar", () => {
       isGuest: false,
       isLoading: false,
       logout: mockLogout,
+      createGuestSession: jest.fn(),
     });
   });
 
@@ -130,6 +131,7 @@ describe("Navbar", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: jest.fn(),
       });
     });
 
@@ -163,6 +165,7 @@ describe("Navbar", () => {
         isGuest: false,
         isLoading: false,
         logout: mockLogout,
+        createGuestSession: jest.fn(),
       });
     });
 

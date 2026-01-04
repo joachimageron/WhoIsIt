@@ -32,7 +32,7 @@ export class GameService {
     private readonly gameLobbyService: GameLobbyService,
     private readonly gamePlayService: GamePlayService,
     private readonly gameStatsService: GameStatsService,
-  ) { }
+  ) {}
 
   // Delegate lobby operations to GameLobbyService
   async createGame(

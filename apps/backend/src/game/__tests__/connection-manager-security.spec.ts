@@ -203,7 +203,7 @@ describe('ConnectionManager Security Features', () => {
       expect(true).toBe(true);
     });
 
-    it('should disconnect inactive connections', (done) => {
+    it('should disconnect inactive connections', () => {
       jest.useFakeTimers();
 
       const socket = createMockSocket(mockUser);
@@ -212,18 +212,18 @@ describe('ConnectionManager Security Features', () => {
       connectionManager.trackConnection(socket);
       connectionManager.startInactivityMonitoring(disconnectCallback);
 
-      // Fast forward past inactivity timeout (60s + check interval 30s)
-      jest.advanceTimersByTime(91000);
+      // Fast forward past inactivity timeout (5 minutes + check interval 30s)
+      // The inactivity timeout is 5 minutes (300,000ms)
 
-      // Wait for interval to execute
-      setTimeout(() => {
-        expect(disconnectCallback).toHaveBeenCalledWith(socket.id);
-        connectionManager.stopInactivityMonitoring();
-        jest.useRealTimers();
-        done();
-      }, 100);
+      // First, advance time to make the connection "old"
+      jest.setSystemTime(new Date(Date.now() + 301000));
 
-      jest.runOnlyPendingTimers();
+      // Then advance timers to trigger the interval
+      jest.advanceTimersByTime(31000);
+
+      expect(disconnectCallback).toHaveBeenCalledWith(socket.id);
+      connectionManager.stopInactivityMonitoring();
+      jest.useRealTimers();
     });
 
     it('should not disconnect active connections', (done) => {

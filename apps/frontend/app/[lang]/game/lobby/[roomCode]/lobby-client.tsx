@@ -78,6 +78,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
               router.push(`/${lang}/game/play/${roomCode}`);
             }, 1500);
           }
+
           return;
         }
 

@@ -36,12 +36,15 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const lobby: GameLobbyResponse = {
+        id: "lobby-1",
+        status: "lobby",
+        visibility: "public",
         roomCode: "TEST123",
         players: [],
         hostId: "host-1",
-        maxPlayers: 4,
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: "2024-01-01T00:00:00Z",
       } as GameLobbyResponse;
 
       act(() => {
@@ -55,12 +58,15 @@ describe("useGameStore", () => {
       const { result } = renderHook(() => useGameStore());
 
       const lobby: GameLobbyResponse = {
+        id: "lobby-1",
+        status: "lobby",
+        visibility: "public",
         roomCode: "TEST123",
         players: [],
         hostId: "host-1",
-        maxPlayers: 4,
         characterSetId: "set-1",
-        isStarted: false,
+        ruleConfig: {},
+        createdAt: "2024-01-01T00:00:00Z",
       } as GameLobbyResponse;
 
       act(() => {
@@ -112,8 +118,10 @@ describe("useGameStore", () => {
       const gameState: GameStateResponse = {
         id: "game-1",
         roomCode: "TEST123",
-        currentPlayerId: "player-1",
-        roundNumber: 1,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -134,8 +142,10 @@ describe("useGameStore", () => {
       const gameState1: GameStateResponse = {
         id: "game-1",
         roomCode: "TEST123",
-        currentPlayerId: "player-1",
-        roundNumber: 1,
+        status: "in_progress",
+        currentRoundNumber: 2,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -145,8 +155,10 @@ describe("useGameStore", () => {
       const gameState2: GameStateResponse = {
         id: "game-1",
         roomCode: "TEST123",
-        currentPlayerId: "player-2",
-        roundNumber: 2,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -164,8 +176,10 @@ describe("useGameStore", () => {
       const gameState1: GameStateResponse = {
         id: "game-1",
         roomCode: "TEST123",
-        currentPlayerId: "player-1",
-        roundNumber: 1,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       const characters: CharacterResponseDto[] = [
@@ -179,8 +193,14 @@ describe("useGameStore", () => {
 
       const question: QuestionResponse = {
         id: "q1",
-        text: "Is it a person?",
-        playerId: "player-1",
+        roundId: "r1",
+        roundNumber: 1,
+        askedByPlayerId: "player-1",
+        askedByPlayerUsername: "Player1",
+        targetPlayerId: "player-2",
+        targetPlayerUsername: "Player2",
+        questionText: "Is it a person?",
+        askedAt: "2024-06-01T12:00:00Z",
       } as QuestionResponse;
 
       act(() => {
@@ -200,10 +220,12 @@ describe("useGameStore", () => {
 
       // Change roomCode
       const gameState2: GameStateResponse = {
-        id: "game-2",
+        id: "game-1",
         roomCode: "NEWROOM",
-        currentPlayerId: "player-1",
-        roundNumber: 1,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -227,8 +249,10 @@ describe("useGameStore", () => {
       const gameState1: GameStateResponse = {
         id: "game-1",
         roomCode: "TEST123",
-        currentPlayerId: "player-1",
-        roundNumber: 1,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -241,9 +265,11 @@ describe("useGameStore", () => {
       // Set gameState with null roomCode
       const gameState2: GameStateResponse = {
         id: "game-1",
-        roomCode: null as any,
-        currentPlayerId: "player-1",
-        roundNumber: 2,
+        roomCode: null as string | null,
+        status: "in_progress",
+        currentRoundNumber: 1,
+        currentRoundState: "question",
+        players: [],
       } as GameStateResponse;
 
       act(() => {
@@ -311,7 +337,7 @@ describe("useGameStore", () => {
         id: "char-1",
         name: "Alice",
         imageUrl: "url1",
-      } as PlayerCharacterResponse;
+      } as unknown as PlayerCharacterResponse;
 
       act(() => {
         result.current.setMyCharacter(myCharacter);
@@ -328,7 +354,7 @@ describe("useGameStore", () => {
         id: "char-1",
         name: "Alice",
         imageUrl: "url1",
-      } as PlayerCharacterResponse;
+      } as unknown as PlayerCharacterResponse;
 
       act(() => {
         result.current.setMyCharacter(myCharacter1);
@@ -338,7 +364,7 @@ describe("useGameStore", () => {
         id: "char-2",
         name: "Bob",
         imageUrl: "url2",
-      } as PlayerCharacterResponse;
+      } as unknown as PlayerCharacterResponse;
 
       act(() => {
         result.current.setMyCharacter(myCharacter2);
@@ -356,7 +382,7 @@ describe("useGameStore", () => {
         id: "q1",
         text: "Is it a person?",
         playerId: "player-1",
-      } as QuestionResponse;
+      } as unknown as QuestionResponse;
 
       act(() => {
         result.current.addQuestion(question);
@@ -374,7 +400,7 @@ describe("useGameStore", () => {
         id: "q1",
         text: "Is it a person?",
         playerId: "player-1",
-      } as QuestionResponse;
+      } as unknown as QuestionResponse;
 
       act(() => {
         result.current.addQuestion(question1);
@@ -384,7 +410,7 @@ describe("useGameStore", () => {
         id: "q2",
         text: "Does it fly?",
         playerId: "player-1",
-      } as QuestionResponse;
+      } as unknown as QuestionResponse;
 
       act(() => {
         result.current.addQuestion(question2);
@@ -403,8 +429,8 @@ describe("useGameStore", () => {
       const answer: AnswerResponse = {
         id: "a1",
         questionId: "q1",
-        answer: true,
-      } as AnswerResponse;
+        answerValue: "yes",
+      } as unknown as AnswerResponse;
 
       act(() => {
         result.current.addAnswer(answer);
@@ -427,8 +453,8 @@ describe("useGameStore", () => {
       const answer: AnswerResponse = {
         id: "a1",
         questionId: "q1",
-        answer: true,
-      } as AnswerResponse;
+        answerValue: "yes",
+      } as unknown as AnswerResponse;
 
       act(() => {
         result.current.addAnswer(answer);
@@ -452,8 +478,8 @@ describe("useGameStore", () => {
       const answer1: AnswerResponse = {
         id: "a1",
         questionId: "q1",
-        answer: true,
-      } as AnswerResponse;
+        answerValue: "yes",
+      } as unknown as AnswerResponse;
 
       act(() => {
         result.current.addAnswer(answer1);
@@ -462,8 +488,8 @@ describe("useGameStore", () => {
       const answer2: AnswerResponse = {
         id: "a2",
         questionId: "q1",
-        answer: false,
-      } as AnswerResponse;
+        answerValue: "no",
+      } as unknown as AnswerResponse;
 
       act(() => {
         result.current.addAnswer(answer2);
@@ -656,7 +682,7 @@ describe("useGameStore", () => {
       const lobby: GameLobbyResponse = {
         roomCode: "TEST123",
         players: [],
-      } as GameLobbyResponse;
+      } as unknown as GameLobbyResponse;
 
       act(() => {
         result.current.setLobby(lobby);
@@ -684,7 +710,7 @@ describe("useGameStore", () => {
         result.current.setLobby({
           roomCode: "TEST123",
           players: [],
-        } as GameLobbyResponse);
+        } as unknown as GameLobbyResponse);
         result.current.setConnected(true);
         result.current.setGameState({
           id: "game-1",

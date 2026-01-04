@@ -44,9 +44,7 @@ describe("State Persistence - Integration Tests", () => {
     // Step 2: Simulate page reload by rehydrating store
     {
       // Force rehydration
-      // @ts-expect-error - accessing internal persist API for testing
       if (useAuthStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useAuthStore.persist.rehydrate();
       }
 
@@ -90,9 +88,7 @@ describe("State Persistence - Integration Tests", () => {
     // Step 2: Simulate page reload
     {
       // Force rehydration
-      // @ts-expect-error - accessing internal persist API for testing
       if (useGameStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useGameStore.persist.rehydrate();
       }
 
@@ -159,9 +155,7 @@ describe("State Persistence - Integration Tests", () => {
     // Step 3: Simulate page reload - user should remain logged out
     {
       // Force rehydration
-      // @ts-expect-error - accessing internal persist API for testing
       if (useAuthStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useAuthStore.persist.rehydrate();
       }
 
@@ -199,9 +193,7 @@ describe("State Persistence - Integration Tests", () => {
     // Step 3: Simulate page reload - state should remain reset
     {
       // Force rehydration
-      // @ts-expect-error - accessing internal persist API for testing
       if (useGameStore.persist?.rehydrate) {
-        // @ts-expect-error
         await useGameStore.persist.rehydrate();
       }
 

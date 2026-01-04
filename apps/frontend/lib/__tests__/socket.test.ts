@@ -5,7 +5,7 @@ const mockIo = jest.fn(() => ({
 }));
 
 jest.mock("socket.io-client", () => ({
-  io: (...args: any[]) => mockIo(...args),
+  io: (...args: any[]) => (mockIo as any)(...args),
 }));
 
 import { getSocket, disconnectSocket } from "../socket";

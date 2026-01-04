@@ -139,7 +139,6 @@ describe("QuestionsPanel", () => {
 
     await waitFor(() => {
       expect(mockGameApi.askQuestion).toHaveBeenCalledWith("ABC123", {
-        playerId: "player-1",
         targetPlayerId: "player-2",
         questionText: "Test question",
       });
@@ -388,7 +387,6 @@ describe("QuestionsPanel", () => {
 
     await waitFor(() => {
       expect(mockGameApi.askQuestion).toHaveBeenCalledWith("ABC123", {
-        playerId: "player-1",
         targetPlayerId: "player-2",
         questionText: "Test question",
       });

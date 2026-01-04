@@ -106,7 +106,6 @@ describe("useGameActions", () => {
 
       expect(mockLeaveRoom).toHaveBeenCalledWith({
         roomCode: "TEST123",
-        playerId: "player-1",
       });
       expect(mockPush).toHaveBeenCalledWith("/en");
     });
@@ -169,7 +168,6 @@ describe("useGameActions", () => {
       });
 
       expect(mockGameApi.submitGuess).toHaveBeenCalledWith("TEST123", {
-        playerId: "player-1",
         targetPlayerId: "player-2",
         targetCharacterId: "char-1",
       });
@@ -246,13 +244,12 @@ describe("useGameActions", () => {
       const { result } = renderHook(() => useGameActions(mockProps));
 
       await act(async () => {
-        await result.current.handleSubmitAnswer("q1", true);
+        await result.current.handleSubmitAnswer("q1", "yes");
       });
 
       expect(mockGameApi.submitAnswer).toHaveBeenCalledWith("TEST123", {
-        playerId: "player-1",
         questionId: "q1",
-        answerValue: true,
+        answerValue: "yes",
         answerText: undefined,
       });
       expect(mockProps.setPendingQuestion).toHaveBeenCalledWith(null);
@@ -269,7 +266,6 @@ describe("useGameActions", () => {
       });
 
       expect(mockGameApi.submitAnswer).toHaveBeenCalledWith("TEST123", {
-        playerId: "player-1",
         questionId: "q1",
         answerValue: "yes",
         answerText: "Custom answer",
@@ -281,7 +277,7 @@ describe("useGameActions", () => {
       const { result } = renderHook(() => useGameActions(props));
 
       await act(async () => {
-        await result.current.handleSubmitAnswer("q1", true);
+        await result.current.handleSubmitAnswer("q1", "yes");
       });
 
       expect(mockGameApi.submitAnswer).not.toHaveBeenCalled();
@@ -300,7 +296,7 @@ describe("useGameActions", () => {
       const { result } = renderHook(() => useGameActions(mockProps));
 
       await act(async () => {
-        await result.current.handleSubmitAnswer("q1", true);
+        await result.current.handleSubmitAnswer("q1", "yes");
       });
 
       expect(mockProps.setPendingQuestion).not.toHaveBeenCalled();

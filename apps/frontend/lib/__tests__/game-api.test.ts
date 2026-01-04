@@ -1,6 +1,5 @@
 import type {
   CreateGameRequest,
-  JoinGameRequest,
   AskQuestionRequest,
   SubmitAnswerRequest,
   SubmitGuessRequest,
@@ -98,7 +97,6 @@ describe("game-api", () => {
   describe("createGame", () => {
     const createData: CreateGameRequest = {
       characterSetId: "set-1",
-      maxPlayers: 4,
       turnTimerSeconds: 60,
     };
 
@@ -143,10 +141,6 @@ describe("game-api", () => {
   });
 
   describe("joinGame", () => {
-    const joinData: JoinGameRequest = {
-      username: "player2",
-    };
-
     it("successfully joins a game", async () => {
       const mockLobby = {
         roomCode: "TEST123",
@@ -162,7 +156,7 @@ describe("game-api", () => {
         json: async () => mockLobby,
       } as Response);
 
-      const result = await gameApi.joinGame("TEST123", joinData);
+      const result = await gameApi.joinGame("TEST123");
 
       expect(mockFetch).toHaveBeenCalledWith(`${API_URL}/games/TEST123/join`, {
         method: "POST",
@@ -170,7 +164,6 @@ describe("game-api", () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(joinData),
       });
       expect(result).toEqual(mockLobby);
     });
@@ -181,9 +174,7 @@ describe("game-api", () => {
         json: async () => ({ message: "Game is full" }),
       } as Response);
 
-      await expect(gameApi.joinGame("TEST123", joinData)).rejects.toThrow(
-        "Game is full",
-      );
+      await expect(gameApi.joinGame("TEST123")).rejects.toThrow("Game is full");
     });
   });
 
@@ -367,8 +358,8 @@ describe("game-api", () => {
 
   describe("askQuestion", () => {
     const questionData: AskQuestionRequest = {
-      playerId: "player-1",
-      text: "Is it a person?",
+      targetPlayerId: "player-1",
+      questionText: "Is it a person?",
     };
 
     it("successfully asks a question", async () => {
@@ -413,9 +404,8 @@ describe("game-api", () => {
 
   describe("submitAnswer", () => {
     const answerData: SubmitAnswerRequest = {
-      playerId: "player-1",
       questionId: "q1",
-      answerValue: true,
+      answerValue: "yes",
     };
 
     it("successfully submits an answer", async () => {
@@ -461,8 +451,8 @@ describe("game-api", () => {
 
   describe("submitGuess", () => {
     const guessData: SubmitGuessRequest = {
-      playerId: "player-1",
       targetCharacterId: "char-1",
+      targetPlayerId: "player-2",
     };
 
     it("successfully submits a guess", async () => {

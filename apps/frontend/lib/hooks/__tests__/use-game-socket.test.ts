@@ -80,12 +80,11 @@ describe("useGameSocket", () => {
 
       const response = await result.current.joinRoom({
         roomCode: "TEST123",
-        playerId: "player-1",
       });
 
       expect(mockEmit).toHaveBeenCalledWith(
         "joinRoom",
-        { roomCode: "TEST123", playerId: "player-1" },
+        { roomCode: "TEST123"},
         expect.any(Function),
       );
       expect(response).toEqual({ success: true });
@@ -105,7 +104,6 @@ describe("useGameSocket", () => {
 
       const response = await result.current.joinRoom({
         roomCode: "TEST123",
-        playerId: "player-1",
       });
 
       expect(response).toEqual(mockResponse);
@@ -124,12 +122,11 @@ describe("useGameSocket", () => {
 
       await result.current.leaveRoom({
         roomCode: "TEST123",
-        playerId: "player-1",
       });
 
       expect(mockEmit).toHaveBeenCalledWith(
         "leaveRoom",
-        { roomCode: "TEST123", playerId: "player-1" },
+        { roomCode: "TEST123" },
         expect.any(Function),
       );
     });
@@ -147,13 +144,12 @@ describe("useGameSocket", () => {
 
       const response = await result.current.updatePlayerReady({
         roomCode: "TEST123",
-        playerId: "player-1",
         isReady: true,
       });
 
       expect(mockEmit).toHaveBeenCalledWith(
         "updatePlayerReady",
-        { roomCode: "TEST123", playerId: "player-1", isReady: true },
+        { roomCode: "TEST123", isReady: true },
         expect.any(Function),
       );
       expect(response).toEqual(mockResponse);

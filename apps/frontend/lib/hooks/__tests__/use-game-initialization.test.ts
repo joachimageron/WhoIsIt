@@ -146,7 +146,6 @@ describe("useGameInitialization", () => {
       );
       expect(mockJoinRoom).toHaveBeenCalledWith({
         roomCode: "TEST123",
-        playerId: "player-1",
       });
       expect(result.current.currentPlayerId).toBe("player-1");
       expect(result.current.lobby).toEqual(mockLobby);

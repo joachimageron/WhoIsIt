@@ -9,18 +9,6 @@ import { useAuth } from "../use-auth";
 jest.mock("@/lib/auth-api");
 const mockAuthApi = authApi as jest.Mocked<typeof authApi>;
 
-// Mock guest-session module (used by auth-store)
-jest.mock("@/lib/guest-session", () => ({
-  getGuestSession: jest.fn(),
-  clearGuestSession: jest.fn(),
-  createGuestSession: jest.fn((username: string) => ({
-    id: "guest-123",
-    username,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-  })),
-}));
-
 describe("useAuth", () => {
   beforeEach(() => {
     jest.clearAllMocks();

@@ -2,18 +2,6 @@ import { renderHook, act } from "@testing-library/react";
 
 import { useAuthStore, type User } from "../auth-store";
 
-// Mock guest-session module
-jest.mock("@/lib/guest-session", () => ({
-  getGuestSession: jest.fn(),
-  clearGuestSession: jest.fn(),
-  createGuestSession: jest.fn((username: string) => ({
-    id: "guest-123",
-    username,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 24 * 60 * 60 * 1000,
-  })),
-}));
-
 describe("useAuthStore", () => {
   beforeEach(() => {
     // Reset store to initial state
