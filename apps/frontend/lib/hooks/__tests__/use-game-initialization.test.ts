@@ -2,12 +2,12 @@ import type { Dictionary } from "@/dictionaries";
 
 import { renderHook, waitFor } from "@testing-library/react";
 
-import { useGameInitialization } from "../use-game-initialization";
-
 import * as gameApi from "@/lib/game-api";
 import { useAuthStore } from "@/store/auth-store";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+
+import { useGameInitialization } from "../use-game-initialization";
 
 // Mock dependencies
 jest.mock("@/lib/game-api");

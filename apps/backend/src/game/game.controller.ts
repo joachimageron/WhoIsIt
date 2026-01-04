@@ -68,11 +68,7 @@ export class GameController {
 
     const user = req.user as User;
 
-    return this.gameService.joinGame(
-      roomCode,
-      user.id,
-      user.username,
-    );
+    return this.gameService.joinGame(roomCode, user.id, user.username);
   }
 
   @Get(':roomCode')

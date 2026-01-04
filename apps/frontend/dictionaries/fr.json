@@ -228,6 +228,7 @@
       "notAllPlayersReady": "Les deux joueurs doivent être prêts pour démarrer le jeu.",
       "waitingForHost": "En attente du démarrage par l'hôte...",
       "gameStarting": "Démarrage de la partie !",
+      "gameAlreadyStarted": "La partie a déjà commencé",
       "redirectingToGame": "Redirection vers le jeu...",
       "errors": {
         "failedToJoin": "Échec de la connexion au lobby",

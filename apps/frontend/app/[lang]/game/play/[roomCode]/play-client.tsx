@@ -8,6 +8,11 @@ import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
 
+import { useGameStore } from "@/store/game-store";
+import { useGameInitialization } from "@/lib/hooks/use-game-initialization";
+import { useGameEvents } from "@/lib/hooks/use-game-events";
+import { useGameActions } from "@/lib/hooks/use-game-actions";
+
 import { CharacterGrid } from "./components/character-grid";
 import { QuestionsPanel } from "./components/questions-panel";
 import { QuestionHistory } from "./components/question-history";
@@ -15,11 +20,6 @@ import { GameHeader } from "./components/game-header";
 import { GuessModal } from "./components/guess-modal";
 import { TurnTimer } from "./components/turn-timer";
 import { AnswerModal } from "./components/answer-modal";
-
-import { useGameStore } from "@/store/game-store";
-import { useGameInitialization } from "@/lib/hooks/use-game-initialization";
-import { useGameEvents } from "@/lib/hooks/use-game-events";
-import { useGameActions } from "@/lib/hooks/use-game-actions";
 
 interface GamePlayClientProps {
   dict: Dictionary;

@@ -4,9 +4,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { addToast } from "@heroui/toast";
 
-import { ForgotPasswordForm } from "../forgot-password-form";
-
 import * as authApi from "@/lib/auth-api";
+
+import { ForgotPasswordForm } from "../forgot-password-form";
 
 // Mock auth API
 jest.mock("@/lib/auth-api");

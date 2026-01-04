@@ -3,12 +3,12 @@ import { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import clsx from "clsx";
 
-import { Providers } from "./providers";
-
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: {

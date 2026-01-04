@@ -1,6 +1,6 @@
-import { ProfileForm } from "./profile-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { ProfileForm } from "./profile-form";
 
 export default async function ProfilePage({
   params,

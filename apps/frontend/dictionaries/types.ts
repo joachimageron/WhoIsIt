@@ -245,6 +245,7 @@ export interface Dictionary {
       notAllPlayersReady: string;
       waitingForHost: string;
       gameStarting: string;
+      gameAlreadyStarted: string;
       redirectingToGame: string;
       errors: {
         failedToJoin: string;

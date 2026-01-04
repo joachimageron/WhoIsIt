@@ -1,8 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 
-import { resetGameStore } from "../reset-game-store";
-
 import { useGameStore } from "@/store/game-store";
+
+import { resetGameStore } from "../reset-game-store";
 
 describe("resetGameStore", () => {
   beforeEach(() => {

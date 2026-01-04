@@ -1,8 +1,8 @@
 import type { Locale } from "@/dictionaries";
 
-import { GameResultsClient } from "./results-client";
-
 import { getDictionary } from "@/dictionaries";
+
+import { GameResultsClient } from "./results-client";
 
 export default async function ResultsPage({
   params,

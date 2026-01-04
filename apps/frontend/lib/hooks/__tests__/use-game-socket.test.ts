@@ -1,8 +1,8 @@
 import { renderHook } from "@testing-library/react";
 
-import { useGameSocket } from "../use-game-socket";
-
 import { getSocket, disconnectSocket } from "@/lib/socket";
+
+import { useGameSocket } from "../use-game-socket";
 
 // Mock socket module
 const mockConnect = jest.fn();

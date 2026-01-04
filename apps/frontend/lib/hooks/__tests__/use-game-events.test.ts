@@ -2,10 +2,10 @@ import type { Dictionary } from "@/dictionaries";
 
 import { renderHook, act } from "@testing-library/react";
 
-import { useGameEvents } from "../use-game-events";
-
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+
+import { useGameEvents } from "../use-game-events";
 
 // Mock dependencies
 jest.mock("@/store/game-store");

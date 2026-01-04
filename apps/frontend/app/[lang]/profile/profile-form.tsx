@@ -11,12 +11,12 @@ import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/toast";
 import { Chip } from "@heroui/chip";
 
-import { GameStats } from "./game-stats";
-import { GameHistory } from "./game-history";
-
 import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
+
+import { GameHistory } from "./game-history";
+import { GameStats } from "./game-stats";
 
 interface ProfileFormProps {
   dict: Dictionary;

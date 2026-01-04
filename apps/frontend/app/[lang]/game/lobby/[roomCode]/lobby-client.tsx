@@ -44,6 +44,7 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
   const [isJoining, setIsJoining] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
   const [isTogglingReady, setIsTogglingReady] = useState(false);
+  const isRedirectingRef = React.useRef(false);
 
   // Get current player
   const currentPlayer = lobby?.players.find(
@@ -63,6 +64,22 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
         const lobbyData = await gameApi.getLobby(roomCode);
 
         setLobby(lobbyData);
+
+        // If game is already in progress, redirect to play page
+        if (lobbyData.status === "in_progress") {
+          if (!isRedirectingRef.current) {
+            isRedirectingRef.current = true;
+            addToast({
+              color: "default",
+              title: dict.game.lobby.gameAlreadyStarted,
+              description: dict.game.lobby.redirectingToGame,
+            });
+            setTimeout(() => {
+              router.push(`/${lang}/game/play/${roomCode}`);
+            }, 1500);
+          }
+          return;
+        }
 
         // Then join via Socket.IO for real-time updates
         const response = await joinRoom({
@@ -123,13 +140,18 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
     const unsubscribeGameStarted = onGameStarted((event) => {
       setLobby(event.lobby);
-      addToast({
-        color: "success",
-        title: dict.game.lobby.gameStarting,
-        description: dict.game.lobby.redirectingToGame,
-      });
-      // Navigate to game page
-      router.push(`/${lang}/game/play/${event.roomCode}`);
+      if (!isRedirectingRef.current) {
+        isRedirectingRef.current = true;
+        addToast({
+          color: "success",
+          title: dict.game.lobby.gameStarting,
+          description: dict.game.lobby.redirectingToGame,
+        });
+        // Navigate to game page
+        setTimeout(() => {
+          router.push(`/${lang}/game/play/${event.roomCode}`);
+        }, 1500);
+      }
     });
 
     return () => {

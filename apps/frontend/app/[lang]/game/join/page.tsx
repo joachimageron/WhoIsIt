@@ -1,6 +1,6 @@
-import { JoinForm } from "./join-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { JoinForm } from "./join-form";
 
 export default async function JoinGamePage({
   params,
