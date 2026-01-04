@@ -1,8 +1,8 @@
 import type { Locale } from "@/dictionaries";
 
-import { GamePlayClient } from "./play-client";
-
 import { getDictionary } from "@/dictionaries";
+
+import { GamePlayClient } from "./play-client";
 
 export default async function PlayPage({
   params,

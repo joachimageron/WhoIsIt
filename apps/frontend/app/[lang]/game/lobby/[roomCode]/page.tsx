@@ -1,6 +1,6 @@
-import { LobbyClient } from "./lobby-client";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { LobbyClient } from "./lobby-client";
 
 export default async function LobbyPage({
   params,

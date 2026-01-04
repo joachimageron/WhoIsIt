@@ -1,6 +1,6 @@
-import { VerifyEmailForm } from "./verify-email-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { VerifyEmailForm } from "./verify-email-form";
 
 export default async function VerifyEmailPage({
   params,

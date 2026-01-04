@@ -3,10 +3,10 @@ import type { Dictionary } from "@/dictionaries";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { LoginForm } from "../login-form";
-
 import * as authApi from "@/lib/auth-api";
 import { useAuthStore } from "@/store/auth-store";
+
+import { LoginForm } from "../login-form";
 
 // Mock auth API
 jest.mock("@/lib/auth-api");

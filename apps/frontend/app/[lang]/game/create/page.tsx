@@ -1,6 +1,6 @@
-import { CreateGameForm } from "./create-game-form";
-
 import { getDictionary, Locale } from "@/dictionaries";
+
+import { CreateGameForm } from "./create-game-form";
 
 export default async function CreateGamePage({
   params,

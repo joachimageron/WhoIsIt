@@ -28,7 +28,7 @@ export interface RequestWithUser extends Request {
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) { }
+  constructor(private readonly authService: AuthService) {}
 
   // Stricter rate limiting for registration: 3 attempts per minute
   @Throttle({ default: { limit: 3, ttl: 60000 } })
@@ -43,7 +43,7 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -68,7 +68,7 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -118,7 +118,7 @@ export class AuthController {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain: process.env.COOKIE_DOMAIN || undefined,
     };
 
@@ -203,7 +203,7 @@ export class AuthController {
     res.cookie('guest_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });

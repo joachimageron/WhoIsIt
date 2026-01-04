@@ -1,6 +1,6 @@
-import { LoginForm } from "./login-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { LoginForm } from "./login-form";
 
 export default async function LoginPage({
   params,

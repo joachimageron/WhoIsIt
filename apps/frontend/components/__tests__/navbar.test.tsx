@@ -2,9 +2,9 @@ import type { Dictionary } from "@/dictionaries";
 
 import { render, screen } from "@testing-library/react";
 
-import { Navbar } from "../navbar";
-
 import { useAuth } from "@/lib/hooks/use-auth";
+
+import { Navbar } from "../navbar";
 
 // Mock next/navigation
 const mockPush = jest.fn();

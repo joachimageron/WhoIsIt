@@ -64,6 +64,18 @@ export function LobbyClient({ dict, lang, roomCode }: LobbyClientProps) {
 
         setLobby(lobbyData);
 
+        // If game is already in progress, redirect to play page
+        if (lobbyData.status === "in_progress") {
+          addToast({
+            color: "primary",
+            title: dict.game.lobby.gameAlreadyStarted,
+            description: dict.game.lobby.redirectingToGame,
+          });
+          router.push(`/${lang}/game/play/${roomCode}`);
+
+          return;
+        }
+
         // Then join via Socket.IO for real-time updates
         const response = await joinRoom({
           roomCode,

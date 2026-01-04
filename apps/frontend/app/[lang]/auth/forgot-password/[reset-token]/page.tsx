@@ -1,6 +1,6 @@
-import { ResetPasswordForm } from "./reset-password-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { ResetPasswordForm } from "./reset-password-form";
 
 export default async function ResetPasswordPage({
   params,

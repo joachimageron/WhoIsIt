@@ -1,6 +1,6 @@
-import { RegisterForm } from "./register-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { RegisterForm } from "./register-form";
 
 export default async function RegisterPage({
   params,

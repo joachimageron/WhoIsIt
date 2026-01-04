@@ -228,6 +228,7 @@
       "notAllPlayersReady": "Both players must be ready to start the game.",
       "waitingForHost": "Waiting for host to start the game...",
       "gameStarting": "Game Starting!",
+      "gameAlreadyStarted": "Game already started",
       "redirectingToGame": "Redirecting to game...",
       "errors": {
         "failedToJoin": "Failed to join lobby",

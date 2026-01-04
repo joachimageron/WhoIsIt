@@ -1,6 +1,6 @@
-import { ForgotPasswordForm } from "./forgot-password-form";
-
 import { getDictionary, type Locale } from "@/dictionaries";
+
+import { ForgotPasswordForm } from "./forgot-password-form";
 
 export default async function ForgotPasswordPage({
   params,

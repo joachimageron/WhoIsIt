@@ -3,11 +3,11 @@ import type { Dictionary } from "@/dictionaries";
 import { renderHook, act } from "@testing-library/react";
 import { addToast } from "@heroui/toast";
 
-import { useGameActions } from "../use-game-actions";
-
 import * as gameApi from "@/lib/game-api";
 import { useGameStore } from "@/store/game-store";
 import { useGameSocket } from "@/lib/hooks/use-game-socket";
+
+import { useGameActions } from "../use-game-actions";
 
 // Mock dependencies
 jest.mock("@/lib/game-api");
