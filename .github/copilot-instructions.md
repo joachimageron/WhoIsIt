@@ -181,7 +181,7 @@ Use `report_progress`:
 
 ### Documentation
 
-- **Update related docs**: If you change or add functionality, always update relevant documentation in /docs.
+- **Update related docs**: If you change or add functionality, always update relevant documentation.
 - **Keep consistency**: Match the style and format of existing documentation.
 - **Inline comments**: Add comments only when they match existing patterns or are necessary for complex logic.
 
