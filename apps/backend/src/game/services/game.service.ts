@@ -32,7 +32,7 @@ export class GameService {
     private readonly gameLobbyService: GameLobbyService,
     private readonly gamePlayService: GamePlayService,
     private readonly gameStatsService: GameStatsService,
-  ) {}
+  ) { }
 
   // Delegate lobby operations to GameLobbyService
   async createGame(
@@ -213,7 +213,7 @@ export class GameService {
     const guess = await this.gameRepository.manager.findOne(Guess, {
       where: { id: guessResponse.id },
       relations: {
-        guessedBy: true,
+        guessedBy: { secret: true, game: true, user: true },
         targetPlayer: { secret: true },
         round: true,
       },

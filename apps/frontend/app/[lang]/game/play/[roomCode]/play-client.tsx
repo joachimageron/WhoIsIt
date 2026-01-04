@@ -86,6 +86,9 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
   const { gameState, characters, questions, myCharacter } = playState;
   const isMyTurn = gameState.activePlayerId === currentPlayerId;
 
+  const me = gameState.players.find((p) => p.id === currentPlayerId);
+  const isEliminated = me?.isEliminated;
+
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4">
       <GameHeader

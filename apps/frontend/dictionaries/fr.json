@@ -251,6 +251,7 @@
       "timer": "Temps Restant",
       "connecting": "Connexion au jeu...",
       "loadingGame": "Chargement de l'état du jeu...",
+      "eliminated": "Vous avez été éliminé !",
       "characters": {
         "characterGrid": "Grille de Personnages",
         "activeCharacters": "Personnages Actifs",

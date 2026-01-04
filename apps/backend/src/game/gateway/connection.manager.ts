@@ -18,7 +18,7 @@ export class ConnectionManager {
   private readonly MAX_RECONNECTIONS_PER_MINUTE = 5;
   private readonly RECONNECTION_WINDOW_MS = 60 * 1000; // 1 minute
   private readonly BAN_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-  private readonly INACTIVITY_TIMEOUT_MS = 60 * 1000; // 60 seconds
+  private readonly INACTIVITY_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
   private inactivityCheckInterval: NodeJS.Timeout | null = null;
 

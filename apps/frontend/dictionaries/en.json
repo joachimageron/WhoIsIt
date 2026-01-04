@@ -251,6 +251,7 @@
       "timer": "Time Remaining",
       "connecting": "Connecting to game...",
       "loadingGame": "Loading game state...",
+      "eliminated": "You have been eliminated!",
       "characters": {
         "characterGrid": "Character Grid",
         "activeCharacters": "Active Characters",

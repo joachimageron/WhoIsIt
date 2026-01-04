@@ -268,6 +268,7 @@ export interface Dictionary {
       timer: string;
       connecting: string;
       loadingGame: string;
+      eliminated: string;
       characters: {
         characterGrid: string;
         activeCharacters: string;

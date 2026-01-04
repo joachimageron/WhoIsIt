@@ -1573,5 +1573,49 @@ describe('GamePlayService', () => {
       expect(result).toBe(true);
       expect(playerRepository.save).not.toHaveBeenCalled();
     });
+
+    it('should eliminate player when max guesses reached on incorrect guess', async () => {
+      const mockSecret = {
+        id: 'secret-1',
+        status: PlayerSecretStatus.HIDDEN,
+      } as PlayerSecret;
+
+      const guessingPlayer = {
+        ...mockPlayer,
+        score: 0,
+        secret: mockSecret,
+        game: { id: 'game-1' },
+      } as GamePlayer;
+
+      const targetPlayer = {
+        id: 'player-2',
+        username: 'target',
+      } as GamePlayer;
+
+      const incorrectGuess = {
+        id: 'guess-1',
+        guessedBy: guessingPlayer,
+        targetPlayer: targetPlayer,
+        isCorrect: false,
+        round: { game: { id: 'game-1' } },
+      } as Guess;
+
+      // Mock guess count to be at limit (3)
+      guessRepository.count.mockResolvedValue(3);
+      playerSecretRepository.save.mockResolvedValue({
+        ...mockSecret,
+        status: PlayerSecretStatus.REVEALED,
+      });
+
+      const result = await service.handleGuessResult(incorrectGuess);
+
+      expect(result).toBe(true);
+      expect(guessRepository.count).toHaveBeenCalled();
+      expect(playerSecretRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          status: PlayerSecretStatus.REVEALED,
+        }),
+      );
+    });
   });
 });

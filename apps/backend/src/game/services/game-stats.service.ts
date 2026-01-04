@@ -70,7 +70,8 @@ export class GameStatsService {
         // Find the last remaining player with unrevealed secret
         const lastPlayerSecret = await this.playerSecretRepository
           .createQueryBuilder('secret')
-          .innerJoin('secret.player', 'player')
+          .innerJoinAndSelect('secret.player', 'player')
+          .leftJoinAndSelect('player.user', 'user')
           .where('player.game_id = :gameId', { gameId: game.id })
           .andWhere('player.leftAt IS NULL')
           .andWhere('secret.status = :status', {

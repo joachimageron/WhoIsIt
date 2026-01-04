@@ -63,7 +63,7 @@ export class GamePlayService {
     @InjectRepository(Guess)
     private readonly guessRepository: Repository<Guess>,
     private readonly gameLobbyService: GameLobbyService,
-  ) {}
+  ) { }
 
   /**
    * Initialize the first round of the game
@@ -161,7 +161,7 @@ export class GamePlayService {
     const game = await this.gameRepository.findOne({
       where: { roomCode: normalizedRoomCode },
       relations: {
-        players: { user: true },
+        players: { user: true, secret: true },
         rounds: { activePlayer: true },
       },
       order: {
@@ -190,6 +190,7 @@ export class GamePlayService {
         avatarUrl: player.avatarUrl ?? undefined,
         role: player.role,
         isReady: player.isReady,
+        isEliminated: player.secret?.status === PlayerSecretStatus.REVEALED,
         joinedAt: player.joinedAt?.toISOString?.() ?? new Date().toISOString(),
         leftAt: player.leftAt?.toISOString?.(),
         userId: player.user?.id,
@@ -817,8 +818,31 @@ export class GamePlayService {
       await this.playerRepository.save(guessingPlayer);
     } else {
       // Incorrect guess - penalty is applied in submitGuess
-      // We just need to return false to indicate no game end check needed yet
-      // unless we want to implement elimination logic here
+
+      // Check if player has reached max guesses
+      if (guessingPlayer.game) {
+        const guessCount = await this.guessRepository.count({
+          where: {
+            guessedBy: { id: guessingPlayer.id },
+            round: { game: { id: guessingPlayer.game.id } },
+          },
+        });
+
+        if (guessCount >= GamePlayService.MAX_GUESSES_PER_PLAYER) {
+          // Eliminate player by revealing their secret
+          let secret = guessingPlayer.secret;
+          if (!secret) {
+            secret = await this.playerSecretRepository.findOne({
+              where: { player: { id: guessingPlayer.id } },
+            }) ?? undefined;
+          }
+
+          if (secret) {
+            secret.status = PlayerSecretStatus.REVEALED;
+            await this.playerSecretRepository.save(secret);
+          }
+        }
+      }
     }
 
     // Return true to indicate we need to check for game end

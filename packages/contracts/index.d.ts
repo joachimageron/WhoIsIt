@@ -15,6 +15,7 @@ export type GamePlayerResponse = {
   avatarUrl?: string;
   role: GamePlayerRole;
   isReady: boolean;
+  isEliminated?: boolean;
   joinedAt: string;
   leftAt?: string;
   userId?: string;
