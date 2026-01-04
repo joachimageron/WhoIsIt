@@ -161,9 +161,9 @@ describe('AuthController', () => {
       controller.logout(res);
 
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(res.clearCookie).toHaveBeenCalledWith('access_token');
+      expect(res.clearCookie).toHaveBeenCalledWith('access_token', expect.any(Object));
       // eslint-disable-next-line @typescript-eslint/unbound-method
-      expect(res.clearCookie).toHaveBeenCalledWith('guest_token');
+      expect(res.clearCookie).toHaveBeenCalledWith('guest_token', expect.any(Object));
 
       expect(res.json).toHaveBeenCalledWith({
         message: 'Logged out successfully',

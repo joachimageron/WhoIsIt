@@ -123,7 +123,6 @@ describe('GameService', () => {
         roomCode,
         joinRequest,
         userId,
-        username,
       );
     });
   });

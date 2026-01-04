@@ -43,7 +43,8 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -67,7 +68,8 @@ export class AuthController {
     res.cookie('access_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
@@ -113,9 +115,16 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Response({ passthrough: false }) res: ExpressResponse) {
+    const cookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      domain: process.env.COOKIE_DOMAIN || undefined,
+    };
+
     // Clear both access_token and guest_token cookies
-    res.clearCookie('access_token');
-    res.clearCookie('guest_token');
+    res.clearCookie('access_token', cookieOptions);
+    res.clearCookie('guest_token', cookieOptions);
     return res.json({ message: 'Logged out successfully' });
   }
 
@@ -194,7 +203,8 @@ export class AuthController {
     res.cookie('guest_token', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: (process.env.NODE_ENV === 'production' ? 'none' : 'lax') as 'none' | 'lax',
+      domain: process.env.COOKIE_DOMAIN || undefined,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 

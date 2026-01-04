@@ -42,6 +42,8 @@ services:
       EMAIL_USER: ${EMAIL_USER:-}
       EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
       EMAIL_FROM: ${EMAIL_FROM:-noreply@whoisit.com}
+      # Cookie Domain (optional, e.g. .ageronjoachim.com)
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN:-}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoisit-backend.rule=Host(`whoisit-api.ageronjoachim.com`)"

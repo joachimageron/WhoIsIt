@@ -229,46 +229,20 @@ describe('GameController', () => {
   describe('join', () => {
     it('should join a game successfully', async () => {
       const roomCode = 'ABC12';
-      const joinRequest: JoinGameRequest = {
-        avatarUrl: 'https://example.com/avatar.jpg',
-      };
 
       gameService.joinGame.mockResolvedValue(mockGameLobbyResponse);
 
-      const result = await controller.join(roomCode, mockRequest, joinRequest);
+      const result = await controller.join(roomCode, mockRequest);
 
       expect(result).toEqual(mockGameLobbyResponse);
       expect(gameService.joinGame).toHaveBeenCalledWith(
         roomCode,
-        {
-          ...joinRequest,
-          avatarUrl: 'https://example.com/avatar.jpg',
-        },
         mockUser.id,
         mockUser.username,
       );
     });
 
-    it('should trim avatarUrl', async () => {
-      const roomCode = 'ABC12';
-      const joinRequest: JoinGameRequest = {
-        avatarUrl: '  https://example.com/avatar.jpg  ',
-      };
 
-      gameService.joinGame.mockResolvedValue(mockGameLobbyResponse);
-
-      await controller.join(roomCode, mockRequest, joinRequest);
-
-      expect(gameService.joinGame).toHaveBeenCalledWith(
-        roomCode,
-        {
-          ...joinRequest,
-          avatarUrl: 'https://example.com/avatar.jpg',
-        },
-        mockUser.id,
-        mockUser.username,
-      );
-    });
 
     it('should throw BadRequestException if roomCode is missing', async () => {
       const joinRequest: JoinGameRequest = {};

@@ -17,7 +17,8 @@ async function bootstrap() {
   app.use(helmet());
 
   // Trust proxy (required for secure cookies behind reverse proxy like Traefik)
-  app.getHttpAdapter().getInstance().set('trust proxy', 1);
+  // 'true' trusts all proxies, which is safe here since we don't expose ports directly
+  app.getHttpAdapter().getInstance().set('trust proxy', true);
 
   app.use(cookieParser());
   app.useGlobalPipes(
