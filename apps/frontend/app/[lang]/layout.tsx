@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
 import clsx from "clsx";
 
 import { Providers } from "./providers";
@@ -39,6 +40,12 @@ export default async function RootLayout({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
+
+  // Validate locale to prevent bot traffic from rendering the app with invalid lang
+  if (!["en", "fr"].includes(lang)) {
+    notFound();
+  }
+
   const dict = await getDictionary(lang);
 
   return (

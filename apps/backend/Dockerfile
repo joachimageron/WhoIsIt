@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Builder
 # ============================================
-FROM node:25-alpine AS builder
+FROM node:lts-alpine AS builder
 
 # Install pnpm
 RUN npm install -g pnpm
@@ -29,7 +29,7 @@ RUN pnpm --filter @whois-it/backend... install --frozen-lockfile && \
 # ============================================
 # Stage 2: Production
 # ============================================
-FROM node:25-alpine AS production
+FROM node:lts-alpine AS production
 
 # Install pnpm
 RUN npm install -g pnpm

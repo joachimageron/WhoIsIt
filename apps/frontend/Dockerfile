@@ -1,7 +1,7 @@
 # ============================================
 # Stage 1: Builder
 # ============================================
-FROM node:25-alpine AS builder
+FROM node:lts-alpine AS builder
 
 RUN npm install -g pnpm
 
@@ -34,7 +34,7 @@ RUN pnpm --filter @whois-it/frontend build
 # ============================================
 # Stage 2: Production
 # ============================================
-FROM node:25-alpine AS production
+FROM node:lts-alpine AS production
 
 WORKDIR /app
 
