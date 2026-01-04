@@ -207,6 +207,7 @@ If tests or builds fail:
 - ✅ Update existing tests when modifying features
 - ✅ New features require new tests
 - ✅ **Proactively fix weak tests**: When you encounter tests that only check mocks without validating behavior, refactor them even if not in your original scope
+- ✅ Update documentation for new or changed features
 - ⚠️ Frontend builds may fail in restricted environments (Google Fonts) - this is expected
 - ⚠️ Don't use `DB_SYNC=true` in production - use migrations instead
 - ⚠️ Tests must fail when the feature they test is broken
