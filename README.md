@@ -33,7 +33,7 @@ docker-compose -f docker-compose.dev.yml up
 # - PostgreSQL: localhost:5432
 ```
 
-For more Docker options and commands, see the [Docker Setup Guide](./docs/deployment/docker.md).
+For production deployment, see the `docker-compose.prod.yml` file.
 
 ### Option 2: Using pnpm (Local Development)
 
@@ -48,6 +48,10 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
    Duplicate `apps/backend/.env.example` to `.env` and adjust values for your PostgreSQL instance.
 
    ```bash
+   # On Unix/Linux/macOS
+   cp apps/backend/.env.example apps/backend/.env
+   
+   # On Windows
    copy apps\backend\.env.example apps\backend\.env
    ```
 
@@ -56,6 +60,10 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
    Duplicate `apps/frontend/.env.example` to `.env` to configure API and Socket.IO URLs.
 
    ```bash
+   # On Unix/Linux/macOS
+   cp apps/frontend/.env.example apps/frontend/.env
+   
+   # On Windows
    copy apps\frontend\.env.example apps\frontend\.env
    ```
 
@@ -95,9 +103,7 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
    pnpm test:cov
    ```
 
-   For detailed testing strategies, see:
-   - [Backend Testing Coverage Strategy](./docs/development/testing-coverage-strategy.md)
-   - [Frontend Testing Coverage Strategy](./docs/frontend/testing-coverage-strategy.md)
+   Run tests frequently during development to ensure code quality.
 
 ## Tooling highlights
 
@@ -107,20 +113,23 @@ For more Docker options and commands, see the [Docker Setup Guide](./docs/deploy
 
 ## Documentation
 
-Comprehensive documentation is available in the [`/docs`](./docs) directory:
+Comprehensive documentation is available throughout the codebase:
 
-- **[Getting Started](./docs/development/getting-started.md)** - Complete setup guide for local development
-- **[Docker Setup](./docs/deployment/docker.md)** - Docker and Docker Compose setup guide
-- **[Architecture](./docs/architecture/overview.md)** - System design and architectural decisions
-- **[Backend](./docs/backend/README.md)** - NestJS API, database schema, and services
-- **[Frontend](./docs/frontend/README.md)** - Next.js application, components, and state management
-- **[API Reference](./docs/api/rest-api.md)** - REST endpoints and WebSocket events
-- **[Deployment](./docs/deployment/README.md)** - Production deployment guides
+### Backend Documentation
+- **[Game Module](./apps/backend/src/game/README.md)** - Game logic, lobby management, and gameplay mechanics
+- **[Authentication Module](./apps/backend/src/auth/README.md)** - User authentication and authorization
+- **[Database Module](./apps/backend/src/database/README.md)** - Database schema, entities, and migrations
+- **[Email Module](./apps/backend/src/email/README.md)** - Email functionality
 
-See the [Documentation Index](./docs/README.md) for the complete table of contents.
+### Frontend Documentation
+- **[Components](./apps/frontend/components/README.md)** - Reusable React components
+- **[State Management](./apps/frontend/store/README.md)** - Zustand stores for global state
+- **[Library & Hooks](./apps/frontend/lib/README.md)** - API clients and custom hooks
+- **[Game Pages](./apps/frontend/app/[lang]/game/README.md)** - Game-related pages and routing
+
+### Shared Packages
+- **[Contracts](./packages/contracts/README.md)** - Shared TypeScript types and API contracts
 
 ## Contributing
 
 This repository includes [GitHub Copilot instructions](./.github/copilot-instructions.md) to help developers and AI coding assistants understand the architecture, conventions, and workflows. Review these guidelines before making changes.
-
-For detailed development guidelines, see the [Development Documentation](./docs/development/README.md).

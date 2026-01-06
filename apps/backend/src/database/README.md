@@ -261,9 +261,9 @@ Database connection:
 
 - `DB_HOST` - PostgreSQL host (default: localhost)
 - `DB_PORT` - PostgreSQL port (default: 5432)
-- `DB_USERNAME` - Database username (default: postgres)
+- `DB_USER` - Database username (default: postgres)
 - `DB_PASSWORD` - Database password
-- `DB_DATABASE` - Database name (default: whoisit)
+- `DB_NAME` - Database name (default: whois_it)
 - `DB_SYNC` - Auto-sync schema (development only, default: false)
 
 ### Connection Configuration
@@ -275,9 +275,9 @@ In `data-source.ts`:
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
-  username: process.env.DB_USERNAME || 'postgres',
+  username: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE || 'whoisit',
+  database: process.env.DB_NAME || 'whois_it',
   entities: ['dist/**/*.entity.js'],
   migrations: ['dist/database/migrations/*.js'],
   synchronize: process.env.DB_SYNC === 'true', // NEVER in production!
