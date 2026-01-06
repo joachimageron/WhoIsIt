@@ -84,7 +84,7 @@ describe("useGameSocket", () => {
 
       expect(mockEmit).toHaveBeenCalledWith(
         "joinRoom",
-        { roomCode: "TEST123"},
+        { roomCode: "TEST123" },
         expect.any(Function),
       );
       expect(response).toEqual({ success: true });

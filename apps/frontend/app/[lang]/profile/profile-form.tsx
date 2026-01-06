@@ -15,8 +15,8 @@ import { useAuthStore } from "@/store/auth-store";
 import * as authApi from "@/lib/auth-api";
 import { isValidEmail } from "@/lib/utils/validation";
 
-import { GameHistory } from "./game-history";
 import { GameStats } from "./game-stats";
+import { GameHistory } from "./game-history";
 
 interface ProfileFormProps {
   dict: Dictionary;

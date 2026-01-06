@@ -8,10 +8,10 @@ import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { Icon } from "@iconify/react";
 
-import { useGameStore } from "@/store/game-store";
-import { useGameInitialization } from "@/lib/hooks/use-game-initialization";
-import { useGameEvents } from "@/lib/hooks/use-game-events";
 import { useGameActions } from "@/lib/hooks/use-game-actions";
+import { useGameEvents } from "@/lib/hooks/use-game-events";
+import { useGameInitialization } from "@/lib/hooks/use-game-initialization";
+import { useGameStore } from "@/store/game-store";
 
 import { CharacterGrid } from "./components/character-grid";
 import { QuestionsPanel } from "./components/questions-panel";
@@ -85,9 +85,6 @@ export function GamePlayClient({ dict, lang, roomCode }: GamePlayClientProps) {
 
   const { gameState, characters, questions, myCharacter } = playState;
   const isMyTurn = gameState.activePlayerId === currentPlayerId;
-
-  const me = gameState.players.find((p) => p.id === currentPlayerId);
-  const isEliminated = me?.isEliminated;
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4">
