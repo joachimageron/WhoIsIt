@@ -105,6 +105,28 @@ For production deployment, see the `docker-compose.prod.yml` file.
 
    Run tests frequently during development to ensure code quality.
 
+### Database Management (Seeding & Resetting)
+
+**Using Docker (Development):**
+
+```bash
+# Seed the database (populates with initial data)
+docker-compose -f docker-compose.dev.yml exec backend-dev pnpm seed
+
+# Reset database (drop + recreate + seed)
+docker-compose -f docker-compose.dev.yml exec backend-dev pnpm db:reset
+```
+
+**Using pnpm directly (Local):**
+
+```bash
+# Seed the database
+pnpm seed
+
+# Reset database
+pnpm db:reset
+```
+
 ## Tooling highlights
 
 - **Frontend**: Next.js 15 with Turbopack, Tailwind CSS 4, HeroUI component suite, Zustand state management, and Socket.IO client.
