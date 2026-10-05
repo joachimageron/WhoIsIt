@@ -1,9 +1,13 @@
 services:
   # PostgreSQL Database (Isolée)
   postgres:
-    image: postgres:alpine
+    image: postgres:18-alpine
+    pull_policy: missing
     container_name: whoisit-postgres-prod
     environment:
+      # Postgres 18+ stocke par défaut dans /var/lib/postgresql/18/docker :
+      # on force PGDATA pour que les données restent dans le volume nommé
+      PGDATA: /var/lib/postgresql/data
       POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
       POSTGRES_DB: ${DB_NAME:-whois_it}
@@ -16,7 +20,7 @@ services:
       retries: 5
     networks:
       - db-network
-    restart: always
+    restart: unless-stopped
 
   # Backend Service (Pont entre DB et Web)
   backend:
@@ -24,6 +28,7 @@ services:
       context: .
       dockerfile: apps/backend/Dockerfile
       target: production
+    pull_policy: build
     container_name: whoisit-backend-prod
     environment:
       NODE_ENV: production
@@ -58,7 +63,7 @@ services:
     networks:
       - db-network
       - dokploy-network
-    restart: on-failure:3
+    restart: unless-stopped
 
   # Frontend Service (Exposé Web uniquement)
   frontend:
@@ -69,6 +74,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
         NEXT_PUBLIC_SOCKET_URL: ${NEXT_PUBLIC_SOCKET_URL}
+    pull_policy: build
     container_name: whoisit-frontend-prod
     environment:
       NODE_ENV: production
@@ -86,7 +92,7 @@ services:
       - "traefik.docker.network=dokploy-network"
     networks:
       - dokploy-network
-    restart: on-failure:3
+    restart: unless-stopped
 
 volumes:
   postgres_data:

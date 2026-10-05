@@ -1,9 +1,10 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:alpine
+    image: postgres:18-alpine
     container_name: whoisit-postgres-dev
     environment:
+      PGDATA: /var/lib/postgresql/data
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: whois_it
