@@ -13,7 +13,7 @@ interface AuthenticatedSocket extends Socket {
 }
 
 export class WsAuthAdapter extends IoAdapter {
-  private readonly logger = new Logger(WsAuthAdapter.name);
+  protected readonly logger = new Logger(WsAuthAdapter.name);
 
   constructor(
     private app: INestApplicationContext,
