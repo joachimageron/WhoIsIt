@@ -8,9 +8,10 @@ import { getDictionary, type Locale } from "@/dictionaries";
 export default async function Home({
   params,
 }: {
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }) {
-  const { lang } = await params;
+  const { lang: langParam } = await params;
+  const lang = langParam as Locale;
   const dict = await getDictionary(lang);
 
   return (
