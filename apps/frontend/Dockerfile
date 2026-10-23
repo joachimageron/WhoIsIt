@@ -51,6 +51,10 @@ COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
 # Placement dans le dossier de l'app pour lancer le serveur
 WORKDIR /app/apps/frontend
 
+# Exécution sans root : le code reste propriété de root, donc non modifiable par le
+# process. Le cache Next (.next/cache) est monté en tmpfs par docker-compose.prod.yml
+USER node
+
 EXPOSE 3000
 
 # Healthcheck amélioré (accepte 200, 301, 302, 307, 308)

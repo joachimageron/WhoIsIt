@@ -56,13 +56,21 @@ services:
       - "traefik.http.routers.whoisit-backend.tls=true"
       - "traefik.http.routers.whoisit-backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.whoisit-backend.loadbalancer.server.port=4000"
-      - "traefik.docker.network=dokploy-network"
+      - "traefik.docker.network=whois-it-whoisit-k32hmg"
     depends_on:
       postgres:
         condition: service_healthy
+    # Durcissement : FS en lecture seule, /tmp non exécutable, aucune capability
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     networks:
       - db-network
-      - dokploy-network
+      - whois-it-whoisit-k32hmg
     restart: unless-stopped
 
   # Frontend Service (Exposé Web uniquement)
@@ -89,9 +97,18 @@ services:
       - "traefik.http.routers.whoisit-frontend.tls=true"
       - "traefik.http.routers.whoisit-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.whoisit-frontend.loadbalancer.server.port=3000"
-      - "traefik.docker.network=dokploy-network"
+      - "traefik.docker.network=whois-it-whoisit-k32hmg"
+    # Durcissement : FS en lecture seule, /tmp et cache Next non exécutables, aucune capability
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m
+      - /app/apps/frontend/.next/cache:rw,noexec,nosuid,nodev,size=256m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     networks:
-      - dokploy-network
+      - whois-it-whoisit-k32hmg
     restart: unless-stopped
 
 volumes:
@@ -102,6 +119,10 @@ networks:
   # Réseau interne privé pour la DB
   db-network:
     internal: true
-  # Réseau externe Dokploy pour Traefik
-  dokploy-network:
+  # Réseau dédié partagé avec Traefik, créé par Dokploy ("Isolated Deployment" activé
+  # sur le compose) qui y connecte dokploy-traefik à chaque déploiement. On ne rejoint
+  # plus dokploy-network, qui donne accès à Dokploy et aux autres services du VPS.
+  # Sans l'option, le déploiement échoue (réseau introuvable) au lieu d'exposer l'app.
+  whois-it-whoisit-k32hmg:
+    name: whois-it-whoisit-k32hmg
     external: true
