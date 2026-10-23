@@ -37,9 +37,10 @@ export default async function RootLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
+  params: Promise<{ lang: string }>;
 }) {
-  const { lang } = await params;
+  const { lang: langParam } = await params;
+  const lang = langParam as Locale;
 
   // Validate locale to prevent bot traffic from rendering the app with invalid lang
   if (!["en", "fr"].includes(lang)) {

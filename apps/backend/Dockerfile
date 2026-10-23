@@ -50,6 +50,9 @@ COPY --from=builder /app/packages/contracts ./packages/contracts
 
 WORKDIR /app/apps/backend
 
+# Exécution sans root : le code reste propriété de root, donc non modifiable par le process
+USER node
+
 # Expose port
 EXPOSE 4000
 
