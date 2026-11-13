@@ -56,7 +56,7 @@ services:
       - "traefik.http.routers.whoisit-backend.tls=true"
       - "traefik.http.routers.whoisit-backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.whoisit-backend.loadbalancer.server.port=4000"
-      - "traefik.docker.network=whois-it-whoisit-k32hmg"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-whois-it-whoisit-k32hmg}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -97,7 +97,7 @@ services:
       - "traefik.http.routers.whoisit-frontend.tls=true"
       - "traefik.http.routers.whoisit-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.whoisit-frontend.loadbalancer.server.port=3000"
-      - "traefik.docker.network=whois-it-whoisit-k32hmg"
+      - "traefik.docker.network=${TRAEFIK_NETWORK:-whois-it-whoisit-k32hmg}"
     # Durcissement : FS en lecture seule, /tmp et cache Next non exécutables, aucune capability
     read_only: true
     tmpfs:
@@ -123,6 +123,8 @@ networks:
   # sur le compose) qui y connecte dokploy-traefik à chaque déploiement. On ne rejoint
   # plus dokploy-network, qui donne accès à Dokploy et aux autres services du VPS.
   # Sans l'option, le déploiement échoue (réseau introuvable) au lieu d'exposer l'app.
+  # Le réseau porte le nom de l'appName du compose Dokploy : TRAEFIK_NETWORK doit valoir
+  # cet appName (variable d'environnement du compose dans Dokploy).
   whois-it-whoisit-k32hmg:
-    name: whois-it-whoisit-k32hmg
+    name: ${TRAEFIK_NETWORK:-whois-it-whoisit-k32hmg}
     external: true
